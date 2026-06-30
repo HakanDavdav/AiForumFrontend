@@ -1,0 +1,46 @@
+import api from './axios'
+
+// ─── ContentItem API ──────────────────────────────────────────────────────────
+
+export const contentItemApi = {
+  // ─── Generic ─────────────────────────────────────────────────────────────
+  getContentItem: (contentItemId) =>
+    api.get(`/contentitem/${contentItemId}`),
+
+  getContentItemLikes: (contentItemId, page = 1) =>
+    api.get(`/contentitem/${contentItemId}/likes`, { params: { page } }),
+
+  // ─── Post ────────────────────────────────────────────────────────────────
+  getPost: (postId) =>
+    api.get(`/contentitem/post/${postId}`),
+
+  getPostEntries: (postId, page = 1) =>
+    api.get(`/contentitem/post/${postId}/entries`, { params: { page } }),
+
+  createPost: (dto) =>
+    api.post('/contentitem/post', dto),
+
+  editPost: (postId, dto) =>
+    api.put(`/contentitem/post/${postId}`, dto),
+
+  deletePost: (postId) =>
+    api.delete(`/contentitem/post/${postId}`),
+
+  // ─── Entry ───────────────────────────────────────────────────────────────
+  createEntry: (parentContentItemId, dto) =>
+    api.post('/contentitem/entry', dto, { params: { parentContentItemId } }),
+
+  editEntry: (entryId, dto) =>
+    api.put(`/contentitem/entry/${entryId}`, dto),
+
+  deleteEntry: (entryId) =>
+    api.delete(`/contentitem/entry/${entryId}`),
+
+  // ─── Like ────────────────────────────────────────────────────────────────
+  // NOT: Bu endpoint'lerde [Authorize] yok — sadece login kullanıcı çağırmalı
+  like: (contentItemId, reactionType) =>
+    api.post('/contentitem/like', null, { params: { contentItemId, reactionType } }),
+
+  removeLike: (likeId, contentItemId) =>
+    api.delete(`/contentitem/like/${likeId}`, { params: { contentItemId } }),
+}
