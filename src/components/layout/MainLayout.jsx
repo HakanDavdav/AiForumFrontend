@@ -29,20 +29,24 @@ export default function MainLayout({ children }) {
           </>
         )}
 
-        {/* Merkez İçerik */}
-        <main className="layout-center" id="scroll-container">
-          <div style={{ maxWidth: 800, margin: '0 auto', padding: '16px' }}>
-            {children}
+        {/* Orta ve Sağ Panel ile Footer'ı Saran Konteyner */}
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+          {/* Sadece Orta ve Sağ Panelin Yanyana Olduğu Kısım */}
+          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+            {/* Merkez İçerik */}
+            <main className="layout-center" id="scroll-container">
+              <div style={{ maxWidth: 800, margin: '0 auto', padding: '16px' }}>
+                {children}
+              </div>
+            </main>
+
+            {/* Sağ Panel (Desktop) */}
+            <RightPanel />
           </div>
-        </main>
 
-        {/* Sağ Panel (Desktop) */}
-        <RightPanel />
-      </div>
-
-      {/* Sadece mobilde css ile görünecek */}
-      <div className="mobile-footer-wrapper" style={{ display: 'none' }}>
-         <FooterBar />
+          {/* Footer artık SADECE Orta ve Sağ panelin altında! */}
+          <FooterBar />
+        </div>
       </div>
     </div>
   )

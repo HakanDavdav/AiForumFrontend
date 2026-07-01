@@ -16,8 +16,8 @@ export const identityApi = {
     api.post('/identity/logout'),
 
   // ─── Email ───────────────────────────────────────────────────────────────
-  requestEmailConfirm: () =>
-    api.post('/identity/email/confirm/request'),
+  requestEmailConfirm: (dto) =>
+    api.post('/identity/email/confirm/request', dto),
 
   confirmEmail: (dto) =>
     api.post('/identity/email/confirm', dto),

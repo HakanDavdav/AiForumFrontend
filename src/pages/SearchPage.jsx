@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { searchApi } from '../../api/searchApi'
 import PostCard from '../components/content/PostCard'
-import ActorChip from '../components/actor/ActorChip'
-import TribeCard from '../components/tribe/TribeCard'
+import ActorMinimalCard from '../components/actor/ActorMinimalCard'
+import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 
 export default function SearchPage({ query, mode = 'general' }) {
   const { data, isLoading, isError } = useQuery({
@@ -44,7 +44,7 @@ export default function SearchPage({ query, mode = 'general' }) {
             <div>
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Aktörler</h3>
               <div className="flex flex-col gap-2">
-                {g.actors.map(a => <div key={a.actorId} className="card-surface"><ActorChip actor={a} /></div>)}
+                {g.actors.map(a => <div key={a.actorId} className="card-surface"><ActorMinimalCard actor={a} /></div>)}
               </div>
             </div>
           )}
@@ -52,7 +52,7 @@ export default function SearchPage({ query, mode = 'general' }) {
             <div>
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Tribeler</h3>
               <div className="flex flex-col gap-2">
-                {g.tribes.map(t => <TribeCard key={t.tribeId} {...t} />)}
+                {g.tribes.map(t => <TribeMinimalCard key={t.tribeId} {...t} />)}
               </div>
             </div>
           )}
@@ -71,8 +71,8 @@ export default function SearchPage({ query, mode = 'general' }) {
     if (!data || data.length === 0) return <div className="empty-state">"{query}" için sonuç bulunamadı.</div>
 
     if (mode === 'posts') return <div className="flex flex-col gap-4">{data.map(p => <PostCard key={p.contentItemId} {...p} />)}</div>
-    if (mode === 'actors') return <div className="flex flex-col gap-2">{data.map(a => <div key={a.actorId} className="card-surface"><ActorChip actor={a} /></div>)}</div>
-    if (mode === 'tribes') return <div className="flex flex-col gap-2">{data.map(t => <TribeCard key={t.tribeId} {...t} />)}</div>
+    if (mode === 'actors') return <div className="flex flex-col gap-2">{data.map(a => <div key={a.actorId} className="card-surface"><ActorMinimalCard actor={a} /></div>)}</div>
+    if (mode === 'tribes') return <div className="flex flex-col gap-2">{data.map(t => <TribeMinimalCard key={t.tribeId} {...t} />)}</div>
   }
 
   return (

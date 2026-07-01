@@ -1,29 +1,39 @@
 import { useState, useRef, useEffect } from 'react'
-import { Search, Settings, User, ChevronDown, Menu, Bell, LogOut } from 'lucide-react'
+import { Search, Settings, User, ChevronDown, Menu, Bell, LogOut, PenLine } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { tribeApi } from '../../api/tribeApi'
-import { identityApi } from '../../api/identityApi'
 import { searchApi } from '../../api/searchApi'
+import { actorApi } from '../../api/actorApi'
+import { identityApi } from '../../api/identityApi'
 import { OrderType, OrderTypeLabels } from '../../constants/enums'
-import TribeCard from '../tribe/TribeCard'
+import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import ActorAvatar from '../actor/ActorAvatar'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 
 export default function TopBar({ currentUser }) {
   const { isLoggedIn, logout: storeLogout } = useAuthStore()
-  const { setCenterView, setSearchMode, searchMode, toggleLeftDrawer } = useUIStore()
+  const { setCenterView, setSearchMode, searchMode, toggleLeftDrawer, activeLeftCacheType, setActiveLeftCacheType } = useUIStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [isMyTribesOpen, setIsMyTribesOpen] = useState(false)
   const [searchModeDropdown, setSearchModeDropdown] = useState(false)
+  const [isMyBotsOpen, setIsMyBotsOpen] = useState(false)
   const queryClient = useQueryClient()
   const myTribesRef = useRef(null)
+  const myBotsRef = useRef(null)
 
   // My Tribes dropdown
   const { data: myTribes } = useQuery({
     queryKey: ['my-tribes'],
     queryFn: () => tribeApi.getMyTribes().then((r) => r.data?.data || []),
+    enabled: isLoggedIn,
+  })
+
+  // My Bots dropdown
+  const { data: myBots } = useQuery({
+    queryKey: ['my-bots'],
+    queryFn: () => actorApi.getMyBots().then((r) => r.data?.data || []),
     enabled: isLoggedIn,
   })
 
@@ -40,6 +50,9 @@ export default function TopBar({ currentUser }) {
     const handler = (e) => {
       if (myTribesRef.current && !myTribesRef.current.contains(e.target)) {
         setIsMyTribesOpen(false)
+      }
+      if (myBotsRef.current && !myBotsRef.current.contains(e.target)) {
+        setIsMyBotsOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -218,16 +231,16 @@ export default function TopBar({ currentUser }) {
         }}
       >
         {/* Cache buttons */}
-        <button className="btn btn-ghost btn-sm" onClick={() => setCenterView('feed', { cacheType: 'trending' })}>
+        <button className={`btn btn-sm ${activeLeftCacheType === 'trending' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveLeftCacheType('trending')}>
           🔥 Trend
         </button>
-        <button className="btn btn-ghost btn-sm" onClick={() => setCenterView('feed', { cacheType: 'recent' })}>
+        <button className={`btn btn-sm ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveLeftCacheType('recent')}>
           🕐 Son Konular
         </button>
-        <button className="btn btn-ghost btn-sm" onClick={() => setCenterView('feed', { cacheType: 'mostLiked' })}>
+        <button className={`btn btn-sm ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveLeftCacheType('mostLiked')}>
           ❤ En Çok Beğenilen
         </button>
-        <button className="btn btn-ghost btn-sm" onClick={() => setCenterView('feed', { cacheType: 'mostDisliked' })}>
+        <button className={`btn btn-sm ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActiveLeftCacheType('mostDisliked')}>
           💀 En Çok Beğenilmeyen
         </button>
 
@@ -241,46 +254,124 @@ export default function TopBar({ currentUser }) {
           👑 Aktör Sıralaması
         </button>
 
-        {/* My Tribes dropdown */}
+        {/* My Tribes & My Bots dropdowns */}
         {isLoggedIn && (
-          <div style={{ position: 'relative', marginLeft: 4 }} ref={myTribesRef}>
-            <button
-              className="btn btn-outline btn-sm"
-              onClick={() => setIsMyTribesOpen((v) => !v)}
-            >
-              Tribe'larım <ChevronDown size={12} />
-            </button>
-            <AnimatePresence>
-              {isMyTribesOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  style={{
-                    position: 'absolute', top: '100%', left: 0, marginTop: 4,
-                    background: 'var(--color-bg)', border: '1px solid var(--color-border)',
-                    borderRadius: 12, boxShadow: 'var(--shadow-lg)', zIndex: 200,
-                    minWidth: 220, maxHeight: 320, overflowY: 'auto', padding: 8,
-                  }}
-                >
-                  <button
-                    className="btn btn-primary btn-sm"
-                    style={{ width: '100%', marginBottom: 8 }}
-                    onClick={() => { setCenterView('create-tribe'); setIsMyTribesOpen(false) }}
+          <div style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
+            {/* My Tribes */}
+            <div style={{ position: 'relative' }} ref={myTribesRef}>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => {
+                  setIsMyTribesOpen((v) => !v)
+                  setIsMyBotsOpen(false)
+                }}
+              >
+                Tribe'larım <ChevronDown size={12} />
+              </button>
+              <AnimatePresence>
+                {isMyTribesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{
+                      position: 'absolute', top: '100%', left: 0, marginTop: 4,
+                      background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+                      borderRadius: 12, boxShadow: 'var(--shadow-lg)', zIndex: 200,
+                      minWidth: 220, maxHeight: 320, overflowY: 'auto', padding: 8,
+                    }}
                   >
-                    + Yeni Tribe Oluştur
-                  </button>
-                  {myTribes?.map((t) => (
-                    <div key={t.tribeId} onClick={() => { setCenterView('tribe', { tribeId: t.tribeId }); setIsMyTribesOpen(false) }}>
-                      <TribeCard {...t} />
-                    </div>
-                  ))}
-                  {(!myTribes || myTribes.length === 0) && (
-                    <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>Henüz tribe yok</p>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      style={{ width: '100%', marginBottom: 8 }}
+                      onClick={() => { setCenterView('create-tribe'); setIsMyTribesOpen(false) }}
+                    >
+                      + Yeni Tribe Oluştur
+                    </button>
+                    {myTribes?.map((t) => (
+                      <div key={t.tribeId} style={{ display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0' }}>
+                        <div style={{ flex: 1 }} onClick={() => { setCenterView('tribe', { tribeId: t.tribeId }); setIsMyTribesOpen(false) }}>
+                          <TribeMinimalCard {...t} />
+                        </div>
+                        <button 
+                          className="btn btn-ghost btn-sm" 
+                          style={{ padding: 6 }} 
+                          title="Tribe Düzenle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCenterView('tribeSettings', { tribeId: t.tribeId });
+                            setIsMyTribesOpen(false);
+                          }}
+                        >
+                          <PenLine size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {(!myTribes || myTribes.length === 0) && (
+                      <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>Henüz tribe yok</p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* My Bots */}
+            <div style={{ position: 'relative' }} ref={myBotsRef}>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => {
+                  setIsMyBotsOpen((v) => !v)
+                  setIsMyTribesOpen(false)
+                }}
+              >
+                Botlarım <ChevronDown size={12} />
+              </button>
+              <AnimatePresence>
+                {isMyBotsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{
+                      position: 'absolute', top: '100%', left: 0, marginTop: 4,
+                      background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+                      borderRadius: 12, boxShadow: 'var(--shadow-lg)', zIndex: 200,
+                      minWidth: 220, maxHeight: 320, overflowY: 'auto', padding: 8,
+                    }}
+                  >
+                    <button
+                      className="btn btn-primary btn-sm"
+                      style={{ width: '100%', marginBottom: 8 }}
+                      onClick={() => { setCenterView('create-bot'); setIsMyBotsOpen(false) }}
+                    >
+                      + Yeni Bot Üret
+                    </button>
+                    {myBots?.map((b) => (
+                      <div key={b.actorId} style={{ display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0' }}>
+                        <div className="card-surface" style={{ flex: 1, padding: 6, cursor: 'pointer' }} onClick={() => { setCenterView('profile', { actorId: b.actorId }); setIsMyBotsOpen(false) }}>
+                          <ActorMinimalCard actor={b} clickable={false} showHierarchyBtn={false} />
+                        </div>
+                        <button 
+                          className="btn btn-ghost btn-sm" 
+                          style={{ padding: 6 }} 
+                          title="Bot Düzenle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCenterView('create-bot', { botId: b.actorId });
+                            setIsMyBotsOpen(false);
+                          }}
+                        >
+                          <PenLine size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {(!myBots || myBots.length === 0) && (
+                      <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>Henüz bot yok</p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         )}
       </div>

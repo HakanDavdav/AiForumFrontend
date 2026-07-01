@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { LogOut, UserPlus, Settings } from 'lucide-react'
+import { LogOut, UserPlus, Settings, ArrowLeft } from 'lucide-react'
 import { tribeApi } from '../../api/tribeApi'
-import TribeCard from '../components/tribe/TribeCard'
+import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import ActorAvatar from '../components/actor/ActorAvatar'
-import ActorChip from '../components/actor/ActorChip'
+import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 
 export default function TribePage({ tribeId }) {
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
-  const { setCenterView } = useUIStore()
+  const { setCenterView, goBack } = useUIStore()
   const queryClient = useQueryClient()
 
   const { data: tribe, isLoading } = useQuery({
@@ -36,11 +36,17 @@ export default function TribePage({ tribeId }) {
 
   return (
     <div className="flex-col gap-4">
+      <div className="flex items-center gap-3 px-2">
+        <button className="btn-icon" onClick={goBack}>
+          <ArrowLeft size={18} />
+        </button>
+      </div>
+
       {/* ─── Tribe Header ─── */}
       <div className="card-surface" style={{ position: 'relative' }}>
         <div className="flex gap-4">
           <div style={{ width: 80, height: 80, flexShrink: 0 }}>
-             <TribeCard 
+             <TribeMinimalCard 
                tribeId={tribe.tribeId} 
                tribeName={tribe.tribeName} 
                imageUrl={tribe.imageUrl} 
@@ -72,7 +78,10 @@ export default function TribePage({ tribeId }) {
                   </button>
                 )}
                 {isLoggedIn && isLeader && (
-                  <button className="btn btn-outline btn-sm">
+                  <button 
+                    className="btn btn-outline btn-sm"
+                    onClick={() => setCenterView('tribeSettings', { tribeId })}
+                  >
                     <Settings size={14} /> Yönetim
                   </button>
                 )}
@@ -108,7 +117,7 @@ export default function TribePage({ tribeId }) {
         ) : (
           tribe.membershipList?.map(member => (
             <div key={member.actorId} className="card-surface flex items-center justify-between" style={{ padding: '8px 12px' }}>
-              <ActorChip actor={member} />
+              <ActorMinimalCard actor={member} />
               <div className="flex items-center gap-4">
                 <span className="badge" style={{ background: 'var(--color-surface-3)', color: 'var(--color-text-secondary)' }}>
                   {member.actorRole?.roleName || 'Üye'}

@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft } from 'lucide-react'
+import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
 import { contentItemApi } from '../../api/contentItemApi'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
@@ -10,6 +11,7 @@ import useAuthStore from '../../store/authStore'
 export default function PostDetailPage({ postId }) {
   const { restorePreviousCenterView } = useUIStore()
   const { isLoggedIn } = useAuthStore()
+  const queryClient = useQueryClient()
 
   const { data: postData, isLoading: isPostLoading } = useQuery({
     queryKey: ['post', postId],
@@ -17,11 +19,22 @@ export default function PostDetailPage({ postId }) {
     enabled: !!postId,
   })
 
-  // Şimdilik page 1, paginasyon sonra eklenebilir
-  const { data: entriesData, isLoading: isEntriesLoading } = useQuery({
-    queryKey: ['post-entries', postId, 1],
-    queryFn: () => contentItemApi.getPostEntries(postId, 1).then(r => r.data?.data || []),
-    enabled: !!postId,
+  const [page, setPage] = useState(1)
+  
+  // Backend'den perPage gelmediği için, page=1'deki data uzunluğuna bakarak limiti çıkarıyoruz.
+  const [inferredPerPage, setInferredPerPage] = useState(20)
+
+  const { data: entriesData, isLoading: isEntriesLoading, isFetching: isEntriesFetching } = useQuery({
+    queryKey: ['post-entries', postId, page],
+    queryFn: () => contentItemApi.getPostEntries(postId, page).then(r => {
+      const data = r.data?.data || []
+      // Sadece 1. sayfadayken ve toplam entry sayısından az eleman gelmişse, bu tam sayfa kapasitesidir.
+      if (page === 1 && postData && postData.entryCount > data.length) {
+        setInferredPerPage(data.length)
+      }
+      return data
+    }),
+    enabled: !!postId && !!postData,
   })
 
   if (isPostLoading || isEntriesLoading) {
@@ -59,7 +72,11 @@ export default function PostDetailPage({ postId }) {
           </h3>
           <EntryDraft 
             parentContentItemId={postId} 
-            queryKey={['post-entries', postId, 1]} 
+            onSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ['post-entries', postId] })
+              queryClient.invalidateQueries({ queryKey: ['post', postId] })
+              setPage(1) // Reset to first page to see the new entry
+            }}
           />
         </div>
       )}
@@ -77,9 +94,40 @@ export default function PostDetailPage({ postId }) {
             <EntryCard 
               key={entry.contentItemId} 
               {...entry} 
-              queryKey={['post-entries', postId, 1]}
+              queryKey={['post-entries', postId, page]}
             />
           ))
+        )}
+
+        {/* Pagination Controls */}
+        {postData.entryCount > inferredPerPage && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            marginTop: 24,
+            paddingTop: 16,
+            borderTop: '1px solid var(--color-border)'
+          }}>
+            <button
+              className="btn btn-outline btn-sm"
+              disabled={page === 1 || isEntriesFetching}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+            >
+              <ChevronLeft size={16} /> Önceki
+            </button>
+            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+              Sayfa {page} / {Math.max(1, Math.ceil((postData.entryCount || 0) / inferredPerPage))}
+            </span>
+            <button
+              className="btn btn-outline btn-sm"
+              disabled={page >= Math.ceil((postData.entryCount || 0) / inferredPerPage) || isEntriesFetching}
+              onClick={() => setPage(p => p + 1)}
+            >
+              Sonraki <ChevronRight size={16} />
+            </button>
+          </div>
         )}
       </div>
     </div>

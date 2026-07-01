@@ -2,55 +2,64 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../../api/identityApi'
 import useUIStore from '../../../store/uiStore'
+import TokenModal from '../../../components/auth/TokenModal'
 
 export default function RegisterPage() {
   const { setCenterView } = useUIStore()
 
+  // Form states
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(false)
 
+  const [isConfirming, setIsConfirming] = useState(false)
+
+  // 1. Register Mutation
   const registerMutation = useMutation({
     mutationFn: (data) => identityApi.register(data),
     onSuccess: () => {
-      setSuccess(true)
+      // Register başarılı olduğunda, zincirleme (chain) email gönderim isteğini tetikliyoruz
+      requestEmailConfirmMutation.mutate({ emailOrUsername: email })
     },
     onError: (err) => {
+      // Backend'den gelen "Wait 30 seconds max" gibi hatalar burada gösterilir
       setError(err.message || 'Kayıt işlemi başarısız.')
     }
   })
 
-  const handleSubmit = (e) => {
+  // 2. Zincirleme Email İstek Mutation (Register'dan hemen sonra)
+  const requestEmailConfirmMutation = useMutation({
+    mutationFn: (data) => identityApi.requestEmailConfirm(data),
+    onSuccess: () => {
+      // Onay modalını aç
+      setIsConfirming(true)
+    },
+    onError: (err) => {
+      setError(err.message || 'Onay kodu gönderilirken hata oluştu.')
+    }
+  })
+
+  const handleTimeout = () => {
+    setIsConfirming(false)
+    setError('Süreniz doldu (30 saniye). Lütfen tekrar deneyin.')
+  }
+
+  const handleRegisterSubmit = (e) => {
     e.preventDefault()
     setError(null)
     registerMutation.mutate({ username, email, password })
   }
 
-  if (success) {
-    return (
-      <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32, textAlign: 'center' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>Aramıza Hoş Geldiniz!</h2>
-        <p className="text-muted" style={{ marginBottom: 24 }}>
-          Kayıt işleminiz başarıyla tamamlandı. E-posta adresinize gönderilen aktivasyon bağlantısına tıklayarak hesabınızı onaylayabilirsiniz.
-        </p>
-        <button className="btn btn-primary w-full" onClick={() => setCenterView('login')}>
-          Giriş Yap
-        </button>
-      </div>
-    )
-  }
-
   return (
-    <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
-      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>Hesap Oluştur</h2>
-      <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
-        AiForum topluluğuna katılın.
-      </p>
+    <>
+      <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>Hesap Oluştur</h2>
+        <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
+          AiForum topluluğuna katılın.
+        </p>
 
-      <form onSubmit={handleSubmit} className="flex-col gap-4">
+        <form onSubmit={handleRegisterSubmit} className="flex-col gap-4">
         <div className="form-group">
           <label className="form-label">Kullanıcı Adı</label>
           <input 
@@ -91,10 +100,10 @@ export default function RegisterPage() {
         <button 
           type="submit" 
           className="btn btn-primary w-full"
-          disabled={registerMutation.isPending}
+          disabled={registerMutation.isPending || requestEmailConfirmMutation.isPending}
           style={{ marginTop: 8 }}
         >
-          {registerMutation.isPending ? 'Kayıt Olunuyor...' : 'Kayıt Ol'}
+          {registerMutation.isPending || requestEmailConfirmMutation.isPending ? 'İşleniyor...' : 'Kayıt Ol'}
         </button>
       </form>
 
@@ -102,5 +111,13 @@ export default function RegisterPage() {
         Zaten hesabınız var mı? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => setCenterView('login')}>Giriş Yap</button>
       </div>
     </div>
+
+    <TokenModal 
+      isOpen={isConfirming} 
+      email={email}
+      onTimeout={handleTimeout}
+      onSuccess={() => setIsConfirming(false)}
+    />
+  </>
   )
 }

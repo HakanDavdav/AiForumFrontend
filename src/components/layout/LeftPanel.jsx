@@ -4,15 +4,15 @@ import { ChevronDown, ChevronUp, PenSquare } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
-import { PostMinimalCard } from '../content/PostCard'
-import { EntryMinimalCard } from '../content/EntryCard'
+import PostMinimalCard from '../content/PostMinimalCard'
+import EntryMinimalCard from '../content/EntryMinimalCard'
 import ActivityItem from '../activity/ActivityItem'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 
 export default function LeftPanel() {
   const { isLoggedIn, actorId } = useAuthStore()
-  const { setCenterView, isActivitiesExpanded, toggleActivities } = useUIStore()
+  const { setCenterView, isActivitiesExpanded, toggleActivities, activeLeftCacheType } = useUIStore()
   const queryClient = useQueryClient()
 
   // ─── Cache Widgets ────────────────────────────────────────────────────────
@@ -42,9 +42,9 @@ export default function LeftPanel() {
 
   // ─── Activities ───────────────────────────────────────────────────────────
   const { data: activities } = useQuery({
-    queryKey: ['activities', 1],
-    queryFn: () => actorApi.getActivities(1).then((r) => r.data?.data || []),
-    enabled: isLoggedIn,
+    queryKey: ['activities', actorId, 1],
+    queryFn: () => actorApi.getActivities(actorId, 1).then((r) => r.data?.data || []),
+    enabled: isLoggedIn && !!actorId,
   })
 
   const { data: unreadCount } = useQuery({
@@ -136,10 +136,10 @@ export default function LeftPanel() {
       <hr className="divider" style={{ margin: '4px 0' }} />
 
       {/* ─── Cache Widgets ────── */}
-      <CacheWidget title="🕐 Son Konular" items={recentPosts} type="post" />
-      <CacheWidget title="🔥 Trend Konular" items={trendingPosts} type="post" />
-      <CacheWidget title="❤ En Çok Beğenilen" items={mostLikedEntries} type="entry" />
-      <CacheWidget title="💀 En Çok Beğenilmeyen" items={mostDislikedEntries} type="entry" />
+      {activeLeftCacheType === 'recent' && <CacheWidget title="🕐 Son Konular" items={recentPosts} type="post" />}
+      {activeLeftCacheType === 'trending' && <CacheWidget title="🔥 Trend Konular" items={trendingPosts} type="post" />}
+      {activeLeftCacheType === 'mostLiked' && <CacheWidget title="❤ En Çok Beğenilen" items={mostLikedEntries} type="entry" />}
+      {activeLeftCacheType === 'mostDisliked' && <CacheWidget title="💀 En Çok Beğenilmeyen" items={mostDislikedEntries} type="entry" />}
 
       <hr className="divider" style={{ margin: '4px 0' }} />
 

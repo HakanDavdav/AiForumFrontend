@@ -5,14 +5,42 @@ import PostCard from '../components/content/PostCard'
 import useUIStore from '../../store/uiStore'
 
 export default function FeedPage({ cacheType = 'recent' }) {
-  // FeedPage'de ya "Son Konular" ya da "Trend Konular" gösterilir
-  // (Beğenilen/Beğenilmeyen Entry'ler genelde yan barlarda kompakt olarak gösterilir, ama buraya da eklenebilir)
+  // cacheType üzerinden uygun API fonksiyonunu, başlığı ve alt başlığı belirliyoruz
+  const getFeedConfig = () => {
+    switch (cacheType) {
+      case 'trending':
+        return {
+          queryFn: () => searchApi.getTrendingPosts(),
+          title: '🔥 Trend Konular',
+          description: 'Şu an platformda en çok konuşulanlar'
+        }
+      case 'mostLiked':
+        return {
+          queryFn: () => searchApi.getMostLikedEntries(),
+          title: '❤ En Çok Beğenilenler',
+          description: 'Platformda en fazla beğeni toplayan içerikler'
+        }
+      case 'mostDisliked':
+        return {
+          queryFn: () => searchApi.getMostDislikedEntries(),
+          title: '💀 En Çok Beğenilmeyenler',
+          description: 'Platformda en çok tepki çeken içerikler'
+        }
+      case 'recent':
+      default:
+        return {
+          queryFn: () => searchApi.getRecentPosts(),
+          title: '🕐 Son Eklenenler',
+          description: 'Platformdaki en güncel konular'
+        }
+    }
+  }
 
-  const isTrending = cacheType === 'trending'
+  const { queryFn, title, description } = getFeedConfig()
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['feed', isTrending ? 'trending' : 'recent'],
-    queryFn: () => isTrending ? searchApi.getTrendingPosts() : searchApi.getRecentPosts(),
+    queryKey: ['feed', cacheType],
+    queryFn: queryFn,
     select: parseCacheResponse,
   })
 
@@ -29,23 +57,20 @@ export default function FeedPage({ cacheType = 'recent' }) {
   }
 
   if (!data || data.length === 0) {
-    return <div className="empty-state">Henüz hiç gönderi yok.</div>
+    return <div className="empty-state">Henüz hiç içerik yok.</div>
   }
 
   return (
     <div className="flex-col gap-4">
       <div style={{ padding: '0 8px 16px', borderBottom: '1px solid var(--color-border)' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>
-          {isTrending ? '🔥 Trend Konular' : '🕐 Son Eklenenler'}
-        </h1>
-        <p className="text-muted">
-          {isTrending ? 'Şu an platformda en çok konuşulanlar' : 'Platformdaki en güncel konular'}
-        </p>
+        <h1 style={{ fontSize: 24, fontWeight: 800 }}>{title}</h1>
+        <p className="text-muted">{description}</p>
       </div>
 
       <div className="flex-col gap-4" style={{ marginTop: 16 }}>
-        {data.map((post) => (
-          <PostCard key={post.contentItemId} {...post} />
+        {data.map((item) => (
+          // Backend'den Entry olarak da gelse, sistem title kazandırıp Post gibi simüle ettiği için PostCard kullanabiliyoruz
+          <PostCard key={item.contentItemId} {...item} />
         ))}
       </div>
     </div>

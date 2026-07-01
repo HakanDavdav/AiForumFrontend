@@ -3,7 +3,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { Pencil, Trash2, MessageSquare } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import ActorChip from '../actor/ActorChip'
+import ActorMinimalCard from '../actor/ActorMinimalCard'
 import ReactionButton from './ReactionButton'
 import LikeListModal from './LikeListModal'
 import EntryDraft from './EntryDraft'
@@ -27,12 +27,16 @@ export default function EntryCard({
   isOwner = false,
   onDelete,
   onEdit,
-  queryKey,  // invalidation için
+  queryKey, // invalidation için
 }) {
   const [showReplyDraft, setShowReplyDraft] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
+  const setCenterView = useUIStore((s) => s.setCenterView)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
+  const loggedInActorId = useAuthStore((s) => s.actorId)
   const queryClient = useQueryClient()
+
+  const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
 
   const deleteMutation = useMutation({
     mutationFn: () => contentItemApi.deleteEntry(contentItemId),
@@ -66,29 +70,26 @@ export default function EntryCard({
             ❤ {likeCount ?? 0}
           </button>
           {isLoggedIn && (
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => setShowReplyDraft((v) => !v)}
-            >
+            <button className="btn btn-ghost btn-sm" onClick={() => setShowReplyDraft((v) => !v)}>
               <MessageSquare size={13} />
               Cevapla
             </button>
           )}
         </div>
 
-        {/* Sağ: ActorChip + zaman + owner actions */}
+        {/* Sağ: ActorMinimalCard + zaman + owner actions */}
         <div className="flex items-center gap-2">
           <span className="text-muted">{timeAgo}</span>
-          <ActorChip actor={actor} showHierarchyBtn={false} />
-          {isOwner && (
+          <ActorMinimalCard actor={actor} showHierarchyBtn={false} />
+          {isOwnerInternal && (
             <div className="flex items-center gap-1">
-              <button className="btn-icon" onClick={onEdit} title="Düzenle">
+              <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit ? onEdit() : setCenterView('edit-entry', { entryId: contentItemId }) }} title="Düzenle">
                 <Pencil size={13} />
               </button>
               <button
                 className="btn-icon"
                 style={{ color: 'var(--color-error)' }}
-                onClick={() => deleteMutation.mutate()}
+                onClick={(e) => { e.stopPropagation(); deleteMutation.mutate() }}
                 title="Sil"
               >
                 <Trash2 size={13} />
@@ -117,23 +118,6 @@ export default function EntryCard({
           onClose={() => setShowLikes(false)}
         />
       )}
-    </div>
-  )
-}
-
-// ─── EntryMinimalCard ─────────────────────────────────────────────────────────
-
-export function EntryMinimalCard({ contentItemId, likeCount }) {
-  const setCenterView = useUIStore((s) => s.setCenterView)
-  return (
-    <div
-      className="post-minimal-card"
-      onClick={() => setCenterView('entry', { contentItemId })}
-    >
-      <span className="post-minimal-title text-muted" style={{ fontStyle: 'italic' }}>
-        #{contentItemId?.slice(0, 8)}
-      </span>
-      <span className="post-minimal-count">❤ {likeCount ?? 0}</span>
     </div>
   )
 }

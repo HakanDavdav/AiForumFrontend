@@ -37,8 +37,8 @@ export const actorApi = {
     api.delete(`/actor/unfollow/${actorId}`),
 
   // ─── Activities ──────────────────────────────────────────────────────────
-  getActivities: (page = 1) =>
-    api.get('/actor/activities', { params: { page } }),
+  getActivities: (actorId, page = 1) =>
+    api.get('/actor/activities', { params: { actorId, page } }),
 
   getUnreadActivityCount: () =>
     api.get('/actor/activities/unread-count'),
@@ -59,4 +59,8 @@ export const actorApi = {
   // ─── User Profile Edit ───────────────────────────────────────────────────
   editUser: (dto) =>
     api.put('/actor/edit-user', dto),
+
+  // ─── My Bots ─────────────────────────────────────────────────────────────
+  getMyBots: () =>
+    api.get('/actor/my-bots'),
 }

@@ -1,19 +1,29 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Network, Search, Filter } from 'lucide-react'
+import { Network, Search, Filter, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
-import ActorChip from '../components/actor/ActorChip'
-import TribeCard from '../components/tribe/TribeCard'
+import ActorMinimalCard from '../components/actor/ActorMinimalCard'
+import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
+import FollowListModal from '../components/profile/FollowListModal'
+import ProfileLikesModal from '../components/profile/ProfileLikesModal'
+import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 
 export default function ProfilePage({ actorId }) {
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
-  const { setCenterView } = useUIStore()
-  const [activeTab, setActiveTab] = useState('posts')
+  const { setCenterView, goBack } = useUIStore()
+  const [activeTab, setActiveTab] = useState('bots')
+  const [postsPage, setPostsPage] = useState(1)
+  const [entriesPage, setEntriesPage] = useState(1)
+  const inferredPerPage = 5
+  
+  // FollowListModal state
+  const [followModalConfig, setFollowModalConfig] = useState({ isOpen: false, type: 'followers' })
+  const [likesModalOpen, setLikesModalOpen] = useState(false)
 
   const isOwnProfile = actorId === currentUserId
 
@@ -23,16 +33,16 @@ export default function ProfilePage({ actorId }) {
     enabled: !!actorId,
   })
 
-  // Tabs lazy loading
-  const { data: postsData, isLoading: isPostsLoading } = useQuery({
-    queryKey: ['profile-posts', actorId],
-    queryFn: () => actorApi.getProfilePosts(actorId, 1).then(r => r.data?.data || []),
+  // Tabs lazy loading & pagination
+  const { data: postsData, isLoading: isPostsLoading, isFetching: isPostsFetching } = useQuery({
+    queryKey: ['profile-posts', actorId, postsPage],
+    queryFn: () => actorApi.getProfilePosts(actorId, postsPage).then(r => r.data?.data || []),
     enabled: !!actorId && activeTab === 'posts',
   })
 
-  const { data: entriesData, isLoading: isEntriesLoading } = useQuery({
-    queryKey: ['profile-entries', actorId],
-    queryFn: () => actorApi.getProfileEntries(actorId, 1).then(r => r.data?.data || []),
+  const { data: entriesData, isLoading: isEntriesLoading, isFetching: isEntriesFetching } = useQuery({
+    queryKey: ['profile-entries', actorId, entriesPage],
+    queryFn: () => actorApi.getProfileEntries(actorId, entriesPage).then(r => r.data?.data || []),
     enabled: !!actorId && activeTab === 'entries',
   })
 
@@ -41,6 +51,12 @@ export default function ProfilePage({ actorId }) {
 
   return (
     <div className="flex-col gap-4">
+      <div className="flex items-center gap-3 px-2">
+        <button className="btn-icon" onClick={goBack}>
+          <ArrowLeft size={18} />
+        </button>
+      </div>
+
       {/* ─── Profile Header ─── */}
       <div className="card-surface" style={{ position: 'relative' }}>
         <div className="flex gap-4">
@@ -84,15 +100,31 @@ export default function ProfilePage({ actorId }) {
             </p>
 
             <div className="flex items-center gap-6" style={{ marginTop: 16 }}>
+              <div 
+                className="flex-col" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => setLikesModalOpen(true)}
+              >
+                <span style={{ fontSize: 20, fontWeight: 700 }}>{profile.likeCount ?? 0}</span>
+                <span className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reaksiyon</span>
+              </div>
               <div className="flex-col">
                 <span style={{ fontSize: 20, fontWeight: 700 }}>{profile.actorPoint?.toLocaleString('tr-TR') ?? 0}</span>
                 <span className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Puan</span>
               </div>
-              <div className="flex-col">
+              <div 
+                className="flex-col" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => setFollowModalConfig({ isOpen: true, type: 'followers' })}
+              >
                 <span style={{ fontSize: 20, fontWeight: 700 }}>{profile.followerCount ?? 0}</span>
                 <span className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Takipçi</span>
               </div>
-              <div className="flex-col">
+              <div 
+                className="flex-col" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => setFollowModalConfig({ isOpen: true, type: 'following' })}
+              >
                 <span style={{ fontSize: 20, fontWeight: 700 }}>{profile.followedCount ?? 0}</span>
                 <span className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Takip</span>
               </div>
@@ -101,24 +133,60 @@ export default function ProfilePage({ actorId }) {
         </div>
       </div>
 
-      {/* ─── Tabs ─── */}
-      <div style={{ display: 'flex', gap: 16, borderBottom: '1px solid var(--color-border)' }}>
-        {['posts', 'entries', 'bots', 'tribes'].map(tab => (
-           <button 
-             key={tab}
-             className={`btn btn-ghost`}
-             style={{ 
-               borderRadius: 0, paddingBottom: 12, borderBottom: activeTab === tab ? '2px solid var(--color-primary)' : '2px solid transparent',
-               color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)', fontWeight: activeTab === tab ? 600 : 500
-             }}
-             onClick={() => setActiveTab(tab)}
-           >
-             {tab === 'posts' && 'Konular'}
-             {tab === 'entries' && 'Yanıtlar'}
-             {tab === 'bots' && `Botlar (${profile.botModules?.length ?? 0})`}
-             {tab === 'tribes' && `Tribeler (${profile.tribeModules?.length ?? 0})`}
-           </button>
-        ))}
+      {/* ─── Profile Activities Panel ─── */}
+      <ProfileActivitiesPanel actorId={actorId} />
+
+      {/* ─── Tabs & Pagination ─── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)' }}>
+        <div style={{ display: 'flex', gap: 16 }}>
+          {['posts', 'entries', 'bots', 'tribes'].map(tab => (
+             <button 
+               key={tab}
+               className={`btn btn-ghost`}
+               style={{ 
+                 borderRadius: 0, paddingBottom: 12, borderBottom: activeTab === tab ? '2px solid var(--color-primary)' : '2px solid transparent',
+                 color: activeTab === tab ? 'var(--color-primary)' : 'var(--color-text-muted)', fontWeight: activeTab === tab ? 600 : 500
+               }}
+               onClick={() => setActiveTab(tab)}
+             >
+               {tab === 'posts' && `Konular (${profile.postCount ?? 0})`}
+               {tab === 'entries' && `Yanıtlar (${profile.entryCount ?? 0})`}
+               {tab === 'bots' && `Botlar (${profile.botModules?.length ?? 0})`}
+               {tab === 'tribes' && `Tribeler (${profile.tribeModules?.length ?? 0})`}
+             </button>
+          ))}
+        </div>
+
+        {/* Paging Controls */}
+        {(activeTab === 'posts' || activeTab === 'entries') && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingBottom: 12 }}>
+            <button
+              className="btn btn-outline btn-sm"
+              disabled={(activeTab === 'posts' ? postsPage : entriesPage) === 1 || isPostsFetching || isEntriesFetching}
+              onClick={() => {
+                if (activeTab === 'posts') setPostsPage(p => Math.max(1, p - 1))
+                else setEntriesPage(p => Math.max(1, p - 1))
+              }}
+              style={{ padding: '4px 8px' }}
+            >
+              <ChevronLeft size={14} />
+            </button>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+              Sayfa {activeTab === 'posts' ? postsPage : entriesPage} / {Math.max(1, Math.ceil((activeTab === 'posts' ? (profile.postCount || 0) : (profile.entryCount || 0)) / inferredPerPage))}
+            </span>
+            <button
+              className="btn btn-outline btn-sm"
+              disabled={(activeTab === 'posts' ? postsPage : entriesPage) >= Math.ceil((activeTab === 'posts' ? (profile.postCount || 0) : (profile.entryCount || 0)) / inferredPerPage) || isPostsFetching || isEntriesFetching}
+              onClick={() => {
+                if (activeTab === 'posts') setPostsPage(p => p + 1)
+                else setEntriesPage(p => p + 1)
+              }}
+              style={{ padding: '4px 8px' }}
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ─── Tab Content ─── */}
@@ -139,9 +207,15 @@ export default function ProfilePage({ actorId }) {
           <div className="flex-col gap-2">
             {profile.botModules?.length === 0 ? <p className="empty-state">Hiç botu yok.</p> :
              profile.botModules.map(bot => (
-               <div key={bot.actorId} className="card-surface flex items-center justify-between" style={{ padding: 12 }}>
-                 <ActorChip actor={bot} />
-                 <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-primary)' }}>{bot.actorPoint ?? 0} P</span>
+               <div 
+                 key={bot.actorId} 
+                 className="lb-card" 
+                 style={{ padding: '8px 16px' }}
+               >
+                 <div style={{ flex: 1, minWidth: 0 }}>
+                   <ActorMinimalCard actor={bot} />
+                 </div>
+                 <div className="lb-score">{bot.actorPoint?.toLocaleString('tr-TR') ?? 0} puan</div>
                </div>
              ))}
           </div>
@@ -151,11 +225,24 @@ export default function ProfilePage({ actorId }) {
           <div className="flex-col gap-2">
             {profile.tribeModules?.length === 0 ? <p className="empty-state">Hiçbir tribe üyesi değil.</p> :
              profile.tribeModules.map(tribe => (
-               <TribeCard key={tribe.tribeId} {...tribe} />
+               <TribeMinimalCard key={tribe.tribeId} {...tribe} />
              ))}
           </div>
         )}
       </div>
+
+      <FollowListModal 
+        actorId={actorId}
+        type={followModalConfig.type}
+        isOpen={followModalConfig.isOpen}
+        onClose={() => setFollowModalConfig(prev => ({ ...prev, isOpen: false }))}
+      />
+
+      <ProfileLikesModal
+        actorId={actorId}
+        isOpen={likesModalOpen}
+        onClose={() => setLikesModalOpen(false)}
+      />
     </div>
   )
 }

@@ -1,14 +1,12 @@
+import { useEffect, useRef } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { X } from 'lucide-react'
-import { contentItemApi } from '../../api/contentItemApi'
+import { actorApi } from '../../api/actorApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
-import { ReactionEmojis } from '../../constants/enums'
 
-/**
- * LikeListModal — plan.md Component #17
- * İçeriği beğenenlerin listesi, paginated.
- */
-export default function LikeListModal({ contentItemId, isOpen, onClose }) {
+export default function FollowListModal({ actorId, type, isOpen, onClose }) {
+  // type is 'followers' or 'following'
+  
   const {
     data,
     isLoading,
@@ -16,16 +14,18 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['likes', contentItemId],
+    queryKey: ['follow-list', actorId, type],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await contentItemApi.getContentItemLikes(contentItemId, pageParam)
+      const res = type === 'followers'
+        ? await actorApi.getProfileFollowers(actorId, pageParam)
+        : await actorApi.getProfileFollowing(actorId, pageParam)
       return {
         items: res.data?.data || [],
         nextPage: (res.data?.data?.length === 10) ? pageParam + 1 : undefined,
       }
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
-    enabled: isOpen && !!contentItemId,
+    enabled: isOpen && !!actorId,
   })
 
   // Bütün sayfaların içeriğini tek array'de topla
@@ -51,7 +51,9 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
         style={{ maxWidth: 400, height: '60vh', display: 'flex', flexDirection: 'column' }}
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600 }}>Beğenenler</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 600 }}>
+            {type === 'followers' ? 'Takipçiler' : 'Takip Edilenler'}
+          </h3>
           <button className="btn-icon" onClick={onClose}><X size={18} /></button>
         </div>
 
@@ -64,13 +66,12 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">Henüz beğeni yok</p>
+            <p className="empty-state">Henüz kimse yok.</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {items.map((like) => (
-                <div key={like.likeId} className="card-surface flex items-center justify-between" style={{ padding: 12 }}>
-                  <ActorMinimalCard actor={like.actor} showHierarchyBtn={false} clickable={true} />
-                  <span style={{ fontSize: 18 }}>{ReactionEmojis[like.reactionType]}</span>
+              {items.map((actor) => (
+                <div key={actor.actorId} className="card-surface" style={{ padding: 12 }}>
+                  <ActorMinimalCard actor={actor} showHierarchyBtn={false} clickable={true} />
                 </div>
               ))}
               

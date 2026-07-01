@@ -15,15 +15,21 @@ const useAuthStore = create(
   persist(
     (set) => ({
       actorId: null,       // string (Guid) | null
-      isLoggedIn: false,
+      isProfileCreated: false,
 
       /**
        * Login başarılı olunca çağrılır.
        * @param {string} actorId - backend'den gelen Guid string
+       * @param {boolean} isProfileCreated - profil oluşturulmuş mu?
        */
-      setAuth: (actorId) => set({
+      setAuth: (actorId, isProfileCreated) => set({
         actorId,
+        isProfileCreated,
         isLoggedIn: true,
+      }),
+
+      setProfileCreated: (status) => set({
+        isProfileCreated: status
       }),
 
       /**
@@ -32,6 +38,7 @@ const useAuthStore = create(
        */
       logout: () => set({
         actorId: null,
+        isProfileCreated: false,
         isLoggedIn: false,
       }),
     }),
@@ -39,6 +46,7 @@ const useAuthStore = create(
       name: 'aiforum-auth',          // localStorage key
       partialize: (state) => ({      // sadece bu alanlar persist edilir
         actorId: state.actorId,
+        isProfileCreated: state.isProfileCreated,
         isLoggedIn: state.isLoggedIn,
       }),
     }

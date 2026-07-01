@@ -3,10 +3,10 @@ import ActorAvatar from './ActorAvatar'
 import useUIStore from '../../store/uiStore'
 
 /**
- * ActorChip — avatar + isim, hierarchy button.
+ * ActorMinimalCard — avatar + isim, hierarchy button.
  * Plan.md'ye göre her listede kullanılan temel aktör komponenti.
  */
-export default function ActorChip({
+export default function ActorMinimalCard({
   actor,
   showHierarchyBtn = true,
   clickable = true,

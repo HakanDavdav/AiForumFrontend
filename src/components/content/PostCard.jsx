@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { Pencil, Trash2, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
-import ActorChip from '../actor/ActorChip'
+import ActorMinimalCard from '../actor/ActorMinimalCard'
 import ReactionButton from './ReactionButton'
 import EntryDraft from './EntryDraft'
 import LikeListModal from './LikeListModal'
@@ -34,6 +34,9 @@ export default function PostCard({
   const [showLikes, setShowLikes] = useState(false)
   const setCenterView = useUIStore((s) => s.setCenterView)
   const queryClient = useQueryClient()
+  const loggedInActorId = useAuthStore((s) => s.actorId)
+
+  const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
 
   const deleteMutation = useMutation({
     mutationFn: () => contentItemApi.deletePost(contentItemId),
@@ -54,11 +57,22 @@ export default function PostCard({
   return (
     <article
       className="post-card"
-      style={isSticky ? { position: 'sticky', top: 0, zIndex: 10, borderRadius: 0, borderLeft: 'none', borderRight: 'none' } : {}}
+      style={
+        isSticky
+          ? {
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+              borderRadius: 0,
+              borderLeft: 'none',
+              borderRight: 'none',
+            }
+          : {}
+      }
     >
-      {/* Header: ActorChip + zaman */}
+      {/* Header: ActorMinimalCard + zaman */}
       <div className="flex items-center justify-between">
-        <ActorChip actor={actor} />
+        <ActorMinimalCard actor={actor} />
         <span className="text-muted">{timeAgo}</span>
       </div>
 
@@ -70,7 +84,12 @@ export default function PostCard({
       )}
 
       {/* Title */}
-      <h2 className="post-card-title" onClick={handleTitleClick}>
+      <h2
+        className="post-card-title"
+        onClick={handleTitleClick}
+        style={{ cursor: 'pointer' }}
+        title="Konu detaylarına gitmek için tıklayın"
+      >
         {title || 'Başlıksız'}
       </h2>
 
@@ -90,14 +109,14 @@ export default function PostCard({
           </button>
         </div>
 
-        {isOwner && (
+        {isOwnerInternal && (
           <div className="flex items-center gap-1">
-            <button className="btn-icon" onClick={onEdit} title="Düzenle">
+            <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit ? onEdit() : setCenterView('create-post', { postId: contentItemId }) }} title="Düzenle">
               <Pencil size={14} />
             </button>
             <button
               className="btn-icon"
-              onClick={() => deleteMutation.mutate()}
+              onClick={(e) => { e.stopPropagation(); deleteMutation.mutate() }}
               title="Sil"
               style={{ color: 'var(--color-error)' }}
             >
@@ -115,21 +134,5 @@ export default function PostCard({
         />
       )}
     </article>
-  )
-}
-
-// ─── PostMinimalCard ──────────────────────────────────────────────────────────
-
-export function PostMinimalCard({ contentItemId, title, entryCount }) {
-  const setCenterView = useUIStore((s) => s.setCenterView)
-
-  return (
-    <div
-      className="post-minimal-card"
-      onClick={() => setCenterView('post', { postId: contentItemId })}
-    >
-      <span className="post-minimal-title">{title || 'Başlıksız'}</span>
-      <span className="post-minimal-count">💬 {entryCount ?? 0}</span>
-    </div>
   )
 }
