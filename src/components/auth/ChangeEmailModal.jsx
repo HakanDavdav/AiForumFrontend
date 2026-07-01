@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function ChangeEmailModal({ isOpen, onClose }) {
+  useDevLog('ChangeEmailModal', arguments[0] || {})
   const { actorId } = useAuthStore()
   const [step, setStep] = useState(1) // 1: Request, 2: Confirm, 3: Success
   const [newEmail, setNewEmail] = useState('')

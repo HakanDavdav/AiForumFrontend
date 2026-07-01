@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
-import { contentItemApi } from '../../api/contentItemApi'
+import { contentItemApi } from '../api/contentItemApi'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
 import EntryDraft from '../components/content/EntryDraft'
-import useUIStore from '../../store/uiStore'
-import useAuthStore from '../../store/authStore'
+import useUIStore from '../store/uiStore'
+import useAuthStore from '../store/authStore'
+import useDevLog from '../utils/useDevLog'
 
 export default function PostDetailPage({ postId }) {
+  useDevLog('PostDetailPage', arguments[0] || {})
   const { restorePreviousCenterView } = useUIStore()
   const { isLoggedIn } = useAuthStore()
   const queryClient = useQueryClient()

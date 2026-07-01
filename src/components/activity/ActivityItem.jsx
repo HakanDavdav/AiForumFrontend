@@ -3,12 +3,14 @@ import { tr } from 'date-fns/locale'
 import { CheckCheck } from 'lucide-react'
 import { IdTypes } from '../../constants/enums'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * ActivityItem — plan.md Component #5
  * Bildirim/aktivite öğesi. Okunmamışlar vurgulanır.
  */
 export default function ActivityItem({ activity, onMarkRead }) {
+  useDevLog('ActivityItem', arguments[0] || {})
   const setCenterView = useUIStore((s) => s.setCenterView)
 
   if (!activity) return null

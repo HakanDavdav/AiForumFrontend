@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
+import useDevLog from '../../utils/useDevLog'
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {
+  useDevLog('ForgotPasswordModal', arguments[0] || {})
   // Step: 'request' | 'confirm' | 'success'
   const [step, setStep] = useState('request')
   

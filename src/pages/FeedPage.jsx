@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { searchApi, parseCacheResponse } from '../../api/searchApi'
+import { searchApi, parseCacheResponse } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
-import useUIStore from '../../store/uiStore'
+import useUIStore from '../store/uiStore'
+import useDevLog from '../utils/useDevLog'
 
 export default function FeedPage({ cacheType = 'recent' }) {
+  useDevLog('FeedPage', arguments[0] || {})
   // cacheType üzerinden uygun API fonksiyonunu, başlığı ve alt başlığı belirliyoruz
   const getFeedConfig = () => {
     switch (cacheType) {

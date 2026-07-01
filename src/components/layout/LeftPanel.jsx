@@ -9,8 +9,10 @@ import EntryMinimalCard from '../content/EntryMinimalCard'
 import ActivityItem from '../activity/ActivityItem'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function LeftPanel() {
+  useDevLog('LeftPanel', arguments[0] || {})
   const { isLoggedIn, actorId } = useAuthStore()
   const { setCenterView, isActivitiesExpanded, toggleActivities, activeLeftCacheType } = useUIStore()
   const queryClient = useQueryClient()

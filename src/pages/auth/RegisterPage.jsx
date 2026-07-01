@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { identityApi } from '../../../api/identityApi'
-import useUIStore from '../../../store/uiStore'
-import TokenModal from '../../../components/auth/TokenModal'
+import { identityApi } from '../../api/identityApi'
+import useUIStore from '../../store/uiStore'
+import TokenModal from '../../components/auth/TokenModal'
+import useDevLog from '../../utils/useDevLog'
 
 export default function RegisterPage() {
+  useDevLog('RegisterPage', arguments[0] || {})
   const { setCenterView } = useUIStore()
 
   // Form states

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Minus } from 'lucide-react'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import { actorApi } from '../../api/actorApi'
+import useDevLog from '../../utils/useDevLog'
 
 function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId }) {
   const [isExpanding, setIsExpanding] = useState(false)
@@ -134,6 +135,7 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
 }
 
 export default function HierarchyTree({ data, setTreeData, expandCounter, fetchDepth, rootActorId }) {
+  useDevLog('HierarchyTree', arguments[0] || {})
   if (!data) return null
   return (
     <div className="hierarchy-tree-container">

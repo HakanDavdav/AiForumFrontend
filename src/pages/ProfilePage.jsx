@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Network, Search, Filter, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
-import { actorApi } from '../../api/actorApi'
+import { actorApi } from '../api/actorApi'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
@@ -10,10 +10,12 @@ import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import FollowListModal from '../components/profile/FollowListModal'
 import ProfileLikesModal from '../components/profile/ProfileLikesModal'
 import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel'
-import useAuthStore from '../../store/authStore'
-import useUIStore from '../../store/uiStore'
+import useAuthStore from '../store/authStore'
+import useUIStore from '../store/uiStore'
+import useDevLog from '../utils/useDevLog'
 
 export default function ProfilePage({ actorId }) {
+  useDevLog('ProfilePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
   const { setCenterView, goBack } = useUIStore()
   const [activeTab, setActiveTab] = useState('bots')

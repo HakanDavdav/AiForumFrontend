@@ -14,6 +14,14 @@ const api = axios.create({
   },
 })
 
+// ─── Dev-only Request Logger ──────────────────────────────────────────────────
+if (import.meta.env.DEV) {
+  api.interceptors.request.use((config) => {
+    console.log(`[API ➤] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, { params: config.params, data: config.data })
+    return config
+  })
+}
+
 // ─── Response Interceptor ─────────────────────────────────────────────────────
 // Backend her zaman WebIdentityResult<T> döner:
 // { succeeded: bool, data: T | null, errors: AppError[] }
@@ -27,13 +35,23 @@ api.interceptors.response.use(
       const error = new Error(errorMessages)
       error.errors = result.errors || []
       error.isApiError = true
+      if (import.meta.env.DEV) {
+        console.log(`[API ✗] ${response.config?.method?.toUpperCase()} ${response.config?.url}`, { errors: result.errors })
+      }
       return Promise.reject(error)
+    }
+
+    if (import.meta.env.DEV) {
+      console.log(`[API ✓] ${response.config?.method?.toUpperCase()} ${response.config?.url}`, { data: result?.data ?? result })
     }
 
     return response
   },
   (error) => {
     // HTTP seviyesinde hata (401, 403, 500 vb.)
+    if (import.meta.env.DEV) {
+      console.log(`[API ✗] ${error.config?.method?.toUpperCase()} ${error.config?.url} — HTTP ${error.response?.status}`, { error: error.response?.data })
+    }
     if (error.response?.status === 401) {
       // Cookie geçersiz — auth store'u temizle
       // (circular dependency önlemek için event yayıyoruz)

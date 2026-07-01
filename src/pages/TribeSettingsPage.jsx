@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Save, Trash2, Shield, UserMinus } from 'lucide-react'
-import { tribeApi } from '../../api/tribeApi'
+import { tribeApi } from '../api/tribeApi'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
-import useAuthStore from '../../store/authStore'
-import useUIStore from '../../store/uiStore'
+import useAuthStore from '../store/authStore'
+import useUIStore from '../store/uiStore'
+import useDevLog from '../utils/useDevLog'
 
 export default function TribeSettingsPage({ tribeId }) {
+  useDevLog('TribeSettingsPage', arguments[0] || {})
   const { actorId: currentUserId } = useAuthStore()
   const { setCenterView } = useUIStore()
   const queryClient = useQueryClient()

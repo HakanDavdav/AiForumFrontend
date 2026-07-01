@@ -11,6 +11,7 @@ import { TopicTagList } from '../topic/TopicTag'
 import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * PostCard — tam post görünümü (PostDto'dan).
@@ -31,6 +32,7 @@ export default function PostCard({
   onDelete,
   onEdit,
 }) {
+  useDevLog('PostCard', arguments[0] || {})
   const [showLikes, setShowLikes] = useState(false)
   const setCenterView = useUIStore((s) => s.setCenterView)
   const queryClient = useQueryClient()

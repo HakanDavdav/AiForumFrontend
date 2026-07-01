@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { actorApi } from '../../../api/actorApi'
-import useAuthStore from '../../../store/authStore'
-import useUIStore from '../../../store/uiStore'
+import { actorApi } from '../../api/actorApi'
+import useAuthStore from '../../store/authStore'
+import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function InitProfilePage() {
+  useDevLog('InitProfilePage', arguments[0] || {})
   const { actorId, setProfileCreated } = useAuthStore()
   const { setCenterView } = useUIStore()
   const queryClient = useQueryClient()

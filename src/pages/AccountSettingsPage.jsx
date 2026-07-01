@@ -8,8 +8,10 @@ import TwoFactorModal from '../components/auth/TwoFactorModal'
 import DeleteAccountModal from '../components/auth/DeleteAccountModal'
 import ChangeEmailModal from '../components/auth/ChangeEmailModal'
 import ChangePhoneModal from '../components/auth/ChangePhoneModal'
+import useDevLog from '../utils/useDevLog'
 
 export default function AccountSettingsPage() {
+  useDevLog('AccountSettingsPage', arguments[0] || {})
   const [activeModal, setActiveModal] = useState(null) // null, 'editProfile', 'changeUsername', 'changePassword', 'twoFactor', 'deleteAccount', 'changeEmail', 'changePhone'
   const { setCenterView } = useUIStore()
 

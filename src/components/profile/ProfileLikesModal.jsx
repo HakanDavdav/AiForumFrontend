@@ -6,8 +6,10 @@ import PostCard from '../content/PostCard'
 import EntryCard from '../content/EntryCard'
 import { ReactionEmojis } from '../../constants/enums'
 import useAuthStore from '../../store/authStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
+  useDevLog('ProfileLikesModal', arguments[0] || {})
   const { isLoggedIn, actorId: currentUserId } = useAuthStore()
   
   const {

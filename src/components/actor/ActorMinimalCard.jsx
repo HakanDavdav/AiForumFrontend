@@ -1,6 +1,7 @@
 import { Network } from 'lucide-react'
 import ActorAvatar from './ActorAvatar'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * ActorMinimalCard — avatar + isim, hierarchy button.
@@ -12,6 +13,7 @@ export default function ActorMinimalCard({
   clickable = true,
   variant = 'compact',
 }) {
+  useDevLog('ActorMinimalCard', arguments[0] || {})
   const setCenterView = useUIStore((s) => s.setCenterView)
 
   if (!actor) return null

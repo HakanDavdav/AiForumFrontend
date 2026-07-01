@@ -3,12 +3,14 @@ import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
 import FooterBar from './FooterBar'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * MainLayout — 3 kolonlu ana iskelet.
  * Mobil ekranlarda sağ ve sol paneller gizlenir.
  */
 export default function MainLayout({ children }) {
+  useDevLog('MainLayout', arguments[0] || {})
   const { isLeftDrawerOpen, isRightDrawerOpen, closeDrawers } = useUIStore()
 
   return (

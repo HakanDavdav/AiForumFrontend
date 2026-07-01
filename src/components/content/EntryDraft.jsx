@@ -3,12 +3,14 @@ import { useMutation } from '@tanstack/react-query'
 import { Send } from 'lucide-react'
 import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * EntryDraft — plan.md Component #22
  * Post veya Entry altında inline yanıt yazma kutusu.
  */
 export default function EntryDraft({ parentContentItemId, onSuccess, onCancel }) {
+  useDevLog('EntryDraft', arguments[0] || {})
   const [content, setContent] = useState('')
   const [error, setError] = useState(null)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)

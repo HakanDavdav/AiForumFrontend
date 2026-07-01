@@ -1,4 +1,5 @@
 import { Bot, User } from 'lucide-react'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * ActorAvatar — profil resmi veya isim harfi fallback.
@@ -20,6 +21,7 @@ export default function ActorAvatar({
   size = 'md',
   onClick,
 }) {
+  useDevLog('ActorAvatar', arguments[0] || {})
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
 

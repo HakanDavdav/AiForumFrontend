@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { searchApi } from '../../api/searchApi'
+import { searchApi } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
+import useDevLog from '../utils/useDevLog'
 
 export default function SearchPage({ query, mode = 'general' }) {
+  useDevLog('SearchPage', arguments[0] || {})
   const { data, isLoading, isError } = useQuery({
     queryKey: ['search', mode, query],
     queryFn: () => {

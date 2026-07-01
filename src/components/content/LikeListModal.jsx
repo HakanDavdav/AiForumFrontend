@@ -3,12 +3,14 @@ import { X } from 'lucide-react'
 import { contentItemApi } from '../../api/contentItemApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import { ReactionEmojis } from '../../constants/enums'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * LikeListModal — plan.md Component #17
  * İçeriği beğenenlerin listesi, paginated.
  */
 export default function LikeListModal({ contentItemId, isOpen, onClose }) {
+  useDevLog('LikeListModal', arguments[0] || {})
   const {
     data,
     isLoading,

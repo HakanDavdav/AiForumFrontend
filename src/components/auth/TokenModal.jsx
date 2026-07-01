@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function TokenModal({ isOpen, email, onSuccess, onTimeout }) {
+  useDevLog('TokenModal', arguments[0] || {})
   const [confirmToken, setConfirmToken] = useState('')
   const [countdown, setCountdown] = useState(30)
   const [confirmError, setConfirmError] = useState(null)

@@ -8,8 +8,10 @@ import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import useUIStore from '../../store/uiStore'
 import useAuthStore from '../../store/authStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function RightPanel() {
+  useDevLog('RightPanel', arguments[0] || {})
   const setCenterView = useUIStore((s) => s.setCenterView)
 
   const handleWheel = (e) => {

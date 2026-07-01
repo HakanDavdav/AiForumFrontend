@@ -3,8 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
 import useUIStore from '../../store/uiStore'
 import { TopicTypes, BotModes } from '../../constants/TopicTypes'
+import useDevLog from '../../utils/useDevLog'
 
 export default function CreateEditBotPage() {
+  useDevLog('CreateEditBotPage', arguments[0] || {})
   const { setCenterView, centerViewParams } = useUIStore()
   const queryClient = useQueryClient()
   

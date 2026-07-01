@@ -3,8 +3,10 @@ import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function DeleteAccountModal({ isOpen, onClose }) {
+  useDevLog('DeleteAccountModal', arguments[0] || {})
   const [password, setPassword] = useState('')
   const { clearAuth } = useAuthStore()
   const { setCenterView } = useUIStore()

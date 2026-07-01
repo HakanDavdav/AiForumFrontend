@@ -6,6 +6,7 @@ import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
 import useUIStore from '../store/uiStore'
 import useAuthStore from '../store/authStore'
+import useDevLog from '../utils/useDevLog'
 
 /**
  * ContentItemPage — plan.md "Contextual Entry Thread" (satır 167–178)
@@ -22,6 +23,7 @@ import useAuthStore from '../store/authStore'
  *       Alt: odaklanan EntryCard (highlight)
  */
 export default function ContentItemPage({ contentItemId }) {
+  useDevLog('ContentItemPage', arguments[0] || {})
   const { setCenterView, restorePreviousCenterView } = useUIStore()
   const { isLoggedIn, actorId } = useAuthStore()
 

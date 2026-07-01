@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, Maximize2, Network } from 'lucide-react'
-import { actorApi } from '../../api/actorApi'
-import useUIStore from '../../store/uiStore'
+import { actorApi } from '../api/actorApi'
+import useUIStore from '../store/uiStore'
 import HierarchyTree from '../components/hierarchy/HierarchyTree'
+import useDevLog from '../utils/useDevLog'
 
 export default function HierarchyPage({ actorId }) {
+  useDevLog('HierarchyPage', arguments[0] || {})
   const { restorePreviousCenterView } = useUIStore()
   const [treeData, setTreeData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)

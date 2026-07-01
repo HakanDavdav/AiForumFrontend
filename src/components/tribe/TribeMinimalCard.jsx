@@ -1,10 +1,12 @@
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * TribeMinimalCard — plan.md Component #4
  * MinimalTribeDto'dan tribe kartı. Tıklanınca Center Panel'de TribeProfileView açar.
  */
 export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true }) {
+  useDevLog('TribeMinimalCard', arguments[0] || {})
   const setCenterView = useUIStore((s) => s.setCenterView)
 
   const handleClick = () => {

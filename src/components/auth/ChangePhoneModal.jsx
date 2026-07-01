@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
+import useDevLog from '../../utils/useDevLog'
 
 export default function ChangePhoneModal({ isOpen, onClose }) {
+  useDevLog('ChangePhoneModal', arguments[0] || {})
   const [step, setStep] = useState(1) // 1: Request, 2: Confirm, 3: Success
   const [phoneNumber, setPhoneNumber] = useState('')
   const [token, setToken] = useState('')

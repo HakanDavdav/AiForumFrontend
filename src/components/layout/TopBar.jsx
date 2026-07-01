@@ -11,8 +11,10 @@ import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import ActorAvatar from '../actor/ActorAvatar'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function TopBar({ currentUser }) {
+  useDevLog('TopBar', arguments[0] || {})
   const { isLoggedIn, logout: storeLogout } = useAuthStore()
   const { setCenterView, setSearchMode, searchMode, toggleLeftDrawer, activeLeftCacheType, setActiveLeftCacheType } = useUIStore()
   const [searchQuery, setSearchQuery] = useState('')

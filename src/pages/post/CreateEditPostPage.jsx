@@ -3,8 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { contentItemApi } from '../../api/contentItemApi'
 import useUIStore from '../../store/uiStore'
 import { TopicTypes } from '../../constants/TopicTypes'
+import useDevLog from '../../utils/useDevLog'
 
 export default function CreateEditPostPage() {
+  useDevLog('CreateEditPostPage', arguments[0] || {})
   const { setCenterView, centerViewParams } = useUIStore()
   const queryClient = useQueryClient()
 

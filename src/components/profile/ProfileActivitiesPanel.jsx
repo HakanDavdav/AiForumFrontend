@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
 import ActivityItem from '../activity/ActivityItem'
+import useDevLog from '../../utils/useDevLog'
 
 export default function ProfileActivitiesPanel({ actorId }) {
+  useDevLog('ProfileActivitiesPanel', arguments[0] || {})
   const [page, setPage] = useState(1)
   const [activities, setActivities] = useState([])
   const [hasMore, setHasMore] = useState(true)

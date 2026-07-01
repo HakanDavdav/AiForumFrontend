@@ -10,6 +10,7 @@ import EntryDraft from './EntryDraft'
 import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * EntryCard — plan.md Component #9
@@ -29,6 +30,7 @@ export default function EntryCard({
   onEdit,
   queryKey, // invalidation için
 }) {
+  useDevLog('EntryCard', arguments[0] || {})
   const [showReplyDraft, setShowReplyDraft] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
   const setCenterView = useUIStore((s) => s.setCenterView)

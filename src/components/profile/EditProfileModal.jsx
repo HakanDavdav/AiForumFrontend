@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
 import useAuthStore from '../../store/authStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function EditProfileModal({ isOpen, onClose }) {
+  useDevLog('EditProfileModal', arguments[0] || {})
   const { actorId } = useAuthStore()
   const queryClient = useQueryClient()
   

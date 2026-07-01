@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { contentItemApi } from '../../api/contentItemApi'
 import { ReactionType, ReactionEmojis } from '../../constants/enums'
 import useAuthStore from '../../store/authStore'
+import useDevLog from '../../utils/useDevLog'
 
 /**
  * ReactionButton — Like / Dislike / BrutallyDislike toggle grubu.
@@ -15,6 +16,7 @@ export default function ReactionButton({
   currentLikeId = null,         // string | null — kaldırmak için gerekli
   onReactionChange,             // (newReaction, newCount) => void
 }) {
+  useDevLog('ReactionButton', arguments[0] || {})
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const [optimisticReaction, setOptimisticReaction] = useState(currentUserReaction)
   const [optimisticCount, setOptimisticCount] = useState(likeCount ?? 0)

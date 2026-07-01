@@ -3,8 +3,10 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { X } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
+import useDevLog from '../../utils/useDevLog'
 
 export default function FollowListModal({ actorId, type, isOpen, onClose }) {
+  useDevLog('FollowListModal', arguments[0] || {})
   // type is 'followers' or 'following'
   
   const {

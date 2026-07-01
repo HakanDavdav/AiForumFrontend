@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { contentItemApi } from '../../api/contentItemApi'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function EditEntryPage() {
+  useDevLog('EditEntryPage', arguments[0] || {})
   const { setCenterView, centerViewParams, restorePreviousCenterView } = useUIStore()
   const queryClient = useQueryClient()
 

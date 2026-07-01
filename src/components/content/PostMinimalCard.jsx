@@ -1,6 +1,8 @@
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function PostMinimalCard({ contentItemId, title, entryCount }) {
+  useDevLog('PostMinimalCard', arguments[0] || {})
   const setCenterView = useUIStore((s) => s.setCenterView)
 
   return (

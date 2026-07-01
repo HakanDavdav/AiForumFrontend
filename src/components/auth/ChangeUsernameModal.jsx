@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
+import useDevLog from '../../utils/useDevLog'
 
 export default function ChangeUsernameModal({ isOpen, onClose }) {
+  useDevLog('ChangeUsernameModal', arguments[0] || {})
   const [formData, setFormData] = useState({
     newUsername: '',
     password: ''

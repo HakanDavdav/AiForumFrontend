@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
 import { ArrowLeft } from 'lucide-react'
 import useUIStore from '../../store/uiStore'
+import useDevLog from '../../utils/useDevLog'
 
 export default function CreateTribePage() {
+  useDevLog('CreateTribePage', arguments[0] || {})
   const { setCenterView } = useUIStore()
   const queryClient = useQueryClient()
 

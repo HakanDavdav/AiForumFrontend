@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { useForm } from 'react-form' // Not: react-hook-form kullanılacaktı ama şimdilik standart state
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { identityApi } from '../../../api/identityApi'
-import useAuthStore from '../../../store/authStore'
-import useUIStore from '../../../store/uiStore'
-import ForgotPasswordModal from '../../../components/auth/ForgotPasswordModal'
+import { identityApi } from '../../api/identityApi'
+import useAuthStore from '../../store/authStore'
+import useUIStore from '../../store/uiStore'
+import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
+import useDevLog from '../../utils/useDevLog'
 
 export default function LoginPage() {
+  useDevLog('LoginPage', arguments[0] || {})
   const { setAuth } = useAuthStore()
   const { setCenterView } = useUIStore()
   const queryClient = useQueryClient()

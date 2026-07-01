@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { searchApi, parseCacheResponse } from '../../api/searchApi'
-import ActorMinimalCard from '../actor/ActorMinimalCard'
-import TribeMinimalCard from '../tribe/TribeMinimalCard'
-import useUIStore from '../../store/uiStore'
+import { searchApi, parseCacheResponse } from '../api/searchApi'
+import ActorMinimalCard from '../components/actor/ActorMinimalCard'
+import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
+import useUIStore from '../store/uiStore'
 import { ArrowLeft } from 'lucide-react'
+import useDevLog from '../utils/useDevLog'
 
 export default function LeaderboardPage({ type = 'actor' }) {
+  useDevLog('LeaderboardPage', arguments[0] || {})
   const { setCenterView, goBack } = useUIStore()
   const isActor = type === 'actor'
 

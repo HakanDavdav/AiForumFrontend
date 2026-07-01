@@ -1,13 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { LogOut, UserPlus, Settings, ArrowLeft } from 'lucide-react'
-import { tribeApi } from '../../api/tribeApi'
+import { tribeApi } from '../api/tribeApi'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
-import useAuthStore from '../../store/authStore'
-import useUIStore from '../../store/uiStore'
+import useAuthStore from '../store/authStore'
+import useUIStore from '../store/uiStore'
+import useDevLog from '../utils/useDevLog'
 
 export default function TribePage({ tribeId }) {
+  useDevLog('TribePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
   const { setCenterView, goBack } = useUIStore()
   const queryClient = useQueryClient()
