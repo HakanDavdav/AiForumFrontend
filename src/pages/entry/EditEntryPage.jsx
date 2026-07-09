@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft } from 'lucide-react'
 import { contentItemApi } from '../../api/contentItemApi'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function EditEntryPage() {
   useDevLog('EditEntryPage', arguments[0] || {})
-  const { setCenterView, centerViewParams, restorePreviousCenterView } = useUIStore()
+  const { setCenterView, centerViewParams, goBack } = useUIStore()
   const queryClient = useQueryClient()
 
   const entryId = centerViewParams?.entryId
@@ -39,7 +40,7 @@ export default function EditEntryPage() {
       
       // Go back to the previous view after 1 second delay
       setTimeout(() => {
-        restorePreviousCenterView()
+        goBack()
       }, 1000)
     }
   })
@@ -59,11 +60,11 @@ export default function EditEntryPage() {
 
   return (
     <div className="flex-col gap-4">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
-        <button className="btn btn-ghost btn-sm" onClick={restorePreviousCenterView}>
-          {'< İptal'}
+      <div className="flex items-center gap-3 px-2" style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
+        <button className="btn-icon" onClick={goBack}>
+          <ArrowLeft size={18} />
         </button>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>Yanıtı Düzenle</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>Yanıtı Düzenle</h1>
       </div>
 
       <div className="card-surface flex-col gap-4" style={{ padding: 24, maxWidth: 600, margin: '0 auto', width: '100%' }}>

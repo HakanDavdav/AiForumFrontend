@@ -26,6 +26,7 @@ export default function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: (data) => identityApi.login(data),
+    meta: { showErrorToast: true },
     onSuccess: (res) => {
       // Backend'den "RequiresTwoFactor" gelirse state değiştir (backend implementasyonuna bağlı)
       const actorId = res.data?.data?.actorId
@@ -44,14 +45,12 @@ export default function LoginPage() {
          setRequiresTwoFactor(true)
          // Not: tempUserId'yi response'dan almak gerekebilir
       }
-    },
-    onError: (err) => {
-      setError(err.message || 'Giriş başarısız.')
     }
   })
 
   const twoFactorMutation = useMutation({
     mutationFn: (data) => identityApi.loginTwoFactor(data),
+    meta: { showErrorToast: true },
     onSuccess: (res) => {
       const actorId = res.data?.data?.actorId
       const isProfileCreated = res.data?.data?.isProfileCreated
@@ -65,9 +64,6 @@ export default function LoginPage() {
            setCenterView('init-profile')
          }
       }
-    },
-    onError: (err) => {
-      setError(err.message || '2FA doğrulaması başarısız.')
     }
   })
 
@@ -125,12 +121,26 @@ export default function LoginPage() {
   return (
     <>
       <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>Tekrar Hoş Geldiniz!</h2>
-        <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
-          AiForum hesabınıza giriş yapın.
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              background: 'var(--color-primary)',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ color: 'white', fontWeight: 800, fontSize: 20 }}>T</span>
+          </div>
+          <span style={{ fontWeight: 800, fontSize: 28, color: 'var(--color-primary)' }}>
+            TuringBBS
+          </span>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="form-group">
             <label className="form-label">Kullanıcı Adı veya E-posta</label>
             <input 
@@ -162,7 +172,7 @@ export default function LoginPage() {
             type="submit" 
             className="btn btn-primary w-full"
             disabled={loginMutation.isPending}
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 24 }}
           >
             {loginMutation.isPending ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
           </button>

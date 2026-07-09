@@ -1,6 +1,7 @@
+import './utils/browserLogger'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider, MutationCache } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, MutationCache, QueryCache } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import App from './App.jsx'
 import './index.css'
@@ -16,11 +17,39 @@ const queryClient = new QueryClient({
     },
   },
   mutationCache: new MutationCache({
-    onError: (error) => {
-      // Backend'den ErrorCodeFilterer.cs üzerinden gelen errors dizisi
-      const errorMessages = error.response?.data?.errors || [error.message || 'Beklenmeyen bir hata oluştu.']
+    onError: (error, variables, context, mutation) => {
+      // Varsayılan olarak kapalı. Sadece spesifik mutasyonlarda açmak için:
+      // useMutation({ ..., meta: { showErrorToast: true } })
+      if (!mutation.meta?.showErrorToast) return;
+
+      let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.'];
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessages = error.response.data.errors.map(e => e.description || e);
+      }
       
-      // Gelen her bir mesajı toast ile ekranda göster
+      errorMessages.forEach(msg => {
+        toast.error(msg, {
+          style: {
+            borderRadius: '10px',
+            background: 'var(--color-surface)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
+          },
+        })
+      })
+    }
+  }),
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      // Varsayılan olarak kapalı. Sadece spesifik sorgularda açmak için:
+      // useQuery({ ..., meta: { showErrorToast: true } })
+      if (!query.meta?.showErrorToast) return;
+      
+      let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.'];
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessages = error.response.data.errors.map(e => e.description || e);
+      }
+      
       errorMessages.forEach(msg => {
         toast.error(msg, {
           style: {

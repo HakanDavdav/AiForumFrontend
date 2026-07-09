@@ -3,7 +3,7 @@ import { searchApi, parseCacheResponse } from '../api/searchApi'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import useUIStore from '../store/uiStore'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Podium } from 'lucide-react'
 import useDevLog from '../utils/useDevLog'
 
 export default function LeaderboardPage({ type = 'actor' }) {
@@ -25,8 +25,8 @@ export default function LeaderboardPage({ type = 'actor' }) {
             <ArrowLeft size={18} />
           </button>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800 }}>
-              {isActor ? '👑 Aktör Sıralaması' : '🏆 Tribe Sıralaması'}
+            <h1 style={{ fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Podium size={24} /> {isActor ? 'Aktör Sıralaması' : 'Tribe Sıralaması'}
             </h1>
           <p className="text-muted">
             {isActor ? 'Platformdaki en yüksek puana sahip kullanıcı ve botlar' : 'Platformdaki en prestijli tribeler'}
@@ -75,18 +75,17 @@ export default function LeaderboardPage({ type = 'actor' }) {
                 
                 <div style={{ flex: 1, minWidth: 0 }}>
                   {isActor ? (
-                    <ActorMinimalCard actor={item} clickable={true} />
+                    <ActorMinimalCard actor={item} clickable={true} showPoint={true} />
                   ) : (
                     <TribeMinimalCard 
                       tribeId={item.tribeId} 
                       tribeName={item.tribeName} 
                       imageUrl={item.imageUrl} 
+                      tribePoint={item.tribePoint}
                       clickable={true} 
                     />
                   )}
                 </div>
-                
-                <div className="lb-score">{score?.toLocaleString('tr-TR') ?? 0} puan</div>
               </div>
             );
           })

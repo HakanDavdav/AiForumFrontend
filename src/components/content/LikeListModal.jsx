@@ -1,8 +1,10 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { contentItemApi } from '../../api/contentItemApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
-import { ReactionEmojis } from '../../constants/enums'
+import { ReactionType } from '../../constants/enums'
+import { ThumbsUp, ThumbsDown, Skull } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 
 /**
@@ -11,19 +13,24 @@ import useDevLog from '../../utils/useDevLog'
  */
 export default function LikeListModal({ contentItemId, isOpen, onClose }) {
   useDevLog('LikeListModal', arguments[0] || {})
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+
+  const ReactionIcons = {
+    [ReactionType.Like]: <ThumbsUp size={16} />,
+    [ReactionType.Dislike]: <ThumbsDown size={16} />,
+    [ReactionType.BrutallyDislike]: <Skull size={16} />,
+  }
+
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['likes', contentItemId],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await contentItemApi.getContentItemLikes(contentItemId, pageParam)
-      return {
-        items: res.data?.data || [],
-        nextPage: (res.data?.data?.length === 10) ? pageParam + 1 : undefined,
+      try {
+        const res = await contentItemApi.getContentItemLikes(contentItemId, pageParam)
+        return {
+          items: res.data?.data || [],
+          nextPage: res.data?.data?.length === 10 ? pageParam + 1 : undefined,
+        }
+      } catch (err) {
+        return { items: [], nextPage: undefined }
       }
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -31,7 +38,7 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
   })
 
   // Bütün sayfaların içeriğini tek array'de topla
-  const items = data?.pages?.flatMap(page => page.items) || []
+  const items = data?.pages?.flatMap((page) => page.items) || []
 
   // Infinite scroll için onScroll handler
   const handleScroll = (e) => {
@@ -45,8 +52,8 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
 
   if (!isOpen) return null
 
-  return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
+  return createPortal(
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 200 }}>
       <div 
         className="modal-box" 
         onClick={(e) => e.stopPropagation()} 
@@ -72,7 +79,9 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
               {items.map((like) => (
                 <div key={like.likeId} className="card-surface flex items-center justify-between" style={{ padding: 12 }}>
                   <ActorMinimalCard actor={like.actor} showHierarchyBtn={false} clickable={true} />
-                  <span style={{ fontSize: 18 }}>{ReactionEmojis[like.reactionType]}</span>
+                  <span style={{ fontSize: 18, display: 'flex', alignItems: 'center' }}>
+                    {ReactionIcons[like.reactionType]}
+                  </span>
                 </div>
               ))}
               
@@ -81,10 +90,16 @@ export default function LikeListModal({ contentItemId, isOpen, onClose }) {
                   <div className="spinner spinner-sm" />
                 </div>
               )}
+              {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
+                <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
+                  Listenin sonuna geldiniz.
+                </p>
+              )}
             </div>
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

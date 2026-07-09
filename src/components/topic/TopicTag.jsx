@@ -1,7 +1,9 @@
 // TopicTag & TopicTagList
 import { TopicLabels, TopicColors, TopicTypes, parseTopicFlags } from '../../constants/enums'
+import useDevLog from '../../utils/useDevLog'
 
 export function TopicTag({ topicType, size = 'sm', onClick }) {
+  useDevLog('TopicTag', arguments[0] || {})
   const label = TopicLabels[topicType] || `Konu ${topicType}`
   const color = TopicColors[topicType] || '#64748B'
 
@@ -23,6 +25,7 @@ export function TopicTag({ topicType, size = 'sm', onClick }) {
 }
 
 export function TopicTagList({ topicTypes, max = 5 }) {
+  useDevLog('TopicTagList', arguments[0] || {})
   if (!topicTypes || topicTypes.length === 0) return null
 
   // Backend array of int → parse

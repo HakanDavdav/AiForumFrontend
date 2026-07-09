@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
   const [error, setError] = useState(null)
 
   const [isConfirming, setIsConfirming] = useState(false)
@@ -20,25 +21,20 @@ export default function RegisterPage() {
   // 1. Register Mutation
   const registerMutation = useMutation({
     mutationFn: (data) => identityApi.register(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       // Register başarılı olduğunda, zincirleme (chain) email gönderim isteğini tetikliyoruz
       requestEmailConfirmMutation.mutate({ emailOrUsername: email })
-    },
-    onError: (err) => {
-      // Backend'den gelen "Wait 30 seconds max" gibi hatalar burada gösterilir
-      setError(err.message || 'Kayıt işlemi başarısız.')
     }
   })
 
   // 2. Zincirleme Email İstek Mutation (Register'dan hemen sonra)
   const requestEmailConfirmMutation = useMutation({
     mutationFn: (data) => identityApi.requestEmailConfirm(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       // Onay modalını aç
       setIsConfirming(true)
-    },
-    onError: (err) => {
-      setError(err.message || 'Onay kodu gönderilirken hata oluştu.')
     }
   })
 
@@ -50,18 +46,38 @@ export default function RegisterPage() {
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
     setError(null)
+
+    if (password !== passwordConfirm) {
+      setError('Şifreler eşleşmiyor.')
+      return
+    }
+
     registerMutation.mutate({ username, email, password })
   }
 
   return (
     <>
       <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>Hesap Oluştur</h2>
-        <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
-          AiForum topluluğuna katılın.
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              background: 'var(--color-primary)',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{ color: 'white', fontWeight: 800, fontSize: 20 }}>T</span>
+          </div>
+          <span style={{ fontWeight: 800, fontSize: 28, color: 'var(--color-primary)' }}>
+            TuringBBS
+          </span>
+        </div>
 
-        <form onSubmit={handleRegisterSubmit} className="flex-col gap-4">
+        <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
         <div className="form-group">
           <label className="form-label">Kullanıcı Adı</label>
           <input 
@@ -97,13 +113,25 @@ export default function RegisterPage() {
           />
         </div>
 
+        <div className="form-group">
+          <label className="form-label">Şifre Tekrar</label>
+          <input 
+            className="input" 
+            type="password" 
+            value={passwordConfirm}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
+            required 
+            minLength={6}
+          />
+        </div>
+
         {error && <div className="form-error text-center">{error}</div>}
 
         <button 
           type="submit" 
           className="btn btn-primary w-full"
           disabled={registerMutation.isPending || requestEmailConfirmMutation.isPending}
-          style={{ marginTop: 8 }}
+          style={{ marginTop: 24 }}
         >
           {registerMutation.isPending || requestEmailConfirmMutation.isPending ? 'İşleniyor...' : 'Kayıt Ol'}
         </button>

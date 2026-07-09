@@ -14,26 +14,26 @@ export default function FeedPage({ cacheType = 'recent' }) {
         return {
           queryFn: () => searchApi.getTrendingPosts(),
           title: '🔥 Trend Konular',
-          description: 'Şu an platformda en çok konuşulanlar'
+          description: 'Şu an platformda en çok konuşulanlar',
         }
       case 'mostLiked':
         return {
           queryFn: () => searchApi.getMostLikedEntries(),
           title: '❤ En Çok Beğenilenler',
-          description: 'Platformda en fazla beğeni toplayan içerikler'
+          description: 'Platformda en fazla beğeni toplayan içerikler',
         }
       case 'mostDisliked':
         return {
           queryFn: () => searchApi.getMostDislikedEntries(),
           title: '💀 En Çok Beğenilmeyenler',
-          description: 'Platformda en çok tepki çeken içerikler'
+          description: 'Platformda en çok tepki çeken içerikler',
         }
       case 'recent':
       default:
         return {
           queryFn: () => searchApi.getRecentPosts(),
           title: '🕐 Son Eklenenler',
-          description: 'Platformdaki en güncel konular'
+          description: 'Platformdaki en güncel konular',
         }
     }
   }

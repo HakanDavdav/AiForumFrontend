@@ -1,16 +1,22 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { X } from 'lucide-react'
+import { X, ThumbsUp, ThumbsDown, Skull } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import PostCard from '../content/PostCard'
-import EntryCard from '../content/EntryCard'
-import { ReactionEmojis } from '../../constants/enums'
+import ContextualEntryThread from '../content/ContextualEntryThread'
+import { ReactionEmojis, ReactionType } from '../../constants/enums'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
   useDevLog('ProfileLikesModal', arguments[0] || {})
   const { isLoggedIn, actorId: currentUserId } = useAuthStore()
+
+  const ReactionIcons = {
+    [ReactionType.Like]: <ThumbsUp size={14} />,
+    [ReactionType.Dislike]: <ThumbsDown size={14} />,
+    [ReactionType.BrutallyDislike]: <Skull size={14} />,
+  }
   
   const {
     data,
@@ -21,10 +27,14 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
   } = useInfiniteQuery({
     queryKey: ['profile-likes', actorId],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = await actorApi.getProfileLikes(actorId, pageParam)
-      return {
-        items: res.data?.data || [],
-        nextPage: (res.data?.data?.length === 2) ? pageParam + 1 : undefined,
+      try {
+        const res = await actorApi.getProfileLikes(actorId, pageParam)
+        return {
+          items: res.data?.data || [],
+          nextPage: (res.data?.data?.length === 2) ? pageParam + 1 : undefined,
+        }
+      } catch (err) {
+        return { items: [], nextPage: undefined }
       }
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -42,17 +52,6 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
         fetchNextPage()
       }
     }
-  }
-
-  // Hiyerarşi zincirini oluşturma fonksiyonu (ContentItemPage'den uyarlandı)
-  const buildParentChain = (entry) => {
-    const chain = []
-    let current = entry?.parentEntry
-    while (current) {
-      chain.unshift(current)
-      current = current.parentEntry
-    }
-    return chain
   }
 
   const isOwner = (item) => isLoggedIn && item?.actor?.actorId === currentUserId
@@ -86,14 +85,12 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
               {items.map((like) => {
                 const isPost = !!like.post
                 const isEntry = !!like.entry
-                const entryChain = isEntry ? buildParentChain(like.entry) : []
-                const rootPost = like.entry?.parentPost
 
                 return (
                   <div key={like.likeId} className="card-surface flex flex-col gap-3" style={{ padding: 16 }}>
                     <div className="flex items-center justify-between" style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-primary)' }}>
-                        {isPost ? 'Ana konuya' : 'Bir yanıta'} {ReactionEmojis[like.reactionType]} attı
+                      <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        {isPost ? 'Ana konuya' : 'Bir yanıta'} {ReactionIcons[like.reactionType]} attı
                       </span>
                       <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
                         {new Date(like.createdAt).toLocaleDateString('tr-TR')}
@@ -107,51 +104,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
                     )}
 
                     {isEntry && (
-                      <div className="flex-col gap-2">
-                        {/* Root Post */}
-                        {rootPost && (
-                          <div style={{ opacity: 0.7, transform: 'scale(0.95)', transformOrigin: 'top left' }}>
-                            <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
-                          </div>
-                        )}
-
-                        {/* Parent Chain */}
-                        {entryChain.length > 0 && (
-                          <div className="flex-col" style={{ gap: 2, marginTop: 4 }}>
-                            {entryChain.map((parentEntry, idx) => (
-                              <div
-                                key={parentEntry.contentItemId}
-                                style={{
-                                  marginLeft: (idx + 1) * 10,
-                                  opacity: Math.max(0.5, 1 - idx * 0.15),
-                                  borderLeft: '2px solid var(--color-border)',
-                                  paddingLeft: 10,
-                                  paddingTop: 2,
-                                  paddingBottom: 2,
-                                }}
-                              >
-                                <EntryCard {...parentEntry} depth={idx} isOwner={isOwner(parentEntry)} />
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Odaklanan Entry */}
-                        <div
-                          style={{
-                            marginLeft: (entryChain.length + 1) * 10,
-                            marginTop: 8,
-                            borderLeft: '3px solid var(--color-primary)',
-                            borderRadius: '0 8px 8px 0',
-                            background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)',
-                            paddingLeft: 10,
-                            paddingTop: 4,
-                            paddingBottom: 4
-                          }}
-                        >
-                          <EntryCard {...like.entry} depth={0} isOwner={isOwner(like.entry)} />
-                        </div>
-                      </div>
+                      <ContextualEntryThread entryDto={like.entry} hideCardStyle />
                     )}
                   </div>
                 )
@@ -161,6 +114,11 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
                 <div style={{ textAlign: 'center', padding: 16 }}>
                   <div className="spinner spinner-sm" />
                 </div>
+              )}
+              {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
+                <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
+                  Listenin sonuna geldiniz.
+                </p>
               )}
             </div>
           )}

@@ -205,12 +205,14 @@ export const IdTypes = {
 }
 
 export const OrderType = {
-  MostLiked: 0,
-  Oldest: 1,
-  Newest: 2,
+  None: 0,
+  MostLiked: 1,
+  Oldest: 2,
+  Newest: 3,
 }
 
 export const OrderTypeLabels = {
+  [OrderType.None]: 'Sıralama Yok',
   [OrderType.MostLiked]: 'En Çok Beğenilen',
   [OrderType.Oldest]: 'En Eski',
   [OrderType.Newest]: 'En Yeni',

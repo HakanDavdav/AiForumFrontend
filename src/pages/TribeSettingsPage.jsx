@@ -73,7 +73,7 @@ export default function TribeSettingsPage({ tribeId }) {
   if (isLoading) return <div className="flex justify-center" style={{ padding: 40 }}><div className="spinner spinner-lg" /></div>
   if (!tribe) return <div className="empty-state">Tribe bulunamadı</div>
 
-  const isLeader = tribe.membershipList?.some(m => m.actorId === currentUserId && m.actorRole?.roleName === 'TribeLeader')
+  const isLeader = tribe.tribeMemberships?.some(m => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader')
   if (!isLeader) {
     return (
       <div className="empty-state">
@@ -117,7 +117,7 @@ export default function TribeSettingsPage({ tribeId }) {
         {/* ─── General Settings Form ─── */}
         <div className="card-surface">
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Genel Ayarlar</h2>
-          <form onSubmit={handleSave} className="flex-col gap-3">
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div className="input-group">
               <label>Kabile Adı</label>
               <input type="text" name="tribeName" className="input" value={formData.tribeName} onChange={handleChange} required />
@@ -156,22 +156,23 @@ export default function TribeSettingsPage({ tribeId }) {
         <div className="card-surface">
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Üye Yönetimi</h2>
           <div className="flex-col gap-2">
-            {tribe.membershipList?.map(member => (
-              <div key={member.actorId} className="flex items-center justify-between" style={{ padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
-                <ActorMinimalCard actor={member} />
+            {tribe.tribeMemberships?.map(member => (
+              member.actor ? (
+              <div key={member.actor.actorId} className="flex items-center justify-between" style={{ padding: '8px 0', borderBottom: '1px solid var(--color-border)' }}>
+                <ActorMinimalCard actor={member.actor} />
                 
                 <div className="flex items-center gap-2">
                   <span className="badge" style={{ background: 'var(--color-surface-3)', marginRight: 8 }}>
-                    {member.actorRole?.roleName}
+                    {member.roleName === 'TribeLeader' ? 'Lider' : member.roleName || 'Üye'}
                   </span>
                   
-                  {member.actorId !== currentUserId && (
+                  {member.actor.actorId !== currentUserId && (
                     <>
-                      {member.actorRole?.roleName === 'Member' ? (
+                      {member.roleName === 'Member' || !member.roleName ? (
                         <button 
                           className="btn btn-ghost btn-sm" 
                           title="Moderatör Yap"
-                          onClick={() => rankMutation.mutate({ memberActorId: member.actorId, promotionType: 1 })}
+                          onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 1 })}
                           disabled={rankMutation.isPending}
                         >
                           <Shield size={14} /> Terfi
@@ -180,7 +181,7 @@ export default function TribeSettingsPage({ tribeId }) {
                         <button 
                           className="btn btn-ghost btn-sm" 
                           title="Rütbesini Düşür"
-                          onClick={() => rankMutation.mutate({ memberActorId: member.actorId, promotionType: 2 })}
+                          onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 2 })}
                           disabled={rankMutation.isPending}
                         >
                           <Shield size={14} /> Düşür
@@ -193,7 +194,7 @@ export default function TribeSettingsPage({ tribeId }) {
                         title="Kabileden Kov"
                         onClick={() => {
                           if (window.confirm("Bu üyeyi kovmak istediğinize emin misiniz?")) {
-                            expelMutation.mutate(member.actorId)
+                            expelMutation.mutate(member.actor.actorId)
                           }
                         }}
                         disabled={expelMutation.isPending}
@@ -204,6 +205,7 @@ export default function TribeSettingsPage({ tribeId }) {
                   )}
                 </div>
               </div>
+              ) : null
             ))}
           </div>
         </div>

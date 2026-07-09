@@ -2,8 +2,7 @@ import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
 import { contentItemApi } from '../api/contentItemApi'
-import PostCard from '../components/content/PostCard'
-import EntryCard from '../components/content/EntryCard'
+import ContextualEntryThread from '../components/content/ContextualEntryThread'
 import useUIStore from '../store/uiStore'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
@@ -25,18 +24,16 @@ import useDevLog from '../utils/useDevLog'
 export default function ContentItemPage({ contentItemId }) {
   useDevLog('ContentItemPage', arguments[0] || {})
   const { setCenterView, restorePreviousCenterView } = useUIStore()
-  const { isLoggedIn, actorId } = useAuthStore()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['contentitem', contentItemId],
-    queryFn: () =>
-      contentItemApi.getContentItem(contentItemId).then((r) => r.data?.data),
+    queryFn: () => contentItemApi.getContentItem(contentItemId).then((r) => r.data?.data),
     enabled: !!contentItemId,
   })
 
   // Post branch: yönlendirmeyi render fazına taşı
-  const postDto  = data?.item2 ?? null
-  const entryDto = data?.item1 ?? null
+  const postDto = data?.Item2 ?? data?.item2 ?? null
+  const entryDto = data?.Item1 ?? data?.item1 ?? null
 
   useEffect(() => {
     if (postDto && !entryDto) {
@@ -87,21 +84,6 @@ export default function ContentItemPage({ contentItemId }) {
     )
   }
 
-  // ─── Parent entry zincirini en eski → en yeni sıralar ───────────────────────
-  const buildParentChain = (entry) => {
-    const chain = []
-    let current = entry?.parentEntry
-    while (current) {
-      chain.unshift(current)   // başa ekle → root'a yakın üstte olur
-      current = current.parentEntry
-    }
-    return chain
-  }
-
-  const parentChain = buildParentChain(entryDto)
-  const rootPost    = entryDto.parentPost
-  const isOwner     = (item) => isLoggedIn && item?.actor?.actorId === actorId
-
   return (
     <div className="flex-col gap-4">
       {/* ── Geri butonu ────────────────────────────────────────────────────── */}
@@ -118,79 +100,9 @@ export default function ContentItemPage({ contentItemId }) {
         </span>
       </div>
 
-      {/* ── Root Post ──────────────────────────────────────────────────────── */}
-      {rootPost && (
-        <div>
-          <SectionLabel color="var(--color-text-faint)">ANA KONU</SectionLabel>
-          <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
-        </div>
-      )}
-
-      {/* ── Parent Entry Zinciri ───────────────────────────────────────────── */}
-      {parentChain.length > 0 && (
-        <div>
-          <SectionLabel color="var(--color-text-faint)">BAĞLAM</SectionLabel>
-          <div className="flex-col" style={{ gap: 2 }}>
-            {parentChain.map((parentEntry, idx) => (
-              <div
-                key={parentEntry.contentItemId}
-                style={{
-                  marginLeft: idx * 14,
-                  opacity: Math.max(0.45, 1 - idx * 0.15),
-                  borderLeft: '2px solid var(--color-border)',
-                  paddingLeft: 12,
-                  paddingTop: 4,
-                  paddingBottom: 4,
-                }}
-              >
-                <EntryCard
-                  {...parentEntry}
-                  depth={idx}
-                  isOwner={isOwner(parentEntry)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Odaklanan Entry (highlight) ────────────────────────────────────── */}
-      <div>
-        <SectionLabel color="var(--color-primary)">ODAKLANAN YANIT</SectionLabel>
-        <div
-          style={{
-            borderLeft: '3px solid var(--color-primary)',
-            borderRadius: '0 8px 8px 0',
-            background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)',
-            paddingLeft: 12,
-          }}
-        >
-          <EntryCard
-            {...entryDto}
-            depth={0}
-            isOwner={isOwner(entryDto)}
-          />
-        </div>
-      </div>
+      {/* ── Contextual Thread ──────────────────────────────────────────────── */}
+      <ContextualEntryThread entryDto={entryDto} />
     </div>
   )
 }
 
-// ─── küçük yardımcı ──────────────────────────────────────────────────────────
-function SectionLabel({ children, color }) {
-  return (
-    <p
-      style={{
-        fontSize: 11,
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-        color,
-        marginBottom: 6,
-        paddingLeft: 4,
-      }}
-    >
-      {children}
-    </p>
-  )
-}

@@ -16,38 +16,57 @@ export default function MainLayout({ children }) {
   return (
     <div className="layout-root">
       <TopBar />
-      
+
       <div className="layout-body">
-        {/* Sol Panel (Desktop) */}
-        <LeftPanel />
+        <div
+          style={{
+            display: 'flex',
+            width: '100%',
+            maxWidth: '1432px',
+            margin: '0 auto',
+            padding: '0 16px',
+          }}
+        >
+          {/* Sol Panel (Desktop) */}
+          <LeftPanel />
 
-        {/* Mobil Sol Drawer */}
-        {isLeftDrawerOpen && (
-          <>
-            <div className="modal-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
-            <div style={{ position: 'fixed', top: 'var(--topbar-height)', left: 0, bottom: 0, width: '80%', zIndex: 101, background: 'var(--color-bg)', overflowY: 'auto' }}>
-              <LeftPanel />
-            </div>
-          </>
-        )}
-
-        {/* Orta ve Sağ Panel ile Footer'ı Saran Konteyner */}
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-          {/* Sadece Orta ve Sağ Panelin Yanyana Olduğu Kısım */}
-          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-            {/* Merkez İçerik */}
-            <main className="layout-center" id="scroll-container">
-              <div style={{ maxWidth: 800, margin: '0 auto', padding: '16px' }}>
-                {children}
+          {/* Mobil Sol Drawer */}
+          {isLeftDrawerOpen && (
+            <>
+              <div className="modal-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 'var(--topbar-height)',
+                  left: 0,
+                  bottom: 0,
+                  width: '80%',
+                  zIndex: 101,
+                  background: 'var(--color-bg)',
+                  overflowY: 'auto',
+                }}
+              >
+                <LeftPanel />
               </div>
-            </main>
+            </>
+          )}
 
-            {/* Sağ Panel (Desktop) */}
-            <RightPanel />
+          {/* Orta ve Sağ Panel ile Footer'ı Saran Konteyner */}
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+            {/* Sadece Orta ve Sağ Panelin Yanyana Olduğu Kısım */}
+            <div style={{ display: 'flex', flex: 1, minWidth: 0 }}>
+              {/* Merkez İçerik */}
+              <main className="layout-center" id="scroll-container" style={{ minWidth: 0 }}>
+                <div style={{ maxWidth: 800, margin: '0 auto', padding: '16px' }}>{children}</div>
+              </main>
+
+              {/* Sağ Panel (Desktop) */}
+              <RightPanel />
+            </div>
+
+            {/* Footer artık SADECE Orta ve Sağ panelin altında! */}
+            <FooterBar />
           </div>
-
-          {/* Footer artık SADECE Orta ve Sağ panelin altında! */}
-          <FooterBar />
         </div>
       </div>
     </div>

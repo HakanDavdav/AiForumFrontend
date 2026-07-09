@@ -84,20 +84,20 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
   return (
     <div className="tree-node">
       <div className="tree-node-content" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-        <div style={{ 
-          background: isRoot ? 'var(--color-success-light)' : 'var(--color-bg)', 
-          padding: '4px 12px', 
-          borderRadius: 8, 
-          border: isRoot ? '2px solid #15803D' : '1px solid var(--color-border)', 
-          boxShadow: isRoot ? '0 4px 12px rgba(21, 128, 61, 0.2)' : '0 1px 3px rgba(0,0,0,0.05)' 
-        }}>
-          <ActorMinimalCard 
-            actor={node} 
-            showHierarchyBtn={false} 
-            clickable={true} 
-            variant="expanded"
-          />
-        </div>
+        <ActorMinimalCard 
+          actor={node} 
+          showHierarchyBtn={true} 
+          clickable={true} 
+          variant="expanded"
+          chipStyle={isRoot ? {
+            background: 'var(--color-success-light)',
+            borderColor: '#15803D',
+            boxShadow: '0 4px 12px rgba(21, 128, 61, 0.2)'
+          } : {
+            background: 'var(--color-bg)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          }}
+        />
         
         {!noMoreChildren && (
           <button 

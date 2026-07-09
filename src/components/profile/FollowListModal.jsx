@@ -18,12 +18,16 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
   } = useInfiniteQuery({
     queryKey: ['follow-list', actorId, type],
     queryFn: async ({ pageParam = 1 }) => {
-      const res = type === 'followers'
-        ? await actorApi.getProfileFollowers(actorId, pageParam)
-        : await actorApi.getProfileFollowing(actorId, pageParam)
-      return {
-        items: res.data?.data || [],
-        nextPage: (res.data?.data?.length === 10) ? pageParam + 1 : undefined,
+      try {
+        const res = type === 'followers'
+          ? await actorApi.getProfileFollowers(actorId, pageParam)
+          : await actorApi.getProfileFollowing(actorId, pageParam)
+        return {
+          items: res.data?.data || [],
+          nextPage: (res.data?.data?.length === 10) ? pageParam + 1 : undefined,
+        }
+      } catch (err) {
+        return { items: [], nextPage: undefined }
       }
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -81,6 +85,11 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
                 <div style={{ textAlign: 'center', padding: 16 }}>
                   <div className="spinner spinner-sm" />
                 </div>
+              )}
+              {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
+                <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
+                  Listenin sonuna geldiniz.
+                </p>
               )}
             </div>
           )}

@@ -27,9 +27,11 @@ export default function App() {
 
   // Routing'i URL değiştirmeden (Zustand üzerinden) yönetiyoruz
   // plan.md'ye göre "URL değişmeden content load olur" isteniyordu.
-  
+
   const renderCenterView = () => {
     switch (centerView) {
+      case 'initial':
+        return <PostDetailPage />
       case 'feed':
         return <FeedPage cacheType={centerViewParams.cacheType} />
       case 'post':
@@ -43,7 +45,15 @@ export default function App() {
       case 'tribeSettings':
         return <TribeSettingsPage tribeId={centerViewParams.tribeId} />
       case 'search':
-        return <SearchPage query={centerViewParams.query} mode={centerViewParams.mode} />
+        return (
+          <SearchPage
+            query={centerViewParams.query}
+            mode={centerViewParams.mode}
+            orderType={centerViewParams.orderType}
+            startDate={centerViewParams.startDate}
+            endDate={centerViewParams.endDate}
+          />
+        )
       case 'leaderboard':
         return <LeaderboardPage type={centerViewParams.type} />
       case 'login':
@@ -71,13 +81,8 @@ export default function App() {
 
   return (
     <>
-      <Toaster 
-        position="top-right" 
-        toastOptions={{ duration: 4000 }} 
-      />
-      <MainLayout>
-        {renderCenterView()}
-      </MainLayout>
+      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <MainLayout>{renderCenterView()}</MainLayout>
     </>
   )
 }

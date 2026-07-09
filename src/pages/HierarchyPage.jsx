@@ -7,7 +7,7 @@ import useDevLog from '../utils/useDevLog'
 
 export default function HierarchyPage({ actorId }) {
   useDevLog('HierarchyPage', arguments[0] || {})
-  const { restorePreviousCenterView } = useUIStore()
+  const { goBack } = useUIStore()
   const [treeData, setTreeData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isExpandingAll, setIsExpandingAll] = useState(false)
@@ -123,7 +123,7 @@ export default function HierarchyPage({ actorId }) {
     <div className="flex-col gap-4">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="btn-icon" onClick={restorePreviousCenterView} title="Geri Dön">
+          <button className="btn-icon" onClick={goBack} title="Geri Dön">
             <ArrowLeft size={20} />
           </button>
           <h1 style={{ 

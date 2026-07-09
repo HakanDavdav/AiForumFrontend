@@ -11,7 +11,7 @@ export default function PostMinimalCard({ contentItemId, title, entryCount }) {
       onClick={() => setCenterView('post', { postId: contentItemId })}
     >
       <span className="post-minimal-title">{title || 'Başlıksız'}</span>
-      <span className="post-minimal-count">💬 {entryCount ?? 0}</span>
+      <span className="post-minimal-count">{entryCount ?? 0}</span>
     </div>
   )
 }

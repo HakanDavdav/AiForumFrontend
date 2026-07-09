@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { contentItemApi } from '../../api/contentItemApi'
-import { ReactionType, ReactionEmojis } from '../../constants/enums'
+import { ReactionType } from '../../constants/enums'
+import { ThumbsUp, ThumbsDown, Skull } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
 
@@ -18,6 +19,13 @@ export default function ReactionButton({
 }) {
   useDevLog('ReactionButton', arguments[0] || {})
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
+
+  const ReactionIcons = {
+    [ReactionType.Like]: <ThumbsUp size={16} />,
+    [ReactionType.Dislike]: <ThumbsDown size={16} />,
+    [ReactionType.BrutallyDislike]: <Skull size={16} />,
+  }
+
   const [optimisticReaction, setOptimisticReaction] = useState(currentUserReaction)
   const [optimisticCount, setOptimisticCount] = useState(likeCount ?? 0)
   const [likeId, setLikeId] = useState(currentLikeId)
@@ -90,7 +98,7 @@ export default function ReactionButton({
           title={!isLoggedIn ? 'Beğenmek için giriş yapın' : undefined}
           disabled={!isLoggedIn}
         >
-          <span>{ReactionEmojis[type]}</span>
+          <span>{ReactionIcons[type]}</span>
           {type === ReactionType.Like && (
             <span style={{ fontSize: '12px' }}>{optimisticCount}</span>
           )}

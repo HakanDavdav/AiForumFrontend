@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
 import { contentItemApi } from '../api/contentItemApi'
+import { searchApi, parseCacheResponse } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
 import EntryDraft from '../components/content/EntryDraft'
@@ -9,38 +10,56 @@ import useUIStore from '../store/uiStore'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
 
-export default function PostDetailPage({ postId }) {
+export default function PostDetailPage({ postId: propPostId }) {
   useDevLog('PostDetailPage', arguments[0] || {})
-  const { restorePreviousCenterView } = useUIStore()
+  const { goBack, viewHistory } = useUIStore()
   const { isLoggedIn } = useAuthStore()
   const queryClient = useQueryClient()
 
+  // Eğer prop olarak postId gelmediyse (initial view), en trend postu getir
+  const { data: trendingData, isLoading: isTrendingLoading } = useQuery({
+    queryKey: ['feed', 'trending'],
+    queryFn: () => searchApi.getTrendingPosts().then(parseCacheResponse),
+    enabled: !propPostId,
+  })
+
+  const postId = propPostId || (trendingData && trendingData[0]?.contentItemId)
+
   const { data: postData, isLoading: isPostLoading } = useQuery({
     queryKey: ['post', postId],
-    queryFn: () => contentItemApi.getPost(postId).then(r => r.data?.data),
+    queryFn: () => contentItemApi.getPost(postId).then((r) => r.data?.data),
     enabled: !!postId,
   })
 
   const [page, setPage] = useState(1)
-  
+
   // Backend'den perPage gelmediği için, page=1'deki data uzunluğuna bakarak limiti çıkarıyoruz.
   const [inferredPerPage, setInferredPerPage] = useState(20)
 
-  const { data: entriesData, isLoading: isEntriesLoading, isFetching: isEntriesFetching } = useQuery({
+  const {
+    data: entriesData,
+    isLoading: isEntriesLoading,
+    isFetching: isEntriesFetching,
+  } = useQuery({
     queryKey: ['post-entries', postId, page],
-    queryFn: () => contentItemApi.getPostEntries(postId, page).then(r => {
-      const data = r.data?.data || []
-      // Sadece 1. sayfadayken ve toplam entry sayısından az eleman gelmişse, bu tam sayfa kapasitesidir.
-      if (page === 1 && postData && postData.entryCount > data.length) {
-        setInferredPerPage(data.length)
-      }
-      return data
-    }),
+    queryFn: () =>
+      contentItemApi.getPostEntries(postId, page).then((r) => {
+        const data = r.data?.data || []
+        // Sadece 1. sayfadayken ve toplam entry sayısından az eleman gelmişse, bu tam sayfa kapasitesidir.
+        if (page === 1 && postData && postData.entryCount > data.length) {
+          setInferredPerPage(data.length)
+        }
+        return data
+      }),
     enabled: !!postId && !!postData,
   })
 
-  if (isPostLoading || isEntriesLoading) {
-    return <div className="flex justify-center" style={{ padding: 40 }}><div className="spinner spinner-lg" /></div>
+  if (isPostLoading || isEntriesLoading || isTrendingLoading) {
+    return (
+      <div className="flex justify-center" style={{ padding: 40 }}>
+        <div className="spinner spinner-lg" />
+      </div>
+    )
   }
 
   if (!postData) {
@@ -48,7 +67,13 @@ export default function PostDetailPage({ postId }) {
       <div className="empty-state">
         Konu bulunamadı.
         <br />
-        <button className="btn btn-ghost" onClick={restorePreviousCenterView} style={{ marginTop: 16 }}>Geri Dön</button>
+        <button
+          className="btn btn-ghost"
+          onClick={goBack}
+          style={{ marginTop: 16 }}
+        >
+          Geri Dön
+        </button>
       </div>
     )
   }
@@ -56,46 +81,81 @@ export default function PostDetailPage({ postId }) {
   return (
     <div className="flex-col gap-4">
       {/* Top Navigation */}
-      <div className="flex items-center gap-4" style={{ marginBottom: 8 }}>
-        <button className="btn-icon" onClick={restorePreviousCenterView} style={{ background: 'var(--color-surface-2)' }}>
-          <ArrowLeft size={18} />
-        </button>
-        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-muted)' }}>Geri Dön</span>
-      </div>
+      {/* Top Navigation */}
+      {viewHistory.length > 0 && (
+        <div className="flex items-center gap-4" style={{ marginBottom: 8 }}>
+          <button
+            className="btn-icon"
+            onClick={goBack}
+            style={{ background: 'var(--color-surface-2)' }}
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-muted)' }}>
+            Geri Dön
+          </span>
+        </div>
+      )}
 
       {/* Main Post */}
       <PostCard {...postData} isSticky={true} />
 
       {/* Ana Posta Doğrudan Cevap Yazma Kutusu */}
-      {isLoggedIn && (
-        <div style={{ marginTop: 16 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, color: 'var(--color-text-secondary)' }}>
-            Konuya Cevap Yaz
-          </h3>
-          <EntryDraft 
-            parentContentItemId={postId} 
+      <div style={{ marginTop: 16 }}>
+        <h3
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            marginBottom: 8,
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          Konuya Cevap Yaz
+        </h3>
+        {isLoggedIn ? (
+          <EntryDraft
+            parentContentItemId={postId}
             onSuccess={() => {
               queryClient.invalidateQueries({ queryKey: ['post-entries', postId] })
               queryClient.invalidateQueries({ queryKey: ['post', postId] })
               setPage(1) // Reset to first page to see the new entry
             }}
           />
-        </div>
-      )}
+        ) : (
+          <div className="card-surface" style={{ textAlign: 'center', padding: '24px 16px' }}>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: 12 }}>
+              Bu konuya cevap yazabilmek için giriş yapmalısınız.
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button className="btn btn-outline btn-sm" onClick={() => useUIStore.getState().setCenterView('login')}>Giriş Yap</button>
+              <button className="btn btn-primary btn-sm" onClick={() => useUIStore.getState().setCenterView('register')}>Kayıt Ol</button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Entries List */}
       <div className="flex-col gap-4" style={{ marginTop: 24 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--color-border)' }}>
+        <h3
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            paddingBottom: 8,
+            borderBottom: '1px solid var(--color-border)',
+          }}
+        >
           Yorumlar ({postData.entryCount ?? 0})
         </h3>
-        
-        {(!entriesData || entriesData.length === 0) ? (
-           <p className="empty-state" style={{ paddingTop: 40 }}>İlk yorumu siz yapın!</p>
+
+        {!entriesData || entriesData.length === 0 ? (
+          <p className="empty-state" style={{ paddingTop: 40 }}>
+            İlk yorumu siz yapın!
+          </p>
         ) : (
-          entriesData.map(entry => (
-            <EntryCard 
-              key={entry.contentItemId} 
-              {...entry} 
+          entriesData.map((entry) => (
+            <EntryCard
+              key={entry.contentItemId}
+              {...entry}
               queryKey={['post-entries', postId, page]}
             />
           ))
@@ -103,19 +163,21 @@ export default function PostDetailPage({ postId }) {
 
         {/* Pagination Controls */}
         {postData.entryCount > inferredPerPage && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 16,
-            marginTop: 24,
-            paddingTop: 16,
-            borderTop: '1px solid var(--color-border)'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 16,
+              marginTop: 24,
+              paddingTop: 16,
+              borderTop: '1px solid var(--color-border)',
+            }}
+          >
             <button
               className="btn btn-outline btn-sm"
               disabled={page === 1 || isEntriesFetching}
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
               <ChevronLeft size={16} /> Önceki
             </button>
@@ -124,8 +186,10 @@ export default function PostDetailPage({ postId }) {
             </span>
             <button
               className="btn btn-outline btn-sm"
-              disabled={page >= Math.ceil((postData.entryCount || 0) / inferredPerPage) || isEntriesFetching}
-              onClick={() => setPage(p => p + 1)}
+              disabled={
+                page >= Math.ceil((postData.entryCount || 0) / inferredPerPage) || isEntriesFetching
+              }
+              onClick={() => setPage((p) => p + 1)}
             >
               Sonraki <ChevronRight size={16} />
             </button>

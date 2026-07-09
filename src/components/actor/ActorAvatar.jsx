@@ -1,4 +1,4 @@
-import { Bot, User } from 'lucide-react'
+import { Bot, PersonStanding } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 
 /**
@@ -25,8 +25,17 @@ export default function ActorAvatar({
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
 
-  const sizeMap = { sm: 'avatar-sm', md: 'avatar-md', lg: 'avatar-lg', xl: 'avatar-xl' }
+  const sizeMap = { sm: 'avatar-sm', md: 'avatar-md', lg: 'avatar-lg', xl: 'avatar-xl', xxl: 'avatar-xxl' }
   const sizeClass = sizeMap[size] || 'avatar-md'
+
+  const badgeSizeMap = {
+    sm: { size: 14, icon: 10, bottom: -2, right: -2 },
+    md: { size: 18, icon: 12, bottom: -2, right: -2 },
+    lg: { size: 22, icon: 14, bottom: -2, right: -2 },
+    xl: { size: 28, icon: 16, bottom: 0, right: 0 },
+    xxl: { size: 40, icon: 24, bottom: 2, right: 2 },
+  }
+  const badgeOpts = badgeSizeMap[size] || badgeSizeMap.md
 
   const handleClick = (e) => {
     if (onClick) {
@@ -36,13 +45,9 @@ export default function ActorAvatar({
   }
 
   return (
-    <div className="actor-avatar-wrap" style={{ cursor: 'pointer' }} onClick={handleClick}>
+    <div className="actor-avatar-wrap" style={{ cursor: 'pointer', alignSelf: 'flex-start', height: 'max-content', display: 'inline-flex' }} onClick={handleClick}>
       {imageUrl ? (
-        <img
-          src={imageUrl}
-          alt={profileName || 'Aktör'}
-          className={`avatar ${sizeClass}`}
-        />
+        <img src={imageUrl} alt={profileName || 'Aktör'} className={`avatar ${sizeClass}`} />
       ) : (
         <div
           className={`avatar-fallback ${sizeClass}`}
@@ -56,8 +61,31 @@ export default function ActorAvatar({
       )}
 
       {isBot && (
-        <div className="actor-avatar-bot-badge" title="Bot">
-          <Bot size={8} color="white" strokeWidth={2.5} />
+        <div
+          className="actor-avatar-user-badge"
+          title="Bot"
+          style={{
+            width: badgeOpts.size,
+            height: badgeOpts.size,
+            bottom: badgeOpts.bottom,
+            right: badgeOpts.right,
+          }}
+        >
+          <Bot size={badgeOpts.icon} color="white" strokeWidth={2.5} />
+        </div>
+      )}
+      {discriminator === 'User' && (
+        <div
+          className="actor-avatar-user-badge"
+          title="Kullanıcı"
+          style={{
+            width: badgeOpts.size,
+            height: badgeOpts.size,
+            bottom: badgeOpts.bottom,
+            right: badgeOpts.right,
+          }}
+        >
+          <PersonStanding size={badgeOpts.icon} color="white" strokeWidth={2.5} />
         </div>
       )}
     </div>

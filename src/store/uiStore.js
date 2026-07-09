@@ -21,20 +21,23 @@ import { create } from 'zustand'
  */
 const useUIStore = create((set) => ({
   // ─── Center Panel ─────────────────────────────────────────────────────────
-  centerView: 'feed',
-  centerViewParams: {},   // { postId, actorId, tribeId, query, ... }
-  viewHistory: [],        // Max 5 items: [{ view, params }]
+  centerView: 'initial',
+  centerViewParams: {}, // { postId, actorId, tribeId, query, ... }
+  viewHistory: [], // Max 5 items: [{ view, params }]
 
   setCenterView: (view, params = {}) =>
     set((state) => {
       // Eğer zaten aynı sayfadaysak (view ve params aynıysa) geçmişe ekleme
-      if (state.centerView === view && JSON.stringify(state.centerViewParams) === JSON.stringify(params)) {
+      if (
+        state.centerView === view &&
+        JSON.stringify(state.centerViewParams) === JSON.stringify(params)
+      ) {
         return {}
       }
-      
+
       const newHistoryItem = { view: state.centerView, params: state.centerViewParams }
       const newHistory = [...state.viewHistory, newHistoryItem]
-      
+
       // Maksimum 5 geçmiş tut
       if (newHistory.length > 5) {
         newHistory.shift() // En eskisini sil
@@ -49,14 +52,14 @@ const useUIStore = create((set) => ({
 
   goBack: () =>
     set((state) => {
-      // Geçmiş boşsa Feed'e güvenli dönüş yap
+      // Geçmiş boşsa Initial'a güvenli dönüş yap
       if (state.viewHistory.length === 0) {
-        return { centerView: 'feed', centerViewParams: {} }
+        return { centerView: 'initial', centerViewParams: {} }
       }
-      
+
       const newHistory = [...state.viewHistory]
       const previous = newHistory.pop() // Sonuncuyu al ve listeden çıkar
-      
+
       return {
         viewHistory: newHistory,
         centerView: previous.view,
@@ -69,28 +72,22 @@ const useUIStore = create((set) => ({
   setActiveLeftCacheType: (type) => set({ activeLeftCacheType: type }),
 
   isActivitiesExpanded: false,
-  toggleActivities: () =>
-    set((state) => ({ isActivitiesExpanded: !state.isActivitiesExpanded })),
+  toggleActivities: () => set((state) => ({ isActivitiesExpanded: !state.isActivitiesExpanded })),
 
   // ─── Responsive Drawers ───────────────────────────────────────────────────
   isLeftDrawerOpen: false,
   isRightDrawerOpen: false,
-  toggleLeftDrawer: () =>
-    set((state) => ({ isLeftDrawerOpen: !state.isLeftDrawerOpen })),
-  toggleRightDrawer: () =>
-    set((state) => ({ isRightDrawerOpen: !state.isRightDrawerOpen })),
-  closeDrawers: () =>
-    set({ isLeftDrawerOpen: false, isRightDrawerOpen: false }),
+  toggleLeftDrawer: () => set((state) => ({ isLeftDrawerOpen: !state.isLeftDrawerOpen })),
+  toggleRightDrawer: () => set((state) => ({ isRightDrawerOpen: !state.isRightDrawerOpen })),
+  closeDrawers: () => set({ isLeftDrawerOpen: false, isRightDrawerOpen: false }),
 
   // ─── My Tribes Dropdown ───────────────────────────────────────────────────
   isMyTribesOpen: false,
-  toggleMyTribes: () =>
-    set((state) => ({ isMyTribesOpen: !state.isMyTribesOpen })),
-  closeMyTribes: () =>
-    set({ isMyTribesOpen: false }),
+  toggleMyTribes: () => set((state) => ({ isMyTribesOpen: !state.isMyTribesOpen })),
+  closeMyTribes: () => set({ isMyTribesOpen: false }),
 
   // ─── Search ───────────────────────────────────────────────────────────────
-  searchMode: 'general',  // 'general' | 'posts' | 'actors' | 'tribes'
+  searchMode: 'general', // 'general' | 'posts' | 'actors' | 'tribes'
   setSearchMode: (mode) => set({ searchMode: mode }),
 }))
 

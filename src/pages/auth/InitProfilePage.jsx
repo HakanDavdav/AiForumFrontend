@@ -5,6 +5,26 @@ import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
 
+const TOPIC_TYPES = [
+  { value: 1, label: 'Politika' },
+  { value: 32, label: 'Teknoloji' },
+  { value: 128, label: 'Yapay Zeka' },
+  { value: 64, label: 'Bilim' },
+  { value: 4, label: 'Dünya Haberleri' },
+  { value: 8, label: 'Yerel Haberler' },
+  { value: 2, label: 'Ekonomi' },
+  { value: 16, label: 'Trend Konular' },
+  { value: 1024, label: 'Spor' },
+  { value: 2048, label: 'Eğlence' },
+  { value: 4096, label: 'Oyun' },
+  { value: 8192, label: 'Ünlüler' },
+  { value: 16384, label: 'Yaşam Tarzı' },
+  { value: 512, label: 'Sağlık' },
+  { value: 256, label: 'Uzay' },
+  { value: 32768, label: 'Eğitim' },
+  { value: 65536, label: 'İlişkiler' },
+]
+
 export default function InitProfilePage() {
   useDevLog('InitProfilePage', arguments[0] || {})
   const { actorId, setProfileCreated } = useAuthStore()
@@ -13,33 +33,36 @@ export default function InitProfilePage() {
 
   const [profileName, setProfileName] = useState('')
   const [bio, setBio] = useState('')
+  const [selectedTopics, setSelectedTopics] = useState([])
   const [error, setError] = useState(null)
 
   const initProfileMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
-      // Başarılı olunca authStore'da isProfileCreated'ı güncelle ve feed'e at
       setProfileCreated(true)
       queryClient.invalidateQueries()
-      setCenterView('feed')
-    },
-    onError: (err) => {
-      setError(err.message || 'Profil oluşturulurken bir hata oluştu.')
+      setCenterView('initial')
     }
   })
+
+  const toggleTopic = (value) => {
+    setSelectedTopics(prev =>
+      prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]
+    )
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setError(null)
-    
-    // CreateEditUserProfileDto beklentilerine uygun payload
+
     const payload = {
       userId: actorId,
       profileName: profileName,
       bio: bio,
       imageUrl: '',
-      topicTypes: [0], // Varsayılan bir konu (enum değeri örn: Software)
-      theme: 0, // Light
+      topicTypes: selectedTopics,
+      theme: 0,
       entryPerPage: 50,
       postPerPage: 20,
       socialNotificationPreference: true,
@@ -58,9 +81,9 @@ export default function InitProfilePage() {
         AiForum'u kullanmaya başlamak için lütfen temel bilgilerinizi girin.
       </p>
 
-      <form onSubmit={handleSubmit} className="flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="form-group">
-          <label className="form-label">Görünen Ad (Profile Name)</label>
+          <label className="form-label">Görünen Ad</label>
           <input 
             className="input" 
             type="text" 
@@ -72,7 +95,7 @@ export default function InitProfilePage() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Kısa Biyografi (Bio)</label>
+          <label className="form-label">Biyografi</label>
           <textarea 
             className="input" 
             value={bio}
@@ -80,6 +103,30 @@ export default function InitProfilePage() {
             rows={3}
             placeholder="Kendinizden bahsedin..."
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">İlgi Alanlarınız</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+            {TOPIC_TYPES.map(topic => (
+              <label key={topic.value} style={{
+                display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer',
+                padding: '4px 10px', borderRadius: 6, fontSize: 13,
+                background: selectedTopics.includes(topic.value) ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: selectedTopics.includes(topic.value) ? '#fff' : 'var(--color-text)',
+                border: '1px solid var(--color-border)',
+                transition: 'all 0.15s'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={selectedTopics.includes(topic.value)}
+                  onChange={() => toggleTopic(topic.value)}
+                  style={{ display: 'none' }}
+                />
+                {topic.label}
+              </label>
+            ))}
+          </div>
         </div>
 
         {error && <div className="form-error text-center">{error}</div>}

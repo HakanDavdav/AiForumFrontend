@@ -1,0 +1,364 @@
+Entity Framework Core 10.0.1 initialized 'ApplicationDbContext' using provider 'Npgsql.EntityFrameworkCore.PostgreSQL:10.0.0+7624373747b28d693b45cea8174471d4b312e2a5' with options: MigrationsHistoryTable=DefaultSchema.__EFMigrationsHistory using vector 
+Compiling query expression: 
+'DbSet<Actor>()
+    .Where(a => a.ActorId == @userId)
+    .FirstOrDefault()'
+Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Actor>(
+    asyncEnumerable: SingleQueryingEnumerable.Create<Actor>(
+        relationalQueryContext: (RelationalQueryContext)queryContext, 
+        relationalCommandResolver: parameters => [LIFTABLE Constant: RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IPropertyBase, int> { [Property: Actor.ActorId (Guid) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Actor.ActorPoint (int?) Required ValueGenerated.OnAdd, 1], [Property: Actor.ActorType (string) Required AfterSave:Throw MaxLength(5), 2], [Property: Actor.Bio (string) MaxLength(500), 3], [Property: Actor.CreatedAt (DateTime?) Required Index ValueGenerated.OnAdd, 4], [Property: Actor.Depth (int?) Required ValueGenerated.OnAdd, 5], [Property: Actor.EntryCount (int?) Required ValueGenerated.OnAdd, 6], [Property: Actor.FollowedCount (int?) Required ValueGenerated.OnAdd, 7], [Property: Actor.FollowerCount (int?) Required ValueGenerated.OnAdd, 8], [Property: Actor.ImageUrl (string) MaxLength(500), 9], [Property: Actor.ParentActorId (Guid?) FK Index, 10], [Property: Actor.PostCount (int?) Required ValueGenerated.OnAdd, 11], [Property: Actor.ProfileName (string) Index MaxLength(50), 12], [Property: Actor.ReactionCount (int?) Required ValueGenerated.OnAdd, 13], [Property: Bot.IsDeleted (bool) Required ValueGenerated.OnAdd, 14], [Property: Bot.UserIdentityId (no field, Guid?) Shadow FK Index, 15] }
+            SELECT TOP(1) a.ActorId, a.ActorPoint, a.ActorType, a.Bio, a.CreatedAt, a.Depth, a.EntryCount, a.FollowedCount, a.FollowerCount, a.ImageUrl, a.ParentActorId, a.PostCount, a.ProfileName, a.ReactionCount, a.IsDeleted, a.UserIdentityId
+            FROM DefaultSchema.Actors AS a
+            WHERE a.ActorId == @userId) | Resolver: c => new RelationalCommandCache(
+            c.Dependencies.MemoryCache, 
+            c.RelationalDependencies.QuerySqlGeneratorFactory, 
+            c.RelationalDependencies.RelationalParameterBasedSqlProcessorFactory, 
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IPropertyBase, int> { [Property: Actor.ActorId (Guid) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Actor.ActorPoint (int?) Required ValueGenerated.OnAdd, 1], [Property: Actor.ActorType (string) Required AfterSave:Throw MaxLength(5), 2], [Property: Actor.Bio (string) MaxLength(500), 3], [Property: Actor.CreatedAt (DateTime?) Required Index ValueGenerated.OnAdd, 4], [Property: Actor.Depth (int?) Required ValueGenerated.OnAdd, 5], [Property: Actor.EntryCount (int?) Required ValueGenerated.OnAdd, 6], [Property: Actor.FollowedCount (int?) Required ValueGenerated.OnAdd, 7], [Property: Actor.FollowerCount (int?) Required ValueGenerated.OnAdd, 8], [Property: Actor.ImageUrl (string) MaxLength(500), 9], [Property: Actor.ParentActorId (Guid?) FK Index, 10], [Property: Actor.PostCount (int?) Required ValueGenerated.OnAdd, 11], [Property: Actor.ProfileName (string) Index MaxLength(50), 12], [Property: Actor.ReactionCount (int?) Required ValueGenerated.OnAdd, 13], [Property: Bot.IsDeleted (bool) Required ValueGenerated.OnAdd, 14], [Property: Bot.UserIdentityId (no field, Guid?) Shadow FK Index, 15] }
+            SELECT TOP(1) a.ActorId, a.ActorPoint, a.ActorType, a.Bio, a.CreatedAt, a.Depth, a.EntryCount, a.FollowedCount, a.FollowerCount, a.ImageUrl, a.ParentActorId, a.PostCount, a.ProfileName, a.ReactionCount, a.IsDeleted, a.UserIdentityId
+            FROM DefaultSchema.Actors AS a
+            WHERE a.ActorId == @userId, 
+            False, 
+            Parameter
+        )].GetRelationalCommandTemplate(parameters), 
+        readerColumns: null, 
+        shaper: (queryContext, dataReader, resultContext, resultCoordinator) => 
+        {
+            Actor entity;
+            entity = 
+            {
+                MaterializationContext materializationContext1;
+                IEntityType entityType1;
+                Actor instance1;
+                InternalEntityEntry entry1;
+                bool hasNullKey1;
+                materializationContext1 = new MaterializationContext(
+                    [LIFTABLE Constant: ValueBuffer | Resolver: _ => (object)ValueBuffer.Empty], 
+                    queryContext.Context
+                );
+                instance1 = default(Actor);
+                entry1 = queryContext.TryGetEntry(
+                    key: [LIFTABLE Constant: Key: Actor.ActorId PK | Resolver: c => c.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Actor").FindPrimaryKey()], 
+                    keyValues: new object[]{ (object)dataReader.GetGuid(0) }, 
+                    throwOnNullKey: True, 
+                    hasNullKey: hasNullKey1);
+                !(hasNullKey1) ? entry1 != default(InternalEntityEntry) ? 
+                {
+                    entityType1 = entry1.EntityType;
+                    return instance1 = (Actor)entry1.Entity;
+                } : 
+                {
+                    ISnapshot shadowSnapshot1;
+                    shadowSnapshot1 = [LIFTABLE Constant: Snapshot | Resolver: _ => Snapshot.Empty];
+                    entityType1 = 
+                    {
+                        string discriminator;
+                        discriminator = dataReader.GetString(2);
+                        return switch (discriminator)
+                        {
+                            case "Actor": 
+                                [LIFTABLE Constant: EntityType: Actor | Resolver: namelessParameter{0} => namelessParameter{0}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Actor")]
+                            case "Bot": 
+                                [LIFTABLE Constant: EntityType: Bot Base: Actor | Resolver: namelessParameter{1} => namelessParameter{1}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Bot")]
+                            case "User": 
+                                [LIFTABLE Constant: EntityType: User Base: Actor | Resolver: namelessParameter{2} => namelessParameter{2}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.User")]
+                            default: 
+                                {
+                                    throw StructuralTypeShaperExpression.CreateUnableToDiscriminateException(
+                                        type: [LIFTABLE Constant: EntityType: Actor | Resolver: namelessParameter{3} => namelessParameter{3}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Actor")], 
+                                        discriminator: (object)discriminator);
+                                    return null;
+                                }
+                        }
+                    };
+                    instance1 = switch (entityType1)
+                    {
+                        case [LIFTABLE Constant: EntityType: Actor | Resolver: namelessParameter{4} => namelessParameter{4}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Actor")]: 
+                            {
+                                return 
+                                {
+                                    Actor instance;
+                                    instance = new Actor();
+                                    instance.<ActorId>k__BackingField = dataReader.GetGuid(0);
+                                    instance.<ActorPoint>k__BackingField = (int?)dataReader.GetInt32(1);
+                                    instance.<ActorType>k__BackingField = dataReader.GetString(2);
+                                    instance.<Bio>k__BackingField = dataReader.IsDBNull(3) ? default(string) : dataReader.GetString(3);
+                                    instance.<CreatedAt>k__BackingField = (DateTime?)dataReader.GetDateTime(4);
+                                    instance.<Depth>k__BackingField = (int?)dataReader.GetInt32(5);
+                                    instance.<EntryCount>k__BackingField = (int?)dataReader.GetInt32(6);
+                                    instance.<FollowedCount>k__BackingField = (int?)dataReader.GetInt32(7);
+                                    instance.<FollowerCount>k__BackingField = (int?)dataReader.GetInt32(8);
+                                    instance.<ImageUrl>k__BackingField = dataReader.IsDBNull(9) ? default(string) : dataReader.GetString(9);
+                                    instance.<ParentActorId>k__BackingField = dataReader.IsDBNull(10) ? default(Guid?) : (Guid?)dataReader.GetGuid(10);
+                                    instance.<PostCount>k__BackingField = (int?)dataReader.GetInt32(11);
+                                    instance.<ProfileName>k__BackingField = dataReader.IsDBNull(12) ? default(string) : dataReader.GetString(12);
+                                    instance.<ReactionCount>k__BackingField = (int?)dataReader.GetInt32(13);
+                                    (instance is IInjectableService) ? ((IInjectableService)instance).Injected(
+                                        context: materializationContext1.Context, 
+                                        entity: instance, 
+                                        queryTrackingBehavior: TrackAll, 
+                                        structuralType: [LIFTABLE Constant: EntityType: Actor | Resolver: namelessParameter{5} => namelessParameter{5}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Actor")]) : default(void);
+                                    return instance;
+                                }}
+                        case [LIFTABLE Constant: EntityType: Bot Base: Actor | Resolver: namelessParameter{6} => namelessParameter{6}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Bot")]: 
+                            {
+                                shadowSnapshot1 = (ISnapshot)new Snapshot<Guid?>(dataReader.IsDBNull(15) ? default(Guid?) : (Guid?)dataReader.GetGuid(15));
+                                return (Actor)
+                                {
+                                    Bot instance;
+                                    instance = new Bot();
+                                    instance.<ActorId>k__BackingField = dataReader.GetGuid(0);
+                                    instance.<ActorPoint>k__BackingField = (int?)dataReader.GetInt32(1);
+                                    instance.<ActorType>k__BackingField = dataReader.GetString(2);
+                                    instance.<Bio>k__BackingField = dataReader.IsDBNull(3) ? default(string) : dataReader.GetString(3);
+                                    instance.<CreatedAt>k__BackingField = (DateTime?)dataReader.GetDateTime(4);
+                                    instance.<Depth>k__BackingField = (int?)dataReader.GetInt32(5);
+                                    instance.<EntryCount>k__BackingField = (int?)dataReader.GetInt32(6);
+                                    instance.<FollowedCount>k__BackingField = (int?)dataReader.GetInt32(7);
+                                    instance.<FollowerCount>k__BackingField = (int?)dataReader.GetInt32(8);
+                                    instance.<ImageUrl>k__BackingField = dataReader.IsDBNull(9) ? default(string) : dataReader.GetString(9);
+                                    instance.<ParentActorId>k__BackingField = dataReader.IsDBNull(10) ? default(Guid?) : (Guid?)dataReader.GetGuid(10);
+                                    instance.<PostCount>k__BackingField = (int?)dataReader.GetInt32(11);
+                                    instance.<ProfileName>k__BackingField = dataReader.IsDBNull(12) ? default(string) : dataReader.GetString(12);
+                                    instance.<ReactionCount>k__BackingField = (int?)dataReader.GetInt32(13);
+                                    instance.<IsDeleted>k__BackingField = dataReader.IsDBNull(14) ? default(bool) : dataReader.GetBoolean(14);
+                                    (instance is IInjectableService) ? ((IInjectableService)instance).Injected(
+                                        context: materializationContext1.Context, 
+                                        entity: instance, 
+                                        queryTrackingBehavior: TrackAll, 
+                                        structuralType: [LIFTABLE Constant: EntityType: Bot Base: Actor | Resolver: namelessParameter{7} => namelessParameter{7}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.Bot")]) : default(void);
+                                    return instance;
+                                };
+                            }
+                        case [LIFTABLE Constant: EntityType: User Base: Actor | Resolver: namelessParameter{8} => namelessParameter{8}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.User")]: 
+                            {
+                                return (Actor)
+                                {
+                                    User instance;
+                                    instance = new User();
+                                    instance.<ActorId>k__BackingField = dataReader.GetGuid(0);
+                                    instance.<ActorPoint>k__BackingField = (int?)dataReader.GetInt32(1);
+                                    instance.<ActorType>k__BackingField = dataReader.GetString(2);
+                                    instance.<Bio>k__BackingField = dataReader.IsDBNull(3) ? default(string) : dataReader.GetString(3);
+                                    instance.<CreatedAt>k__BackingField = (DateTime?)dataReader.GetDateTime(4);
+                                    instance.<Depth>k__BackingField = (int?)dataReader.GetInt32(5);
+                                    instance.<EntryCount>k__BackingField = (int?)dataReader.GetInt32(6);
+                                    instance.<FollowedCount>k__BackingField = (int?)dataReader.GetInt32(7);
+                                    instance.<FollowerCount>k__BackingField = (int?)dataReader.GetInt32(8);
+                                    instance.<ImageUrl>k__BackingField = dataReader.IsDBNull(9) ? default(string) : dataReader.GetString(9);
+                                    instance.<ParentActorId>k__BackingField = dataReader.IsDBNull(10) ? default(Guid?) : (Guid?)dataReader.GetGuid(10);
+                                    instance.<PostCount>k__BackingField = (int?)dataReader.GetInt32(11);
+                                    instance.<ProfileName>k__BackingField = dataReader.IsDBNull(12) ? default(string) : dataReader.GetString(12);
+                                    instance.<ReactionCount>k__BackingField = (int?)dataReader.GetInt32(13);
+                                    (instance is IInjectableService) ? ((IInjectableService)instance).Injected(
+                                        context: materializationContext1.Context, 
+                                        entity: instance, 
+                                        queryTrackingBehavior: TrackAll, 
+                                        structuralType: [LIFTABLE Constant: EntityType: User Base: Actor | Resolver: namelessParameter{9} => namelessParameter{9}.Dependencies.Model.FindEntityType("DataAccessLayer.Concrete.Entities.User")]) : default(void);
+                                    return instance;
+                                };
+                            }
+                        default: 
+                            default(Actor)
+                    }
+                    ;
+                    entry1 = entityType1 == default(IEntityType) ? default(InternalEntityEntry) : queryContext.StartTracking(
+                        entityType: entityType1, 
+                        entity: instance1, 
+                        snapshot: shadowSnapshot1);
+                    return instance1;
+                } : default(void);
+                return instance1;
+            };
+            return entity;
+        }, 
+        contextType: DataAccessLayer.Concrete.ApplicationDbContext, 
+        standAloneStateManager: False, 
+        detailedErrorsEnabled: False, 
+        threadSafetyChecksEnabled: True), 
+    cancellationToken: queryContext.CancellationToken)'
+Creating DbConnection.
+Created DbConnection. (0ms).
+Opening connection to database 'test_db' on server 'tcp://postgres:5432'.
+Opened connection to database 'test_db' on server 'tcp://postgres:5432'.
+Enlisted in an ambient transaction with isolation level 'ReadCommitted'.
+Creating DbCommand for 'ExecuteReader'.
+Created DbCommand for 'ExecuteReader' (0ms).
+Initialized DbCommand for 'ExecuteReader' (0ms).
+Executing DbCommand [Parameters=[@userId='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+SELECT a."ActorId", a."ActorPoint", a."ActorType", a."Bio", a."CreatedAt", a."Depth", a."EntryCount", a."FollowedCount", a."FollowerCount", a."ImageUrl", a."ParentActorId", a."PostCount", a."ProfileName", a."ReactionCount", a."IsDeleted", a."UserIdentityId"
+FROM "DefaultSchema"."Actors" AS a
+WHERE a."ActorId" = @userId
+LIMIT 1
+Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+SELECT a."ActorId", a."ActorPoint", a."ActorType", a."Bio", a."CreatedAt", a."Depth", a."EntryCount", a."FollowedCount", a."FollowerCount", a."ImageUrl", a."ParentActorId", a."PostCount", a."ProfileName", a."ReactionCount", a."IsDeleted", a."UserIdentityId"
+FROM "DefaultSchema"."Actors" AS a
+WHERE a."ActorId" = @userId
+LIMIT 1
+Context 'ApplicationDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Closing data reader to 'test_db' on server 'tcp://postgres:5432'.
+A data reader for 'test_db' on server 'tcp://postgres:5432' is being disposed after spending 0ms reading results.
+Closing connection to database 'test_db' on server 'tcp://postgres:5432'.
+Closed connection to database 'test_db' on server 'tcp://postgres:5432' (0ms).
+Compiling query expression: 
+'DbSet<Bot>()
+    .Where(b => b.ParentActorId == @userId && !(b.IsDeleted))
+    .Count()'
+Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleAsync<int>(
+    asyncEnumerable: SingleQueryingEnumerable.Create<int>(
+        relationalQueryContext: (RelationalQueryContext)queryContext, 
+        relationalCommandResolver: parameters => [LIFTABLE Constant: RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT CAST(count(*) AS integer)
+            FROM DefaultSchema.Actors AS a
+            WHERE (a.ActorType == 'Bot') && ((a.ParentActorId == @userId) && Not(a.IsDeleted))) | Resolver: c => new RelationalCommandCache(
+            c.Dependencies.MemoryCache, 
+            c.RelationalDependencies.QuerySqlGeneratorFactory, 
+            c.RelationalDependencies.RelationalParameterBasedSqlProcessorFactory, 
+            Projection Mapping:
+                EmptyProjectionMember -> 0
+            SELECT CAST(count(*) AS integer)
+            FROM DefaultSchema.Actors AS a
+            WHERE (a.ActorType == 'Bot') && ((a.ParentActorId == @userId) && Not(a.IsDeleted)), 
+            False, 
+            Parameter
+        )].GetRelationalCommandTemplate(parameters), 
+        readerColumns: null, 
+        shaper: (queryContext, dataReader, resultContext, resultCoordinator) => 
+        {
+            int? value1;
+            value1 = dataReader.IsDBNull(0) ? default(int?) : (int?)dataReader.GetInt32(0);
+            return (int)value1;
+        }, 
+        contextType: DataAccessLayer.Concrete.ApplicationDbContext, 
+        standAloneStateManager: False, 
+        detailedErrorsEnabled: False, 
+        threadSafetyChecksEnabled: True), 
+    cancellationToken: queryContext.CancellationToken)'
+Opening connection to database 'test_db' on server 'tcp://postgres:5432'.
+Opened connection to database 'test_db' on server 'tcp://postgres:5432'.
+Creating DbCommand for 'ExecuteReader'.
+Created DbCommand for 'ExecuteReader' (0ms).
+Initialized DbCommand for 'ExecuteReader' (0ms).
+Executing DbCommand [Parameters=[@userId='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+SELECT count(*)::int
+FROM "DefaultSchema"."Actors" AS a
+WHERE a."ActorType" = 'Bot' AND a."ParentActorId" = @userId AND NOT (a."IsDeleted")
+Executed DbCommand (1ms) [Parameters=[@userId='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+SELECT count(*)::int
+FROM "DefaultSchema"."Actors" AS a
+WHERE a."ActorType" = 'Bot' AND a."ParentActorId" = @userId AND NOT (a."IsDeleted")
+Closing data reader to 'test_db' on server 'tcp://postgres:5432'.
+A data reader for 'test_db' on server 'tcp://postgres:5432' is being disposed after spending 0ms reading results.
+Closing connection to database 'test_db' on server 'tcp://postgres:5432'.
+Closed connection to database 'test_db' on server 'tcp://postgres:5432' (0ms).
+'ApplicationDbContext' generated a value for the property 'Bot.ActorType'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+The navigation 'Bot.ParentActor' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'Bot' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+'ApplicationDbContext' generated a value for the property 'TopicTypeOwnership.TopicTypeOwnershipId'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+The navigation 'TopicTypeOwnership.OwnerActor' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'TopicTypeOwnership' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+'ApplicationDbContext' generated a value for the property 'TopicTypeOwnership.TopicTypeOwnershipId'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+The navigation 'TopicTypeOwnership.OwnerActor' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'TopicTypeOwnership' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+'ApplicationDbContext' generated a value for the property 'TopicTypeOwnership.TopicTypeOwnershipId'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+The navigation 'TopicTypeOwnership.OwnerActor' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'TopicTypeOwnership' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+The navigation 'BotSettings.Bot' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'BotSettings' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'OutboxMessage' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+Context 'ApplicationDbContext' started tracking 'OutboxMessage' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+DetectChanges starting for 'ApplicationDbContext'.
+DetectChanges completed for 'ApplicationDbContext'.
+SaveChanges starting for 'ApplicationDbContext'.
+DetectChanges starting for 'ApplicationDbContext'.
+DetectChanges completed for 'ApplicationDbContext'.
+Executing 7 update commands as a batch.
+Opening connection to database 'test_db' on server 'tcp://postgres:5432'.
+Opened connection to database 'test_db' on server 'tcp://postgres:5432'.
+Creating DbCommand for 'ExecuteReader'.
+Created DbCommand for 'ExecuteReader' (0ms).
+Initialized DbCommand for 'ExecuteReader' (1ms).
+Executing DbCommand [Parameters=[@p0='?' (DbType = Guid), @p1='?', @p2='?', @p3='?' (DbType = DateTime), @p4='?', @p5='?' (DbType = Guid), @p6='?', @p7='?' (DbType = Guid), @p8='?', @p9='?' (DbType = Guid), @p10='?' (DbType = DateTime), @p11='?', @p12='?' (DbType = Int32), @p13='?', @p14='?' (DbType = Int32), @p15='?' (DbType = Guid), @p16='?', @p17='?', @p18='?' (DbType = Guid), @p19='?' (DbType = DateTime), @p20='?', @p21='?' (DbType = Int32), @p22='?', @p23='?' (DbType = Int32), @p24='?' (DbType = Guid), @p25='?', @p26='?' (DbType = Guid), @p27='?' (DbType = Int32), @p28='?', @p29='?', @p30='?' (DbType = Object), @p31='?' (DbType = Guid), @p32='?' (DbType = DateTime), @p33='?' (DbType = Guid), @p34='?' (DbType = Guid), @p35='?' (DbType = Guid), @p36='?' (DbType = Guid), @p37='?' (DbType = DateTime), @p38='?' (DbType = Guid), @p39='?' (DbType = Guid), @p40='?' (DbType = Guid), @p41='?' (DbType = Guid), @p42='?' (DbType = DateTime), @p43='?' (DbType = Guid), @p44='?' (DbType = Guid), @p45='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+INSERT INTO "DefaultSchema"."Actors" ("ActorId", "ActorType", "Bio", "CreatedAt", "ImageUrl", "ParentActorId", "ProfileName", "UserIdentityId")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)
+RETURNING "ActorPoint", "Depth", "EntryCount", "FollowedCount", "FollowerCount", "IsDeleted", "PostCount", "ReactionCount";
+INSERT INTO "DefaultSchema"."OutboxMessages" ("KafkaTopicType", "OutboxMessageId", "CreatedAt", "Payload", "RetryCount", "SpanId", "Status", "TraceId", "Type")
+VALUES (@p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16);
+INSERT INTO "DefaultSchema"."OutboxMessages" ("KafkaTopicType", "OutboxMessageId", "CreatedAt", "Payload", "RetryCount", "SpanId", "Status", "TraceId", "Type")
+VALUES (@p17, @p18, @p19, @p20, @p21, @p22, @p23, @p24, @p25);
+INSERT INTO "DefaultSchema"."BotSettings" ("ActorId", "BotGrade", "BotPersonality", "Instructions", "PersonalityVector")
+VALUES (@p26, @p27, @p28, @p29, @p30)
+RETURNING "BotCapabilities", "BotMode", "DailyBotOperationCount", "Status";
+INSERT INTO "DefaultSchema"."TopicTypeOwnerships" ("TopicTypeOwnershipId", "CreatedAt", "OwnerActorId", "PostId", "TopicTypeId")
+VALUES (@p31, @p32, @p33, @p34, @p35);
+INSERT INTO "DefaultSchema"."TopicTypeOwnerships" ("TopicTypeOwnershipId", "CreatedAt", "OwnerActorId", "PostId", "TopicTypeId")
+VALUES (@p36, @p37, @p38, @p39, @p40);
+INSERT INTO "DefaultSchema"."TopicTypeOwnerships" ("TopicTypeOwnershipId", "CreatedAt", "OwnerActorId", "PostId", "TopicTypeId")
+VALUES (@p41, @p42, @p43, @p44, @p45);
+Executed DbCommand (16ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?', @p2='?', @p3='?' (DbType = DateTime), @p4='?', @p5='?' (DbType = Guid), @p6='?', @p7='?' (DbType = Guid), @p8='?', @p9='?' (DbType = Guid), @p10='?' (DbType = DateTime), @p11='?', @p12='?' (DbType = Int32), @p13='?', @p14='?' (DbType = Int32), @p15='?' (DbType = Guid), @p16='?', @p17='?', @p18='?' (DbType = Guid), @p19='?' (DbType = DateTime), @p20='?', @p21='?' (DbType = Int32), @p22='?', @p23='?' (DbType = Int32), @p24='?' (DbType = Guid), @p25='?', @p26='?' (DbType = Guid), @p27='?' (DbType = Int32), @p28='?', @p29='?', @p30='?' (DbType = Object), @p31='?' (DbType = Guid), @p32='?' (DbType = DateTime), @p33='?' (DbType = Guid), @p34='?' (DbType = Guid), @p35='?' (DbType = Guid), @p36='?' (DbType = Guid), @p37='?' (DbType = DateTime), @p38='?' (DbType = Guid), @p39='?' (DbType = Guid), @p40='?' (DbType = Guid), @p41='?' (DbType = Guid), @p42='?' (DbType = DateTime), @p43='?' (DbType = Guid), @p44='?' (DbType = Guid), @p45='?' (DbType = Guid)], CommandType='Text', CommandTimeout='30']
+INSERT INTO "DefaultSchema"."Actors" ("ActorId", "ActorType", "Bio", "CreatedAt", "ImageUrl", "ParentActorId", "ProfileName", "UserIdentityId")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7)
+RETURNING "ActorPoint", "Depth", "EntryCount", "FollowedCount", "FollowerCount", "IsDeleted", "PostCount", "ReactionCount";
+INSERT INTO "DefaultSchema"."OutboxMessages" ("KafkaTopicType", "OutboxMessageId", "CreatedAt", "Payload", "RetryCount", "SpanId", "Status", "TraceId", "Type")
+VALUES (@p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16);
+INSERT INTO "DefaultSchema"."OutboxMessages" ("KafkaTopicType", "OutboxMessageId", "CreatedAt", "Payload", "RetryCount", "SpanId", "Status", "TraceId", "Type")
+VALUES (@p17, @p18, @p19, @p20, @p21, @p22, @p23, @p24, @p25);
+INSERT INTO "DefaultSchema"."BotSettings" ("ActorId", "BotGrade", "BotPersonality", "Instructions", "PersonalityVector")
+VALUES (@p26, @p27, @p28, @p29, @p30)
+RETURNING "BotCapabilities", "BotMode", "DailyBotOperationCount", "Status";
+INSERT INTO "DefaultSchema"."TopicTypeOwnerships" ("TopicTypeOwnershipId", "CreatedAt", "OwnerActorId", "PostId", "TopicTypeId")
+VALUES (@p31, @p32, @p33, @p34, @p35);
+INSERT INTO "DefaultSchema"."TopicTypeOwnerships" ("TopicTypeOwnershipId", "CreatedAt", "OwnerActorId", "PostId", "TopicTypeId")
+VALUES (@p36, @p37, @p38, @p39, @p40);
+INSERT INTO "DefaultSchema"."TopicTypeOwnerships" ("TopicTypeOwnershipId", "CreatedAt", "OwnerActorId", "PostId", "TopicTypeId")
+VALUES (@p41, @p42, @p43, @p44, @p45);
+Closing data reader to 'test_db' on server 'tcp://postgres:5432'.
+A data reader for 'test_db' on server 'tcp://postgres:5432' is being disposed after spending 34ms reading results.
+Closing connection to database 'test_db' on server 'tcp://postgres:5432'.
+Closed connection to database 'test_db' on server 'tcp://postgres:5432' (0ms).
+An exception occurred in the database while saving changes for context type 'DataAccessLayer.Concrete.ApplicationDbContext'.
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23502: null value in column "BotGrade" of relation "BotSettings" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlModificationCommandBatch.Consume(RelationalDataReader reader, Boolean async, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23502
+    MessageText: null value in column "BotGrade" of relation "BotSettings" violates not-null constraint
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: DefaultSchema
+    TableName: BotSettings
+    ColumnName: BotGrade
+    File: execMain.c
+    Line: 2057
+    Routine: ExecConstraints
+   --- End of inner exception stack trace ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlModificationCommandBatch.Consume(RelationalDataReader reader, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChangesAsync(IList`1 entries, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+23502: null value in column "BotGrade" of relation "BotSettings" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Connection id "0HNMSHC4FTJDF", Request id "0HNMSHC4FTJDF:00000001": An unhandled exception was thrown by the application.
+'ApplicationDbContext' disposed.
+Disposing connection to database 'test_db' on server 'tcp://postgres:5432'.
+Disposed connection to database 'test_db' on server 'tcp://postgres:5432' (0ms).

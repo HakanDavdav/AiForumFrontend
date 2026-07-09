@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, PenSquare } from 'lucide-react'
+import { ChevronDown, ChevronUp, PenSquare, Flame, Clock8, ThumbsUp, Skull } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
@@ -14,8 +14,10 @@ import useDevLog from '../../utils/useDevLog'
 export default function LeftPanel() {
   useDevLog('LeftPanel', arguments[0] || {})
   const { isLoggedIn, actorId } = useAuthStore()
-  const { setCenterView, isActivitiesExpanded, toggleActivities, activeLeftCacheType } = useUIStore()
+  const { setCenterView, isActivitiesExpanded, toggleActivities, activeLeftCacheType } =
+    useUIStore()
   const queryClient = useQueryClient()
+  const [isCacheExpanded, setIsCacheExpanded] = useState(true)
 
   // ─── Cache Widgets ────────────────────────────────────────────────────────
   const { data: recentPosts } = useQuery({
@@ -64,6 +66,21 @@ export default function LeftPanel() {
     },
   })
 
+  // Panel açıldığında görünen (ilk 7) okumadığımız aktiviteleri otomatik okundu işaretle
+  useEffect(() => {
+    if (isActivitiesExpanded && activities?.length > 0) {
+      const unreadIds = activities
+        .slice(0, 7)
+        .filter((a) => !a.isRead)
+        .map((a) => a.activityId)
+
+      if (unreadIds.length > 0) {
+        markReadMutation.mutate(unreadIds)
+      }
+    }
+  }, [isActivitiesExpanded, activities])
+
+
   return (
     <aside className="layout-left" style={{ padding: '12px 0' }}>
       {/* ─── Create Post Button ── */}
@@ -86,9 +103,17 @@ export default function LeftPanel() {
           <button
             onClick={toggleActivities}
             style={{
-              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '8px 16px', background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 16px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -96,9 +121,14 @@ export default function LeftPanel() {
               {unreadCount > 0 && (
                 <span
                   style={{
-                    background: 'var(--color-primary)', color: 'white',
-                    borderRadius: 99, fontSize: 10, fontWeight: 700,
-                    padding: '1px 6px', minWidth: 18, textAlign: 'center',
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    borderRadius: 99,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: '1px 6px',
+                    minWidth: 18,
+                    textAlign: 'center',
                   }}
                 >
                   {unreadCount}
@@ -117,9 +147,11 @@ export default function LeftPanel() {
                 transition={{ duration: 0.25 }}
                 style={{ overflow: 'hidden' }}
               >
-                <div style={{ maxHeight: 280, overflowY: 'auto', padding: '0 8px' }}>
+                <div style={{ padding: '0 8px' }}>
                   {activities?.length === 0 && (
-                    <p className="empty-state" style={{ padding: '12px 8px' }}>Aktivite yok</p>
+                    <p className="empty-state" style={{ padding: '12px 8px' }}>
+                      Aktivite yok
+                    </p>
                   )}
                   {activities?.slice(0, 7).map((a) => (
                     <ActivityItem
@@ -138,10 +170,18 @@ export default function LeftPanel() {
       <hr className="divider" style={{ margin: '4px 0' }} />
 
       {/* ─── Cache Widgets ────── */}
-      {activeLeftCacheType === 'recent' && <CacheWidget title="🕐 Son Konular" items={recentPosts} type="post" />}
-      {activeLeftCacheType === 'trending' && <CacheWidget title="🔥 Trend Konular" items={trendingPosts} type="post" />}
-      {activeLeftCacheType === 'mostLiked' && <CacheWidget title="❤ En Çok Beğenilen" items={mostLikedEntries} type="entry" />}
-      {activeLeftCacheType === 'mostDisliked' && <CacheWidget title="💀 En Çok Beğenilmeyen" items={mostDislikedEntries} type="entry" />}
+      {activeLeftCacheType === 'recent' && (
+        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Clock8 size={14}/> Yeni</span>} items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+      )}
+      {activeLeftCacheType === 'trending' && (
+        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Flame size={14}/> Popüler</span>} items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+      )}
+      {activeLeftCacheType === 'mostLiked' && (
+        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><ThumbsUp size={14}/> Deb</span>} items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+      )}
+      {activeLeftCacheType === 'mostDisliked' && (
+        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Skull size={14}/> Dene</span>} items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+      )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />
 
@@ -150,9 +190,15 @@ export default function LeftPanel() {
         {isLoggedIn ? (
           <div
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 8px', background: 'var(--color-success-light)',
-              borderRadius: 8, fontSize: 12, color: '#15803D', fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 8px',
+              background: 'var(--color-success-light)',
+              borderRadius: 8,
+              fontSize: 12,
+              color: '#15803D',
+              fontWeight: 500,
             }}
           >
             <span>✓</span> Oturum Açık
@@ -182,36 +228,84 @@ export default function LeftPanel() {
 
 // ─── Cache Widget sub-component ───────────────────────────────────────────────
 
-function CacheWidget({ title, items, type }) {
-  const [expanded, setExpanded] = useState(true)
+function CacheWidget({ title, items, type, expanded, setExpanded }) {
+  const [limit, setLimit] = useState(25)
+
+  const maxItems = items ? items.length : 0
 
   return (
     <div style={{ marginBottom: 4 }}>
-      <button
-        onClick={() => setExpanded((v) => !v)}
+      <div
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '6px 16px', background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 12, fontWeight: 600, color: 'var(--color-text-muted)',
-          textTransform: 'uppercase', letterSpacing: '0.05em',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '6px 16px',
         }}
       >
-        {title}
-        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-      </button>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            padding: 0,
+            flex: 1,
+            textAlign: 'left'
+          }}
+        >
+          {title}
+          {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        </button>
+
+        {expanded && maxItems > 0 && (
+          <select
+            value={limit}
+            onChange={(e) => setLimit(Number(e.target.value))}
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 4,
+              color: 'var(--color-text-secondary)',
+              fontSize: 11,
+              padding: '2px 4px',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+            title="Gösterilecek öğe sayısı"
+          >
+            <option value={25}>25</option>
+            {maxItems > 25 && <option value={50}>50</option>}
+            {maxItems > 50 && <option value={75}>75</option>}
+            <option value={maxItems}>Hepsi ({maxItems})</option>
+          </select>
+        )}
+      </div>
 
       {expanded && (
         <div style={{ padding: '0 4px' }}>
           {!items || items.length === 0 ? (
-            <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>Yükleniyor...</p>
+            <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
+              Yükleniyor...
+            </p>
           ) : (
-            items.slice(0, 6).map((item) =>
-              type === 'post' ? (
-                <PostMinimalCard key={item.contentItemId} {...item} />
-              ) : (
-                <EntryMinimalCard key={item.contentItemId} {...item} />
+            items
+              .slice(0, limit)
+              .map((item) =>
+                type === 'post' ? (
+                  <PostMinimalCard key={item.contentItemId} {...item} />
+                ) : (
+                  <EntryMinimalCard key={item.contentItemId} {...item} />
+                )
               )
-            )
           )}
         </div>
       )}

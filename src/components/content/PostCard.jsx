@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { formatDistanceToNow } from 'date-fns'
-import { tr } from 'date-fns/locale'
-import { Pencil, Trash2, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
+import { getShortTimeAgo } from '../../utils/formatTime'
+import { Pencil, Trash2, MessageSquare, ChevronDown, ChevronUp, Smile } from 'lucide-react'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import ReactionButton from './ReactionButton'
 import EntryDraft from './EntryDraft'
@@ -48,9 +47,7 @@ export default function PostCard({
     },
   })
 
-  const timeAgo = createdAt
-    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: tr })
-    : ''
+  const timeAgo = getShortTimeAgo(createdAt)
 
   const handleTitleClick = () => {
     setCenterView('post', { postId: contentItemId })
@@ -102,6 +99,13 @@ export default function PostCard({
       <div className="post-card-footer">
         <div className="flex items-center gap-2">
           <ReactionButton contentItemId={contentItemId} likeCount={likeCount} />
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setShowLikes(true)}
+            title="Reaksiyonları gör"
+          >
+            <Smile size={14} /> {likeCount ?? 0}
+          </button>
           <button
             className="btn btn-ghost btn-sm"
             onClick={() => setCenterView('post', { postId: contentItemId })}

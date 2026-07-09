@@ -1,6 +1,5 @@
-import { formatDistanceToNow } from 'date-fns'
-import { tr } from 'date-fns/locale'
-import { CheckCheck } from 'lucide-react'
+import { CheckCheck, AtSign } from 'lucide-react'
+import { getShortTimeAgo } from '../../utils/formatTime'
 import { IdTypes } from '../../constants/enums'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
@@ -9,28 +8,17 @@ import useDevLog from '../../utils/useDevLog'
  * ActivityItem — plan.md Component #5
  * Bildirim/aktivite öğesi. Okunmamışlar vurgulanır.
  */
-export default function ActivityItem({ activity, onMarkRead }) {
+export default function ActivityItem({ activity, onMarkRead, currentProfileName }) {
   useDevLog('ActivityItem', arguments[0] || {})
   const setCenterView = useUIStore((s) => s.setCenterView)
 
   if (!activity) return null
 
-  const {
-    activityId,
-    message,
-    isRead,
-    createdAt,
-    additionalIdType,
-    additionalId,
-  } = activity
+  const { activityId, message, isRead, createdAt, additionalIdType, additionalId } = activity
 
-  const timeAgo = createdAt
-    ? formatDistanceToNow(new Date(createdAt), { addSuffix: true, locale: tr })
-    : ''
+  const timeAgo = getShortTimeAgo(createdAt)
 
   const handleClick = () => {
-    if (!isRead && onMarkRead) onMarkRead(activityId)
-
     if (!additionalId) return
     switch (additionalIdType) {
       case IdTypes.Post:
@@ -48,6 +36,8 @@ export default function ActivityItem({ activity, onMarkRead }) {
     }
   }
 
+  const mentionsProfile = currentProfileName && message && message.toLowerCase().includes(currentProfileName.toLowerCase());
+
   return (
     <div className={`activity-item ${isRead ? '' : 'unread'}`} onClick={handleClick}>
       {!isRead && <div className="activity-dot" />}
@@ -55,14 +45,10 @@ export default function ActivityItem({ activity, onMarkRead }) {
         <p className="activity-message">{message || 'Yeni aktivite'}</p>
         <span className="activity-time">{timeAgo}</span>
       </div>
-      {!isRead && onMarkRead && (
-        <button
-          className="btn-icon"
-          title="Okundu işaretle"
-          onClick={(e) => { e.stopPropagation(); onMarkRead(activityId) }}
-        >
-          <CheckCheck size={14} style={{ color: 'var(--color-primary)' }} />
-        </button>
+      {mentionsProfile && (
+        <div style={{ padding: '0 8px', color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }} title={`@${currentProfileName} bahsedildi`}>
+          <AtSign size={16} />
+        </div>
       )}
     </div>
   )
