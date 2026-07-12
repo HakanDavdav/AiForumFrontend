@@ -1,8 +1,8 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 /**
  * UI Store — merkezi panel/layout durumu.
- * Sayfa yenilenince sıfırlanması isteniyor (persist yok).
  *
  * centerView: CenterPanel'de ne gösterildiği
  *   - 'feed'          → Ana akış (trending/recent posts)
@@ -19,76 +19,41 @@ import { create } from 'zustand'
  *   - 'account-settings' → Hesap ayarları
  *   - 'hierarchy'     → ActorHierarchyTree overlay
  */
-const useUIStore = create((set) => ({
-  // ─── Center Panel ─────────────────────────────────────────────────────────
-  centerView: 'initial',
-  centerViewParams: {}, // { postId, actorId, tribeId, query, ... }
-  viewHistory: [], // Max 5 items: [{ view, params }]
+const useUIStore = create(
+  persist(
+    (set) => ({
+      // ─── Center Panel ─────────────────────────────────────────────────────────
+      // Removed centerView, centerViewParams, viewHistory, setCenterView, goBack for React Router migration
 
-  setCenterView: (view, params = {}) =>
-    set((state) => {
-      // Eğer zaten aynı sayfadaysak (view ve params aynıysa) geçmişe ekleme
-      if (
-        state.centerView === view &&
-        JSON.stringify(state.centerViewParams) === JSON.stringify(params)
-      ) {
-        return {}
-      }
 
-      const newHistoryItem = { view: state.centerView, params: state.centerViewParams }
-      const newHistory = [...state.viewHistory, newHistoryItem]
+      // ─── Left Panel ───────────────────────────────────────────────────────────
+      activeLeftCacheType: 'recent',
+      setActiveLeftCacheType: (type) => set({ activeLeftCacheType: type }),
 
-      // Maksimum 5 geçmiş tut
-      if (newHistory.length > 5) {
-        newHistory.shift() // En eskisini sil
-      }
+      isActivitiesExpanded: false,
+      toggleActivities: () => set((state) => ({ isActivitiesExpanded: !state.isActivitiesExpanded })),
 
-      return {
-        viewHistory: newHistory,
-        centerView: view,
-        centerViewParams: params,
-      }
+      // ─── Responsive Drawers ───────────────────────────────────────────────────
+      isLeftDrawerOpen: false,
+      isRightDrawerOpen: false,
+      toggleLeftDrawer: () => set((state) => ({ isLeftDrawerOpen: !state.isLeftDrawerOpen })),
+      toggleRightDrawer: () => set((state) => ({ isRightDrawerOpen: !state.isRightDrawerOpen })),
+      closeDrawers: () => set({ isLeftDrawerOpen: false, isRightDrawerOpen: false }),
+
+      // ─── My Tribes Dropdown ───────────────────────────────────────────────────
+      isMyTribesOpen: false,
+      toggleMyTribes: () => set((state) => ({ isMyTribesOpen: !state.isMyTribesOpen })),
+      closeMyTribes: () => set({ isMyTribesOpen: false }),
+
+      // ─── Search ───────────────────────────────────────────────────────────────
+      searchMode: 'general', // 'general' | 'posts' | 'actors' | 'tribes'
+      setSearchMode: (mode) => set({ searchMode: mode }),
     }),
-
-  goBack: () =>
-    set((state) => {
-      // Geçmiş boşsa Initial'a güvenli dönüş yap
-      if (state.viewHistory.length === 0) {
-        return { centerView: 'initial', centerViewParams: {} }
-      }
-
-      const newHistory = [...state.viewHistory]
-      const previous = newHistory.pop() // Sonuncuyu al ve listeden çıkar
-
-      return {
-        viewHistory: newHistory,
-        centerView: previous.view,
-        centerViewParams: previous.params,
-      }
-    }),
-
-  // ─── Left Panel ───────────────────────────────────────────────────────────
-  activeLeftCacheType: 'recent',
-  setActiveLeftCacheType: (type) => set({ activeLeftCacheType: type }),
-
-  isActivitiesExpanded: false,
-  toggleActivities: () => set((state) => ({ isActivitiesExpanded: !state.isActivitiesExpanded })),
-
-  // ─── Responsive Drawers ───────────────────────────────────────────────────
-  isLeftDrawerOpen: false,
-  isRightDrawerOpen: false,
-  toggleLeftDrawer: () => set((state) => ({ isLeftDrawerOpen: !state.isLeftDrawerOpen })),
-  toggleRightDrawer: () => set((state) => ({ isRightDrawerOpen: !state.isRightDrawerOpen })),
-  closeDrawers: () => set({ isLeftDrawerOpen: false, isRightDrawerOpen: false }),
-
-  // ─── My Tribes Dropdown ───────────────────────────────────────────────────
-  isMyTribesOpen: false,
-  toggleMyTribes: () => set((state) => ({ isMyTribesOpen: !state.isMyTribesOpen })),
-  closeMyTribes: () => set({ isMyTribesOpen: false }),
-
-  // ─── Search ───────────────────────────────────────────────────────────────
-  searchMode: 'general', // 'general' | 'posts' | 'actors' | 'tribes'
-  setSearchMode: (mode) => set({ searchMode: mode }),
-}))
+    {
+      name: 'ui-store-storage', // sessionStorage key
+      storage: createJSONStorage(() => sessionStorage), // F5 atıldığında veriyi hatırlar, sekme kapandığında silinir
+    }
+  )
+)
 
 export default useUIStore

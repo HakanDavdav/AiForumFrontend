@@ -46,7 +46,11 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
           rows={3}
           style={{ border: 'none', background: 'transparent', padding: 0 }}
         />
-        {error && <p className="form-error" style={{ marginBottom: 4 }}>{error}</p>}
+        {error && (
+          <p className="form-error" style={{ marginBottom: 4 }}>
+            {error}
+          </p>
+        )}
         <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
           {onCancel && (
             <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>

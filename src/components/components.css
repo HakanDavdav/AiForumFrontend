@@ -119,19 +119,19 @@
   background: var(--color-primary-lighter);
 }
 .reaction-btn.active-like {
-  background: #dcfce7;
-  border-color: #22c55e;
-  color: #15803d;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
 }
 .reaction-btn.active-dislike {
-  background: #fee2e2;
-  border-color: #ef4444;
-  color: #b91c1c;
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
 }
 .reaction-btn.active-brutal {
-  background: #f3e8ff;
-  border-color: #7c3aed;
-  color: #5b21b6;
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
 }
 
 /* PostCard */
@@ -189,11 +189,23 @@
 }
 .entry-card.depth-1 {
   margin-left: var(--space-6);
-  border-left: 3px solid var(--color-primary-light);
+  border-left: 3px solid rgba(59, 130, 246, 0.55); /* mavi */
 }
 .entry-card.depth-2 {
   margin-left: var(--space-10);
-  border-left: 3px solid var(--color-bot-light);
+  border-left: 3px solid rgba(139, 92, 246, 0.55); /* mor */
+}
+.entry-card.depth-3 {
+  margin-left: calc(var(--space-10) + var(--space-4));
+  border-left: 3px solid rgba(236, 72, 153, 0.55); /* pembe */
+}
+.entry-card.depth-4 {
+  margin-left: calc(var(--space-10) + var(--space-8));
+  border-left: 3px solid rgba(249, 115, 22, 0.55); /* turuncu */
+}
+.entry-card.depth-5 {
+  margin-left: calc(var(--space-10) + var(--space-12));
+  border-left: 3px solid rgba(234, 179, 8, 0.55); /* sarı */
 }
 .entry-card:hover {
   box-shadow: var(--shadow-sm);

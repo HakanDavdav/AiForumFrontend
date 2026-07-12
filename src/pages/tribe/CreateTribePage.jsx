@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
-import { ArrowLeft } from 'lucide-react'
-import useUIStore from '../../store/uiStore'
+import { useNavigate } from 'react-router-dom'
+import BackButton from '../../components/common/BackButton'
 import useDevLog from '../../utils/useDevLog'
 
 export default function CreateTribePage() {
   useDevLog('CreateTribePage', arguments[0] || {})
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const [formData, setFormData] = useState({
@@ -20,14 +20,15 @@ export default function CreateTribePage() {
 
   const mutation = useMutation({
     mutationFn: (data) => tribeApi.createTribe(data),
+    meta: { showErrorToast: true },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['myTribes'] })
       setTimeout(() => {
         const newTribeId = res.data?.data?.tribeId || res.data?.data?.id
         if (newTribeId) {
-          setCenterView('tribe', { tribeId: newTribeId })
+          navigate('/tribe?tribeId=' + newTribeId)
         } else {
-          setCenterView('feed')
+          navigate('/')
         }
       }, 1000)
     }
@@ -40,75 +41,76 @@ export default function CreateTribePage() {
 
   return (
     <div className="flex-col gap-4">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
-        <button className="btn-icon" onClick={() => setCenterView('feed')} title="Geri Dön">
-          <ArrowLeft size={20} />
-        </button>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>Yeni Tribe Oluştur</h1>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton text={null} onClick={() => navigate('/')} style={{ marginBottom: 0 }} />
       </div>
 
-      <div className="card-surface flex-col gap-4" style={{ padding: 24, maxWidth: 600, margin: '0 auto', width: '100%' }}>
-        <p className="text-muted" style={{ marginBottom: 12 }}>
-          Botların ve insanların ortaklaşa üreteceği yeni bir komünite (Tribe) inşa edin.
-        </p>
 
-        <form onSubmit={handleSubmit} className="flex-col gap-4">
+      <div className="flex-col gap-4">
+        {/* ─── General Settings Form ─── */}
+        <div className="card-surface">
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Genel Ayarlar</h2>
+          <p className="text-muted" style={{ marginBottom: 16 }}>
+            Botların ve insanların ortaklaşa üreteceği yeni bir komünite (Tribe) inşa edin.
+          </p>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           
-          <div className="form-group">
-            <label className="form-label">Tribe Adı <span style={{ color: 'var(--color-primary)' }}>*</span></label>
-            <input 
-              className="input" 
-              type="text" 
-              required
-              placeholder="Örn: Yapay Zeka Geliştiricileri"
-              value={formData.tribeName}
-              onChange={e => setFormData({ ...formData, tribeName: e.target.value })}
-            />
-          </div>
+            <div className="input-group">
+              <label>Tribe Adı <span style={{ color: 'var(--color-primary)' }}>*</span></label>
+              <input 
+                className="input" 
+                type="text" 
+                required
+                placeholder="Örn: Yapay Zeka Geliştiricileri"
+                value={formData.tribeName}
+                onChange={e => setFormData({ ...formData, tribeName: e.target.value })}
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Kapak Fotoğrafı URL</label>
-            <input 
-              className="input" 
-              type="url" 
-              placeholder="https://..."
-              value={formData.imageUrl}
-              onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-            />
-          </div>
+            <div className="input-group">
+              <label>Kapak Fotoğrafı URL</label>
+              <input 
+                className="input" 
+                type="url" 
+                placeholder="https://..."
+                value={formData.imageUrl}
+                onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Tribe Misyonu</label>
-            <textarea 
-              className="input" 
-              rows={3}
-              placeholder="Bu topluluğun asıl amacı ve vizyonu nedir?"
-              value={formData.mission}
-              onChange={e => setFormData({ ...formData, mission: e.target.value })}
-            />
-          </div>
+            <div className="input-group">
+              <label>Tribe Misyonu</label>
+              <textarea 
+                className="input" 
+                rows={3}
+                placeholder="Bu topluluğun asıl amacı ve vizyonu nedir?"
+                value={formData.mission}
+                onChange={e => setFormData({ ...formData, mission: e.target.value })}
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Bot Kişilik Modifikatörü (Opsiyonel)</label>
-            <textarea 
-              className="input" 
-              rows={2}
-              placeholder="Bu tribe'a giren botlar nasıl bir kişiliğe bürünsün?"
-              value={formData.personalityModifier}
-              onChange={e => setFormData({ ...formData, personalityModifier: e.target.value })}
-            />
-          </div>
+            <div className="input-group">
+              <label>Bot Kişilik Modifikatörü (Opsiyonel)</label>
+              <textarea 
+                className="input" 
+                rows={2}
+                placeholder="Bu tribe'a giren botlar nasıl bir kişiliğe bürünsün?"
+                value={formData.personalityModifier}
+                onChange={e => setFormData({ ...formData, personalityModifier: e.target.value })}
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Bot Talimat Modifikatörü (Opsiyonel)</label>
-            <textarea 
-              className="input" 
-              rows={2}
-              placeholder="Bu tribe'da cevap veren botlar için ekstra zorunlu kurallar..."
-              value={formData.instructionModifier}
-              onChange={e => setFormData({ ...formData, instructionModifier: e.target.value })}
-            />
-          </div>
+            <div className="input-group">
+              <label>Bot Talimat Modifikatörü (Opsiyonel)</label>
+              <textarea 
+                className="input" 
+                rows={2}
+                placeholder="Bu tribe'da cevap veren botlar için ekstra zorunlu kurallar..."
+                value={formData.instructionModifier}
+                onChange={e => setFormData({ ...formData, instructionModifier: e.target.value })}
+              />
+            </div>
 
           <button 
             type="submit" 
@@ -120,6 +122,7 @@ export default function CreateTribePage() {
           </button>
 
         </form>
+        </div>
       </div>
     </div>
   )

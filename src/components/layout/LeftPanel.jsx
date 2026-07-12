@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import React, { useState, useEffect, useRef } from 'react'
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, PenSquare, Flame, Clock8, ThumbsUp, Skull } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
 import PostMinimalCard from '../content/PostMinimalCard'
@@ -14,7 +15,8 @@ import useDevLog from '../../utils/useDevLog'
 export default function LeftPanel() {
   useDevLog('LeftPanel', arguments[0] || {})
   const { isLoggedIn, actorId } = useAuthStore()
-  const { setCenterView, isActivitiesExpanded, toggleActivities, activeLeftCacheType } =
+  const navigate = useNavigate()
+  const { isActivitiesExpanded, toggleActivities, activeLeftCacheType } =
     useUIStore()
   const queryClient = useQueryClient()
   const [isCacheExpanded, setIsCacheExpanded] = useState(true)
@@ -45,11 +47,24 @@ export default function LeftPanel() {
   })
 
   // ─── Activities ───────────────────────────────────────────────────────────
-  const { data: activities } = useQuery({
-    queryKey: ['activities', actorId, 1],
-    queryFn: () => actorApi.getActivities(actorId, 1).then((r) => r.data?.data || []),
+  const {
+    data: activitiesData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['activities', actorId],
+    queryFn: ({ pageParam = 1 }) => actorApi.getActivities(actorId, pageParam).then((r) => r.data?.data || []),
+    getNextPageParam: (lastPage, allPages) => {
+      // API sayfa boyutu 10 ise, tam 10 veri gelmişse sonraki sayfa olabilir.
+      // Eğer backend pagination desteklemiyorsa ve hepsini birden döndürüyorsa (örn 148 tane)
+      // bu sayede sonsuz döngüye girip tekrar tekrar yüklemeyi durdurur.
+      return lastPage?.length === 10 ? allPages.length + 1 : undefined
+    },
     enabled: isLoggedIn && !!actorId,
   })
+
+  const activities = React.useMemo(() => activitiesData?.pages?.flatMap((p) => p) || [], [activitiesData])
 
   const { data: unreadCount } = useQuery({
     queryKey: ['activities-unread'],
@@ -66,11 +81,10 @@ export default function LeftPanel() {
     },
   })
 
-  // Panel açıldığında görünen (ilk 7) okumadığımız aktiviteleri otomatik okundu işaretle
+  // Panel açıldığında veya yeni veri yüklendiğinde, ekrandaki tüm okumadığımız aktiviteleri otomatik okundu işaretle
   useEffect(() => {
     if (isActivitiesExpanded && activities?.length > 0) {
       const unreadIds = activities
-        .slice(0, 7)
         .filter((a) => !a.isRead)
         .map((a) => a.activityId)
 
@@ -89,7 +103,7 @@ export default function LeftPanel() {
           <button
             className="btn btn-primary"
             style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
-            onClick={() => setCenterView('create-post')}
+            onClick={() => navigate('/create-post')}
           >
             <PenSquare size={16} />
             Yeni Konu Başlat
@@ -147,20 +161,33 @@ export default function LeftPanel() {
                 transition={{ duration: 0.25 }}
                 style={{ overflow: 'hidden' }}
               >
-                <div style={{ padding: '0 8px' }}>
-                  {activities?.length === 0 && (
-                    <p className="empty-state" style={{ padding: '12px 8px' }}>
-                      Aktivite yok
-                    </p>
-                  )}
-                  {activities?.slice(0, 7).map((a) => (
-                    <ActivityItem
-                      key={a.activityId}
-                      activity={a}
-                      onMarkRead={(id) => markReadMutation.mutate([id])}
-                    />
-                  ))}
-                </div>
+                <ActivitiesScrollArea
+                  onScrollBottom={() => {
+                    if (hasNextPage && !isFetchingNextPage) {
+                      fetchNextPage()
+                    }
+                  }}
+                >
+                  <div style={{ padding: '0 8px' }}>
+                    {activities?.length === 0 && (
+                      <p className="empty-state" style={{ padding: '12px 8px' }}>
+                        Aktivite yok
+                      </p>
+                    )}
+                    {activities?.map((a) => (
+                      <ActivityItem
+                        key={a.activityId}
+                        activity={a}
+                        onMarkRead={(id) => markReadMutation.mutate([id])}
+                      />
+                    ))}
+                    {isFetchingNextPage && (
+                      <p style={{ textAlign: 'center', padding: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+                        Yükleniyor...
+                      </p>
+                    )}
+                  </div>
+                </ActivitiesScrollArea>
               </motion.div>
             )}
           </AnimatePresence>
@@ -208,14 +235,14 @@ export default function LeftPanel() {
             <button
               className="btn btn-outline"
               style={{ width: '100%', fontSize: 13 }}
-              onClick={() => setCenterView('login')}
+              onClick={() => navigate('/login')}
             >
               Giriş Yap
             </button>
             <button
               className="btn btn-primary"
               style={{ width: '100%', fontSize: 13 }}
-              onClick={() => setCenterView('register')}
+              onClick={() => navigate('/register')}
             >
               Kayıt Ol
             </button>
@@ -309,6 +336,59 @@ function CacheWidget({ title, items, type, expanded, setExpanded }) {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── ActivitiesScrollArea sub-component ──────────────────────────────────────────
+
+function ActivitiesScrollArea({ children, onScrollBottom }) {
+  const scrollRef = useRef(null)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    const handleWheel = (e) => {
+      // Sadece mouse tekerleğiyle kaydırmayı engelle
+      e.preventDefault()
+      
+      // Kaydırma hareketini doğrudan sol panele (parent'a) aktar
+      const parent = el.closest('.layout-left')
+      if (parent) {
+        parent.scrollTop += e.deltaY
+      }
+    }
+
+    // passive: false kullanarak e.preventDefault() çalışmasını sağlıyoruz
+    el.addEventListener('wheel', handleWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleWheel)
+  }, [])
+
+  const handleScroll = (e) => {
+    const el = e.currentTarget
+    // Alt sınıra yaklaşıldığında (örneğin 50px kala) onScrollBottom tetikle
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 50) {
+      if (onScrollBottom) onScrollBottom()
+    }
+  }
+
+  return (
+    <div
+      ref={scrollRef}
+      onScroll={handleScroll}
+      style={{
+        maxHeight: 350,
+        overflowY: 'auto',
+        direction: 'rtl', // Scrollbar'ı sola al
+        paddingRight: 4, // rtl olduğu için sağ padding (görsel olarak sağ taraf)
+        paddingLeft: 4,  // Scrollbar ile içerik arası boşluk
+      }}
+      className="activities-scrollbar"
+    >
+      <div style={{ direction: 'ltr' }}>
+        {children}
+      </div>
     </div>
   )
 }

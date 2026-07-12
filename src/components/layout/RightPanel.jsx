@@ -2,18 +2,18 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Podium } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import ActorAvatar from '../actor/ActorAvatar'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
-import useUIStore from '../../store/uiStore'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function RightPanel() {
   useDevLog('RightPanel', arguments[0] || {})
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const navigate = useNavigate()
 
   // ─── Queries ────────────────────────────────────────────────────────
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
@@ -45,7 +45,7 @@ export default function RightPanel() {
             {myBots.slice(0, 3).map((bot) => (
               <div 
                 key={bot.actorId} 
-                onClick={() => setCenterView('profile', { actorId: bot.actorId })}
+                onClick={() => navigate('/profile?actorId=' + bot.actorId)}
                 style={{ cursor: 'pointer' }}
                 title={bot.profileName}
               >
@@ -69,7 +69,7 @@ export default function RightPanel() {
           title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Podium size={16} /> Aktör Sıralaması</span>}
           items={actorLeaderboard}
           type="actor"
-          onViewAll={() => setCenterView('leaderboard', { type: 'actor' })}
+          onViewAll={() => navigate('/leaderboard?type=actor')}
         />
       </div>
 
@@ -81,7 +81,7 @@ export default function RightPanel() {
           title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Podium size={16} /> Tribe Sıralaması</span>}
           items={tribeLeaderboard}
           type="tribe"
-          onViewAll={() => setCenterView('leaderboard', { type: 'tribe' })}
+          onViewAll={() => navigate('/leaderboard?type=tribe')}
         />
       </div>
 
@@ -183,7 +183,7 @@ export default function RightPanel() {
 
 function CacheWidget({ title, items, type, onViewAll }) {
   const [expanded, setExpanded] = useState(true)
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const navigate = useNavigate()
 
   return (
     <div style={{ marginBottom: 4 }}>
@@ -226,7 +226,7 @@ function CacheWidget({ title, items, type, onViewAll }) {
               ) : (
                 items.slice(0, 3).map((item, index) => {
                   const rank = index + 1
-                  const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null
+                  const isTop3 = rank <= 3
                   const score = type === 'actor' ? item.actorPoint : item.tribePoint
 
                   return (
@@ -235,14 +235,15 @@ function CacheWidget({ title, items, type, onViewAll }) {
                       className="lb-card"
                       style={{ padding: '6px 8px', margin: '2px 0' }}
                       onClick={() =>
-                        setCenterView(
-                          type === 'actor' ? 'profile' : 'tribe',
-                          type === 'actor' ? { actorId: item.actorId } : { tribeId: item.tribeId }
+                        navigate(
+                          type === 'actor' ? '/profile?actorId=' + item.actorId : '/tribe?tribeId=' + item.tribeId
                         )
                       }
                     >
-                      <div className="lb-rank" style={{ minWidth: 24 }}>
-                        {rankEmoji || (
+                      <div className="lb-rank" style={{ minWidth: 24, display: 'flex', justifyContent: 'center' }}>
+                        {isTop3 ? (
+                          <img src={`/medals/${rank}.png`} alt={`${rank}.`} style={{ width: 20, height: 20, objectFit: 'contain' }} />
+                        ) : (
                           <span style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>
                             #{rank}
                           </span>

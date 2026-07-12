@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ─── CSS Variables (Design Tokens) ──────────────────────────────────────── */
+/* â”€â”€â”€ CSS Variables (Design Tokens) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 :root {
   /* Colors */
   --color-primary: #3b82f6;
@@ -86,7 +86,7 @@
   --transition-slow: 300ms ease;
 }
 
-/* ─── Reset ────────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Reset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 *,
 *::before,
 *::after {
@@ -117,7 +117,7 @@ body {
   flex-direction: column;
 }
 
-/* ─── Typography ───────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Typography â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 h1,
 h2,
 h3,
@@ -155,7 +155,7 @@ select {
   font-size: var(--font-size-base);
 }
 
-/* ─── Scrollbar Styling ─────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Scrollbar Styling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -171,7 +171,7 @@ select {
   background: var(--color-text-faint);
 }
 
-/* ─── Layout ────────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Layout â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .layout-root {
   display: flex;
   flex-direction: column;
@@ -206,7 +206,7 @@ select {
   border-right: 1px solid var(--color-border);
   border-left: 1px solid var(--color-border);
   background: var(--color-surface);
-  /* Sol paneli ayrı bir bölme/pencere gibi göstermek için hafif bir sağ gölge */
+  /* Sol paneli ayrÄ± bir bÃ¶lme/pencere gibi gÃ¶stermek iÃ§in hafif bir saÄŸ gÃ¶lge */
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03);
   z-index: 10;
   flex-shrink: 0;
@@ -224,26 +224,32 @@ select {
   min-width: var(--right-min-width);
   height: calc(100vh - var(--topbar-height));
   overflow-y: auto;
-  /* Orta panel ile aynı renge (genel arka plana) sahip olması için border ve background kaldırıldı */
+  /* Orta panel ile aynÄ± renge (genel arka plana) sahip olmasÄ± iÃ§in border ve background kaldÄ±rÄ±ldÄ± */
   background: transparent;
   flex-shrink: 0;
 }
 
 .layout-footer {
-  /* Flex container'in en altında durması için */
+  /* Flex container'in en altÄ±nda durmasÄ± iÃ§in */
   height: var(--footer-height);
   background: var(--color-bg);
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
 }
 
-/* ─── Responsive Breakpoints ─────────────────────────────────────────────── */
+/* â”€â”€â”€ Responsive Breakpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 1023px) {
   .layout-right {
     display: none;
   }
   .layout-left {
     width: 30%;
+  }
+}
+
+@media (max-width: 1150px) {
+  .topbar-search-form {
+    display: none !important;
   }
 }
 
@@ -262,7 +268,7 @@ select {
   }
 }
 
-/* ─── Card ──────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -282,7 +288,7 @@ select {
   padding: var(--space-4);
 }
 
-/* ─── Button Variants ─────────────────────────────────────────────────── */
+/* â”€â”€â”€ Button Variants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -362,7 +368,7 @@ select {
   color: var(--color-text);
 }
 
-/* ─── Form Elements ──────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Form Elements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .input {
   width: 100%;
   padding: var(--space-2) var(--space-3);
@@ -409,7 +415,7 @@ select {
   color: var(--color-error);
 }
 
-/* ─── Avatar ────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Avatar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .actor-avatar-wrap {
   position: relative;
   display: inline-flex;
@@ -429,6 +435,79 @@ select {
   width: 14px;
   height: 14px;
 }
+
+.tiny-reaction-list-btn {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--border-color);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.tiny-reaction-list-btn:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+  border-color: var(--color-border);
+  transform: scale(1.15);
+}
+
+@keyframes reactionPop {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.4) rotate(-10deg);
+  }
+  60% {
+    transform: scale(0.8) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes brutalShake {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+  20% {
+    transform: translateX(-3px) rotate(-15deg) scale(1.2);
+    color: #dc2626;
+  }
+  40% {
+    transform: translateX(3px) rotate(15deg) scale(1.2);
+  }
+  60% {
+    transform: translateX(-3px) rotate(-15deg) scale(1.2);
+  }
+  80% {
+    transform: translateX(3px) rotate(15deg) scale(1.2);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-pop svg {
+  animation: reactionPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.animate-shake svg {
+  animation: brutalShake 0.5s ease-in-out;
+}
+
 .actor-avatar-bot-badge {
   background: var(--color-bot);
 }
@@ -478,7 +557,7 @@ select {
   flex-shrink: 0;
 }
 
-/* ─── Badge / Chip ──────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Badge / Chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -502,14 +581,14 @@ select {
   color: var(--color-primary-dark);
 }
 
-/* ─── Divider ────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Divider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .divider {
   border: none;
   border-top: 1px solid var(--color-border);
   margin: var(--space-4) 0;
 }
 
-/* ─── Loading / Skeleton ─────────────────────────────────────────────────── */
+/* â”€â”€â”€ Loading / Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes shimmer {
   0% {
     background-position: -400px 0;
@@ -531,7 +610,7 @@ select {
   border-radius: var(--radius-md);
 }
 
-/* ─── Spinner ─────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Spinner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -557,7 +636,7 @@ select {
   height: 36px;
 }
 
-/* ─── Modal Overlay ─────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Modal Overlay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -582,7 +661,7 @@ select {
   position: relative;
 }
 
-/* ─── Utility ────────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Utility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .flex {
   display: flex;
 }
@@ -644,7 +723,7 @@ select {
   font-size: var(--font-size-sm);
 }
 
-/* ─── Glassmorphism Panel ───────────────────────────────────────────────── */
+/* â”€â”€â”€ Glassmorphism Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .glass {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
@@ -652,7 +731,7 @@ select {
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-/* ─── Animations ────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -693,7 +772,7 @@ select {
   animation: scaleIn var(--transition-base) ease forwards;
 }
 
-/* ─── Pagination ─────────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .pagination {
   display: flex;
   align-items: center;
@@ -822,7 +901,7 @@ select {
   box-shadow: var(--shadow-sm);
 }
 
-/* ─── Reaction Buttons ───────────────────────────────────────────────────── */
+/* â”€â”€â”€ Reaction Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .reaction-group {
   display: flex;
   align-items: center;
@@ -861,18 +940,21 @@ select {
 }
 
 .reaction-btn.active-like {
-  background: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primary) !important;
 }
 
 .reaction-btn.active-dislike {
-  background: var(--color-warning-light);
-  color: var(--color-warning);
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
 }
 
 .reaction-btn.active-brutal {
-  background: var(--color-error-light);
-  color: var(--color-error);
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
 }
 
 /* Tribe Card */
@@ -960,7 +1042,7 @@ select {
   opacity: 0.8;
 }
 
-/* ─── Premium Post Card ─────────────────────────────────────────────────── */
+/* â”€â”€â”€ Premium Post Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .post-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -1028,7 +1110,7 @@ select {
   margin-top: var(--space-2);
 }
 
-/* ─── Premium Entry Card (Comments) ─────────────────────────────────────── */
+/* â”€â”€â”€ Premium Entry Card (Comments) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .entry-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border-light);
@@ -1062,27 +1144,27 @@ select {
 /* Threading (Depth) Styling */
 .entry-card.depth-1 {
   margin-left: var(--space-6);
-  border-left: 3px solid var(--color-primary-light);
+  border-left: 3px solid rgba(59, 130, 246, 0.4);
 }
 
 .entry-card.depth-2 {
   margin-left: var(--space-12);
-  border-left: 3px solid var(--color-bot-light);
+  border-left: 3px solid rgba(139, 92, 246, 0.4);
 }
 
 .entry-card.depth-3 {
   margin-left: 72px;
-  border-left: 3px solid var(--color-warning-light);
+  border-left: 3px solid rgba(236, 72, 153, 0.4);
 }
 
 .entry-card.depth-4 {
   margin-left: 96px;
-  border-left: 3px solid var(--color-error-light);
+  border-left: 3px solid rgba(249, 115, 22, 0.4);
 }
 
 .entry-card.depth-5 {
   margin-left: 120px;
-  border-left: 3px solid var(--color-success-light);
+  border-left: 3px solid rgba(234, 179, 8, 0.4);
 }
 
 /* Glassmorphism utility enhancements for post/entry */
@@ -1094,7 +1176,7 @@ select {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
 }
 
-/* ─── Actor Chip Extensions ─────────────────────────────────────────────── */
+/* â”€â”€â”€ Actor Chip Extensions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .actor-chip-name {
   font-weight: 600;
   font-size: var(--font-size-sm);
@@ -1128,7 +1210,7 @@ select {
   box-shadow: var(--shadow-sm);
 }
 
-/* ─── Reaction Buttons ───────────────────────────────────────────────────── */
+/* â”€â”€â”€ Reaction Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .reaction-group {
   display: flex;
   align-items: center;
@@ -1167,21 +1249,24 @@ select {
 }
 
 .reaction-btn.active-like {
-  background: var(--color-primary-light);
-  color: var(--color-primary-dark);
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primary) !important;
 }
 
 .reaction-btn.active-dislike {
-  background: var(--color-warning-light);
-  color: var(--color-warning);
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
 }
 
 .reaction-btn.active-brutal {
-  background: var(--color-error-light);
-  color: var(--color-error);
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
 }
 
-/* ─── Leaderboard List Items ────────────────────────────────────────────── */
+/* â”€â”€â”€ Leaderboard List Items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .lb-card {
   display: flex;
   align-items: center;
@@ -1217,7 +1302,7 @@ select {
   white-space: nowrap;
 }
 
-/* lb-card içindeki minimal kartların kendi border/hover efektlerini iptal et */
+/* lb-card iÃ§indeki minimal kartlarÄ±n kendi border/hover efektlerini iptal et */
 .lb-card .actor-chip,
 .lb-card .tribe-card {
   background: transparent !important;
@@ -1233,7 +1318,7 @@ select {
   box-shadow: none !important;
 }
 
-/* ─── Profile Page ───────────────────────────────────────────────────────── */
+/* â”€â”€â”€ Profile Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .profile-header-card {
   position: relative;
   background: linear-gradient(to bottom, var(--color-surface), var(--color-bg));
@@ -1327,7 +1412,7 @@ select {
   border-bottom-color: var(--color-primary);
 }
 
-/* ─── Profile Activities ─────────────────────────────────────────────────── */
+/* â”€â”€â”€ Profile Activities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .profile-activities-panel {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -1416,4 +1501,20 @@ textarea {
 
 textarea {
   resize: vertical !important;
+}
+
+/* ─── Activities Scrollbar (Left Panel) ─────────────────────────────────── */
+.activities-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+.activities-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 10px;
+}
+.activities-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-primary-light);
+  border-radius: 10px;
+}
+.activities-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }

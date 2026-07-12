@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Maximize2, Network } from 'lucide-react'
+import { Maximize2, Network } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
-import useUIStore from '../store/uiStore'
+import BackButton from '../components/common/BackButton'
 import HierarchyTree from '../components/hierarchy/HierarchyTree'
 import useDevLog from '../utils/useDevLog'
 
-export default function HierarchyPage({ actorId }) {
+export default function HierarchyPage() {
+  const [searchParams] = useSearchParams()
+  const actorId = searchParams.get('actorId')
   useDevLog('HierarchyPage', arguments[0] || {})
-  const { goBack } = useUIStore()
+  const navigate = useNavigate()
   const [treeData, setTreeData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isExpandingAll, setIsExpandingAll] = useState(false)
@@ -121,11 +124,11 @@ export default function HierarchyPage({ actorId }) {
 
   return (
     <div className="flex-col gap-4">
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton style={{ marginBottom: 0 }} />
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="btn-icon" onClick={goBack} title="Geri Dön">
-            <ArrowLeft size={20} />
-          </button>
           <h1 style={{ 
             fontSize: 26, 
             fontWeight: 900, 

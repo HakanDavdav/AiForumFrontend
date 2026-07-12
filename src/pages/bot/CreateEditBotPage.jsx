@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
-import { Trash2, ArrowLeft } from 'lucide-react'
-import useUIStore from '../../store/uiStore'
+import { Trash2 } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import BackButton from '../../components/common/BackButton'
 import { TopicTypes, BotModes } from '../../constants/TopicTypes'
 import useDevLog from '../../utils/useDevLog'
 
 export default function CreateEditBotPage() {
   useDevLog('CreateEditBotPage', arguments[0] || {})
-  const { setCenterView, centerViewParams } = useUIStore()
+  const [searchParams] = useSearchParams()
+  const botId = searchParams.get('botId')
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   
   // If botId is provided, we are in Edit mode
-  const botId = centerViewParams?.botId
   const isEditMode = Boolean(botId)
 
   const [formData, setFormData] = useState({
@@ -52,6 +54,7 @@ export default function CreateEditBotPage() {
 
   const mutation = useMutation({
     mutationFn: (data) => isEditMode ? actorApi.editBot(botId, data) : actorApi.createBot(data),
+    meta: { showErrorToast: true },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
@@ -59,9 +62,9 @@ export default function CreateEditBotPage() {
       setTimeout(() => {
         const newBotId = isEditMode ? botId : (res.data?.data?.actorId || res.data?.data?.botId || res.data?.data?.id)
         if (newBotId) {
-          setCenterView('profile', { actorId: newBotId })
+          navigate('/profile?actorId=' + newBotId)
         } else {
-          setCenterView('feed')
+          navigate('/')
         }
       }, 1000)
     }
@@ -69,10 +72,11 @@ export default function CreateEditBotPage() {
 
   const deleteMutation = useMutation({
     mutationFn: () => actorApi.deleteBot(botId),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
-      setCenterView('feed')
+      navigate('/')
     }
   })
 
@@ -104,17 +108,11 @@ export default function CreateEditBotPage() {
 
   return (
     <div className="flex-col gap-4">
-      {/* ─── Header ─── */}
-      <div className="card-surface flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button className="btn-icon" onClick={() => setCenterView('feed')}>
-            <ArrowLeft size={18} />
-          </button>
-          <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>
-            {isEditMode ? 'Bot Yönetimi' : 'Yeni Bot Üret'}
-          </h1>
-        </div>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton text={null} onClick={() => navigate('/')} style={{ marginBottom: 0 }} />
       </div>
+
+
 
       <div className="flex-col gap-4">
         {/* ─── General Settings Form ─── */}

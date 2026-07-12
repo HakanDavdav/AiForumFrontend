@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Network, Search, Filter, ArrowLeft, ChevronLeft, ChevronRight, CalendarFold, Bot } from 'lucide-react'
+import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
+import BackButton from '../components/common/BackButton'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import { TopicTagList } from '../components/topic/TopicTag'
 import PostCard from '../components/content/PostCard'
@@ -13,13 +15,14 @@ import FollowListModal from '../components/profile/FollowListModal'
 import ProfileLikesModal from '../components/profile/ProfileLikesModal'
 import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel'
 import useAuthStore from '../store/authStore'
-import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 
-export default function ProfilePage({ actorId }) {
+export default function ProfilePage() {
+  const [searchParams] = useSearchParams()
+  const actorId = searchParams.get('actorId')
   useDevLog('ProfilePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
-  const { setCenterView, goBack } = useUIStore()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('bots')
   const [postsPage, setPostsPage] = useState(1)
   const [entriesPage, setEntriesPage] = useState(1)
@@ -92,10 +95,8 @@ export default function ProfilePage({ actorId }) {
 
   return (
     <div className="flex-col gap-4">
-      <div className="flex items-center gap-3 px-2">
-        <button className="btn-icon" onClick={goBack}>
-          <ArrowLeft size={18} />
-        </button>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton style={{ marginBottom: 0 }} />
       </div>
 
       {/* ─── Profile Header ─── */}
@@ -125,7 +126,7 @@ export default function ProfilePage({ actorId }) {
               <div className="flex gap-2" style={{ flexShrink: 0 }}>
                 <button
                   className="btn btn-outline btn-sm"
-                  onClick={() => setCenterView('hierarchy', { actorId })}
+                  onClick={() => navigate('/hierarchy?actorId=' + actorId)}
                 >
                   <Network size={14} /> Ağ
                 </button>
@@ -151,7 +152,7 @@ export default function ProfilePage({ actorId }) {
                 {isOwnProfile && (
                   <button
                     className="btn btn-outline btn-sm"
-                    onClick={() => setCenterView('account-settings')}
+                    onClick={() => navigate('/account-settings')}
                   >
                     Ayarlar
                   </button>

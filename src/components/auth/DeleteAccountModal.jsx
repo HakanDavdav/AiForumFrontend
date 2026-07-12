@@ -2,20 +2,20 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
-import useUIStore from '../../store/uiStore'
+import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 
 export default function DeleteAccountModal({ isOpen, onClose }) {
   useDevLog('DeleteAccountModal', arguments[0] || {})
   const [password, setPassword] = useState('')
   const { clearAuth } = useAuthStore()
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
 
   const deleteAccountMutation = useMutation({
     mutationFn: (data) => identityApi.deleteAccount(data),
     onSuccess: () => {
       clearAuth()
-      setCenterView('login')
+      navigate('/login')
       onClose()
     }
   })

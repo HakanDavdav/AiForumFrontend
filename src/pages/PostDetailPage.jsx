@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { contentItemApi } from '../api/contentItemApi'
 import { searchApi, parseCacheResponse } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
+import ContextualEntryThread from '../components/content/ContextualEntryThread'
 import EntryDraft from '../components/content/EntryDraft'
-import useUIStore from '../store/uiStore'
+import BackButton from '../components/common/BackButton'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
 
-export default function PostDetailPage({ postId: propPostId }) {
+export default function PostDetailPage() {
+  const [searchParams] = useSearchParams()
+  const propPostId = searchParams.get('postId')
   useDevLog('PostDetailPage', arguments[0] || {})
-  const { goBack, viewHistory } = useUIStore()
+  const navigate = useNavigate()
   const { isLoggedIn } = useAuthStore()
   const queryClient = useQueryClient()
 
@@ -69,7 +73,7 @@ export default function PostDetailPage({ postId: propPostId }) {
         <br />
         <button
           className="btn btn-ghost"
-          onClick={goBack}
+          onClick={() => navigate(-1)}
           style={{ marginTop: 16 }}
         >
           Geri Dön
@@ -81,37 +85,17 @@ export default function PostDetailPage({ postId: propPostId }) {
   return (
     <div className="flex-col gap-4">
       {/* Top Navigation */}
-      {/* Top Navigation */}
-      {viewHistory.length > 0 && (
-        <div className="flex items-center gap-4" style={{ marginBottom: 8 }}>
-          <button
-            className="btn-icon"
-            onClick={goBack}
-            style={{ background: 'var(--color-surface-2)' }}
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-muted)' }}>
-            Geri Dön
-          </span>
+      {window.history.length > 1 && (
+        <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+          <BackButton style={{ marginBottom: 0 }} />
         </div>
       )}
 
       {/* Main Post */}
-      <PostCard {...postData} isSticky={true} />
+      <PostCard {...postData} isSticky={false} />
 
       {/* Ana Posta Doğrudan Cevap Yazma Kutusu */}
       <div style={{ marginTop: 16 }}>
-        <h3
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            marginBottom: 8,
-            color: 'var(--color-text-secondary)',
-          }}
-        >
-          Konuya Cevap Yaz
-        </h3>
         {isLoggedIn ? (
           <EntryDraft
             parentContentItemId={postId}
@@ -127,8 +111,8 @@ export default function PostDetailPage({ postId: propPostId }) {
               Bu konuya cevap yazabilmek için giriş yapmalısınız.
             </p>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              <button className="btn btn-outline btn-sm" onClick={() => useUIStore.getState().setCenterView('login')}>Giriş Yap</button>
-              <button className="btn btn-primary btn-sm" onClick={() => useUIStore.getState().setCenterView('register')}>Kayıt Ol</button>
+              <button className="btn btn-outline btn-sm" onClick={() => navigate('/login')}>Giriş Yap</button>
+              <button className="btn btn-primary btn-sm" onClick={() => navigate('/register')}>Kayıt Ol</button>
             </div>
           </div>
         )}
@@ -153,9 +137,11 @@ export default function PostDetailPage({ postId: propPostId }) {
           </p>
         ) : (
           entriesData.map((entry) => (
-            <EntryCard
+            <ContextualEntryThread
               key={entry.contentItemId}
-              {...entry}
+              entryDto={entry}
+              readMode="parentToChild"
+              hideRootPost={true}
               queryKey={['post-entries', postId, page]}
             />
           ))

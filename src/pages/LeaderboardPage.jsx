@@ -2,13 +2,16 @@ import { useQuery } from '@tanstack/react-query'
 import { searchApi, parseCacheResponse } from '../api/searchApi'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
-import useUIStore from '../store/uiStore'
-import { ArrowLeft, Podium } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Podium } from 'lucide-react'
+import BackButton from '../components/common/BackButton'
 import useDevLog from '../utils/useDevLog'
 
-export default function LeaderboardPage({ type = 'actor' }) {
+export default function LeaderboardPage() {
+  const [searchParams] = useSearchParams()
+  const type = searchParams.get('type') || 'actor'
   useDevLog('LeaderboardPage', arguments[0] || {})
-  const { setCenterView, goBack } = useUIStore()
+  const navigate = useNavigate()
   const isActor = type === 'actor'
 
   const { data, isLoading, isError } = useQuery({
@@ -19,11 +22,11 @@ export default function LeaderboardPage({ type = 'actor' }) {
 
   return (
     <div className="flex-col gap-4">
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton style={{ marginBottom: 0 }} />
+      </div>
       <div style={{ padding: '0 8px 16px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div className="flex items-center gap-3">
-          <button className="btn-icon" onClick={goBack}>
-            <ArrowLeft size={18} />
-          </button>
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Podium size={24} /> {isActor ? 'Aktör Sıralaması' : 'Tribe Sıralaması'}
@@ -37,13 +40,13 @@ export default function LeaderboardPage({ type = 'actor' }) {
         <div style={{ display: 'flex', gap: 8 }}>
            <button 
              className={`btn btn-sm ${isActor ? 'btn-primary' : 'btn-outline'}`}
-             onClick={() => setCenterView('leaderboard', { type: 'actor' })}
+             onClick={() => navigate('/leaderboard?type=actor')}
            >
              Aktörler
            </button>
            <button 
              className={`btn btn-sm ${!isActor ? 'btn-primary' : 'btn-outline'}`}
-             onClick={() => setCenterView('leaderboard', { type: 'tribe' })}
+             onClick={() => navigate('/leaderboard?type=tribe')}
            >
              Tribeler
            </button>
@@ -60,7 +63,7 @@ export default function LeaderboardPage({ type = 'actor' }) {
         ) : (
           data.map((item, index) => {
             const rank = index + 1;
-            const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
+            const isTop3 = rank <= 3;
             const score = isActor ? item.actorPoint : item.tribePoint;
             
             return (
@@ -69,8 +72,12 @@ export default function LeaderboardPage({ type = 'actor' }) {
                 className="lb-card" 
                 style={{ padding: '8px 16px' }}
               >
-                <div className="lb-rank">
-                  {rankEmoji || <span style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>#{rank}</span>}
+                <div className="lb-rank" style={{ display: 'flex', justifyContent: 'center' }}>
+                  {isTop3 ? (
+                    <img src={`/medals/${rank}.png`} alt={`${rank}.`} style={{ width: 26, height: 26, objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>#{rank}</span>
+                  )}
                 </div>
                 
                 <div style={{ flex: 1, minWidth: 0 }}>

@@ -1,16 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { LogOut, UserPlus, Settings, ArrowLeft } from 'lucide-react'
+import { LogOut, UserPlus, Settings } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
+import BackButton from '../components/common/BackButton'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import useAuthStore from '../store/authStore'
-import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 
-export default function TribePage({ tribeId }) {
+export default function TribePage() {
+  const [searchParams] = useSearchParams()
+  const tribeId = searchParams.get('tribeId')
   useDevLog('TribePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
-  const { setCenterView, goBack } = useUIStore()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: tribe, isLoading } = useQuery({
@@ -37,10 +40,8 @@ export default function TribePage({ tribeId }) {
 
   return (
     <div className="flex-col gap-4">
-      <div className="flex items-center gap-3 px-2">
-        <button className="btn-icon" onClick={goBack}>
-          <ArrowLeft size={18} />
-        </button>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton style={{ marginBottom: 0 }} />
       </div>
 
       {/* ─── Tribe Header ─── */}
@@ -89,7 +90,7 @@ export default function TribePage({ tribeId }) {
                 {isLoggedIn && isLeader && (
                   <button 
                     className="btn btn-outline btn-sm"
-                    onClick={() => setCenterView('tribeSettings', { tribeId })}
+                    onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)}
                   >
                     <Settings size={14} /> Yönetim
                   </button>

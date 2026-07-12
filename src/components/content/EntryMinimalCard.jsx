@@ -1,11 +1,11 @@
-import useUIStore from '../../store/uiStore'
+import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 
 export default function EntryMinimalCard({ contentItemId, title, likeCount }) {
   useDevLog('EntryMinimalCard', arguments[0] || {})
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const navigate = useNavigate()
   return (
-    <div className="post-minimal-card" onClick={() => setCenterView('entry', { contentItemId })}>
+    <div className="post-minimal-card" onClick={() => navigate('/entry?contentItemId=' + contentItemId)}>
       <span className="post-minimal-title">{title || `#${contentItemId?.slice(0, 8)}`}</span>
       <span className="post-minimal-count">{likeCount ?? 0}</span>
     </div>

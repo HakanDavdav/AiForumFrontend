@@ -64,21 +64,22 @@ const queryClient = new QueryClient({
   })
 })
 
+import { BrowserRouter } from 'react-router-dom'
+
 // Authentication interceptor error handle (Token düştüğünde vb.)
 window.addEventListener('auth:unauthorized', () => {
   import('./store/authStore').then(({ default: useAuthStore }) => {
     useAuthStore.getState().logout()
-    // UI Store'dan login'e yönlendirilebilir
-    import('./store/uiStore').then(({ default: useUIStore }) => {
-      useUIStore.getState().setCenterView('login')
-    })
+    window.location.href = '/login'
   })
 })
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>
 )

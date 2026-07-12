@@ -19,70 +19,39 @@ import ContentItemPage from './pages/ContentItemPage'
 import CreateEditBotPage from './pages/bot/CreateEditBotPage'
 import CreateTribePage from './pages/tribe/CreateTribePage'
 import CreateEditPostPage from './pages/post/CreateEditPostPage'
-import EditEntryPage from './pages/entry/EditEntryPage'
+
 import HierarchyPage from './pages/HierarchyPage'
 
+import { Routes, Route, Navigate } from 'react-router-dom'
+
 export default function App() {
-  const { centerView, centerViewParams } = useUIStore()
-
-  // Routing'i URL değiştirmeden (Zustand üzerinden) yönetiyoruz
-  // plan.md'ye göre "URL değişmeden content load olur" isteniyordu.
-
-  const renderCenterView = () => {
-    switch (centerView) {
-      case 'initial':
-        return <PostDetailPage />
-      case 'feed':
-        return <FeedPage cacheType={centerViewParams.cacheType} />
-      case 'post':
-        return <PostDetailPage postId={centerViewParams.postId} />
-      case 'entry':
-        return <ContentItemPage contentItemId={centerViewParams.contentItemId} />
-      case 'profile':
-        return <ProfilePage actorId={centerViewParams.actorId} />
-      case 'tribe':
-        return <TribePage tribeId={centerViewParams.tribeId} />
-      case 'tribeSettings':
-        return <TribeSettingsPage tribeId={centerViewParams.tribeId} />
-      case 'search':
-        return (
-          <SearchPage
-            query={centerViewParams.query}
-            mode={centerViewParams.mode}
-            orderType={centerViewParams.orderType}
-            startDate={centerViewParams.startDate}
-            endDate={centerViewParams.endDate}
-          />
-        )
-      case 'leaderboard':
-        return <LeaderboardPage type={centerViewParams.type} />
-      case 'login':
-        return <LoginPage />
-      case 'register':
-        return <RegisterPage />
-      case 'create-bot':
-        return <CreateEditBotPage />
-      case 'create-tribe':
-        return <CreateTribePage />
-      case 'create-post':
-        return <CreateEditPostPage />
-      case 'edit-entry':
-        return <EditEntryPage />
-      case 'init-profile':
-        return <InitProfilePage />
-      case 'account-settings':
-        return <AccountSettingsPage />
-      case 'hierarchy':
-        return <HierarchyPage actorId={centerViewParams.actorId} />
-      default:
-        return <FeedPage />
-    }
-  }
-
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
-      <MainLayout>{renderCenterView()}</MainLayout>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<FeedPage />} />
+          <Route path="/post" element={<PostDetailPage />} />
+          <Route path="/entry" element={<ContentItemPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/tribe" element={<TribePage />} />
+          <Route path="/tribe/settings" element={<TribeSettingsPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/create-bot" element={<CreateEditBotPage />} />
+          <Route path="/edit-bot" element={<CreateEditBotPage />} />
+          <Route path="/create-tribe" element={<CreateTribePage />} />
+          <Route path="/create-post" element={<CreateEditPostPage />} />
+          <Route path="/edit-post" element={<CreateEditPostPage />} />
+          <Route path="/init-profile" element={<InitProfilePage />} />
+          <Route path="/account-settings" element={<AccountSettingsPage />} />
+          <Route path="/hierarchy" element={<HierarchyPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </MainLayout>
     </>
   )
 }
+

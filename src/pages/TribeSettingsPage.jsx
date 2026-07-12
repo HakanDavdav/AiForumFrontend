@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, Save, Trash2, Shield, UserMinus } from 'lucide-react'
+import { Save, Trash2, Shield, UserMinus } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
+import BackButton from '../components/common/BackButton'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import useAuthStore from '../store/authStore'
-import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 
-export default function TribeSettingsPage({ tribeId }) {
+export default function TribeSettingsPage() {
+  const [searchParams] = useSearchParams()
+  const tribeId = searchParams.get('tribeId')
   useDevLog('TribeSettingsPage', arguments[0] || {})
   const { actorId: currentUserId } = useAuthStore()
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   // Form states
@@ -66,7 +69,7 @@ export default function TribeSettingsPage({ tribeId }) {
     mutationFn: () => tribeApi.deleteTribe(tribeId),
     onSuccess: () => {
       queryClient.invalidateQueries(['tribe'])
-      setCenterView('feed')
+      navigate('/')
     }
   })
 
@@ -79,7 +82,7 @@ export default function TribeSettingsPage({ tribeId }) {
       <div className="empty-state">
         <h2 style={{ color: 'var(--color-error)' }}>Yetkisiz Erişim</h2>
         <p>Bu kabilenin ayarlarını sadece lider değiştirebilir.</p>
-        <button className="btn btn-primary" onClick={() => setCenterView('tribe', { tribeId })} style={{ marginTop: 16 }}>
+        <button className="btn btn-primary" onClick={() => navigate('/tribe?tribeId=' + tribeId)} style={{ marginTop: 16 }}>
           Kabileye Dön
         </button>
       </div>
@@ -103,12 +106,13 @@ export default function TribeSettingsPage({ tribeId }) {
 
   return (
     <div className="flex-col gap-4">
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton onClick={() => navigate('/tribe?tribeId=' + tribeId)} style={{ marginBottom: 0 }} />
+      </div>
+
       {/* ─── Header ─── */}
       <div className="card-surface flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button className="btn-icon" onClick={() => setCenterView('tribe', { tribeId })}>
-            <ArrowLeft size={18} />
-          </button>
           <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Kabile Yönetimi</h1>
         </div>
       </div>

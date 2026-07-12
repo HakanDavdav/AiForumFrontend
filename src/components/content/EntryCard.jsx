@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Pencil, Trash2, MessageSquare, Smile } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Pencil, Trash2, MessageSquare, Smile, CirclePlus, CircleMinus } from 'lucide-react'
 import { getShortTimeAgo } from '../../utils/formatTime'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -20,6 +20,7 @@ export default function EntryCard({
   contentItemId,
   content,
   likeCount,
+  dislikeCount,
   entryCount,
   createdAt,
   actor,
@@ -29,28 +30,55 @@ export default function EntryCard({
   onEdit,
   queryKey, // invalidation için
   childEntries,
+  disableChildrenRendering = false,
 }) {
   useDevLog('EntryCard', arguments[0] || {})
   const [showReplyDraft, setShowReplyDraft] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
+  const [activeLikesTab, setActiveLikesTab] = useState(null)
   const [isExpanded, setIsExpanded] = useState(false)
-  const setCenterView = useUIStore((s) => s.setCenterView)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const loggedInActorId = useAuthStore((s) => s.actorId)
+  const [isEditing, setIsEditing] = useState(false)
+  const [localContent, setLocalContent] = useState(content)
+  const [editContent, setEditContent] = useState(content || '')
   const queryClient = useQueryClient()
 
-  // Eğer mevcut childEntries prop'u boşsa ve entryCount > 0 ise dinamik getirme aktif olabilir
-  const hasUnloadedChildren = entryCount > 0 && (!childEntries || childEntries.length === 0)
+  useEffect(() => {
+    setLocalContent(content)
+    if (!isEditing) {
+      setEditContent(content || '')
+    }
+  }, [content, isEditing])
+
+  // Eğer entryCount > 0 ise veya halihazırda childEntries dizisi doluysa çocukları var demektir
+  const hasChildren =
+    !disableChildrenRendering && (entryCount > 0 || (childEntries && childEntries.length > 0))
+  // Sadece çocuklar yüklenmemişse fetch işlemini tetikle
+  const needsFetching = hasChildren && (!childEntries || childEntries.length === 0)
+
+  // --- Start ActorLike Query ---
+  const { data: actorLike } = useQuery({
+    queryKey: ['actorLike', contentItemId, loggedInActorId],
+    queryFn: () =>
+      contentItemApi.getActorLike(contentItemId, loggedInActorId)
+        .then((r) => r.data?.data)
+        .catch(() => null),
+    enabled: isLoggedIn && !!loggedInActorId,
+    retry: false,
+  })
+  // --- End ActorLike Query ---
 
   const { data: fetchedChildEntriesRes, isLoading: isLoadingChildren } = useQuery({
     queryKey: ['entryEntries', contentItemId],
     queryFn: () => contentItemApi.getEntryEntries(contentItemId, 1, 1),
-    enabled: isExpanded && hasUnloadedChildren,
+    enabled: isExpanded && needsFetching,
   })
 
-  const displayChildEntries = (childEntries && childEntries.length > 0) 
-    ? childEntries 
-    : (fetchedChildEntriesRes?.data?.data || [])
+  const displayChildEntries =
+    childEntries && childEntries.length > 0
+      ? childEntries
+      : fetchedChildEntriesRes?.data?.data || []
 
   const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
 
@@ -62,6 +90,15 @@ export default function EntryCard({
     },
   })
 
+  const editMutation = useMutation({
+    mutationFn: (newContent) => contentItemApi.editEntry(contentItemId, { content: newContent }),
+    onSuccess: (res, newContent) => {
+      setIsEditing(false)
+      setLocalContent(newContent)
+      if (queryKey) queryClient.invalidateQueries({ queryKey })
+    },
+  })
+
   const timeAgo = getShortTimeAgo(createdAt)
 
   // Maksimum 5 seviye derinliğe kadar CSS sınıfı atanır (depth-1, depth-2, ..., depth-5)
@@ -70,40 +107,114 @@ export default function EntryCard({
   return (
     <>
       <div className={`entry-card ${depthClass}`} style={{ animation: 'fadeIn 0.2s ease' }}>
-        {/* Content */}
-      <p className="entry-card-content">{content || '—'}</p>
-
-      {/* Footer */}
-      <div className="entry-card-footer">
-        {/* Sol: Reaksiyon + yorum sayısı */}
-        <div className="flex items-center gap-2">
-          <ReactionButton contentItemId={contentItemId} likeCount={likeCount} />
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => setShowLikes(true)}
-            title="Reaksiyonları gör"
-          >
-            <Smile size={13} /> {likeCount ?? 0}
-          </button>
-          {isLoggedIn && (
-            <button className="btn btn-ghost btn-sm" onClick={() => setShowReplyDraft((v) => !v)}>
-              <MessageSquare size={13} />
-              Cevapla
-            </button>
+        {/* Header */}
+        <div className="flex items-start" style={{ marginBottom: 8, marginLeft: -4 }}>
+          {actor ? (
+            <ActorMinimalCard actor={actor} showHierarchyBtn={true} />
+          ) : (
+            <span
+              className="text-muted"
+              style={{ paddingLeft: 8, fontSize: 'var(--font-size-sm)', fontWeight: 500 }}
+            >
+              [Silinmiş Kullanıcı]
+            </span>
           )}
+          <span className="text-muted" style={{ marginLeft: 'auto' }}>
+            {timeAgo}
+          </span>
         </div>
 
-        {/* Sağ: ActorMinimalCard + zaman + owner actions */}
-        <div className="flex items-center gap-2 hide-under-1200">
-          <span className="text-muted">{timeAgo}</span>
-          <ActorMinimalCard actor={actor} showHierarchyBtn={true} />
+        {/* Content */}
+        {isEditing ? (
+          <div style={{ marginTop: 8, marginBottom: 8 }}>
+            <textarea
+              className="input textarea"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              rows={3}
+              style={{ fontSize: 'var(--font-size-sm)', padding: 8 }}
+              autoFocus
+            />
+            <div className="flex justify-end gap-2" style={{ marginTop: 8 }}>
+              <button 
+                className="btn btn-ghost btn-sm" 
+                onClick={() => { setIsEditing(false); setEditContent(localContent || '') }}
+              >
+                İptal
+              </button>
+              <button 
+                className="btn btn-primary btn-sm" 
+                onClick={() => { if (editContent.trim() && editContent !== localContent) editMutation.mutate(editContent) }}
+                disabled={!editContent.trim() || editContent === localContent || editMutation.isPending}
+              >
+                {editMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="entry-card-content">{localContent || '—'}</p>
+        )}
+
+        {/* Footer */}
+        <div className="entry-card-footer">
+          {/* Sol: Reaksiyon + yorum sayısı */}
+          <div className="flex items-center gap-2">
+            {hasChildren && (
+              <>
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    paddingLeft: 0,
+                    paddingRight: 4,
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--color-text-muted)',
+                  }}
+                  title={isExpanded ? 'Yanıtları Gizle' : 'Yanıtları Gör'}
+                >
+                  {isExpanded ? (
+                    <CircleMinus size={19} strokeWidth={2.4} />
+                  ) : (
+                    <CirclePlus size={19} strokeWidth={2.4} />
+                  )}
+                </button>
+                {isLoadingChildren && (
+                  <span className="text-muted" style={{ fontSize: 12, marginLeft: -4 }}>
+                    ...
+                  </span>
+                )}
+              </>
+            )}
+            <ReactionButton
+              contentItemId={contentItemId}
+              likeCount={likeCount}
+              dislikeCount={dislikeCount}
+              currentUserReaction={actorLike?.reactionType}
+              currentLikeId={actorLike?.likeId}
+              onShowReactions={(type) => {
+                setActiveLikesTab(type)
+                setShowLikes(true)
+              }}
+            />
+            {isLoggedIn && (
+              <button className="btn btn-ghost btn-sm" onClick={() => setShowReplyDraft((v) => !v)}>
+                <MessageSquare size={13} />
+                Cevapla
+              </button>
+            )}
+          </div>
+
+          {/* Sağ: Owner actions */}
           {isOwnerInternal && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 hide-under-1200">
               <button
                 className="btn-icon"
                 onClick={(e) => {
                   e.stopPropagation()
-                  onEdit ? onEdit() : setCenterView('edit-entry', { entryId: contentItemId })
+                  setIsEditing(true)
                 }}
                 title="Düzenle"
               >
@@ -123,53 +234,47 @@ export default function EntryCard({
             </div>
           )}
         </div>
-      </div>
 
-      {hasUnloadedChildren && (
-        <div style={{ padding: '0 16px 12px 16px', marginTop: '-4px' }}>
-          <button 
-            className="btn btn-ghost btn-sm" 
-            onClick={() => setIsExpanded(!isExpanded)}
-            style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: 13 }}
-          >
-            {isExpanded ? '- Yanıtları Gizle' : `+ Yanıtları Gör (${entryCount})`}
-          </button>
-          {isLoadingChildren && <span className="text-muted" style={{ fontSize: 12, marginLeft: 8 }}>Yükleniyor...</span>}
-        </div>
-      )}
-
-      {/* Inline Reply Draft */}
-      {showReplyDraft && (
-        <EntryDraft
-          parentContentItemId={contentItemId}
-          onSuccess={() => {
-            setShowReplyDraft(false)
-            if (queryKey) queryClient.invalidateQueries({ queryKey })
-          }}
-          onCancel={() => setShowReplyDraft(false)}
-        />
-      )}
-
-      {showLikes && (
-        <LikeListModal
-          contentItemId={contentItemId}
-          isOpen={showLikes}
-          onClose={() => setShowLikes(false)}
-        />
-      )}
-      </div>
-
-      {displayChildEntries && displayChildEntries.length > 0 && (
-        isExpanded || (childEntries && childEntries.length > 0) ? (
-          displayChildEntries.map(child => (
-            <EntryCard
-              key={child.contentItemId}
-              {...child}
-              queryKey={queryKey}
+        {/* Inline Reply Draft */}
+        {showReplyDraft && (
+          <div style={{ marginTop: 24 }}>
+            <EntryDraft
+              parentContentItemId={contentItemId}
+              onSuccess={() => {
+                setShowReplyDraft(false)
+                if (queryKey) queryClient.invalidateQueries({ queryKey })
+                queryClient.invalidateQueries({ queryKey: ['entryEntries', contentItemId] })
+                // Otomatik olarak yanıtları genişlet
+                setIsExpanded(true)
+              }}
+              onCancel={() => setShowReplyDraft(false)}
             />
-          ))
-        ) : null
-      )}
+          </div>
+        )}
+
+        {showLikes && (
+          <LikeListModal
+            contentItemId={contentItemId}
+            isOpen={showLikes}
+            onClose={() => setShowLikes(false)}
+            initialTab={activeLikesTab}
+          />
+        )}
+      </div>
+
+      {!disableChildrenRendering &&
+        displayChildEntries &&
+        displayChildEntries.length > 0 &&
+        (isExpanded
+          ? displayChildEntries.map((child) => (
+              <EntryCard
+                key={child.contentItemId}
+                {...child}
+                queryKey={queryKey}
+                depth={depth + 1}
+              />
+            ))
+          : null)}
     </>
   )
 }

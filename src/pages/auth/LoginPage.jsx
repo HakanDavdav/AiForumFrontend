@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
-import useUIStore from '../../store/uiStore'
+import { useNavigate } from 'react-router-dom'
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
 import useDevLog from '../../utils/useDevLog'
 
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
   const { setAuth } = useAuthStore()
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const [identifier, setIdentifier] = useState('') // email veya username
@@ -36,9 +36,9 @@ export default function LoginPage() {
          setAuth(actorId, isProfileCreated)
          queryClient.invalidateQueries()
          if (isProfileCreated) {
-           setCenterView('feed')
+           navigate('/')
          } else {
-           setCenterView('init-profile')
+           navigate('/init-profile')
          }
       } else {
          // 2FA senaryosu
@@ -59,9 +59,9 @@ export default function LoginPage() {
          setAuth(actorId, isProfileCreated)
          queryClient.invalidateQueries()
          if (isProfileCreated) {
-           setCenterView('feed')
+           navigate('/')
          } else {
-           setCenterView('init-profile')
+           navigate('/init-profile')
          }
       }
     }
@@ -179,7 +179,7 @@ export default function LoginPage() {
         </form>
 
         <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-          Hesabınız yok mu? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => setCenterView('register')}>Kayıt Ol</button>
+          Hesabınız yok mu? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/register')}>Kayıt Ol</button>
         </div>
       </div>
 

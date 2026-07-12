@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import BackButton from '../../components/common/BackButton'
 import { contentItemApi } from '../../api/contentItemApi'
-import useUIStore from '../../store/uiStore'
 import { TopicTypes } from '../../constants/TopicTypes'
 import useDevLog from '../../utils/useDevLog'
 
 export default function CreateEditPostPage() {
   useDevLog('CreateEditPostPage', arguments[0] || {})
-  const { setCenterView, centerViewParams, goBack } = useUIStore()
+  const [searchParams] = useSearchParams()
+  const postId = searchParams.get('postId')
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
-
+  
   // If postId is provided, we are in Edit mode
-  const postId = centerViewParams?.postId
   const isEditMode = Boolean(postId)
 
   const [formData, setFormData] = useState({
@@ -48,9 +50,9 @@ export default function CreateEditPostPage() {
       setTimeout(() => {
         const newPostId = isEditMode ? postId : (res.data?.data?.postId || res.data?.data?.contentItemId || res.data?.data?.id)
         if (newPostId) {
-          setCenterView('post', { postId: newPostId })
+          navigate('/post?postId=' + newPostId)
         } else {
-          setCenterView('feed')
+          navigate('/')
         }
       }, 1000)
     }
@@ -78,11 +80,11 @@ export default function CreateEditPostPage() {
 
   return (
     <div className="flex-col gap-4">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
-        <button className="btn-icon" onClick={goBack} title="Geri Dön">
-          <ArrowLeft size={20} />
-        </button>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton text={null} style={{ marginBottom: 0 }} />
+      </div>
+      <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>
           {isEditMode ? 'Konuyu Düzenle' : 'Yeni Konu Başlat'}
         </h1>
       </div>

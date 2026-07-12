@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
-import useUIStore from '../../store/uiStore'
+import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 
 export default function TokenModal({ isOpen, email, onSuccess, onTimeout }) {
@@ -10,7 +10,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout }) {
   const [countdown, setCountdown] = useState(30)
   const [confirmError, setConfirmError] = useState(null)
   const [isConfirmed, setIsConfirmed] = useState(false)
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
 
   const confirmEmailMutation = useMutation({
     mutationFn: (data) => identityApi.confirmEmail(data),
@@ -18,7 +18,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout }) {
       setIsConfirmed(true)
       setTimeout(() => {
         if (onSuccess) onSuccess()
-        setCenterView('login')
+        navigate('/login')
       }, 1500)
     },
     onError: (err) => {

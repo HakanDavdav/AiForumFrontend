@@ -1,4 +1,4 @@
-import useUIStore from '../../store/uiStore'
+import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
 import useAuthStore from '../../store/authStore'
@@ -11,7 +11,7 @@ import useDevLog from '../../utils/useDevLog'
  */
 export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true, showPoint = true }) {
   useDevLog('TribeMinimalCard', arguments[0] || {})
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
 
   const { data: myTribes } = useQuery({
@@ -23,12 +23,12 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
   const isMyTribe = myTribes?.some(t => t.tribeId === tribeId)
 
   const handleClick = () => {
-    if (clickable) setCenterView('tribe', { tribeId })
+    if (clickable) navigate('/tribe?tribeId=' + tribeId)
   }
 
   const handleEditClick = (e) => {
     e.stopPropagation()
-    setCenterView('tribeSettings', { tribeId })
+    navigate('/tribe/settings?tribeId=' + tribeId)
   }
 
   return (

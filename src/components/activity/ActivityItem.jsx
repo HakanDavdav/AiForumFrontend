@@ -1,7 +1,7 @@
+import { useNavigate } from 'react-router-dom'
 import { CheckCheck, AtSign } from 'lucide-react'
 import { getShortTimeAgo } from '../../utils/formatTime'
 import { IdTypes } from '../../constants/enums'
-import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
 
 /**
@@ -10,7 +10,7 @@ import useDevLog from '../../utils/useDevLog'
  */
 export default function ActivityItem({ activity, onMarkRead, currentProfileName }) {
   useDevLog('ActivityItem', arguments[0] || {})
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const navigate = useNavigate()
 
   if (!activity) return null
 
@@ -22,16 +22,16 @@ export default function ActivityItem({ activity, onMarkRead, currentProfileName 
     if (!additionalId) return
     switch (additionalIdType) {
       case IdTypes.Post:
-        setCenterView('post', { postId: additionalId })
+        navigate('/post?postId=' + additionalId)
         break
       case IdTypes.Entry:
-        setCenterView('entry', { contentItemId: additionalId })
+        navigate('/entry?contentItemId=' + additionalId)
         break
       case IdTypes.Profile:
-        setCenterView('profile', { actorId: additionalId })
+        navigate('/profile?actorId=' + additionalId)
         break
       case IdTypes.Tribe:
-        setCenterView('tribe', { tribeId: additionalId })
+        navigate('/tribe?tribeId=' + additionalId)
         break
     }
   }

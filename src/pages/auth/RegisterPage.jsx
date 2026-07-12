@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
-import useUIStore from '../../store/uiStore'
 import TokenModal from '../../components/auth/TokenModal'
+import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 
 export default function RegisterPage() {
   useDevLog('RegisterPage', arguments[0] || {})
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
 
   // Form states
   const [username, setUsername] = useState('')
@@ -138,7 +138,7 @@ export default function RegisterPage() {
       </form>
 
       <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-        Zaten hesabınız var mı? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => setCenterView('login')}>Giriş Yap</button>
+        Zaten hesabınız var mı? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/login')}>Giriş Yap</button>
       </div>
     </div>
 

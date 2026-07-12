@@ -21,6 +21,7 @@ import { tribeApi } from '../../api/tribeApi'
 import { searchApi } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
 import { identityApi } from '../../api/identityApi'
+import { useNavigate } from 'react-router-dom'
 import { OrderType, OrderTypeLabels } from '../../constants/enums'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -33,8 +34,8 @@ import useDevLog from '../../utils/useDevLog'
 export default function TopBar() {
   useDevLog('TopBar', arguments[0] || {})
   const { actorId, isLoggedIn, logout: storeLogout } = useAuthStore()
+  const navigate = useNavigate()
   const {
-    setCenterView,
     setSearchMode,
     searchMode,
     toggleLeftDrawer,
@@ -214,7 +215,14 @@ export default function TopBar() {
 
     console.log('handleSearch - params:', params)
 
-    setCenterView('search', params)
+    // Transform search parameters to URL query params
+    const searchParams = new URLSearchParams()
+    if (params.query) searchParams.append('query', params.query)
+    if (params.mode) searchParams.append('mode', params.mode)
+    if (params.orderType) searchParams.append('orderType', params.orderType)
+    if (params.startDate) searchParams.append('startDate', params.startDate)
+    if (params.endDate) searchParams.append('endDate', params.endDate)
+    navigate('/search?' + searchParams.toString())
     setSearchQuery('')
     setShowSuggestions(false)
     setIsFilterOpen(false)
@@ -254,7 +262,7 @@ export default function TopBar() {
             cursor: 'pointer',
             flexShrink: 0,
           }}
-          onClick={() => setCenterView('initial')}
+          onClick={() => navigate('/')}
         >
           <div
             style={{
@@ -276,6 +284,7 @@ export default function TopBar() {
 
         {/* Search Bar */}
         <form
+          className="topbar-search-form"
           onSubmit={handleSearch}
           style={{ flex: 1, display: 'flex', gap: 6, maxWidth: 600, margin: '0 auto' }}
         >
@@ -669,7 +678,7 @@ export default function TopBar() {
         </form>
 
         {/* Right: user info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 'auto' }}>
           {/* Hakan Davdav Linkleri */}
           <div
             style={{
@@ -749,10 +758,10 @@ export default function TopBar() {
             </>
           ) : (
             <div style={{ display: 'flex', gap: 6 }}>
-              <button className="btn btn-ghost btn-sm" onClick={() => setCenterView('login')}>
-                Giriş Yap
+              <button className="btn btn-ghost btn-sm" onClick={() => navigate('/login')}>
+                Giriş
               </button>
-              <button className="btn btn-primary btn-sm" onClick={() => setCenterView('register')}>
+              <button className="btn btn-primary btn-sm" onClick={() => navigate('/register')}>
                 Kayıt Ol
               </button>
             </div>
@@ -808,7 +817,7 @@ export default function TopBar() {
         {/* Leaderboard */}
         <button
           className="btn btn-ghost btn-sm"
-          onClick={() => setCenterView('leaderboard', { type: 'actor' })}
+          onClick={() => navigate('/leaderboard?type=actor')}
         >
           <Podium size={14} style={{ marginRight: '6px' }} /> Leaderboard
         </button>
@@ -856,7 +865,7 @@ export default function TopBar() {
                       className="btn btn-primary btn-sm"
                       style={{ width: '100%', marginBottom: 8 }}
                       onClick={() => {
-                        setCenterView('create-tribe')
+                        navigate('/create-tribe')
                         setIsMyTribesOpen(false)
                         setTribesDropdownPos(null)
                       }}
@@ -927,7 +936,7 @@ export default function TopBar() {
                       className="btn btn-primary btn-sm"
                       style={{ width: '100%', marginBottom: 8 }}
                       onClick={() => {
-                        setCenterView('create-bot')
+                        navigate('/create-bot')
                         setIsMyBotsOpen(false)
                         setBotsDropdownPos(null)
                       }}

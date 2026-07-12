@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import useUIStore from '../store/uiStore'
+import { useNavigate } from 'react-router-dom'
+import BackButton from '../components/common/BackButton'
 import EditProfileModal from '../components/profile/EditProfileModal'
 import ChangeUsernameModal from '../components/auth/ChangeUsernameModal'
 import ChangePasswordModal from '../components/auth/ChangePasswordModal'
@@ -13,18 +14,14 @@ import useDevLog from '../utils/useDevLog'
 export default function AccountSettingsPage() {
   useDevLog('AccountSettingsPage', arguments[0] || {})
   const [activeModal, setActiveModal] = useState(null) // null, 'editProfile', 'changeUsername', 'changePassword', 'twoFactor', 'deleteAccount', 'changeEmail', 'changePhone'
-  const { setCenterView } = useUIStore()
+  const navigate = useNavigate()
 
   return (
     <div className="flex-col gap-4">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
-        <button 
-          className="btn-icon" 
-          onClick={() => setCenterView('feed')}
-          title="Geri Dön"
-        >
-          <ArrowLeft size={20} />
-        </button>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton text={null} onClick={() => navigate('/')} style={{ marginBottom: 0 }} />
+      </div>
+      <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>
           Hesap Ayarları
         </h1>

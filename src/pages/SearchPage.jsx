@@ -1,11 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import { searchApi } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import useDevLog from '../utils/useDevLog'
 
-export default function SearchPage({ query, mode = 'general', orderType, startDate, endDate }) {
+export default function SearchPage() {
+  const [searchParams] = useSearchParams()
+  const query = searchParams.get('query') || ''
+  const mode = searchParams.get('mode') || 'general'
+  const orderType = searchParams.get('orderType') || ''
+  const startDate = searchParams.get('startDate') || ''
+  const endDate = searchParams.get('endDate') || ''
+  
   useDevLog('SearchPage', arguments[0] || {})
 
   // Ensure orderType is never empty string

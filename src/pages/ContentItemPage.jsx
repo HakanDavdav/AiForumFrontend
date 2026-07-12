@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft } from 'lucide-react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { contentItemApi } from '../api/contentItemApi'
 import ContextualEntryThread from '../components/content/ContextualEntryThread'
-import useUIStore from '../store/uiStore'
+import BackButton from '../components/common/BackButton'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
 
@@ -15,15 +16,17 @@ import useDevLog from '../utils/useDevLog'
  * Serialize edilen tuple: { item1: EntryDto|null, item2: PostDto|null }
  *
  * Discriminasyon:
- *   - item2 (PostDto) dolu → PostDetailPage'e yönlendir (setCenterView('post'))
+ *   - item2 (PostDto) dolu → PostDetailPage'e yönlendir (navigate('/post/:id'))
  *   - item1 (EntryDto) dolu → bağlamsal entry thread render et:
  *       Üst: root PostCard (tıklanabilir)
  *       Orta: parentEntry zinciri (girinti + opacity azalarak)
  *       Alt: odaklanan EntryCard (highlight)
  */
-export default function ContentItemPage({ contentItemId }) {
+export default function ContentItemPage() {
+  const [searchParams] = useSearchParams()
+  const contentItemId = searchParams.get('contentItemId')
   useDevLog('ContentItemPage', arguments[0] || {})
-  const { setCenterView, restorePreviousCenterView } = useUIStore()
+  const navigate = useNavigate()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['contentitem', contentItemId],
@@ -37,9 +40,9 @@ export default function ContentItemPage({ contentItemId }) {
 
   useEffect(() => {
     if (postDto && !entryDto) {
-      setCenterView('post', { postId: postDto.contentItemId })
+      navigate('/post?postId=' + postDto.contentItemId)
     }
-  }, [postDto, entryDto, setCenterView])
+  }, [postDto, entryDto, navigate])
 
   // ─── Loading / Error ────────────────────────────────────────────────────────
   if (isLoading) {
@@ -57,7 +60,7 @@ export default function ContentItemPage({ contentItemId }) {
         <br />
         <button
           className="btn btn-ghost"
-          onClick={restorePreviousCenterView}
+          onClick={() => navigate(-1)}
           style={{ marginTop: 16 }}
         >
           Geri Dön
@@ -66,7 +69,7 @@ export default function ContentItemPage({ contentItemId }) {
     )
   }
 
-  // Post branch: setCenterView useEffect'te tetiklenirken boş render
+  // Post branch: navigate useEffect'te tetiklenirken boş render
   if (postDto && !entryDto) return null
 
   if (!entryDto) {
@@ -75,7 +78,7 @@ export default function ContentItemPage({ contentItemId }) {
         Beklenmedik içerik formatı.
         <button
           className="btn btn-ghost"
-          onClick={restorePreviousCenterView}
+          onClick={() => navigate(-1)}
           style={{ marginTop: 16 }}
         >
           Geri Dön
@@ -87,17 +90,8 @@ export default function ContentItemPage({ contentItemId }) {
   return (
     <div className="flex-col gap-4">
       {/* ── Geri butonu ────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-4" style={{ marginBottom: 4 }}>
-        <button
-          className="btn-icon"
-          onClick={restorePreviousCenterView}
-          style={{ background: 'var(--color-surface-2)' }}
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-muted)' }}>
-          Geri Dön
-        </span>
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+        <BackButton style={{ marginBottom: 0 }} />
       </div>
 
       {/* ── Contextual Thread ──────────────────────────────────────────────── */}

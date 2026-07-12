@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { getShortTimeAgo } from '../../utils/formatTime'
 import { Pencil, Trash2, MessageSquare, ChevronDown, ChevronUp, Smile } from 'lucide-react'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -21,6 +22,7 @@ export default function PostCard({
   title,
   content,
   likeCount,
+  dislikeCount,
   entryCount,
   createdAt,
   updatedAt,
@@ -33,11 +35,25 @@ export default function PostCard({
 }) {
   useDevLog('PostCard', arguments[0] || {})
   const [showLikes, setShowLikes] = useState(false)
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const [activeLikesTab, setActiveLikesTab] = useState(null)
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const loggedInActorId = useAuthStore((s) => s.actorId)
 
   const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
+
+  // --- Start ActorLike Query ---
+  const { data: actorLike } = useQuery({
+    queryKey: ['actorLike', contentItemId, loggedInActorId],
+    queryFn: () =>
+      contentItemApi.getActorLike(contentItemId, loggedInActorId)
+        .then((r) => r.data?.data)
+        .catch(() => null),
+    enabled: isLoggedIn && !!loggedInActorId,
+    retry: false,
+  })
+  // --- End ActorLike Query ---
 
   const deleteMutation = useMutation({
     mutationFn: () => contentItemApi.deletePost(contentItemId),
@@ -50,7 +66,7 @@ export default function PostCard({
   const timeAgo = getShortTimeAgo(createdAt)
 
   const handleTitleClick = () => {
-    setCenterView('post', { postId: contentItemId })
+    navigate('/post?postId=' + contentItemId)
   }
 
   return (
@@ -70,9 +86,15 @@ export default function PostCard({
       }
     >
       {/* Header: ActorMinimalCard + zaman */}
-      <div className="flex items-center justify-between">
-        <ActorMinimalCard actor={actor} />
-        <span className="text-muted">{timeAgo}</span>
+      <div className="flex items-start">
+        {actor ? (
+          <ActorMinimalCard actor={actor} />
+        ) : (
+          <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>
+            [Silinmiş Kullanıcı]
+          </span>
+        )}
+        <span className="text-muted" style={{ marginLeft: 'auto' }}>{timeAgo}</span>
       </div>
 
       {/* Topic Tags */}
@@ -98,17 +120,20 @@ export default function PostCard({
       {/* Footer */}
       <div className="post-card-footer">
         <div className="flex items-center gap-2">
-          <ReactionButton contentItemId={contentItemId} likeCount={likeCount} />
+          <ReactionButton
+            contentItemId={contentItemId}
+            likeCount={likeCount}
+            dislikeCount={dislikeCount}
+            currentUserReaction={actorLike?.reactionType}
+            currentLikeId={actorLike?.likeId}
+            onShowReactions={(type) => {
+              setActiveLikesTab(type)
+              setShowLikes(true)
+            }}
+          />
           <button
             className="btn btn-ghost btn-sm"
-            onClick={() => setShowLikes(true)}
-            title="Reaksiyonları gör"
-          >
-            <Smile size={14} /> {likeCount ?? 0}
-          </button>
-          <button
-            className="btn btn-ghost btn-sm"
-            onClick={() => setCenterView('post', { postId: contentItemId })}
+            onClick={() => navigate('/post?postId=' + contentItemId)}
           >
             <MessageSquare size={14} />
             {entryCount ?? 0} yorum
@@ -117,12 +142,22 @@ export default function PostCard({
 
         {isOwnerInternal && (
           <div className="flex items-center gap-1">
-            <button className="btn-icon" onClick={(e) => { e.stopPropagation(); onEdit ? onEdit() : setCenterView('create-post', { postId: contentItemId }) }} title="Düzenle">
+            <button
+              className="btn-icon"
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit ? onEdit() : navigate('/edit-post?postId=' + contentItemId)
+              }}
+              title="Düzenle"
+            >
               <Pencil size={14} />
             </button>
             <button
               className="btn-icon"
-              onClick={(e) => { e.stopPropagation(); deleteMutation.mutate() }}
+              onClick={(e) => {
+                e.stopPropagation()
+                deleteMutation.mutate()
+              }}
               title="Sil"
               style={{ color: 'var(--color-error)' }}
             >
@@ -137,6 +172,7 @@ export default function PostCard({
           contentItemId={contentItemId}
           isOpen={showLikes}
           onClose={() => setShowLikes(false)}
+          initialTab={activeLikesTab}
         />
       )}
     </article>

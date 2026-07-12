@@ -3,11 +3,21 @@ import PostCard from './PostCard'
 import EntryCard from './EntryCard'
 import useAuthStore from '../../store/authStore'
 
-export default function ContextualEntryThread({ entryDto, hideCardStyle = false }) {
+export default function ContextualEntryThread({
+  entryDto,
+  hideCardStyle = false,
+  readMode = 'childToParent',
+  depth = 0,
+  queryKey,
+  hideRootPost = false,
+}) {
   const { isLoggedIn, actorId } = useAuthStore()
 
   if (!entryDto) return null
 
+  const isOwner = (item) => isLoggedIn && item?.actor?.actorId === actorId
+
+  // --- childToParent mod mantığı ---
   const buildParentChain = (entry) => {
     const chain = []
     let current = entry?.parentEntry
@@ -23,58 +33,131 @@ export default function ContextualEntryThread({ entryDto, hideCardStyle = false 
 
   const parentChain = buildParentChain(entryDto)
   const rootPost = parentChain.length > 0 ? parentChain[0].parentPost : entryDto.parentPost
-  const isOwner = (item) => isLoggedIn && item?.actor?.actorId === actorId
 
-  return (
-    <div className={hideCardStyle ? "flex-col gap-4" : "flex-col gap-4 card"} style={hideCardStyle ? {} : { padding: '16px', background: 'var(--color-bg)' }}>
-      {/* ── Root Post ──────────────────────────────────────────────────────── */}
-      {rootPost && (
-        <div>
-          <SectionLabel color="var(--color-text-faint)">ANA KONU</SectionLabel>
-          <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
+  if (readMode === 'childToParent') {
+    return (
+      <div
+        className={hideCardStyle ? 'flex-col gap-4' : 'flex-col gap-4 card'}
+        style={hideCardStyle ? {} : { padding: '16px', background: 'var(--color-bg)' }}
+      >
+        {/* ── Root Post ──────────────────────────────────────────────────────── */}
+        {!hideRootPost && rootPost && (
+          <div>
+            <SectionLabel color="var(--color-text-faint)">ANA KONU</SectionLabel>
+            <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
+          </div>
+        )}
+
+        {/* ── Parent Entry Zinciri ───────────────────────────────────────────── */}
+        {parentChain.length > 0 && (
+          <div>
+            <SectionLabel color="var(--color-text-faint)">BAĞLAM</SectionLabel>
+            <div className="flex-col" style={{ gap: 2 }}>
+              {parentChain.map((parentEntry, idx) => (
+                <div
+                  key={parentEntry.contentItemId + '-' + idx}
+                  style={{
+                    marginLeft: idx * 14,
+                    opacity: Math.max(0.45, 1 - idx * 0.15),
+                    borderLeft: '2px solid var(--color-border)',
+                    paddingLeft: 12,
+                    paddingTop: 4,
+                    paddingBottom: 4,
+                  }}
+                >
+                  <EntryCard
+                    {...parentEntry}
+                    depth={idx}
+                    isOwner={isOwner(parentEntry)}
+                    queryKey={queryKey}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Odaklanan Entry (highlight) ────────────────────────────────────── */}
+        <div style={{ marginLeft: parentChain.length * 14 }}>
+          <SectionLabel color="var(--color-primary)">ODAKLANAN YANIT</SectionLabel>
+          <div
+            style={{
+              borderLeft: '3px solid var(--color-primary)',
+              borderRadius: '0 8px 8px 0',
+              background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)',
+              paddingLeft: 12,
+            }}
+          >
+            <EntryCard
+              {...entryDto}
+              depth={parentChain.length}
+              isOwner={isOwner(entryDto)}
+              queryKey={queryKey}
+            />
+          </div>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      {/* ── Parent Entry Zinciri ───────────────────────────────────────────── */}
-      {parentChain.length > 0 && (
-        <div>
-          <SectionLabel color="var(--color-text-faint)">BAĞLAM</SectionLabel>
-          <div className="flex-col" style={{ gap: 2 }}>
-            {parentChain.map((parentEntry, idx) => (
-              <div
-                key={parentEntry.contentItemId + '-' + idx}
-                style={{
-                  marginLeft: idx * 14,
-                  opacity: Math.max(0.45, 1 - idx * 0.15),
+  // --- parentToChild mod mantığı ---
+  if (readMode === 'parentToChild') {
+    return (
+      <div
+        className={
+          hideCardStyle ? 'flex-col gap-4' : depth === 0 ? 'flex-col gap-4 card' : 'flex-col gap-2'
+        }
+        style={hideCardStyle || depth > 0 ? {} : { padding: '16px', background: 'var(--color-bg)' }}
+      >
+        {depth === 0 && !hideRootPost && rootPost && (
+          <div>
+            <SectionLabel color="var(--color-text-faint)">ANA KONU</SectionLabel>
+            <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
+          </div>
+        )}
+
+        <div
+          style={
+            depth > 0
+              ? {
+                  marginLeft: 14,
                   borderLeft: '2px solid var(--color-border)',
                   paddingLeft: 12,
                   paddingTop: 4,
                   paddingBottom: 4,
-                }}
-              >
-                <EntryCard {...parentEntry} depth={idx} isOwner={isOwner(parentEntry)} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Odaklanan Entry (highlight) ────────────────────────────────────── */}
-      <div>
-        <SectionLabel color="var(--color-primary)">ODAKLANAN YANIT</SectionLabel>
-        <div
-          style={{
-            borderLeft: '3px solid var(--color-primary)',
-            borderRadius: '0 8px 8px 0',
-            background: 'color-mix(in srgb, var(--color-primary) 8%, transparent)',
-            paddingLeft: 12,
-          }}
+                }
+              : {}
+          }
         >
-          <EntryCard {...entryDto} depth={0} isOwner={isOwner(entryDto)} />
+          <EntryCard
+            {...(depth >= 1 ? { ...entryDto, childEntries: undefined } : entryDto)}
+            disableChildrenRendering={depth < 1}
+            depth={depth}
+            isOwner={isOwner(entryDto)}
+            queryKey={queryKey}
+          />
+
+          {depth < 1 && entryDto.childEntries && entryDto.childEntries.length > 0 && (
+            <div className="flex-col gap-2" style={{ marginTop: 8 }}>
+              {entryDto.childEntries.map((childEntry) => (
+                <ContextualEntryThread
+                  key={childEntry.contentItemId}
+                  entryDto={childEntry}
+                  hideCardStyle={true}
+                  readMode="parentToChild"
+                  depth={depth + 1}
+                  queryKey={queryKey}
+                  hideRootPost={hideRootPost}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  )
+    )
+  }
+
+  return null
 }
 
 // ─── küçük yardımcı ──────────────────────────────────────────────────────────

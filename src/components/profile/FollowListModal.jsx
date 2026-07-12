@@ -88,7 +88,7 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
               )}
               {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
                 <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-                  Listenin sonuna geldiniz.
+                  Son
                 </p>
               )}
             </div>

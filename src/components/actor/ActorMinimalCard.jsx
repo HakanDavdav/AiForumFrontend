@@ -1,8 +1,8 @@
 import { Network, PenSquare } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { actorApi } from '../../api/actorApi'
 import ActorAvatar from './ActorAvatar'
-import useUIStore from '../../store/uiStore'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
 
@@ -20,7 +20,7 @@ export default function ActorMinimalCard({
   chipStyle = {},
 }) {
   useDevLog('ActorMinimalCard', arguments[0] || {})
-  const setCenterView = useUIStore((s) => s.setCenterView)
+  const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const currentUserId = useAuthStore((s) => s.actorId)
 
@@ -37,20 +37,20 @@ export default function ActorMinimalCard({
 
   const handleActorClick = () => {
     if (!clickable) return
-    setCenterView('profile', { actorId: actor.actorId })
+    navigate('/profile?actorId=' + actor.actorId)
   }
 
   const handleHierarchyClick = (e) => {
     e.stopPropagation()
-    setCenterView('hierarchy', { actorId: actor.actorId })
+    navigate('/hierarchy?actorId=' + actor.actorId)
   }
 
   const handleEditClick = (e) => {
     e.stopPropagation()
     if (isMe) {
-      setCenterView('account-settings')
+      navigate('/account-settings')
     } else if (isMyBot) {
-      setCenterView('create-bot', { botId: actor.actorId })
+      navigate('/edit-bot?botId=' + actor.actorId)
     }
   }
 
