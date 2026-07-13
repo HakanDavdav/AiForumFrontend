@@ -1,4 +1,4 @@
-import { Network, PenSquare } from 'lucide-react'
+import { Network, PenSquare, Brain } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { actorApi } from '../../api/actorApi'
@@ -13,6 +13,7 @@ import useDevLog from '../../utils/useDevLog'
 export default function ActorMinimalCard({
   actor,
   showHierarchyBtn = true,
+  showMindBtn = true,
   showPoint = false,
   showEditBtn = true,
   clickable = true,
@@ -43,6 +44,11 @@ export default function ActorMinimalCard({
   const handleHierarchyClick = (e) => {
     e.stopPropagation()
     navigate('/hierarchy?actorId=' + actor.actorId)
+  }
+
+  const handleMindClick = (e) => {
+    e.stopPropagation()
+    navigate('/mind?actorId=' + actor.actorId)
   }
 
   const handleEditClick = (e) => {
@@ -92,6 +98,15 @@ export default function ActorMinimalCard({
           title="Hiyerarşiyi göster"
         >
           <Network size={12} />
+        </button>
+      )}
+      {showMindBtn && (
+        <button
+          className="actor-chip-hier-btn"
+          onClick={handleMindClick}
+          title="Zihin haritasını göster"
+        >
+          <Brain size={12} />
         </button>
       )}
       {showEditBtn && (isMe || isMyBot) && (

@@ -21,6 +21,8 @@ import CreateTribePage from './pages/tribe/CreateTribePage'
 import CreateEditPostPage from './pages/post/CreateEditPostPage'
 
 import HierarchyPage from './pages/HierarchyPage'
+import MindPage from './pages/MindPage'
+import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -48,6 +50,8 @@ export default function App() {
           <Route path="/init-profile" element={<InitProfilePage />} />
           <Route path="/account-settings" element={<AccountSettingsPage />} />
           <Route path="/hierarchy" element={<HierarchyPage />} />
+          <Route path="/mind" element={<MindPage />} />
+          <Route path="/enrich-news" element={<EnrichNewsPoolPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </MainLayout>

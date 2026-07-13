@@ -178,10 +178,6 @@ export const PromotionType = {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const ThemeOptions = {
-  Light: 0,
-  Dark: 1,
-}
 
 export const UserFeatures = {
   Default: 0,

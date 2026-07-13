@@ -66,4 +66,14 @@ export const actorApi = {
   // ─── My Bots ─────────────────────────────────────────────────────────────
   getMyBots: () =>
     api.get('/actor/my-bots'),
+
+  // ─── Memory ──────────────────────────────────────────────────────────────
+  getFullMemory: (actorId) =>
+    api.get(`/actor/full-memory/${actorId}`),
+
+  // ─── News Pool ───────────────────────────────────────────────────────────
+  enrichNewsPool: (content) =>
+    api.post('/actor/enrich-news-pool', JSON.stringify(content), {
+      headers: { 'Content-Type': 'application/json' }
+    }),
 }

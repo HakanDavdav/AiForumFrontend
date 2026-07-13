@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, PenSquare, Flame, Clock8, ThumbsUp, Skull } from 'lucide-react'
+import { ChevronDown, ChevronUp, PenSquare, Flame, Clock8, ThumbsUp, Skull, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
@@ -99,7 +99,7 @@ export default function LeftPanel() {
     <aside className="layout-left" style={{ padding: '12px 0' }}>
       {/* ─── Create Post Button ── */}
       {isLoggedIn && (
-        <div style={{ padding: '0 12px 12px' }}>
+        <div style={{ padding: '0 12px 8px' }}>
           <button
             className="btn btn-primary"
             style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
@@ -110,6 +110,31 @@ export default function LeftPanel() {
           </button>
         </div>
       )}
+
+      {/* ─── Enrich News Pool Button (always visible) ── */}
+      <div style={{ padding: isLoggedIn ? '0 12px 12px' : '0 12px 12px' }}>
+        <button
+          className="btn"
+          style={{
+            width: '100%',
+            gap: 8,
+            fontSize: 14,
+            padding: '10px 16px',
+            background: 'linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(99,102,241,0.12) 100%)',
+            border: '1px solid rgba(139,92,246,0.3)',
+            color: 'var(--color-primary)',
+            borderRadius: 8,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={() => navigate('/enrich-news')}
+        >
+          <Sparkles size={16} />
+          Gündemi Zenginleştir
+        </button>
+      </div>
 
       {/* ─── Activities ──────── */}
       {isLoggedIn && (
