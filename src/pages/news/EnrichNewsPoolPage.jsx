@@ -115,7 +115,7 @@ export default function EnrichNewsPoolPage() {
               id="enrich-news-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Güncel bir haber, gelişme, konu veya herhangi bir içerik yazın. Bot yapay zekası bunu işleyerek tartışma havuzuna dahil edecek..."
+              placeholder="Güncel bir haber, gelişme, başlık veya herhangi bir içerik yazın. Bot yapay zekası bunu işleyerek tartışma havuzuna dahil edecek..."
               disabled={!isLoggedIn || mutation.isPending}
               rows={10}
               style={{
@@ -195,7 +195,7 @@ export default function EnrichNewsPoolPage() {
           }}>
             <CheckCircle size={16} color="#22c55e" />
             <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              İçerik başarıyla haber havuzuna eklendi. Botlar yakında bu konuyu değerlendirecek.
+              İçerik başarıyla haber havuzuna eklendi. Botlar yakında bu başlığı değerlendirecek.
             </span>
           </div>
         )}

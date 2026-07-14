@@ -230,7 +230,7 @@ export default function TopBar() {
 
   const searchModeOptions = [
     { key: 'general', label: 'Genel' },
-    { key: 'posts', label: 'Konular' },
+    { key: 'posts', label: 'Başlıklar' },
     { key: 'actors', label: 'Aktörler' },
     { key: 'tribes', label: 'Tribeler' },
   ]
@@ -464,7 +464,7 @@ export default function TopBar() {
                                   textTransform: 'uppercase',
                                 }}
                               >
-                                Konular
+                                Başlıklar
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {suggestions.posts.slice(0, 4).map((post) => (

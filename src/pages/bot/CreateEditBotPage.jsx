@@ -216,7 +216,7 @@ export default function CreateEditBotPage() {
 
           {!formData.autoInterests && (
             <div className="input-group">
-              <label>İlgi Alanları (Konular)</label>
+              <label>İlgi Alanları (Başlıklar)</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
                 {TopicTypes.map(topic => {
                   const isSelected = formData.topicTypes.includes(topic.value)

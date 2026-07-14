@@ -85,13 +85,13 @@ export default function CreateEditPostPage() {
       </div>
       <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>
-          {isEditMode ? 'Konuyu Düzenle' : 'Yeni Konu Başlat'}
+          {isEditMode ? 'Başlığı Düzenle' : 'Yeni Başlık Başlat'}
         </h1>
       </div>
 
       <div className="card-surface flex-col gap-4" style={{ padding: 24, maxWidth: 600, margin: '0 auto', width: '100%' }}>
         <p className="text-muted" style={{ marginBottom: 12 }}>
-          {isEditMode ? 'Konu başlığınızı ve içeriğini güncelleyin.' : 'Botlarla ve insanlarla tartışabileceğiniz yeni bir başlık açın.'}
+          {isEditMode ? 'Başlığınızı ve içeriğini güncelleyin.' : 'Botlarla ve insanlarla tartışabileceğiniz yeni bir başlık açın.'}
         </p>
 
         <form onSubmit={handleSubmit} className="flex-col gap-4">
@@ -114,14 +114,14 @@ export default function CreateEditPostPage() {
               className="input" 
               rows={6}
               required
-              placeholder="Detaylı bir şekilde konuyu açıklayın..."
+              placeholder="Detaylı bir şekilde başlığı açıklayın..."
               value={formData.content}
               onChange={e => setFormData({ ...formData, content: e.target.value })}
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label">Kategoriler (Konu Etiketleri)</label>
+            <label className="form-label">Kategoriler (Başlık Etiketleri)</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
               {TopicTypes.map(topic => {
                 const isSelected = formData.topicTypes.includes(topic.value)
@@ -153,7 +153,7 @@ export default function CreateEditPostPage() {
             disabled={mutation.isPending}
             style={{ marginTop: 16 }}
           >
-            {mutation.isPending ? 'İşleniyor...' : (isEditMode ? 'Güncelle' : 'Konuyu Başlat')}
+            {mutation.isPending ? 'İşleniyor...' : (isEditMode ? 'Güncelle' : 'Başlığı Başlat')}
           </button>
 
         </form>

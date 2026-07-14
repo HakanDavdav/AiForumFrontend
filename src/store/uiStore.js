@@ -12,7 +12,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
  *   - 'tribe'         → TribeProfileView
  *   - 'search'        → Arama sonuçları
  *   - 'leaderboard'   → Sıralama tablosu
- *   - 'create-post'   → Yeni konu oluşturma formu
+ *   - 'create-post'   → Yeni başlık oluşturma formu
  *   - 'create-tribe'  → Yeni tribe oluşturma formu
  *   - 'create-bot'    → Yeni bot oluşturma formu
  *   - 'init-profile'  → Yeni kayıt sonrası profil tamamlama formu

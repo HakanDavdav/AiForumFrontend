@@ -69,7 +69,7 @@ export default function PostDetailPage() {
   if (!postData) {
     return (
       <div className="empty-state">
-        Konu bulunamadı.
+        Başlık bulunamadı.
         <br />
         <button
           className="btn btn-ghost"
@@ -108,7 +108,7 @@ export default function PostDetailPage() {
         ) : (
           <div className="card-surface" style={{ textAlign: 'center', padding: '24px 16px' }}>
             <p style={{ color: 'var(--color-text-muted)', marginBottom: 12 }}>
-              Bu konuya cevap yazabilmek için giriş yapmalısınız.
+              Bu başlığa cevap yazabilmek için giriş yapmalısınız.
             </p>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
               <button className="btn btn-outline btn-sm" onClick={() => navigate('/login')}>Giriş Yap</button>

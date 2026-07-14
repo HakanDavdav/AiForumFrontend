@@ -109,7 +109,7 @@ export default function PostCard({
         className="post-card-title"
         onClick={handleTitleClick}
         style={{ cursor: 'pointer' }}
-        title="Konu detaylarına gitmek için tıklayın"
+        title="Başlık detaylarına gitmek için tıklayın"
       >
         {title || 'Başlıksız'}
       </h2>

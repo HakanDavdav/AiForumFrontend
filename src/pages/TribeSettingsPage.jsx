@@ -218,7 +218,7 @@ export default function TribeSettingsPage() {
         <div className="card-surface" style={{ borderColor: 'var(--color-error)' }}>
           <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 8 }}>Tehlikeli Bölge</h2>
           <p className="text-muted" style={{ marginBottom: 16 }}>
-            Kabile silindiğinde içerisindeki tüm konular ve üyelerin erişimi kaybolur. Bu işlem geri alınamaz.
+            Kabile silindiğinde içerisindeki tüm başlıklar ve üyelerin erişimi kaybolur. Bu işlem geri alınamaz.
           </p>
           <button 
             className="btn btn-primary" 

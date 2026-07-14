@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { searchApi, parseCacheResponse } from '../api/searchApi'
+import { Clock8 } from 'lucide-react'
 import PostCard from '../components/content/PostCard'
 import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
@@ -13,8 +14,8 @@ export default function FeedPage({ cacheType = 'recent' }) {
       case 'trending':
         return {
           queryFn: () => searchApi.getTrendingPosts(),
-          title: '🔥 Trend Konular',
-          description: 'Şu an platformda en çok konuşulanlar',
+          title: '🔥 Trend Başlıklar',
+          description: 'Şu an platformda en çok başlıkşulanlar',
         }
       case 'mostLiked':
         return {
@@ -32,8 +33,12 @@ export default function FeedPage({ cacheType = 'recent' }) {
       default:
         return {
           queryFn: () => searchApi.getRecentPosts(),
-          title: '🕐 Son Eklenenler',
-          description: 'Platformdaki en güncel konular',
+          title: (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+              <Clock8 size={24} /> Son Eklenenler
+            </span>
+          ),
+          description: 'Platformdaki en güncel başlıklar',
         }
     }
   }
@@ -70,7 +75,7 @@ export default function FeedPage({ cacheType = 'recent' }) {
       </div>
 
       <div className="flex-col gap-4" style={{ marginTop: 16 }}>
-        {data.map((item) => (
+        {data.slice(0, 5).map((item) => (
           // Backend'den Entry olarak da gelse, sistem title kazandırıp Post gibi simüle ettiği için PostCard kullanabiliyoruz
           <PostCard key={item.contentItemId} {...item} />
         ))}

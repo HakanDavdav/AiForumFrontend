@@ -4,7 +4,7 @@ import useDevLog from '../../utils/useDevLog'
 
 export function TopicTag({ topicType, size = 'sm', onClick }) {
   useDevLog('TopicTag', arguments[0] || {})
-  const label = TopicLabels[topicType] || `Konu ${topicType}`
+  const label = TopicLabels[topicType] || `Başlık ${topicType}`
   const color = TopicColors[topicType] || '#64748B'
 
   return (

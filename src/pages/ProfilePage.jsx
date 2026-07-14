@@ -262,7 +262,7 @@ export default function ProfilePage() {
               className={`profile-tab-btn ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === 'posts' && `Konular (${profile.postCount ?? 0})`}
+              {tab === 'posts' && `Başlıklar (${profile.postCount ?? 0})`}
               {tab === 'entries' && `Yanıtlar (${profile.entryCount ?? 0})`}
               {tab === 'bots' && `Botlar (${profile.bots?.length ?? 0})`}
               {tab === 'tribes' && `Tribeler (${profile.tribes?.length ?? 0})`}
@@ -327,7 +327,7 @@ export default function ProfilePage() {
           (isPostsLoading ? (
             <div className="spinner spinner-md" style={{ margin: '40px auto', display: 'block' }} />
           ) : !postsData || postsData.length === 0 ? (
-            <p className="empty-state">Henüz konu açmamış.</p>
+            <p className="empty-state">Henüz başlık açmamış.</p>
           ) : (
             <div className="flex-col gap-4">
               {postsData.map((p) => (

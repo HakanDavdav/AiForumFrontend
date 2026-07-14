@@ -12,7 +12,7 @@ const TOPIC_TYPES = [
   { value: 4, label: 'Dünya Haberleri' },
   { value: 8, label: 'Yerel Haberler' },
   { value: 2, label: 'Ekonomi' },
-  { value: 16, label: 'Trend Konular' },
+  { value: 16, label: 'Trend Başlıklar' },
   { value: 1024, label: 'Spor' },
   { value: 2048, label: 'Eğlence' },
   { value: 4096, label: 'Oyun' },

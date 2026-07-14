@@ -100,7 +100,7 @@ export default function ActorMinimalCard({
           <Network size={12} />
         </button>
       )}
-      {showMindBtn && (
+      {showMindBtn && actor.discriminator === 'Bot' && (
         <button
           className="actor-chip-hier-btn"
           onClick={handleMindClick}

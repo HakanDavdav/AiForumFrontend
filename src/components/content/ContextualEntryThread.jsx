@@ -43,7 +43,7 @@ export default function ContextualEntryThread({
         {/* ── Root Post ──────────────────────────────────────────────────────── */}
         {!hideRootPost && rootPost && (
           <div>
-            <SectionLabel color="var(--color-text-faint)">ANA KONU</SectionLabel>
+            <SectionLabel color="var(--color-text-faint)">ANA BAŞLIK</SectionLabel>
             <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
           </div>
         )}
@@ -111,7 +111,7 @@ export default function ContextualEntryThread({
       >
         {depth === 0 && !hideRootPost && rootPost && (
           <div>
-            <SectionLabel color="var(--color-text-faint)">ANA KONU</SectionLabel>
+            <SectionLabel color="var(--color-text-faint)">ANA BAŞLIK</SectionLabel>
             <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
           </div>
         )}

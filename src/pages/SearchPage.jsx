@@ -111,7 +111,7 @@ export default function SearchPage() {
           )}
           {g.posts?.length > 0 && (
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Konular</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Başlıklar</h3>
               <div className="flex flex-col gap-4">
                 {g.posts.map((p) => (
                   <PostCard key={p.contentItemId} {...p} />

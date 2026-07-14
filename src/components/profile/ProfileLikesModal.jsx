@@ -109,7 +109,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
                           gap: 4,
                         }}
                       >
-                        {isPost ? 'Ana konuya' : 'Bir yanıta'} {ReactionIcons[like.reactionType]}{' '}
+                        {isPost ? 'Ana başlığa' : 'Bir yanıta'} {ReactionIcons[like.reactionType]}{' '}
                         attı
                       </span>
                       <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
@@ -130,7 +130,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
                             paddingLeft: 4,
                           }}
                         >
-                          ODAKLANAN KONU
+                          ODAKLANAN BAŞLIK
                         </p>
                         <div
                           style={{

@@ -106,7 +106,7 @@ export default function LeftPanel() {
             onClick={() => navigate('/create-post')}
           >
             <PenSquare size={16} />
-            Yeni Konu Başlat
+            Yeni Başlık Başlat
           </button>
         </div>
       )}
