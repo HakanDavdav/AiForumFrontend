@@ -31,7 +31,7 @@ api.interceptors.response.use(
 
     // succeeded: false → hata olarak fırlat
     if (result && typeof result === 'object' && result.succeeded === false) {
-      const errorMessages = result.errors?.map((e) => e.description || e).join(', ') || 'Bir hata oluştu'
+      const errorMessages = result.errors?.map((e) => e.description || e.message || e).join(', ') || 'Bir hata oluştu'
       const error = new Error(errorMessages)
       error.errors = result.errors || []
       error.isApiError = true

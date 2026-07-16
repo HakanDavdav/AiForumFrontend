@@ -25,7 +25,7 @@ function buildNeuronObject(node) {
 
   // Yarıçap: ForceGraph3D link offset'iyle eşleşecek boyutta
   // nodeRelSize=6, val=30 → ~18.7, val=10 → ~12.9
-  const r = isPersona ? 18 : 12
+  const r = isPersona ? 30 : (node.label === 'Topic' ? 14 : 8)
 
   // İç parlak çekirdek
   group.add(
@@ -104,13 +104,17 @@ function buildNeuronObject(node) {
   })
 
   // Dinamik orantı: Canvas genişliğine göre Mesh'in X genişliğini uzatıyoruz
-  const scaleX = (canvasWidth / 1000) * (r * 12.0)
-  const scaleY = r * 4.2
+  // Persona node'u çok büyük olduğu için kutucuğu devasa yapmamak adına boyut çarpanını kısıtlıyoruz
+  const scaleR = isPersona ? 20 : r
+  const scaleX = (canvasWidth / 1000) * (scaleR * 12.0)
+  const scaleY = scaleR * 4.2
 
   const badgeGeo = new THREE.PlaneGeometry(scaleX, scaleY)
   const badgeMesh = new THREE.Mesh(badgeGeo, badgeMat)
 
-  badgeMesh.position.set(0, r * 5.0, 0)
+  // Gerçek r'ye göre yüksekliği ayarla ki kürenin içine girmesin ama çok da uçmasın
+  const heightMultiplier = isPersona ? 2.5 : 5.0
+  badgeMesh.position.set(0, r * heightMultiplier, 0)
   badgeMesh.renderOrder = 9999999
   badgeMesh.userData = { isBadge: true }
 
@@ -473,7 +477,7 @@ function NodeDetailPanel({ node, onClose }) {
         {Object.entries(node).map(([key, value]) => {
           // Grafik içi gereksiz 3D koordinat bilgilerini filtrele
           if (
-            ['id', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'index', 'name', 'label'].includes(key) ||
+            ['id', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'index', 'name', 'label', 'val', 'color', '__indexColor', '__threeObj'].includes(key) ||
             typeof value === 'object'
           )
             return null
@@ -497,7 +501,7 @@ function NodeDetailPanel({ node, onClose }) {
                   fontWeight: 600,
                 }}
               >
-                {key}
+                {key === 'lastUpdated' ? 'Son Güncelleme' : key}
               </div>
               <div
                 style={{
@@ -508,7 +512,9 @@ function NodeDetailPanel({ node, onClose }) {
                   whiteSpace: 'pre-wrap',
                 }}
               >
-                {String(value)}
+                {key === 'lastUpdated' && typeof value === 'number' 
+                  ? new Date(value).toLocaleString() 
+                  : String(value)}
               </div>
             </div>
           )
@@ -628,10 +634,11 @@ export default function MindPage() {
           const isPersona = n.label === 'Persona'
           const { core } = getNeuronColor(n.label)
           nodesMap.set(nodeId, {
+            ...n,
             id: nodeId,
             name: n.name || nodeId,
             label: n.label,
-            val: isPersona ? 30 : 10,
+            val: isPersona ? 200 : 10,
             color: core,
           })
         }
@@ -700,7 +707,7 @@ export default function MindPage() {
   const handleNodeClick = useCallback((node) => {
     setSelectedNode(node)
     selectedLinkRef.current = null // Node seçildiğinde damar seçimini iptal et
-    const r = node.label === 'Persona' ? 18 : 12
+    const r = node.label === 'Persona' ? 30 : (node.label === 'Topic' ? 14 : 8)
     const distance = r * 1.1
 
     if (fgRef.current) {
@@ -738,7 +745,12 @@ export default function MindPage() {
 
       // Kuvvetleri buradan da güvenli şekilde ayarla
       const lf = fg.d3Force('link')
-      if (lf) lf.distance(260).strength(0.2)
+      if (lf) {
+        lf.distance((link) => {
+          if (link.source?.label === 'Persona' || link.target?.label === 'Persona') return 260
+          return 40 // Kılcal bağlar aşırı kısaltıldı
+        }).strength(0.3)
+      }
       const cf = fg.d3Force('charge')
       if (cf) cf.strength(-900)
 
@@ -889,16 +901,7 @@ export default function MindPage() {
                 >
                   MIND GRAPH
                 </h1>
-                <p
-                  style={{
-                    fontSize: 11,
-                    color: 'rgba(192,132,252,0.55)',
-                    margin: 0,
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Neural Memory Network
-                </p>
+
               </div>
             </div>
           </div>

@@ -114,21 +114,8 @@ export default function LeftPanel() {
       {/* ─── Enrich News Pool Button (always visible) ── */}
       <div style={{ padding: isLoggedIn ? '0 12px 12px' : '0 12px 12px' }}>
         <button
-          className="btn"
-          style={{
-            width: '100%',
-            gap: 8,
-            fontSize: 14,
-            padding: '10px 16px',
-            background: 'linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(99,102,241,0.12) 100%)',
-            border: '1px solid rgba(139,92,246,0.3)',
-            color: 'var(--color-primary)',
-            borderRadius: 8,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+          className="btn btn-primary"
+          style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
           onClick={() => navigate('/enrich-news')}
         >
           <Sparkles size={16} />
@@ -223,16 +210,16 @@ export default function LeftPanel() {
 
       {/* ─── Cache Widgets ────── */}
       {activeLeftCacheType === 'recent' && (
-        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Clock8 size={14}/> Yeni</span>} items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title="Yeni" items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'trending' && (
-        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Flame size={14}/> Popüler</span>} items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title="Popüler" items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'mostLiked' && (
-        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><ThumbsUp size={14}/> Deb</span>} items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title="Deb" items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'mostDisliked' && (
-        <CacheWidget title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Skull size={14}/> Dene</span>} items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title="Dene" items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
+import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
@@ -39,7 +40,12 @@ export default function InitProfilePage() {
   const initProfileMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
     meta: { showErrorToast: true },
-    onSuccess: () => {
+    onSuccess: async () => {
+      try {
+        await identityApi.refreshClaims()
+      } catch (err) {
+        console.error('Failed to refresh claims:', err)
+      }
       setProfileCreated(true)
       queryClient.invalidateQueries()
       navigate('/')
@@ -62,7 +68,6 @@ export default function InitProfilePage() {
       bio: bio,
       imageUrl: '',
       topicTypes: selectedTopics,
-      theme: 0,
       entryPerPage: 50,
       postPerPage: 20,
       socialNotificationPreference: true,

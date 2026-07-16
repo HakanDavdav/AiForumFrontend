@@ -12,8 +12,8 @@ import useDevLog from '../utils/useDevLog'
  * ContentItemPage — plan.md "Contextual Entry Thread" (satır 167–178)
  *
  * GET /api/contentitem/{contentItemId}
- * → WebIdentityResult<(EntryDto?, PostDto?)>
- * Serialize edilen tuple: { item1: EntryDto|null, item2: PostDto|null }
+ * → WebIdentityResult<SingularContentItemDto>
+ * Serialize edilen object: { entry: EntryDto|null, post: PostDto|null }
  *
  * Discriminasyon:
  *   - item2 (PostDto) dolu → PostDetailPage'e yönlendir (navigate('/post/:id'))
@@ -35,8 +35,8 @@ export default function ContentItemPage() {
   })
 
   // Post branch: yönlendirmeyi render fazına taşı
-  const postDto = data?.Item2 ?? data?.item2 ?? null
-  const entryDto = data?.Item1 ?? data?.item1 ?? null
+  const postDto = data?.post ?? data?.Post ?? null
+  const entryDto = data?.entry ?? data?.Entry ?? null
 
   useEffect(() => {
     if (postDto && !entryDto) {

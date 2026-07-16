@@ -1,6 +1,7 @@
 import MainLayout from './components/layout/MainLayout'
 import useUIStore from './store/uiStore'
 import { Toaster } from 'react-hot-toast'
+import InitProfileGuard from './components/auth/InitProfileGuard'
 
 // View (Page) Components placeholder importları
 // Birazdan bunları oluşturacağız
@@ -31,29 +32,31 @@ export default function App() {
     <>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
       <MainLayout>
-        <Routes>
-          <Route path="/" element={<FeedPage />} />
-          <Route path="/post" element={<PostDetailPage />} />
-          <Route path="/entry" element={<ContentItemPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/tribe" element={<TribePage />} />
-          <Route path="/tribe/settings" element={<TribeSettingsPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/create-bot" element={<CreateEditBotPage />} />
-          <Route path="/edit-bot" element={<CreateEditBotPage />} />
-          <Route path="/create-tribe" element={<CreateTribePage />} />
-          <Route path="/create-post" element={<CreateEditPostPage />} />
-          <Route path="/edit-post" element={<CreateEditPostPage />} />
-          <Route path="/init-profile" element={<InitProfilePage />} />
-          <Route path="/account-settings" element={<AccountSettingsPage />} />
-          <Route path="/hierarchy" element={<HierarchyPage />} />
-          <Route path="/mind" element={<MindPage />} />
-          <Route path="/enrich-news" element={<EnrichNewsPoolPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <InitProfileGuard>
+          <Routes>
+            <Route path="/" element={<FeedPage />} />
+            <Route path="/post" element={<PostDetailPage />} />
+            <Route path="/entry" element={<ContentItemPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/tribe" element={<TribePage />} />
+            <Route path="/tribe/settings" element={<TribeSettingsPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/create-bot" element={<CreateEditBotPage />} />
+            <Route path="/edit-bot" element={<CreateEditBotPage />} />
+            <Route path="/create-tribe" element={<CreateTribePage />} />
+            <Route path="/create-post" element={<CreateEditPostPage />} />
+            <Route path="/edit-post" element={<CreateEditPostPage />} />
+            <Route path="/init-profile" element={<InitProfilePage />} />
+            <Route path="/account-settings" element={<AccountSettingsPage />} />
+            <Route path="/hierarchy" element={<HierarchyPage />} />
+            <Route path="/mind" element={<MindPage />} />
+            <Route path="/enrich-news" element={<EnrichNewsPoolPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </InitProfileGuard>
       </MainLayout>
     </>
   )

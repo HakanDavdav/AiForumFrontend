@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Loader2, Bot, Brain, CheckCircle, Edit3 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
 import { TopicTypes, BotModes } from '../../constants/TopicTypes'
@@ -60,7 +60,7 @@ export default function CreateEditBotPage() {
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
       
       setTimeout(() => {
-        const newBotId = isEditMode ? botId : (res.data?.data?.actorId || res.data?.data?.botId || res.data?.data?.id)
+        const newBotId = isEditMode ? botId : (typeof res.data?.data === 'string' ? res.data?.data : res.data?.data?.actorId)
         if (newBotId) {
           navigate('/profile?actorId=' + newBotId)
         } else {
@@ -102,168 +102,434 @@ export default function CreateEditBotPage() {
     })
   }
 
+  const canSubmit = formData.profileName.trim().length > 2 && !mutation.isPending
+
   if (isEditMode && isLoadingExisting) {
-    return <div style={{ padding: 24, textAlign: 'center' }}>Yükleniyor...</div>
+    return (
+      <div className="flex justify-center" style={{ padding: 40 }}>
+        <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }} />
+      </div>
+    )
   }
 
   return (
-    <div className="flex-col gap-4">
-      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
-        <BackButton text={null} onClick={() => navigate('/')} style={{ marginBottom: 0 }} />
+    <div className="page-container" style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px' }}>
+      
+      <div style={{ marginBottom: 24 }}>
+        <BackButton text="Geri Dön" onClick={() => navigate('/')} style={{ marginBottom: 0 }} />
       </div>
 
-
-
-      <div className="flex-col gap-4">
-        {/* ─── General Settings Form ─── */}
-        <div className="card-surface">
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Genel Ayarlar</h2>
-          <p className="text-muted" style={{ marginBottom: 16 }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        marginBottom: 32,
+        paddingBottom: 24,
+        borderBottom: '1px solid var(--color-border)'
+      }}>
+        <div style={{
+          width: 48,
+          height: 48,
+          borderRadius: 14,
+          background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)'
+        }}>
+          {isEditMode ? <Brain size={22} color="#fff" /> : <Bot size={22} color="#fff" />}
+        </div>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+            {isEditMode ? 'Bot Ayarları' : 'Bot Üret'}
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {isEditMode ? 'Yapay zeka tabanlı kişisel botunuzun ayarlarını güncelleyin.' : 'Yapay zeka tabanlı kişisel botunuzu yapılandırın.'}
           </p>
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          
-            <div className="input-group">
-              <label>Bot Adı <span style={{ color: 'var(--color-primary)' }}>*</span></label>
-              <input 
-                className="input" 
-                type="text" 
-                required
-                placeholder="Örn: AnalizBot"
-                value={formData.profileName}
-                onChange={e => setFormData({ ...formData, profileName: e.target.value })}
-              />
-            </div>
-
-            <div className="input-group">
-              <label>Profil Fotoğrafı URL</label>
-              <input 
-                className="input" 
-                type="url" 
-                placeholder="https://..."
-                value={formData.imageUrl}
-                onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-              />
-            </div>
-
-            <div className="input-group">
-              <label>Bot Modu</label>
-              <select 
-                className="input" 
-                value={formData.botMode}
-                onChange={e => setFormData({ ...formData, botMode: parseInt(e.target.value) })}
-              >
-                {BotModes.map(mode => (
-                  <option key={mode.value} value={mode.value}>{mode.label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="input-group">
-              <label>Bot Kişiliği (Prompt)</label>
-              <textarea 
-                className="input" 
-                rows={3}
-                placeholder="Botun karakterini ve nasıl davranması gerektiğini yazın..."
-                value={formData.botPersonality}
-                onChange={e => setFormData({ ...formData, botPersonality: e.target.value })}
-              />
-            </div>
-
-            <div className="input-group">
-              <label>Özel Talimatlar</label>
-              <textarea 
-                className="input" 
-                rows={3}
-                placeholder="Cevap verirken uyması gereken katı kurallar..."
-                value={formData.instructions}
-                onChange={e => setFormData({ ...formData, instructions: e.target.value })}
-              />
-            </div>
-
-            {!formData.autoBio && (
-              <div className="input-group">
-                <label>Biyografi (Hakkında)</label>
-                <textarea 
-                  className="input" 
-                  rows={2}
-                  placeholder="Profilde görünecek kısa bilgi..."
-                  value={formData.bio}
-                  onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                />
-              </div>
-            )}
-
-          <div style={{ display: 'flex', gap: 16, marginTop: 8, marginBottom: 8 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
-              <input 
-                type="checkbox" 
-                checked={formData.autoBio}
-                onChange={e => setFormData({ ...formData, autoBio: e.target.checked })}
-              />
-              Biyografiyi Yapay Zeka Üretsin
-            </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14 }}>
-              <input 
-                type="checkbox" 
-                checked={formData.autoInterests}
-                onChange={e => setFormData({ ...formData, autoInterests: e.target.checked })}
-              />
-              İlgi Alanlarını Yapay Zeka Belirlesin
-            </label>
-          </div>
-
-          {!formData.autoInterests && (
-            <div className="input-group">
-              <label>İlgi Alanları (Başlıklar)</label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
-                {TopicTypes.map(topic => {
-                  const isSelected = formData.topicTypes.includes(topic.value)
-                  return (
-                    <div 
-                      key={topic.value}
-                      onClick={() => handleTopicToggle(topic.value)}
-                      style={{
-                        padding: '6px 12px',
-                        borderRadius: 100,
-                        fontSize: 13,
-                        cursor: 'pointer',
-                        background: isSelected ? 'var(--color-primary)' : 'var(--color-bg)',
-                        color: isSelected ? 'white' : 'var(--color-text)',
-                        border: `1px solid ${isSelected ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      {topic.label}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          <button 
-            type="submit" 
-            className="btn btn-primary w-full"
-            disabled={mutation.isPending}
-            style={{ marginTop: 16 }}
-          >
-            {mutation.isPending ? 'İşleniyor...' : (isEditMode ? 'Botu Güncelle' : 'Botu Üret')}
-          </button>
-
-        </form>
+        </div>
       </div>
 
+      {/* Form */}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: 8,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase'
+          }}>
+            Bot Adı <span style={{ color: 'var(--color-primary)' }}>*</span>
+          </label>
+          <div style={{ position: 'relative' }}>
+            <input 
+              type="text" 
+              required
+              placeholder="Örn: AnalizBot"
+              value={formData.profileName}
+              onChange={e => setFormData({ ...formData, profileName: e.target.value })}
+              disabled={mutation.isPending || mutation.isSuccess}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1.5px solid var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 14,
+                fontFamily: 'inherit',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: 8,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase'
+          }}>
+            Profil Fotoğrafı URL
+          </label>
+          <div style={{ position: 'relative' }}>
+            <input 
+              type="url" 
+              placeholder="https://..."
+              value={formData.imageUrl}
+              onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+              disabled={mutation.isPending || mutation.isSuccess}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1.5px solid var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 14,
+                fontFamily: 'inherit',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: 8,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase'
+          }}>
+            Bot Modu
+          </label>
+          <div style={{ position: 'relative' }}>
+            <select 
+              value={formData.botMode}
+              onChange={e => setFormData({ ...formData, botMode: parseInt(e.target.value) })}
+              disabled={mutation.isPending || mutation.isSuccess}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1.5px solid var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 14,
+                fontFamily: 'inherit',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box',
+                appearance: 'none'
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+            >
+              {BotModes.map(mode => (
+                <option key={mode.value} value={mode.value}>{mode.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: 8,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase'
+          }}>
+            Bot Kişiliği (Prompt)
+          </label>
+          <div style={{ position: 'relative' }}>
+            <textarea 
+              rows={3}
+              placeholder="Botun karakterini ve nasıl davranması gerektiğini yazın..."
+              value={formData.botPersonality}
+              onChange={e => setFormData({ ...formData, botPersonality: e.target.value })}
+              disabled={mutation.isPending || mutation.isSuccess}
+              style={{
+                width: '100%',
+                resize: 'vertical',
+                minHeight: 100,
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1.5px solid var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 14,
+                lineHeight: 1.65,
+                fontFamily: 'inherit',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: 8,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase'
+          }}>
+            Özel Talimatlar
+          </label>
+          <div style={{ position: 'relative' }}>
+            <textarea 
+              rows={3}
+              placeholder="Cevap verirken uyması gereken katı kurallar..."
+              value={formData.instructions}
+              onChange={e => setFormData({ ...formData, instructions: e.target.value })}
+              disabled={mutation.isPending || mutation.isSuccess}
+              style={{
+                width: '100%',
+                resize: 'vertical',
+                minHeight: 100,
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1.5px solid var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 14,
+                lineHeight: 1.65,
+                fontFamily: 'inherit',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+            />
+          </div>
+        </div>
+
+        {!formData.autoBio && (
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 8,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase'
+            }}>
+              Biyografi (Hakkında)
+            </label>
+            <div style={{ position: 'relative' }}>
+              <textarea 
+                rows={2}
+                placeholder="Profilde görünecek kısa bilgi..."
+                value={formData.bio}
+                onChange={e => setFormData({ ...formData, bio: e.target.value })}
+                disabled={mutation.isPending || mutation.isSuccess}
+                style={{
+                  width: '100%',
+                  resize: 'vertical',
+                  minHeight: 80,
+                  padding: '14px 16px',
+                  borderRadius: 12,
+                  border: '1.5px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)',
+                  fontSize: 14,
+                  lineHeight: 1.65,
+                  fontFamily: 'inherit',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
+                onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              />
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--color-text-secondary)' }}>
+            <input 
+              type="checkbox" 
+              checked={formData.autoBio}
+              onChange={e => setFormData({ ...formData, autoBio: e.target.checked })}
+              disabled={mutation.isPending || mutation.isSuccess}
+            />
+            Biyografiyi Yapay Zeka Üretsin
+          </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--color-text-secondary)' }}>
+            <input 
+              type="checkbox" 
+              checked={formData.autoInterests}
+              onChange={e => setFormData({ ...formData, autoInterests: e.target.checked })}
+              disabled={mutation.isPending || mutation.isSuccess}
+            />
+            İlgi Alanlarını Yapay Zeka Belirlesin
+          </label>
+        </div>
+
+        {!formData.autoInterests && (
+          <div>
+            <label style={{
+              display: 'block',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 10,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase'
+            }}>
+              İlgi Alanları (Başlıklar)
+            </label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {TopicTypes.map(topic => {
+                const isSelected = formData.topicTypes.includes(topic.value)
+                return (
+                  <div 
+                    key={topic.value}
+                    onClick={() => {
+                      if (!mutation.isPending && !mutation.isSuccess) {
+                        handleTopicToggle(topic.value)
+                      }
+                    }}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: 20,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      cursor: (mutation.isPending || mutation.isSuccess) ? 'default' : 'pointer',
+                      background: isSelected ? 'var(--color-primary)' : 'var(--color-surface-raised, var(--color-surface))',
+                      color: isSelected ? '#fff' : 'var(--color-text-secondary)',
+                      border: `1px solid ${isSelected ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                      transition: 'all 0.2s',
+                      boxShadow: isSelected ? '0 2px 8px rgba(var(--color-primary-rgb, 99,102,241), 0.25)' : 'none'
+                    }}
+                  >
+                    {topic.label}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Success message */}
+        {mutation.isSuccess && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '12px 16px',
+            borderRadius: 10,
+            background: 'rgba(34, 197, 94, 0.08)',
+            border: '1px solid rgba(34, 197, 94, 0.25)',
+            marginTop: 8,
+          }}>
+            <CheckCircle size={16} color="#22c55e" />
+            <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
+              {isEditMode ? 'Bot başarıyla güncellendi. Yönlendiriliyorsunuz...' : 'Bot başarıyla üretildi. Yönlendiriliyorsunuz...'}
+            </span>
+          </div>
+        )}
+
+        {/* Submit button */}
+        <div style={{ marginTop: 32 }}>
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={!canSubmit || mutation.isSuccess}
+            style={{
+              width: '100%',
+              padding: '13px 24px',
+              fontSize: 14,
+              fontWeight: 600,
+              gap: 8,
+              borderRadius: 12,
+              opacity: (!canSubmit || mutation.isSuccess) ? 0.5 : 1,
+              cursor: (!canSubmit || mutation.isSuccess) ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {mutation.isPending ? (
+              <>
+                <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                İşleniyor...
+              </>
+            ) : (
+              <>
+                {isEditMode ? 'Güncelle' : 'Üret'}
+              </>
+            )}
+          </button>
+        </div>
+
+      </form>
+
+      {/* Delete button section */}
       {isEditMode && (
-        <div className="card-surface" style={{ borderColor: 'var(--color-error)' }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 8 }}>Tehlikeli Bölge</h2>
-          <p className="text-muted" style={{ marginBottom: 16 }}>
+        <div style={{
+          marginTop: 48,
+          padding: '20px',
+          borderRadius: 12,
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'rgba(239, 68, 68, 0.04)'
+        }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: '0 0 8px 0' }}>Tehlikeli Bölge</h2>
+          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 16px 0', lineHeight: 1.5 }}>
             Bot silindiğinde içerisindeki tüm etkileşimler kaybolabilir. Bu işlem geri alınamaz.
           </p>
           <button 
             className="btn btn-primary" 
-            style={{ background: 'var(--color-error)', borderColor: 'var(--color-error)' }}
+            style={{ background: '#ef4444', borderColor: '#ef4444', width: '100%', gap: 8 }}
             onClick={handleDeleteBot}
             disabled={deleteMutation.isPending}
           >
@@ -271,7 +537,7 @@ export default function CreateEditBotPage() {
           </button>
         </div>
       )}
-      </div>
+
     </div>
   )
 }

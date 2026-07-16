@@ -15,6 +15,9 @@ export const identityApi = {
   logout: () =>
     api.post('/identity/logout'),
 
+  refreshClaims: () =>
+    api.post('/identity/refresh-claims'),
+
   // ─── Email ───────────────────────────────────────────────────────────────
   requestEmailConfirm: (dto) =>
     api.post('/identity/email/confirm/request', dto),

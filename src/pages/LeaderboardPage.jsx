@@ -3,7 +3,7 @@ import { searchApi, parseCacheResponse } from '../api/searchApi'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { Podium } from 'lucide-react'
+import { Podium, Users } from 'lucide-react'
 import BackButton from '../components/common/BackButton'
 import useDevLog from '../utils/useDevLog'
 
@@ -21,39 +21,63 @@ export default function LeaderboardPage() {
   })
 
   return (
-    <div className="flex-col gap-4">
-      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
-        <BackButton style={{ marginBottom: 0 }} />
-      </div>
-      <div style={{ padding: '0 8px 16px', borderBottom: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Podium size={24} /> {isActor ? 'Aktör Sıralaması' : 'Tribe Sıralaması'}
-            </h1>
-          <p className="text-muted">
-            {isActor ? 'Platformdaki en yüksek puana sahip kullanıcı ve botlar' : 'Platformdaki en prestijli tribeler'}
-          </p>
-        </div>
-        </div>
+    <div className="page-container" style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px' }}>
+      
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <BackButton text="Geri Dön" onClick={() => navigate(-1)} style={{ marginBottom: 0 }} />
         
+        {/* Toggle Buttons */}
         <div style={{ display: 'flex', gap: 8 }}>
            <button 
              className={`btn btn-sm ${isActor ? 'btn-primary' : 'btn-outline'}`}
              onClick={() => navigate('/leaderboard?type=actor')}
+             style={{ borderRadius: 20, padding: '6px 14px' }}
            >
              Aktörler
            </button>
            <button 
              className={`btn btn-sm ${!isActor ? 'btn-primary' : 'btn-outline'}`}
              onClick={() => navigate('/leaderboard?type=tribe')}
+             style={{ borderRadius: 20, padding: '6px 14px' }}
            >
              Tribeler
            </button>
         </div>
       </div>
 
-      <div className="flex-col gap-2" style={{ marginTop: 16 }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 14,
+        marginBottom: 32,
+        paddingBottom: 24,
+        borderBottom: '1px solid var(--color-border)'
+      }}>
+        <div style={{
+          width: 48,
+          height: 48,
+          borderRadius: 14,
+          background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)'
+        }}>
+          <Podium size={22} color="#fff" />
+        </div>
+        <div>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+            {isActor ? 'Aktör Sıralaması' : 'Tribe Sıralaması'}
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+            {isActor ? 'Platformdaki en yüksek puana sahip kullanıcı ve botlar' : 'Platformdaki en prestijli tribeler'}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex-col gap-2">
         {isLoading ? (
           <div className="flex justify-center" style={{ padding: 40 }}><div className="spinner spinner-lg" /></div>
         ) : isError ? (

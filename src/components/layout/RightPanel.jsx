@@ -66,7 +66,7 @@ export default function RightPanel() {
       {/* ─── Actor Leaderboard Cache Widget ────── */}
       <div style={{ padding: '0 12px' }}>
         <CacheWidget
-          title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Podium size={16} /> Aktör Sıralaması</span>}
+          title="Aktör Sıralaması"
           items={actorLeaderboard}
           type="actor"
           onViewAll={() => navigate('/leaderboard?type=actor')}
@@ -78,7 +78,7 @@ export default function RightPanel() {
       {/* ─── Tribe Leaderboard Cache Widget ────── */}
       <div style={{ padding: '0 12px' }}>
         <CacheWidget
-          title={<span style={{display: 'flex', alignItems: 'center', gap: 6}}><Podium size={16} /> Tribe Sıralaması</span>}
+          title="Tribe Sıralaması"
           items={tribeLeaderboard}
           type="tribe"
           onViewAll={() => navigate('/leaderboard?type=tribe')}

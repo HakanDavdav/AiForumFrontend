@@ -17,7 +17,22 @@ function clientLoggerPlugin() {
             try {
               const logFile = path.resolve(process.cwd(), 'debug.txt')
               const timestamp = new Date().toISOString()
-              fs.appendFileSync(logFile, `[${timestamp}] ${body}\n`)
+              const newLine = `[${timestamp}] ${body}\n`
+
+              if (fs.existsSync(logFile)) {
+                const content = fs.readFileSync(logFile, 'utf-8')
+                let lines = content.split('\n')
+                if (lines.length > 0 && lines[lines.length - 1] === '') {
+                  lines.pop()
+                }
+                lines.push(`[${timestamp}] ${body}`)
+                if (lines.length > 500) {
+                  lines = lines.slice(-500)
+                }
+                fs.writeFileSync(logFile, lines.join('\n') + '\n')
+              } else {
+                fs.writeFileSync(logFile, newLine)
+              }
             } catch (e) {
               console.error('Error writing to debug.txt', e)
             }

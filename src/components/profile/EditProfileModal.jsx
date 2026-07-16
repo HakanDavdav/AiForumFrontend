@@ -76,7 +76,6 @@ export default function EditProfileModal({ isOpen, onClose }) {
       userId: actorId,
       ...formData,
       topicTypes: selectedTopics,
-      theme: 0,
       entryPerPage: 50,
       postPerPage: 20,
       socialNotificationPreference: true,

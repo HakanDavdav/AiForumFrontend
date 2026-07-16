@@ -23,8 +23,12 @@ const queryClient = new QueryClient({
       if (!mutation.meta?.showErrorToast) return;
 
       let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.'];
-      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-        errorMessages = error.response.data.errors.map(e => e.description || e);
+      if (error.response?.data?.errors) {
+        if (Array.isArray(error.response.data.errors)) {
+          errorMessages = error.response.data.errors.map(e => e.description || e.message || e);
+        } else if (typeof error.response.data.errors === 'object') {
+          errorMessages = Object.values(error.response.data.errors).flat();
+        }
       }
       
       errorMessages.forEach(msg => {
@@ -46,8 +50,12 @@ const queryClient = new QueryClient({
       if (!query.meta?.showErrorToast) return;
       
       let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.'];
-      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-        errorMessages = error.response.data.errors.map(e => e.description || e);
+      if (error.response?.data?.errors) {
+        if (Array.isArray(error.response.data.errors)) {
+          errorMessages = error.response.data.errors.map(e => e.description || e.message || e);
+        } else if (typeof error.response.data.errors === 'object') {
+          errorMessages = Object.values(error.response.data.errors).flat();
+        }
       }
       
       errorMessages.forEach(msg => {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot } from 'lucide-react'
+import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot, Brain } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
 import BackButton from '../components/common/BackButton'
@@ -124,6 +124,14 @@ export default function ProfilePage() {
               </h1>
 
               <div className="flex gap-2" style={{ flexShrink: 0 }}>
+                {profile.discriminator === 'Bot' && (
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={() => navigate('/mind?actorId=' + actorId)}
+                  >
+                    <Brain size={14} /> Anılar
+                  </button>
+                )}
                 <button
                   className="btn btn-outline btn-sm"
                   onClick={() => navigate('/hierarchy?actorId=' + actorId)}
