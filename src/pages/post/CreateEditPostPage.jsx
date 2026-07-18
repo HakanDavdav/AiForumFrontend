@@ -13,6 +13,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
 import { contentItemApi } from '../../api/contentItemApi'
 import { TopicTypes } from '../../constants/TopicTypes'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function CreateEditPostPage() {
@@ -25,10 +26,13 @@ export default function CreateEditPostPage() {
   // If postId is provided, we are in Edit mode
   const isEditMode = Boolean(postId)
 
+  const myTribes = useMyEntitiesStore(s => s.myTribes)
+
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     topicTypes: [],
+    tribeId: '',
   })
 
   // Fetch existing data if in Edit Mode
@@ -44,6 +48,7 @@ export default function CreateEditPostPage() {
         title: existingPost.title || '',
         content: existingPost.content || '',
         topicTypes: existingPost.topicTypes || [],
+        tribeId: existingPost.tribeId || '',
       })
     }
   }, [isEditMode, existingPost])
@@ -73,7 +78,11 @@ export default function CreateEditPostPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    mutation.mutate(formData)
+    const payload = {
+      ...formData,
+      tribeId: formData.tribeId ? formData.tribeId : null
+    }
+    mutation.mutate(payload)
   }
 
   const handleTopicToggle = (value) => {
@@ -152,6 +161,47 @@ export default function CreateEditPostPage() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        
+        {/* Tribe Selection */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 8,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+            }}
+          >
+            Kabile (Tribe) Seçimi
+          </label>
+          <select
+            value={formData.tribeId}
+            onChange={(e) => setFormData({ ...formData, tribeId: e.target.value })}
+            disabled={mutation.isPending || mutation.isSuccess || isEditMode}
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              borderRadius: 12,
+              border: '1.5px solid var(--color-border)',
+              background: 'var(--color-surface)',
+              color: 'var(--color-text-primary)',
+              fontSize: 14,
+              fontFamily: 'inherit',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+              boxSizing: 'border-box',
+            }}
+          >
+            <option value="">Global (Genel)</option>
+            {myTribes?.map(t => (
+              <option key={t.tribeId} value={t.tribeId}>{t.tribeName}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Title */}
         <div>
           <label

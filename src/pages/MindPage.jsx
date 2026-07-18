@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import ForceGraph3D from 'react-force-graph-3d'
 import * as THREE from 'three'
 import { actorApi } from '../api/actorApi'
+import { tribeApi } from '../api/tribeApi'
 import { ArrowLeft, Loader2, Brain, Focus } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -527,6 +528,7 @@ function NodeDetailPanel({ node, onClose }) {
 export default function MindPage() {
   const [searchParams] = useSearchParams()
   const actorId = searchParams.get('actorId')
+  const tribeId = searchParams.get('tribeId')
   const navigate = useNavigate()
 
   const [isLoading, setIsLoading] = useState(true)
@@ -579,8 +581,8 @@ export default function MindPage() {
   }, [])
 
   useEffect(() => {
-    if (!actorId) {
-      toast.error('Actor ID is missing.')
+    if (!actorId && !tribeId) {
+      toast.error('Actor or Tribe ID is missing.')
       navigate('/')
       return
     }
@@ -588,7 +590,10 @@ export default function MindPage() {
     const fetchMemory = async () => {
       setIsLoading(true)
       try {
-        const response = await actorApi.getFullMemory(actorId)
+        const response = actorId 
+          ? await actorApi.getFullMemory(actorId)
+          : await tribeApi.getFullMemory(tribeId)
+        
         if (response.data.succeeded) {
           if (response.data.data) {
             try {

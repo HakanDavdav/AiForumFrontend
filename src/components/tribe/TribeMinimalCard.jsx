@@ -2,28 +2,30 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
 import useAuthStore from '../../store/authStore'
-import { PenSquare } from 'lucide-react'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
+import { PenSquare, Brain } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 
 /**
  * TribeMinimalCard — plan.md Component #4
  * MinimalTribeDto'dan tribe kartı. Tıklanınca Center Panel'de TribeProfileView açar.
  */
-export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true, showPoint = true }) {
+export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true, showPoint = true, showMindBtn = true }) {
   useDevLog('TribeMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
 
-  const { data: myTribes } = useQuery({
-    queryKey: ['myTribes'],
-    queryFn: () => tribeApi.getMyTribes().then((res) => res.data.data),
-    enabled: isLoggedIn,
-  })
+  const myTribes = useMyEntitiesStore((s) => s.myTribes)
 
   const isMyTribe = myTribes?.some(t => t.tribeId === tribeId)
 
   const handleClick = () => {
     if (clickable) navigate('/tribe?tribeId=' + tribeId)
+  }
+
+  const handleMindClick = (e) => {
+    e.stopPropagation()
+    navigate('/mind?tribeId=' + tribeId)
   }
 
   const handleEditClick = (e) => {
@@ -50,6 +52,16 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="tribe-card-name truncate">{tribeName || 'İsimsiz Tribe'}</div>
       </div>
+      {showMindBtn && (
+        <button
+          className="actor-chip-hier-btn"
+          onClick={handleMindClick}
+          title="Zihin haritasını göster"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
+          <Brain size={12} />
+        </button>
+      )}
       {isMyTribe && (
         <button
           className="actor-chip-hier-btn"

@@ -616,6 +616,9 @@ select {
     transform: rotate(360deg);
   }
 }
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
 .spinner {
   display: inline-block;
   border-radius: var(--radius-full);

@@ -83,7 +83,7 @@ export default function InitProfilePage() {
         Profilinizi Tamamlayın
       </h2>
       <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
-        AiForum'u kullanmaya başlamak için lütfen temel bilgilerinizi girin.
+        TuringFest'i kullanmaya başlamak için lütfen temel bilgilerinizi girin.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">

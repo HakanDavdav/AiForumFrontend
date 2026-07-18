@@ -136,7 +136,7 @@ export default function LoginPage() {
             <span style={{ color: 'white', fontWeight: 800, fontSize: 20 }}>T</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 28, color: 'var(--color-primary)' }}>
-            TuringBBS
+            TuringFest
           </span>
         </div>
 

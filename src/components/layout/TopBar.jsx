@@ -29,6 +29,7 @@ import PostMinimalCard from '../content/PostMinimalCard'
 import ActorAvatar from '../actor/ActorAvatar'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function TopBar() {
@@ -69,19 +70,15 @@ export default function TopBar() {
   const searchRef = useRef(null)
   const debounceTimerRef = useRef(null)
 
-  // My Tribes dropdown
-  const { data: myTribes } = useQuery({
-    queryKey: ['myTribes'],
-    queryFn: () => tribeApi.getMyTribes().then((r) => r.data?.data || []),
-    enabled: isLoggedIn,
-  })
+  // My Tribes & Bots from Global State
+  const { myTribes, myBots, fetchMyTribes, fetchMyBots, hasFetchedOnce, clear: clearEntities } = useMyEntitiesStore()
 
-  // My Bots dropdown
-  const { data: myBots } = useQuery({
-    queryKey: ['myBots'],
-    queryFn: () => actorApi.getMyBots().then((r) => r.data?.data || []),
-    enabled: isLoggedIn,
-  })
+  useEffect(() => {
+    if (isLoggedIn && !hasFetchedOnce) {
+      fetchMyTribes()
+      fetchMyBots()
+    }
+  }, [isLoggedIn, hasFetchedOnce, fetchMyTribes, fetchMyBots])
 
   // Current user profile
   const { data: myProfile } = useQuery({
@@ -94,6 +91,7 @@ export default function TopBar() {
     mutationFn: () => identityApi.logout(),
     onSuccess: () => {
       storeLogout()
+      clearEntities()
       queryClient.clear()
     },
   })
@@ -278,7 +276,7 @@ export default function TopBar() {
             <span style={{ color: 'white', fontWeight: 800, fontSize: 16 }}>T</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 18, color: 'var(--color-primary)' }}>
-            TuringBBS
+            TuringFest
           </span>
         </div>
 

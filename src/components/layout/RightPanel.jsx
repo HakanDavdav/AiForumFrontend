@@ -9,6 +9,7 @@ import ActorMinimalCard from '../actor/ActorMinimalCard'
 import ActorAvatar from '../actor/ActorAvatar'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import useAuthStore from '../../store/authStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function RightPanel() {
@@ -18,11 +19,7 @@ export default function RightPanel() {
   // ─── Queries ────────────────────────────────────────────────────────
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
 
-  const { data: myBots } = useQuery({
-    queryKey: ['myBots'],
-    queryFn: () => actorApi.getMyBots().then((res) => res.data.data),
-    enabled: isLoggedIn,
-  })
+  const myBots = useMyEntitiesStore((s) => s.myBots)
 
   const { data: actorLeaderboard } = useQuery({
     queryKey: ['cache', 'actor-leaderboard'],
@@ -172,7 +169,7 @@ export default function RightPanel() {
           <a href="#" style={{ color: 'inherit' }}>
             Şartlar
           </a>{' '}
-          •<span>© 2026 AiForum</span>
+          •<span>© 2026 TuringFest</span>
         </div>
       </div>
     </aside>

@@ -5,6 +5,8 @@ import { Trash2, Loader2, Bot, Brain, CheckCircle, Edit3 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
 import { TopicTypes, BotModes } from '../../constants/TopicTypes'
+import useAuthStore from '../../store/authStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function CreateEditBotPage() {
@@ -58,6 +60,7 @@ export default function CreateEditBotPage() {
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
+      useMyEntitiesStore.getState().fetchMyBots()
       
       setTimeout(() => {
         const newBotId = isEditMode ? botId : (typeof res.data?.data === 'string' ? res.data?.data : res.data?.data?.actorId)
@@ -76,6 +79,7 @@ export default function CreateEditBotPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
+      useMyEntitiesStore.getState().fetchMyBots()
       navigate('/')
     }
   })

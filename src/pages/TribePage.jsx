@@ -1,16 +1,21 @@
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { LogOut, UserPlus, Settings } from 'lucide-react'
+import { LogOut, UserPlus, Settings, ChevronLeft, ChevronRight, Brain } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
+import PostCard from '../components/content/PostCard'
 import useAuthStore from '../store/authStore'
+import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 
 export default function TribePage() {
   const [searchParams] = useSearchParams()
   const tribeId = searchParams.get('tribeId')
+  const [postsPage, setPostsPage] = useState(1)
+  const inferredPerPage = 5
   useDevLog('TribePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
   const navigate = useNavigate()
@@ -22,14 +27,26 @@ export default function TribePage() {
     enabled: !!tribeId,
   })
 
+  const { data: postsData, isLoading: isPostsLoading } = useQuery({
+    queryKey: ['tribe-posts', tribeId, postsPage],
+    queryFn: () => tribeApi.getTribePosts(tribeId, postsPage).then(res => res.data?.data),
+    enabled: !!tribeId,
+  })
+
   const joinMutation = useMutation({
     mutationFn: () => tribeApi.joinTribe(tribeId),
-    onSuccess: () => queryClient.invalidateQueries(['tribe', tribeId]),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['tribe', tribeId])
+      useMyEntitiesStore.getState().fetchMyTribes()
+    },
   })
 
   const leaveMutation = useMutation({
     mutationFn: () => tribeApi.leaveTribe(tribeId),
-    onSuccess: () => queryClient.invalidateQueries(['tribe', tribeId]),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['tribe', tribeId])
+      useMyEntitiesStore.getState().fetchMyTribes()
+    },
   })
 
   if (isLoading) return <div className="flex justify-center" style={{ padding: 40 }}><div className="spinner spinner-lg" /></div>
@@ -68,6 +85,12 @@ export default function TribePage() {
               <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{tribe.tribeName}</h1>
               
               <div className="flex gap-2">
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={() => navigate('/mind?tribeId=' + tribeId)}
+                >
+                  <Brain size={14} /> Anılar
+                </button>
                 {isLoggedIn && !isMember && (
                   <button 
                     className="btn btn-primary btn-sm" 
@@ -166,6 +189,49 @@ export default function TribePage() {
           ))
         )}
       </div>
+
+      {/* ─── Posts Section ─── */}
+      <div className="flex items-center justify-between" style={{ paddingBottom: 8, borderBottom: '1px solid var(--color-border)', marginTop: 24 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700 }}>
+          Başlıklar ({tribe.postCount ?? 0})
+        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            className="btn btn-outline btn-sm"
+            disabled={postsPage === 1 || isPostsLoading}
+            onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
+            style={{ padding: '4px 8px' }}
+          >
+            <ChevronLeft size={14} />
+          </button>
+          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+            Sayfa {postsPage} / {Math.max(1, Math.ceil((tribe.postCount || 0) / inferredPerPage))}
+          </span>
+          <button
+            className="btn btn-outline btn-sm"
+            disabled={postsPage >= Math.ceil((tribe.postCount || 0) / inferredPerPage) || isPostsLoading}
+            onClick={() => setPostsPage((p) => p + 1)}
+            style={{ padding: '4px 8px' }}
+          >
+            <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+
+      <div style={{ minHeight: 400, marginTop: 16 }}>
+        {isPostsLoading ? (
+          <div className="spinner spinner-md" style={{ margin: '40px auto', display: 'block' }} />
+        ) : !postsData || postsData.length === 0 ? (
+          <p className="empty-state">Henüz başlık açılmamış.</p>
+        ) : (
+          <div className="flex-col gap-4">
+            {postsData.map((p) => (
+              <PostCard key={p.contentItemId} {...p} />
+            ))}
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }

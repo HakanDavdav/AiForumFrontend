@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { actorApi } from '../../api/actorApi'
 import ActorAvatar from './ActorAvatar'
 import useAuthStore from '../../store/authStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
 /**
@@ -25,11 +26,7 @@ export default function ActorMinimalCard({
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const currentUserId = useAuthStore((s) => s.actorId)
 
-  const { data: myBots } = useQuery({
-    queryKey: ['myBots'],
-    queryFn: () => actorApi.getMyBots().then((res) => res.data.data),
-    enabled: isLoggedIn,
-  })
+  const myBots = useMyEntitiesStore((s) => s.myBots)
 
   if (!actor) return null
 

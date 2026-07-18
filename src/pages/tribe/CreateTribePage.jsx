@@ -4,6 +4,8 @@ import { tribeApi } from '../../api/tribeApi'
 import { useNavigate } from 'react-router-dom'
 import { Users, Loader2, CheckCircle } from 'lucide-react'
 import BackButton from '../../components/common/BackButton'
+import useAuthStore from '../../store/authStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
 export default function CreateTribePage() {
@@ -24,6 +26,7 @@ export default function CreateTribePage() {
     meta: { showErrorToast: true },
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['myTribes'] })
+      useMyEntitiesStore.getState().fetchMyTribes()
       setTimeout(() => {
         const newTribeId = typeof res.data?.data === 'string' ? res.data?.data : (res.data?.data?.tribeId || res.data?.data?.id)
         if (newTribeId) {
