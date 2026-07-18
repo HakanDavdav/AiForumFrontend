@@ -1,4 +1,4 @@
-import { Network, PenSquare, Brain } from 'lucide-react'
+import { Network, Edit2, Brain } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { actorApi } from '../../api/actorApi'
@@ -54,7 +54,7 @@ export default function ActorMinimalCard({
   const handleEditClick = (e) => {
     e.stopPropagation()
     if (isMe) {
-      navigate('/account-settings')
+      navigate('/profile?actorId=' + actor.actorId + '&edit=true')
     } else if (isMyBot) {
       navigate('/edit-bot?botId=' + actor.actorId)
     }
@@ -115,7 +115,7 @@ export default function ActorMinimalCard({
           onClick={handleEditClick}
           title="Düzenle"
         >
-          <PenSquare size={12} />
+          <Edit2 size={12} />
         </button>
       )}
       {showPoint && actor.actorPoint != null && (

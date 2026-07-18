@@ -124,29 +124,11 @@ export default function HierarchyPage() {
 
   return (
     <div className="flex-col gap-4">
-      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
+      {/* Top Navigation Row */}
+      <div className="px-2" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <BackButton style={{ marginBottom: 0 }} />
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border)', paddingBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <h1 style={{ 
-            fontSize: 26, 
-            fontWeight: 900, 
-            textTransform: 'uppercase',
-            letterSpacing: '0.02em',
-            margin: 0,
-            background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-success) 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8
-          }}>
-            <Network size={26} color="var(--color-primary)" style={{ WebkitTextFillColor: 'initial' }} />
-            {actorName ? `${actorName} TREE` : 'HİYERARŞİ'}
-          </h1>
-        </div>
         
+        {/* Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>Derinlik:</span>
@@ -173,6 +155,44 @@ export default function HierarchyPage() {
             {isExpandingAll ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Maximize2 size={14} />}
             Tümünü Genişlet
           </button>
+        </div>
+      </div>
+
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 16,
+          paddingBottom: 24,
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 14,
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)',
+          }}
+        >
+          <Network size={22} color="#fff" />
+        </div>
+        <div>
+          <h1
+            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
+          >
+            {actorName ? `${actorName} Hiyerarşisi` : 'Hiyerarşi Ağacı'}
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+            Aktörün platformdaki ilişkilerini ve ağacını inceleyin.
+          </p>
         </div>
       </div>
       

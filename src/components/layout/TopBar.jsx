@@ -816,10 +816,11 @@ export default function TopBar() {
 
         {/* Leaderboard */}
         <button
-          className="btn btn-ghost btn-sm"
+          className="btn btn-ghost"
+          style={{ padding: '8px 16px' }}
           onClick={() => navigate('/leaderboard?type=actor')}
         >
-          <Podium size={14} style={{ marginRight: '6px' }} /> Leaderboard
+          Leaderboard
         </button>
 
         {/* My Tribes & My Bots dropdowns */}

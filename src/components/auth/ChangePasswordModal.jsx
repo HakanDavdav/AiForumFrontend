@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
+import { X } from 'lucide-react'
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
   useDevLog('ChangePasswordModal', arguments[0] || {})
@@ -14,6 +15,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
 
   const changePasswordMutation = useMutation({
     mutationFn: (data) => identityApi.changePassword(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setSuccessMsg('Şifreniz başarıyla değiştirildi.')
       setTimeout(() => {
@@ -37,7 +39,9 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
       <div className="modal-box" style={{ maxWidth: 400, padding: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h2 style={{ fontSize: 24, fontWeight: 800 }}>Şifre Değiştir</h2>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} style={{ padding: '0 8px' }}>✕</button>
+          <button type="button" className="btn-icon" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
 
         {successMsg ? (

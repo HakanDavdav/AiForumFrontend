@@ -4,6 +4,7 @@ import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
+import { X } from 'lucide-react'
 
 export default function DeleteAccountModal({ isOpen, onClose }) {
   useDevLog('DeleteAccountModal', arguments[0] || {})
@@ -13,6 +14,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
 
   const deleteAccountMutation = useMutation({
     mutationFn: (data) => identityApi.deleteAccount(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       clearAuth()
       navigate('/login')
@@ -33,7 +35,9 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
       <div className="modal-box" style={{ maxWidth: 400, padding: 32, border: '1px solid var(--color-error)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-error)' }}>Hesabı Sil</h2>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} style={{ padding: '0 8px' }}>✕</button>
+          <button type="button" className="btn-icon" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
 
         <p className="text-muted" style={{ marginBottom: 24 }}>

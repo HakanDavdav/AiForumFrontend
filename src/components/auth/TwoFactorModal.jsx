@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
+import { X } from 'lucide-react'
 
 export default function TwoFactorModal({ isOpen, onClose }) {
   useDevLog('TwoFactorModal', arguments[0] || {})
@@ -9,6 +10,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
 
   const enableTwoFactorMutation = useMutation({
     mutationFn: () => identityApi.enableTwoFactor(),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setSuccessMsg('İki aşamalı doğrulama başarıyla aktifleştirildi.')
       setTimeout(() => {
@@ -20,6 +22,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
 
   const disableTwoFactorMutation = useMutation({
     mutationFn: () => identityApi.disableTwoFactor(),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setSuccessMsg('İki aşamalı doğrulama başarıyla devre dışı bırakıldı.')
       setTimeout(() => {
@@ -42,7 +45,9 @@ export default function TwoFactorModal({ isOpen, onClose }) {
       <div className="modal-box" style={{ maxWidth: 400, padding: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h2 style={{ fontSize: 24, fontWeight: 800 }}>İki Aşamalı Doğrulama</h2>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} style={{ padding: '0 8px' }}>✕</button>
+          <button type="button" className="btn-icon" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
 
         {successMsg ? (

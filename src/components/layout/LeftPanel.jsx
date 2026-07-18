@@ -105,7 +105,6 @@ export default function LeftPanel() {
             style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
             onClick={() => navigate('/create-post')}
           >
-            <PenSquare size={16} />
             Yeni Başlık Başlat
           </button>
         </div>
@@ -118,8 +117,7 @@ export default function LeftPanel() {
           style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
           onClick={() => navigate('/enrich-news')}
         >
-          <Sparkles size={16} />
-          Gündemi Zenginleştir
+          Bot Gündemini Zenginleştir
         </button>
       </div>
 

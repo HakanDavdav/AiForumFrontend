@@ -3,6 +3,9 @@ import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
+import { X } from 'lucide-react'
+
+const TOTAL_SECONDS = 120
 
 export default function ChangeEmailModal({ isOpen, onClose }) {
   useDevLog('ChangeEmailModal', arguments[0] || {})
@@ -10,7 +13,7 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1) // 1: Request, 2: Confirm, 3: Success
   const [newEmail, setNewEmail] = useState('')
   const [token, setToken] = useState('')
-  const [countdown, setCountdown] = useState(30)
+  const [countdown, setCountdown] = useState(TOTAL_SECONDS)
 
   // Reset state when modal closes
   useEffect(() => {
@@ -18,7 +21,7 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
       setStep(1)
       setNewEmail('')
       setToken('')
-      setCountdown(30)
+      setCountdown(TOTAL_SECONDS)
     }
   }, [isOpen])
 
@@ -37,14 +40,16 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
 
   const requestMutation = useMutation({
     mutationFn: (data) => identityApi.requestEmailChange(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setStep(2)
-      setCountdown(30)
+      setCountdown(TOTAL_SECONDS)
     }
   })
 
   const confirmMutation = useMutation({
     mutationFn: (data) => identityApi.confirmEmailChange(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setStep(3)
       setTimeout(() => {
@@ -69,6 +74,12 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
     }
   }
 
+  const formatTime = (s) =>
+    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+  const progressPct = (countdown / TOTAL_SECONDS) * 100
+  const isLowTime = countdown <= 60
+  const hasPastedToken = token.length > 10
+
   if (!isOpen) return null
 
   return (
@@ -79,7 +90,9 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
               <h2 style={{ fontSize: 24, fontWeight: 800 }}>E-posta Değiştir</h2>
-              <button className="btn btn-ghost btn-sm" onClick={onClose} style={{ padding: '0 8px' }}>✕</button>
+              <button type="button" className="btn-icon" onClick={onClose}>
+                <X size={20} />
+              </button>
             </div>
             <p className="text-muted" style={{ marginBottom: 24, fontSize: 14 }}>
               Yeni e-posta adresinize bir onay kodu göndereceğiz.
@@ -116,30 +129,70 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
             </p>
             
             <form onSubmit={handleConfirmSubmit} className="flex-col gap-4">
-              <div className="form-group">
-                <input 
-                  className="input text-center" 
-                  type="text" 
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  className="input"
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
-                  required 
-                  placeholder="Onay Kodu"
-                  style={{ fontSize: 24, letterSpacing: 4 }}
+                  placeholder="Onay kodunu buraya yapıştırın"
+                  spellCheck={false}
+                  autoComplete="off"
+                  required
+                  style={{
+                    textAlign: 'center',
+                    padding: '14px',
+                    fontSize: 14,
+                    letterSpacing: 0.5,
+                    border: hasPastedToken ? '2px solid var(--color-primary)' : undefined,
+                    paddingRight: hasPastedToken ? '60px' : '14px' // prevent text from hiding under the badge
+                  }}
                 />
+                {hasPastedToken && (
+                  <span style={{
+                    position: 'absolute', top: '50%', right: 14,
+                    transform: 'translateY(-50%)',
+                    fontSize: 11, color: 'var(--color-primary)',
+                    fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3,
+                  }}>
+                    ✓ hazır
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <div style={{
+                  height: 3, borderRadius: 99,
+                  background: 'var(--color-border)',
+                  overflow: 'hidden', marginBottom: 6,
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${progressPct}%`,
+                    borderRadius: 99,
+                    background: isLowTime ? 'var(--color-error)' : 'var(--color-primary)',
+                    transition: 'width 1s linear, background 0.3s',
+                  }} />
+                </div>
+                <p style={{
+                  fontSize: 12, margin: 0,
+                  color: isLowTime ? 'var(--color-error)' : 'var(--color-text-muted)',
+                  fontWeight: isLowTime ? 600 : 400,
+                  transition: 'color 0.3s',
+                  textAlign: 'left'
+                }}>
+                  Kodun geçerliliği: <strong>{formatTime(countdown)}</strong>
+                </p>
               </div>
 
               <button 
                 type="submit" 
                 className="btn btn-primary w-full"
-                disabled={confirmMutation.isPending}
+                disabled={confirmMutation.isPending || !token.trim()}
               >
                 {confirmMutation.isPending ? 'Onaylanıyor...' : 'Değişikliği Onayla'}
               </button>
             </form>
-
-            <div style={{ marginTop: 24, fontSize: 14, color: countdown <= 10 ? 'var(--color-error)' : 'var(--color-text-secondary)' }}>
-              Kalan Süre: <strong>{countdown} sn</strong>
-            </div>
           </>
         )}
 
