@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot, Brain } from 'lucide-react'
+import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot, Brain, Edit2, Check, X, Settings } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
 import BackButton from '../components/common/BackButton'
@@ -17,6 +18,26 @@ import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
 
+const TOPIC_TYPES = [
+  { value: 1, enumName: 'Politics', label: 'Politika' },
+  { value: 2, enumName: 'Economy', label: 'Ekonomi' },
+  { value: 4, enumName: 'WorldNews', label: 'Dünya Haberleri' },
+  { value: 8, enumName: 'LocalNews', label: 'Yerel Haberler' },
+  { value: 16, enumName: 'Trending', label: 'Trend Başlıklar' },
+  { value: 32, enumName: 'Technology', label: 'Teknoloji' },
+  { value: 64, enumName: 'Science', label: 'Bilim' },
+  { value: 128, enumName: 'AI', label: 'Yapay Zeka' },
+  { value: 256, enumName: 'Space', label: 'Uzay' },
+  { value: 512, enumName: 'Health', label: 'Sağlık' },
+  { value: 1024, enumName: 'Sports', label: 'Spor' },
+  { value: 2048, enumName: 'Entertainment', label: 'Eğlence' },
+  { value: 4096, enumName: 'Gaming', label: 'Oyun' },
+  { value: 8192, enumName: 'Celebrity', label: 'Ünlüler' },
+  { value: 16384, enumName: 'Lifestyle', label: 'Yaşam Tarzı' },
+  { value: 32768, enumName: 'Education', label: 'Eğitim' },
+  { value: 65536, enumName: 'Relationships', label: 'İlişkiler' },
+]
+
 export default function ProfilePage() {
   const [searchParams] = useSearchParams()
   const actorId = searchParams.get('actorId')
@@ -31,6 +52,18 @@ export default function ProfilePage() {
   // FollowListModal state
   const [followModalConfig, setFollowModalConfig] = useState({ isOpen: false, type: 'followers' })
   const [likesModalOpen, setLikesModalOpen] = useState(false)
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [editForm, setEditForm] = useState({ profileName: '', bio: '', topicTypes: [] })
+
+  const toggleTopic = (value) => {
+    setEditForm(prev => ({
+      ...prev,
+      topicTypes: prev.topicTypes.includes(value) 
+        ? prev.topicTypes.filter(v => v !== value) 
+        : [...prev.topicTypes, value]
+    }))
+  }
 
   const isOwnProfile = actorId === currentUserId
 
@@ -63,6 +96,64 @@ export default function ProfilePage() {
       queryClient.invalidateQueries(['profile', actorId])
     },
   })
+
+  const editMutation = useMutation({
+    mutationFn: (data) => actorApi.editUser(data),
+    onSuccess: () => {
+      toast.success('Profil başarıyla güncellendi.')
+      setIsEditing(false)
+      queryClient.invalidateQueries(['profile', actorId])
+    },
+    onError: (err) => {
+      const errMsgs = err.response?.data?.error?.errors || ['Bir hata oluştu.']
+      errMsgs.forEach(m => toast.error(m))
+    }
+  })
+
+  const handleEditInit = () => {
+    const initialTopics = []
+    if (profile?.topicTypes) {
+      profile.topicTypes.forEach(t => {
+        if (!t?.topicTypeName) return;
+        const match = TOPIC_TYPES.find(opt => opt.enumName === t.topicTypeName || opt.label === t.topicTypeName)
+        if (match) initialTopics.push(match.value)
+      })
+    }
+    setEditForm({
+      profileName: profile?.profileName || '',
+      bio: profile?.bio || '',
+      topicTypes: initialTopics
+    })
+    setIsEditing(true)
+  }
+
+  const handleEditSave = () => {
+    if (!editForm.bio.trim()) {
+      toast.error('Biyografi alanı boş bırakılamaz.')
+      return
+    }
+    const payload = {
+      userId: actorId,
+      profileName: editForm.profileName,
+      imageUrl: profile?.imageUrl || '',
+      bio: editForm.bio,
+      topicTypes: editForm.topicTypes,
+      entryPerPage: profile?.entryPerPage || 50,
+      postPerPage: profile?.postPerPage || 20,
+      socialNotificationPreference: profile?.socialNotificationPreference ?? true,
+      socialEmailPreference: profile?.socialEmailPreference ?? true
+    }
+    editMutation.mutate(payload)
+  }
+
+  useEffect(() => {
+    if (isOwnProfile && profile && searchParams.get('edit') === 'true' && !isEditing) {
+      handleEditInit()
+      const newParams = new URLSearchParams(searchParams)
+      newParams.delete('edit')
+      navigate({ search: newParams.toString() }, { replace: true })
+    }
+  }, [profile, isOwnProfile, searchParams, isEditing, navigate])
 
   // Tabs lazy loading & pagination
   const {
@@ -116,11 +207,32 @@ export default function ProfilePage() {
                   minWidth: 0,
                 }}
               >
-                <span
-                  style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                >
-                  {profile.profileName}
-                </span>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    style={{
+                      flex: 1, maxWidth: 300, fontSize: 18,
+                      padding: '8px 16px',
+                      borderRadius: 12,
+                      border: '1.5px solid var(--color-border)',
+                      background: 'var(--color-surface)',
+                      color: 'var(--color-text-primary)',
+                      fontFamily: 'inherit',
+                      outline: 'none',
+                      transition: 'border-color 0.2s',
+                    }}
+                    onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                    onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+                    value={editForm.profileName}
+                    onChange={(e) => setEditForm(f => ({ ...f, profileName: e.target.value }))}
+                  />
+                ) : (
+                  <span
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  >
+                    {profile.profileName}
+                  </span>
+                )}
               </h1>
 
               <div className="flex gap-2" style={{ flexShrink: 0 }}>
@@ -157,22 +269,72 @@ export default function ProfilePage() {
                       Takip Et
                     </button>
                   ))}
-                {isOwnProfile && (
-                  <button
-                    className="btn btn-outline btn-sm"
-                    onClick={() => navigate('/account-settings')}
-                  >
-                    Ayarlar
-                  </button>
+                {isOwnProfile && !isEditing && (
+                  <>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={handleEditInit}
+                    >
+                      <Edit2 size={14} /> Düzenle
+                    </button>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => navigate('/account-settings')}
+                    >
+                      <Settings size={14} /> Güvenlik Ayarları
+                    </button>
+                  </>
+                )}
+                {isOwnProfile && isEditing && (
+                  <>
+                    <button
+                      className="btn btn-success btn-sm"
+                      style={{ background: 'var(--color-success)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
+                      onClick={handleEditSave}
+                      disabled={editMutation.isPending}
+                    >
+                      {editMutation.isPending ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Check size={14} />} Kaydet
+                    </button>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => setIsEditing(false)}
+                      disabled={editMutation.isPending}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <X size={14} /> İptal
+                    </button>
+                  </>
                 )}
               </div>
             </div>
 
-            <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
-              {profile.bio || 'Henüz biyografi eklenmemiş.'}
-            </p>
+            {isEditing ? (
+              <textarea
+                style={{ 
+                  margin: '8px 0', width: '100%', maxWidth: 600, minHeight: 80, fontSize: 14,
+                  padding: '12px 16px',
+                  borderRadius: 12,
+                  border: '1.5px solid var(--color-border)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)',
+                  fontFamily: 'inherit',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                  resize: 'vertical'
+                }}
+                onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+                value={editForm.bio}
+                onChange={(e) => setEditForm(f => ({ ...f, bio: e.target.value }))}
+                placeholder="Kendinizden bahsedin..."
+              />
+            ) : (
+              <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
+                {profile.bio || 'Henüz biyografi eklenmemiş.'}
+              </p>
+            )}
 
-            {profile.createdAt && (
+            {profile.createdAt && !isEditing && (
               <p
                 className="text-muted"
                 style={{
@@ -188,7 +350,7 @@ export default function ProfilePage() {
               </p>
             )}
 
-            {profile.parentActor && (
+            {profile.parentActor && !isEditing && (
               <div style={{ marginTop: 12, marginBottom: 12, maxWidth: 300 }}>
                 <span
                   style={{
@@ -206,14 +368,49 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {profile.topicTypes && profile.topicTypes.length > 0 && (
-              <div style={{ marginTop: 12, marginBottom: 12 }}>
-                <TopicTagList
-                  topicTypes={profile.topicTypes
-                    .map((t) => t.topicTypeName)
-                    .filter((v) => v != null)}
-                />
+            {isEditing ? (
+              <div style={{ marginTop: 12, marginBottom: 12, maxWidth: 600 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 8, textTransform: 'uppercase' }}>
+                  İlgi Alanlarınız
+                </label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                  {TOPIC_TYPES.map(topic => {
+                    const isSelected = editForm.topicTypes.includes(topic.value);
+                    return (
+                      <label key={topic.value} style={{
+                        display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                        padding: '8px 14px', borderRadius: 20, fontSize: 13, fontWeight: 500,
+                        background: isSelected ? 'var(--color-primary)' : 'var(--color-surface)',
+                        color: isSelected ? '#fff' : 'var(--color-text-secondary)',
+                        border: isSelected ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+                        transition: 'all 0.2s ease',
+                        userSelect: 'none'
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleTopic(topic.value)}
+                          style={{ display: 'none' }}
+                        />
+                        {topic.label}
+                      </label>
+                    )
+                  })}
+                </div>
               </div>
+            ) : (
+              profile.topicTypes && profile.topicTypes.length > 0 && (
+                <div style={{ marginTop: 12, marginBottom: 12 }}>
+                  <TopicTagList
+                    topicTypes={profile.topicTypes
+                      .map((t) => {
+                        const match = TOPIC_TYPES.find(opt => opt.enumName === t?.topicTypeName || opt.label === t?.topicTypeName);
+                        return match ? match.label : t?.topicTypeName;
+                      })
+                      .filter((v) => v != null)}
+                  />
+                </div>
+              )
             )}
 
           </div>

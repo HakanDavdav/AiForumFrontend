@@ -1,35 +1,37 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { searchApi, parseCacheResponse } from '../api/searchApi'
-import { contentItemApi } from '../api/contentItemApi'
-import { Clock8 } from 'lucide-react'
+import { Clock8, Flame, Heart, Skull } from 'lucide-react'
 import PostCard from '../components/content/PostCard'
+import BackButton from '../components/common/BackButton'
 import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 
 export default function FeedPage({ cacheType = 'recent' }) {
   useDevLog('FeedPage', arguments[0] || {})
-  
+
   const getFeedConfig = () => {
     switch (cacheType) {
       case 'trending':
         return {
           queryFn: () => searchApi.getTrendingPosts(),
-          title: '🔥 Trend Başlıklar',
+          title: 'Trend Başlıklar',
+          icon: <Flame size={22} color="#fff" />,
           description: 'Şu an platformda en çok konuşulanlar',
-          isPost: true,
         }
       case 'mostLiked':
         return {
           queryFn: () => searchApi.getMostLikedEntries(),
-          title: '❤ En Çok Beğenilenler',
+          title: 'En Çok Beğenilenler',
+          icon: <Heart size={22} color="#fff" />,
           description: 'Platformda en fazla beğeni toplayan içerikler',
           isPost: false,
         }
       case 'mostDisliked':
         return {
           queryFn: () => searchApi.getMostDislikedEntries(),
-          title: '💀 En Çok Beğenilmeyenler',
+          title: 'En Çok Beğenilmeyenler',
+          icon: <Skull size={22} color="#fff" />,
           description: 'Platformda en çok tepki çeken içerikler',
           isPost: false,
         }
@@ -37,18 +39,15 @@ export default function FeedPage({ cacheType = 'recent' }) {
       default:
         return {
           queryFn: () => searchApi.getRecentPosts(),
-          title: (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-              <Clock8 size={24} /> Son Eklenenler
-            </span>
-          ),
+          title: 'Son Eklenenler',
+          icon: <Clock8 size={22} color="#fff" />,
           description: 'Platformdaki en güncel başlıklar',
           isPost: true,
         }
     }
   }
 
-  const { queryFn, title, description, isPost } = getFeedConfig()
+  const { queryFn, title, icon, description } = getFeedConfig()
 
   // 1. Önce Redis'ten (veya Cache'den) Minimal Listeyi Çek
   const { data: minimalData, isLoading: isListLoading, isError: isListError } = useQuery({
@@ -64,8 +63,8 @@ export default function FeedPage({ cacheType = 'recent' }) {
   const fullItemQueries = useQueries({
     queries: itemsToFetch.map((minimalItem) => ({
       queryKey: [isPost ? 'post' : 'entry', minimalItem.contentItemId],
-      queryFn: () => 
-        isPost 
+      queryFn: () =>
+        isPost
           ? contentItemApi.getPost(minimalItem.contentItemId).then((res) => res.data?.data)
           : contentItemApi.getEntry(minimalItem.contentItemId).then((res) => res.data?.data),
       enabled: !!minimalItem.contentItemId,
@@ -98,9 +97,47 @@ export default function FeedPage({ cacheType = 'recent' }) {
 
   return (
     <div className="flex-col gap-4">
-      <div style={{ padding: '0 8px 16px', borderBottom: '1px solid var(--color-border)' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>{title}</h1>
-        <p className="text-muted">{description}</p>
+      {/* Back Button */}
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
+        <BackButton style={{ marginBottom: 0 }} />
+      </div>
+
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 16,
+          paddingBottom: 24,
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 14,
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)',
+          }}
+        >
+          {icon}
+        </div>
+        <div>
+          <h1
+            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
+          >
+            {title}
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+            {description}
+          </p>
+        </div>
       </div>
 
       <div className="flex-col gap-4" style={{ marginTop: 16 }}>

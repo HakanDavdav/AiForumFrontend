@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
+import { KeyRound, X } from 'lucide-react'
+
+const TOTAL_SECONDS = 120 // 2 dakika olarak ayarlıyoruz
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {
   useDevLog('ForgotPasswordModal', arguments[0] || {})
+  
   // Step: 'request' | 'confirm' | 'success'
   const [step, setStep] = useState('request')
   
@@ -12,37 +16,30 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
   const [emailOrUsername, setEmailOrUsername] = useState('')
   const [confirmToken, setConfirmToken] = useState('')
   const [newPassword, setNewPassword] = useState('')
-  
-  // Errors
-  const [error, setError] = useState(null)
-  
+
   // Countdown
-  const [countdown, setCountdown] = useState(30)
+  const [countdown, setCountdown] = useState(TOTAL_SECONDS)
+  const textareaRef = useRef(null)
 
   // 1. Request Password Reset Mutation
   const requestResetMutation = useMutation({
     mutationFn: (data) => identityApi.requestPasswordReset(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setStep('confirm')
-      setCountdown(30)
-      setError(null)
-    },
-    onError: (err) => {
-      setError(err.message || 'Kod gönderilirken hata oluştu.')
+      setCountdown(TOTAL_SECONDS)
     }
   })
 
   // 2. Confirm Password Reset Mutation
   const confirmResetMutation = useMutation({
     mutationFn: (data) => identityApi.confirmPasswordReset(data),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       setStep('success')
       setTimeout(() => {
         handleClose()
-      }, 1500)
-    },
-    onError: (err) => {
-      setError(err.message || 'Onay kodu veya şifre geçersiz.')
+      }, 2000)
     }
   })
 
@@ -56,7 +53,6 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
         }, 1000)
       } else if (countdown === 0) {
         setStep('request')
-        setError('Süreniz doldu (30 saniye). Lütfen tekrar deneyin.')
         setConfirmToken('')
         setNewPassword('')
       }
@@ -66,138 +62,221 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     }
   }, [isOpen, step, countdown])
 
+  useEffect(() => {
+    if (isOpen && step === 'confirm') {
+      setTimeout(() => textareaRef.current?.focus(), 150)
+    }
+  }, [isOpen, step])
+
   const handleClose = () => {
     onClose()
-    // reset state after closing animation
     setTimeout(() => {
       setStep('request')
       setEmailOrUsername('')
       setConfirmToken('')
       setNewPassword('')
-      setError(null)
-      setCountdown(30)
+      setCountdown(TOTAL_SECONDS)
     }, 300)
   }
 
   const handleRequestSubmit = (e) => {
     e.preventDefault()
-    setError(null)
     // distributionStrategy: 0 (Email)
     requestResetMutation.mutate({ emailOrUsername, distributionStrategy: 0 })
   }
 
   const handleConfirmSubmit = (e) => {
     e.preventDefault()
-    setError(null)
-    confirmResetMutation.mutate({ emailOrUsername, token: confirmToken, newPassword })
+    if (!confirmToken.trim() || !newPassword) return
+    confirmResetMutation.mutate({ emailOrUsername, token: confirmToken.trim(), newPassword })
   }
+
+  const formatTime = (s) =>
+    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+  const progressPct = (countdown / TOTAL_SECONDS) * 100
+  const isLowTime = countdown <= 60
+  const hasPastedToken = confirmToken.length > 10
 
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay" style={{ zIndex: 100 }} onClick={handleClose}>
-      <div className="modal-box" style={{ maxWidth: 400, padding: 32, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-        
-        {step === 'success' && (
-          <>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: 'var(--color-success)' }}>Confirmed!</h2>
-            <p className="text-muted" style={{ marginBottom: 24 }}>
-              Şifreniz başarıyla değiştirildi. Giriş yapabilirsiniz...
+    <div className="modal-overlay" style={{ zIndex: 1000 }} onClick={handleClose}>
+      <div 
+        className="modal-box" 
+        style={{ maxWidth: 460, padding: '40px 36px', textAlign: 'center', position: 'relative' }} 
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button 
+          type="button"
+          className="btn-icon" 
+          onClick={handleClose} 
+          style={{ position: 'absolute', top: 16, right: 16, color: 'var(--color-text-muted)' }}
+        >
+          <X size={20} />
+        </button>
+
+        {step === 'success' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <div style={{
+              width: 72, height: 72, borderRadius: '50%',
+              background: 'var(--color-success-light)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 34, color: 'var(--color-success)',
+              animation: 'tkSuccessPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+            }}>✓</div>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
+              Şifre Değiştirildi!
+            </h2>
+            <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
+              Artık yeni şifrenizle giriş yapabilirsiniz...
             </p>
-          </>
-        )}
-
-        {step === 'request' && (
+          </div>
+        ) : (
           <>
-            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>Şifremi Unuttum</h2>
-            <p className="text-muted" style={{ marginBottom: 24 }}>
-              Kayıtlı e-posta adresinizi veya kullanıcı adınızı girin. Size bir onay kodu göndereceğiz.
-            </p>
-            
-            <form onSubmit={handleRequestSubmit} className="flex-col gap-4">
-              <div className="form-group">
-                <input 
-                  className="input" 
-                  type="text" 
-                  value={emailOrUsername}
-                  onChange={(e) => setEmailOrUsername(e.target.value)}
-                  required 
-                  placeholder="E-posta veya Kullanıcı Adı"
-                />
-              </div>
-
-              {error && <div className="form-error text-center">{error}</div>}
-
-              <button 
-                type="submit" 
-                className="btn btn-primary w-full"
-                disabled={requestResetMutation.isPending}
-              >
-                {requestResetMutation.isPending ? 'Gönderiliyor...' : 'Gönder'}
-              </button>
-            </form>
-          </>
-        )}
-
-        {step === 'confirm' && (
-          <>
-            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>Şifreyi Yenile</h2>
-            <p className="text-muted" style={{ marginBottom: 24 }}>
-              <strong>{emailOrUsername}</strong> adresine bir onay kodu gönderdik. Yeni şifrenizi ve kodu girin.
-            </p>
-            
-            <form onSubmit={handleConfirmSubmit} className="flex-col gap-4">
-              <div className="form-group">
-                <input 
-                  className="input text-center" 
-                  type="text" 
-                  value={confirmToken}
-                  onChange={(e) => setConfirmToken(e.target.value)}
-                  required 
-                  placeholder="Onay Kodu"
-                  style={{ fontSize: 24, letterSpacing: 4 }}
-                />
-              </div>
-              <div className="form-group">
-                <input 
-                  className="input" 
-                  type="password" 
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required 
-                  minLength={6}
-                  placeholder="Yeni Şifre"
-                />
-              </div>
-
-              {error && <div className="form-error text-center">{error}</div>}
-
-              <button 
-                type="submit" 
-                className="btn btn-primary w-full"
-                disabled={confirmResetMutation.isPending}
-              >
-                {confirmResetMutation.isPending ? 'Onaylanıyor...' : 'Şifreyi Değiştir'}
-              </button>
-            </form>
-
-            <div style={{ marginTop: 24, fontSize: 14, color: countdown <= 10 ? 'var(--color-error)' : 'var(--color-text-secondary)' }}>
-              Kalan Süre: <strong>{countdown} sn</strong>
+            <div style={{
+              width: 56, height: 56, borderRadius: '50%',
+              background: 'var(--color-primary-lighter)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 20px',
+            }}>
+              <KeyRound size={26} color="var(--color-primary)" strokeWidth={2} />
             </div>
-          </>
-        )}
 
-        {step !== 'success' && (
-          <button 
-            className="btn btn-ghost" 
-            style={{ marginTop: 16, fontSize: 13 }} 
-            onClick={handleClose}
-          >
-            İptal
-          </button>
+            {step === 'request' && (
+              <>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
+                  Şifremi Unuttum
+                </h2>
+                <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
+                  Kayıtlı e-posta adresinizi veya kullanıcı adınızı girin. Size bir onay kodu göndereceğiz.
+                </p>
+                
+                <form onSubmit={handleRequestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  <input 
+                    className="input" 
+                    type="text" 
+                    value={emailOrUsername}
+                    onChange={(e) => setEmailOrUsername(e.target.value)}
+                    required 
+                    placeholder="E-posta veya Kullanıcı Adı"
+                    style={{ textAlign: 'center', padding: '14px', fontSize: 14 }}
+                  />
+
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary w-full"
+                    disabled={requestResetMutation.isPending || !emailOrUsername.trim()}
+                    style={{ marginTop: 8 }}
+                  >
+                    {requestResetMutation.isPending ? 'Gönderiliyor...' : 'Gönder'}
+                  </button>
+                </form>
+              </>
+            )}
+
+            {step === 'confirm' && (
+              <>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
+                  Şifreyi Yenile
+                </h2>
+                <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
+                  <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{emailOrUsername}</span> adresine
+                  {' '}gönderilen onay kodunu aşağıya yapıştırın ve yeni şifrenizi belirleyin.
+                </p>
+                
+                <form onSubmit={handleConfirmSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  
+                  {/* Token Input */}
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      ref={textareaRef}
+                      type="text"
+                      className="input"
+                      value={confirmToken}
+                      onChange={(e) => setConfirmToken(e.target.value)}
+                      placeholder="Onay kodunu buraya yapıştırın"
+                      spellCheck={false}
+                      autoComplete="off"
+                      required
+                      style={{
+                        textAlign: 'center',
+                        padding: '14px',
+                        fontSize: 14,
+                        letterSpacing: 0.5,
+                        border: hasPastedToken ? '2px solid var(--color-primary)' : undefined,
+                        paddingRight: hasPastedToken ? '60px' : '14px' // prevent text from hiding under the badge
+                      }}
+                    />
+                    {hasPastedToken && (
+                      <span style={{
+                        position: 'absolute', top: '50%', right: 14,
+                        transform: 'translateY(-50%)',
+                        fontSize: 11, color: 'var(--color-primary)',
+                        fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3,
+                      }}>
+                        ✓ hazır
+                      </span>
+                    )}
+                  </div>
+
+                  {/* New Password */}
+                  <input 
+                    className="input" 
+                    type="password" 
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required 
+                    minLength={6}
+                    placeholder="Yeni Şifre"
+                    style={{ textAlign: 'center', padding: '14px', fontSize: 14 }}
+                  />
+
+                  {/* Geri Sayım */}
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{
+                      height: 3, borderRadius: 99,
+                      background: 'var(--color-border)',
+                      overflow: 'hidden', marginBottom: 6,
+                    }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${progressPct}%`,
+                        borderRadius: 99,
+                        background: isLowTime ? 'var(--color-error)' : 'var(--color-primary)',
+                        transition: 'width 1s linear, background 0.3s',
+                      }} />
+                    </div>
+                    <p style={{
+                      fontSize: 12, margin: 0,
+                      color: isLowTime ? 'var(--color-error)' : 'var(--color-text-muted)',
+                      fontWeight: isLowTime ? 600 : 400,
+                      transition: 'color 0.3s',
+                    }}>
+                      Kodun geçerliliği: <strong>{formatTime(countdown)}</strong>
+                    </p>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary w-full"
+                    disabled={confirmResetMutation.isPending || !confirmToken.trim() || !newPassword}
+                    style={{ marginTop: 8 }}
+                  >
+                    {confirmResetMutation.isPending ? 'Onaylanıyor...' : 'Şifreyi Değiştir'}
+                  </button>
+                </form>
+              </>
+            )}
+          </>
         )}
       </div>
+
+      <style>{`
+        @keyframes tkSuccessPop {
+          from { transform: scale(0.5); opacity: 0; }
+          to   { transform: scale(1);   opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }

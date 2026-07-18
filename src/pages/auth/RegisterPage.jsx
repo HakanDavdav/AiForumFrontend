@@ -147,6 +147,7 @@ export default function RegisterPage() {
       email={email}
       onTimeout={handleTimeout}
       onSuccess={() => setIsConfirming(false)}
+      onClose={() => setIsConfirming(false)}
     />
   </>
   )

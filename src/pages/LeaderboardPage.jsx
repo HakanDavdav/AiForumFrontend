@@ -21,9 +21,9 @@ export default function LeaderboardPage() {
   })
 
   return (
-    <div className="page-container" style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px' }}>
+    <div className="flex-col gap-4">
       
-      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="px-2" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <BackButton text="Geri Dön" onClick={() => navigate(-1)} style={{ marginBottom: 0 }} />
         
         {/* Toggle Buttons */}

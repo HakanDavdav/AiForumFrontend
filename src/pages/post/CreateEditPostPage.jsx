@@ -111,11 +111,8 @@ export default function CreateEditPostPage() {
   }
 
   return (
-    <div
-      className="page-container"
-      style={{ maxWidth: 720, margin: '0 auto', padding: '32px 16px' }}
-    >
-      <div style={{ marginBottom: 24 }}>
+    <div className="flex-col gap-4">
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
         <BackButton style={{ marginBottom: 0 }} />
       </div>
 

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Settings } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '../components/common/BackButton'
-import EditProfileModal from '../components/profile/EditProfileModal'
+
 import ChangeUsernameModal from '../components/auth/ChangeUsernameModal'
 import ChangePasswordModal from '../components/auth/ChangePasswordModal'
 import TwoFactorModal from '../components/auth/TwoFactorModal'
@@ -18,63 +18,89 @@ export default function AccountSettingsPage() {
 
   return (
     <div className="flex-col gap-4">
-      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
-        <BackButton text={null} onClick={() => navigate('/')} style={{ marginBottom: 0 }} />
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
+        <BackButton style={{ marginBottom: 0 }} />
       </div>
-      <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>
-          Hesap Ayarları
-        </h1>
-      </div>
-
-      {/* Profil Ayarları Bölümü */}
-      <div className="card-surface flex-col gap-4" style={{ padding: 24, marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Profil Ayarları</h2>
-        <p className="text-muted" style={{ fontSize: 14 }}>
-          Diğer kullanıcıların sizi nasıl göreceğini (isim, resim, hakkında) belirleyin.
-        </p>
+      
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 16,
+          paddingBottom: 24,
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 14,
+            background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)',
+          }}
+        >
+          <Settings size={22} color="#fff" />
+        </div>
         <div>
-          <button className="btn btn-outline" onClick={() => setActiveModal('editProfile')}>
-            Profili Düzenle
-          </button>
+          <h1
+            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
+          >
+            Hesap Ayarları
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+            Profilinizi ve güvenlik tercihlerinizi yönetin.
+          </p>
         </div>
       </div>
 
+
+
       {/* Hesap & Güvenlik Bölümü */}
-      <div className="card-surface flex-col gap-4" style={{ padding: 24, marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Hesap & Güvenlik</h2>
-        <p className="text-muted" style={{ fontSize: 14 }}>
-          Giriş bilgilerinizi güncelleyin ve hesabınızı güvende tutun.
-        </p>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-          <button className="btn btn-outline" onClick={() => setActiveModal('changeEmail')}>
+      <div className="card-surface" style={{ padding: 24, marginBottom: 16 }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: 'var(--color-text-primary)' }}>Hesap & Güvenlik</h2>
+          <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
+            Giriş bilgilerinizi güncelleyin ve hesabınızı güvende tutun.
+          </p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+          <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changeEmail')}>
             E-posta Değiştir
           </button>
-          <button className="btn btn-outline" onClick={() => setActiveModal('changePhone')}>
+          <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changePhone')}>
             Telefon Ekle/Değiştir
           </button>
-          <button className="btn btn-outline" onClick={() => setActiveModal('changeUsername')}>
+          <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changeUsername')}>
             Kullanıcı Adı Değiştir
           </button>
-          <button className="btn btn-outline" onClick={() => setActiveModal('changePassword')}>
+          <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changePassword')}>
             Şifre Değiştir
           </button>
-          <button className="btn btn-outline" onClick={() => setActiveModal('twoFactor')}>
-            İki Aşamalı Doğrulama (2FA)
+          <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('twoFactor')}>
+            İki Aşamalı Doğrulama
           </button>
         </div>
       </div>
 
       {/* Tehlikeli Alan Bölümü */}
-      <div className="card-surface flex-col gap-4" style={{ padding: 24, border: '1px solid var(--color-error)' }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 8 }}>Tehlikeli İşlemler</h2>
-        <p className="text-muted" style={{ fontSize: 14 }}>
-          Hesabınızı silmek kalıcı bir işlemdir. Bütün verileriniz silinir.
-        </p>
+      <div className="card-surface" style={{ padding: 24, border: '1px solid var(--color-error)' }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 4 }}>Tehlikeli İşlemler</h2>
+          <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
+            Hesabınızı silmek kalıcı bir işlemdir. Bütün verileriniz silinir.
+          </p>
+        </div>
         <div>
           <button 
             className="btn" 
-            style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
+            style={{ backgroundColor: 'var(--color-error)', color: '#fff', border: 'none' }}
             onClick={() => setActiveModal('deleteAccount')}
           >
             Hesabımı Sil
@@ -83,10 +109,7 @@ export default function AccountSettingsPage() {
       </div>
 
       {/* Modals */}
-      <EditProfileModal 
-        isOpen={activeModal === 'editProfile'} 
-        onClose={() => setActiveModal(null)} 
-      />
+
       <ChangeUsernameModal 
         isOpen={activeModal === 'changeUsername'} 
         onClose={() => setActiveModal(null)} 
