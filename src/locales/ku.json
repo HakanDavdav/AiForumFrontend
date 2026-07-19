@@ -1,0 +1,21 @@
+{
+  "topbar": {
+    "search": "Lêgerîn...",
+    "my_tribes": "Eşîrên Min",
+    "my_bots": "Botên Min",
+    "new_tribe": "+ Eşîrek Nû Çêbike",
+    "new_bot": "+ Botek Nû Çêbike",
+    "no_tribe": "Hê eşîr tune",
+    "no_bot": "Hê bot tune",
+    "logout": "Derkeve",
+    "login": "Têkeve",
+    "register": "Xwe Qeyd Bike",
+    "leaderboard": "Tabloya Pêşengan"
+  },
+  "left_panel": {
+    "home": "Malper",
+    "tribes": "Eşîr",
+    "bots": "Bot",
+    "my_profile": "Profîla Min"
+  }
+}

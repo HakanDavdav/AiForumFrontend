@@ -7,11 +7,13 @@ import BackButton from '../../components/common/BackButton'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function CreateTribePage() {
   useDevLog('CreateTribePage', arguments[0] || {})
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const [formData, setFormData] = useState({
     tribeName: '',
@@ -76,10 +78,10 @@ export default function CreateTribePage() {
         </div>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            Tribe Oluştur
+            {t('tribe_settings.create_tribe')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            Botların ve insanların ortaklaşa üreteceği yeni bir komünite (Tribe) inşa edin.
+            {t('tribe_settings.create_tribe_desc')}
           </p>
         </div>
       </div>
@@ -97,13 +99,13 @@ export default function CreateTribePage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Tribe Adı <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('tribe_settings.tribe_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <input 
               type="text" 
               required
-              placeholder="Örn: Yapay Zeka Geliştiricileri"
+              placeholder={t('tribe_settings.tribe_name_placeholder')}
               value={formData.tribeName}
               onChange={e => setFormData({ ...formData, tribeName: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -136,7 +138,7 @@ export default function CreateTribePage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Kapak Fotoğrafı URL
+            {t('tribe_settings.cover_image')}
           </label>
           <div style={{ position: 'relative' }}>
             <input 
@@ -174,12 +176,12 @@ export default function CreateTribePage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Tribe Misyonu
+            {t('tribe_settings.mission')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea 
               rows={3}
-              placeholder="Bu topluluğun asıl amacı ve vizyonu nedir?"
+              placeholder={t('tribe_settings.mission_placeholder')}
               value={formData.mission}
               onChange={e => setFormData({ ...formData, mission: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -215,12 +217,12 @@ export default function CreateTribePage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Bot Kişilik Modifikatörü (Opsiyonel)
+            {t('tribe_settings.personality_optional')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea 
               rows={2}
-              placeholder="Bu tribe'a giren botlar nasıl bir kişiliğe bürünsün?"
+              placeholder={t('tribe_settings.personality_placeholder')}
               value={formData.personalityModifier}
               onChange={e => setFormData({ ...formData, personalityModifier: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -256,12 +258,12 @@ export default function CreateTribePage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Bot Talimat Modifikatörü (Opsiyonel)
+            {t('tribe_settings.instruction_optional')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea 
               rows={2}
-              placeholder="Bu tribe'da cevap veren botlar için ekstra zorunlu kurallar..."
+              placeholder={t('tribe_settings.instruction_placeholder')}
               value={formData.instructionModifier}
               onChange={e => setFormData({ ...formData, instructionModifier: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -301,7 +303,7 @@ export default function CreateTribePage() {
           }}>
             <CheckCircle size={16} color="#22c55e" />
             <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              Tribe başarıyla oluşturuldu. Yönlendiriliyorsunuz...
+              {t('tribe_settings.success_create')}
             </span>
           </div>
         )}
@@ -326,11 +328,11 @@ export default function CreateTribePage() {
             {mutation.isPending ? (
               <>
                 <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                İşleniyor...
+                {t('auth.processing')}
               </>
             ) : (
               <>
-                Oluştur
+                {t('action.create')}
               </>
             )}
           </button>

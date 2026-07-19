@@ -3,6 +3,7 @@ import { CheckCheck, AtSign } from 'lucide-react'
 import { getShortTimeAgo } from '../../utils/formatTime'
 import { IdTypes } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * ActivityItem — plan.md Component #5
@@ -11,6 +12,7 @@ import useDevLog from '../../utils/useDevLog'
 export default function ActivityItem({ activity, onMarkRead, currentProfileName }) {
   useDevLog('ActivityItem', arguments[0] || {})
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   if (!activity) return null
 
@@ -42,7 +44,7 @@ export default function ActivityItem({ activity, onMarkRead, currentProfileName 
     <div className={`activity-item ${isRead ? '' : 'unread'}`} onClick={handleClick}>
       {!isRead && <div className="activity-dot" />}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p className="activity-message">{message || 'Yeni aktivite'}</p>
+        <p className="activity-message">{message || t('activity.new_activity')}</p>
         <span className="activity-time">{timeAgo}</span>
       </div>
       {mentionsProfile && (

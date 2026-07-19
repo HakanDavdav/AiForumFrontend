@@ -10,6 +10,7 @@ import PostCard from '../components/content/PostCard'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function TribePage() {
   const [searchParams] = useSearchParams()
@@ -20,6 +21,7 @@ export default function TribePage() {
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
@@ -50,7 +52,7 @@ export default function TribePage() {
   })
 
   if (isLoading) return <div className="flex justify-center" style={{ padding: 40 }}><div className="spinner spinner-lg" /></div>
-  if (!tribe) return <div className="empty-state">Tribe bulunamadı</div>
+  if (!tribe) return <div className="empty-state">{t('tribe.not_found')}</div>
 
   const isMember = tribe.tribeMemberships?.some(m => m.actor?.actorId === currentUserId)
   const isLeader = tribe.tribeMemberships?.some(m => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader')
@@ -62,24 +64,8 @@ export default function TribePage() {
       </div>
 
       {/* ─── Tribe Header ─── */}
-      <div className="card-surface" style={{ position: 'relative' }}>
-        <div className="flex gap-4">
-          <div style={{ width: 80, height: 80, flexShrink: 0 }}>
-            {tribe.imageUrl ? (
-              <img src={tribe.imageUrl} alt={tribe.tribeName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-xl)' }} />
-            ) : (
-              <div
-                style={{
-                  width: '100%', height: '100%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'var(--color-primary-light)', color: 'var(--color-primary)',
-                  fontWeight: 800, fontSize: 32, borderRadius: 'var(--radius-xl)'
-                }}
-              >
-                {tribe.tribeName?.[0] || 'T'}
-              </div>
-            )}
-          </div>
+      <div className="profile-header-card" style={{ position: 'relative' }}>
+        <div className="flex justify-between items-start w-full" style={{ gap: 24, width: '100%' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="flex items-center justify-between">
               <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{tribe.tribeName}</h1>
@@ -89,7 +75,7 @@ export default function TribePage() {
                   className="btn btn-outline btn-sm"
                   onClick={() => navigate('/mind?tribeId=' + tribeId)}
                 >
-                  <Brain size={14} /> Anılar
+                  <Brain size={14} /> {t('profile.memories')}
                 </button>
                 {isLoggedIn && !isMember && (
                   <button 
@@ -97,7 +83,7 @@ export default function TribePage() {
                     onClick={() => joinMutation.mutate()}
                     disabled={joinMutation.isPending}
                   >
-                    <UserPlus size={14} /> Katıl
+                    <UserPlus size={14} /> {t('tribe.join')}
                   </button>
                 )}
                 {isLoggedIn && isMember && !isLeader && (
@@ -107,7 +93,7 @@ export default function TribePage() {
                     disabled={leaveMutation.isPending}
                     style={{ color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
                   >
-                    <LogOut size={14} /> Ayrıl
+                    <LogOut size={14} /> {t('tribe.leave')}
                   </button>
                 )}
                 {isLoggedIn && isLeader && (
@@ -115,31 +101,52 @@ export default function TribePage() {
                     className="btn btn-outline btn-sm"
                     onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)}
                   >
-                    <Settings size={14} /> Yönetim
+                    <Settings size={14} /> {t('tribe.management')}
                   </button>
                 )}
               </div>
             </div>
 
-            <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5 }}>
-              {tribe.mission || 'Henüz bir misyon belirlenmemiş.'}
+            <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
+              {tribe.mission || t('tribe.no_mission')}
             </p>
 
             {tribe.createdAt && (
               <p className="text-muted" style={{ margin: '4px 0 12px 0', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>📅 Kuruluş: {new Date(tribe.createdAt).toLocaleDateString('tr-TR')}</span>
+                <span>{t('tribe.founded')}{new Date(tribe.createdAt).toLocaleDateString(currentUserId ? undefined : 'tr-TR')}</span>
               </p>
             )}
+          </div>
 
-            <div className="profile-stats-grid" style={{ marginTop: 16 }}>
-              <div className="profile-stat-box">
-                <span className="profile-stat-value">{tribe.tribePoint?.toLocaleString('tr-TR') ?? 0}</span>
-                <span className="profile-stat-label">Puan</span>
+          <div style={{ width: 120, height: 120, flexShrink: 0 }}>
+            {tribe.imageUrl ? (
+              <img src={tribe.imageUrl} alt={tribe.tribeName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '4px solid var(--color-surface)' }} />
+            ) : (
+              <div
+                style={{
+                  width: '100%', height: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)',
+                  fontWeight: 800, fontSize: 48, borderRadius: '50%',
+                  border: '4px solid var(--color-surface)'
+                }}
+              >
+                {tribe.tribeName?.[0] || 'T'}
               </div>
-              <div className="profile-stat-box">
-                <span className="profile-stat-value">{tribe.memberCount ?? 0}</span>
-                <span className="profile-stat-label">Üye</span>
-              </div>
+            )}
+          </div>
+        </div>
+
+        <div style={{ width: '100%' }}>
+          <div style={{ height: 1, background: 'var(--color-border)', width: '100%' }} />
+          <div className="profile-stats-grid" style={{ width: '100%', marginTop: 8 }}>
+            <div className="profile-stat-box">
+              <span className="profile-stat-value">{tribe.tribePoint?.toLocaleString('tr-TR') ?? 0}</span>
+              <span className="profile-stat-label">{t('profile.points')}</span>
+            </div>
+            <div className="profile-stat-box">
+              <span className="profile-stat-value">{tribe.memberCount ?? 0}</span>
+              <span className="profile-stat-label">{t('tribe.member_count_label')}</span>
             </div>
           </div>
         </div>
@@ -148,17 +155,17 @@ export default function TribePage() {
       {/* ─── Tribe Modifiers (Only for Leaders usually) ─── */}
       {(tribe.personalityModifier || tribe.instructionModifier) && (
         <div className="card-surface" style={{ padding: '16px' }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Tribe Özellikleri</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('tribe.features')}</h3>
           <div className="flex-col gap-4">
             {tribe.personalityModifier && (
               <div>
-                <span className="text-xs font-semibold text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Kişilik Etkisi (Personality Modifier)</span>
+                <span className="text-xs font-semibold text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('tribe.personality_modifier')}</span>
                 <div className="bg-surface p-3 rounded-lg mt-1 text-sm border border-border">{tribe.personalityModifier}</div>
               </div>
             )}
             {tribe.instructionModifier && (
               <div>
-                <span className="text-xs font-semibold text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Talimat Etkisi (Instruction Modifier)</span>
+                <span className="text-xs font-semibold text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('tribe.instruction_modifier')}</span>
                 <div className="bg-surface p-3 rounded-lg mt-1 text-sm border border-border">{tribe.instructionModifier}</div>
               </div>
             )}
@@ -168,12 +175,12 @@ export default function TribePage() {
 
       {/* ─── Members List ─── */}
       <h3 style={{ fontSize: 18, fontWeight: 700, paddingBottom: 8, borderBottom: '1px solid var(--color-border)', marginTop: 16 }}>
-        Üyeler ({tribe.tribeMemberships?.length ?? 0})
+        {t('tribe.members')} ({tribe.tribeMemberships?.length ?? 0})
       </h3>
 
       <div className="flex-col gap-2">
         {tribe.tribeMemberships?.length === 0 ? (
-          <p className="empty-state">Henüz üye yok.</p>
+          <p className="empty-state">{t('tribe.no_members')}</p>
         ) : (
           tribe.tribeMemberships?.map(member => (
             member.actor ? (
@@ -181,7 +188,7 @@ export default function TribePage() {
                 <ActorMinimalCard actor={member.actor} />
                 <div className="flex items-center gap-4">
                   <span className="badge" style={{ background: member.roleName === 'TribeLeader' ? 'var(--color-primary-light)' : 'var(--color-surface-3)', color: member.roleName === 'TribeLeader' ? 'var(--color-primary)' : 'var(--color-text-secondary)' }}>
-                    {member.roleName === 'TribeLeader' ? 'Lider' : member.roleName || 'Üye'}
+                    {member.roleName === 'TribeLeader' ? t('tribe.leader') : member.roleName || t('tribe.member')}
                   </span>
                 </div>
               </div>
@@ -193,7 +200,7 @@ export default function TribePage() {
       {/* ─── Posts Section ─── */}
       <div className="flex items-center justify-between" style={{ paddingBottom: 8, borderBottom: '1px solid var(--color-border)', marginTop: 24 }}>
         <h3 style={{ fontSize: 18, fontWeight: 700 }}>
-          Başlıklar ({tribe.postCount ?? 0})
+          {t('profile.posts')} ({tribe.postCount ?? 0})
         </h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
@@ -205,7 +212,7 @@ export default function TribePage() {
             <ChevronLeft size={14} />
           </button>
           <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-            Sayfa {postsPage} / {Math.max(1, Math.ceil((tribe.postCount || 0) / inferredPerPage))}
+            {t('profile.page')} {postsPage} / {Math.max(1, Math.ceil((tribe.postCount || 0) / inferredPerPage))}
           </span>
           <button
             className="btn btn-outline btn-sm"
@@ -222,7 +229,7 @@ export default function TribePage() {
         {isPostsLoading ? (
           <div className="spinner spinner-md" style={{ margin: '40px auto', display: 'block' }} />
         ) : !postsData || postsData.length === 0 ? (
-          <p className="empty-state">Henüz başlık açılmamış.</p>
+          <p className="empty-state">{t('tribe.no_posts')}</p>
         ) : (
           <div className="flex-col gap-4">
             {postsData.map((p) => (

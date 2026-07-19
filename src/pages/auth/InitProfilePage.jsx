@@ -6,6 +6,7 @@ import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { PersonStanding } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const TOPIC_TYPES = [
   { value: 1, label: 'Politika' },
@@ -37,6 +38,7 @@ export default function InitProfilePage() {
   const [bio, setBio] = useState('')
   const [selectedTopics, setSelectedTopics] = useState([])
   const [error, setError] = useState(null)
+  const { t } = useTranslation()
 
   const initProfileMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
@@ -110,10 +112,10 @@ export default function InitProfilePage() {
           <h1
             style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
-            Profilinizi Tamamlayın
+            {t('auth.complete_profile')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            AiForum'u kullanmaya başlamak için lütfen temel bilgilerinizi girin.
+            {t('auth.complete_profile_desc')}
           </p>
         </div>
       </div>
@@ -138,7 +140,7 @@ export default function InitProfilePage() {
             <input
               type="text"
               required
-              placeholder="Kullanıcı adınızdan farklı olabilir..."
+              placeholder={t('auth.display_name_placeholder')}
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
               disabled={initProfileMutation.isPending || initProfileMutation.isSuccess}
@@ -174,11 +176,11 @@ export default function InitProfilePage() {
               textTransform: 'uppercase',
             }}
           >
-            Biyografi
+            {t('auth.bio')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
-              placeholder="Kendinizden bahsedin..."
+              placeholder={t('profile.bio_placeholder')}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               disabled={initProfileMutation.isPending || initProfileMutation.isSuccess}
@@ -218,7 +220,7 @@ export default function InitProfilePage() {
               textTransform: 'uppercase',
             }}
           >
-            İlgi Alanlarınız
+            {t('profile.interests')}
           </label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}>
             {TOPIC_TYPES.map(topic => {
@@ -268,7 +270,7 @@ export default function InitProfilePage() {
             onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
             onMouseOut={(e) => (e.currentTarget.style.transform = 'none')}
           >
-            {initProfileMutation.isPending ? 'Kaydediliyor...' : 'Kaydet ve Başla'}
+            {initProfileMutation.isPending ? t('action.saving') : t('auth.save_and_start')}
           </button>
         </div>
       </form>

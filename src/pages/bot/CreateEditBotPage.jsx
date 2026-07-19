@@ -8,6 +8,7 @@ import { TopicTypes, BotModes } from '../../constants/TopicTypes'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function CreateEditBotPage() {
   useDevLog('CreateEditBotPage', arguments[0] || {})
@@ -15,6 +16,7 @@ export default function CreateEditBotPage() {
   const botId = searchParams.get('botId')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
   
   // If botId is provided, we are in Edit mode
   const isEditMode = Boolean(botId)
@@ -85,7 +87,7 @@ export default function CreateEditBotPage() {
   })
 
   const handleDeleteBot = () => {
-    if (window.confirm("Bu botu KALICI OLARAK silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
+    if (window.confirm(t('bot.confirm_delete'))) {
       deleteMutation.mutate()
     }
   }
@@ -147,10 +149,10 @@ export default function CreateEditBotPage() {
         </div>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            {isEditMode ? 'Bot Ayarları' : 'Bot Üret'}
+            {isEditMode ? t('bot.bot_settings') : t('bot.create_bot')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            {isEditMode ? 'Yapay zeka tabanlı kişisel botunuzun ayarlarını güncelleyin.' : 'Yapay zeka tabanlı kişisel botunuzu yapılandırın.'}
+            {isEditMode ? t('bot.edit_bot_desc') : t('bot.create_bot_desc')}
           </p>
         </div>
       </div>
@@ -168,13 +170,13 @@ export default function CreateEditBotPage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Bot Adı <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('bot.bot_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <input 
               type="text" 
               required
-              placeholder="Örn: AnalizBot"
+              placeholder={t('bot.bot_name_placeholder')}
               value={formData.profileName}
               onChange={e => setFormData({ ...formData, profileName: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -207,7 +209,7 @@ export default function CreateEditBotPage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Profil Fotoğrafı URL
+            {t('bot.profile_image')}
           </label>
           <div style={{ position: 'relative' }}>
             <input 
@@ -245,7 +247,7 @@ export default function CreateEditBotPage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Bot Modu
+            {t('bot.bot_mode')}
           </label>
           <div style={{ position: 'relative' }}>
             <select 
@@ -286,12 +288,12 @@ export default function CreateEditBotPage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Bot Kişiliği (Prompt)
+            {t('bot.bot_personality')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea 
               rows={3}
-              placeholder="Botun karakterini ve nasıl davranması gerektiğini yazın..."
+              placeholder={t('bot.bot_personality_placeholder')}
               value={formData.botPersonality}
               onChange={e => setFormData({ ...formData, botPersonality: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -327,12 +329,12 @@ export default function CreateEditBotPage() {
             letterSpacing: '0.02em',
             textTransform: 'uppercase'
           }}>
-            Özel Talimatlar
+            {t('bot.special_instructions')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea 
               rows={3}
-              placeholder="Cevap verirken uyması gereken katı kurallar..."
+              placeholder={t('bot.special_instructions_placeholder')}
               value={formData.instructions}
               onChange={e => setFormData({ ...formData, instructions: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -369,12 +371,12 @@ export default function CreateEditBotPage() {
               letterSpacing: '0.02em',
               textTransform: 'uppercase'
             }}>
-              Biyografi (Hakkında)
+              {t('bot.bio')}
             </label>
             <div style={{ position: 'relative' }}>
               <textarea 
                 rows={2}
-                placeholder="Profilde görünecek kısa bilgi..."
+                placeholder={t('bot.bio_placeholder')}
                 value={formData.bio}
                 onChange={e => setFormData({ ...formData, bio: e.target.value })}
                 disabled={mutation.isPending || mutation.isSuccess}
@@ -409,7 +411,7 @@ export default function CreateEditBotPage() {
               onChange={e => setFormData({ ...formData, autoBio: e.target.checked })}
               disabled={mutation.isPending || mutation.isSuccess}
             />
-            Biyografiyi Yapay Zeka Üretsin
+            {t('bot.auto_bio')}
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--color-text-secondary)' }}>
             <input 
@@ -418,7 +420,7 @@ export default function CreateEditBotPage() {
               onChange={e => setFormData({ ...formData, autoInterests: e.target.checked })}
               disabled={mutation.isPending || mutation.isSuccess}
             />
-            İlgi Alanlarını Yapay Zeka Belirlesin
+            {t('bot.auto_interests')}
           </label>
         </div>
 
@@ -433,7 +435,7 @@ export default function CreateEditBotPage() {
               letterSpacing: '0.02em',
               textTransform: 'uppercase'
             }}>
-              İlgi Alanları (Başlıklar)
+              {t('bot.interests')}
             </label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {TopicTypes.map(topic => {
@@ -481,7 +483,7 @@ export default function CreateEditBotPage() {
           }}>
             <CheckCircle size={16} color="#22c55e" />
             <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              {isEditMode ? 'Bot başarıyla güncellendi. Yönlendiriliyorsunuz...' : 'Bot başarıyla üretildi. Yönlendiriliyorsunuz...'}
+              {isEditMode ? t('bot.success_update') : t('bot.success_create')}
             </span>
           </div>
         )}
@@ -506,11 +508,11 @@ export default function CreateEditBotPage() {
             {mutation.isPending ? (
               <>
                 <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                İşleniyor...
+                {t('auth.processing')}
               </>
             ) : (
               <>
-                {isEditMode ? 'Güncelle' : 'Üret'}
+                {isEditMode ? t('action.update') : t('action.generate')}
               </>
             )}
           </button>
@@ -527,9 +529,9 @@ export default function CreateEditBotPage() {
           border: '1px solid rgba(239, 68, 68, 0.3)',
           background: 'rgba(239, 68, 68, 0.04)'
         }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: '0 0 8px 0' }}>Tehlikeli Bölge</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: '0 0 8px 0' }}>{t('tribe_settings.danger_zone')}</h2>
           <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-            Bot silindiğinde içerisindeki tüm etkileşimler kaybolabilir. Bu işlem geri alınamaz.
+            {t('bot.danger_zone_desc')}
           </p>
           <button 
             className="btn btn-primary" 
@@ -537,7 +539,7 @@ export default function CreateEditBotPage() {
             onClick={handleDeleteBot}
             disabled={deleteMutation.isPending}
           >
-            <Trash2 size={16} /> Botu Sil
+            <Trash2 size={16} /> {t('bot.delete_bot')}
           </button>
         </div>
       )}

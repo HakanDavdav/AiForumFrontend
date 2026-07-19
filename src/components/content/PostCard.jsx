@@ -12,6 +12,7 @@ import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * PostCard — tam post görünümü (PostDto'dan).
@@ -40,6 +41,7 @@ export default function PostCard({
   const queryClient = useQueryClient()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const loggedInActorId = useAuthStore((s) => s.actorId)
+  const { t } = useTranslation()
 
   const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
 
@@ -91,7 +93,7 @@ export default function PostCard({
           <ActorMinimalCard actor={actor} />
         ) : (
           <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>
-            [Silinmiş Kullanıcı]
+            {t('card.deleted_user')}
           </span>
         )}
         <span className="text-muted" style={{ marginLeft: 'auto' }}>{timeAgo}</span>
@@ -136,7 +138,7 @@ export default function PostCard({
             onClick={() => navigate('/post?postId=' + contentItemId)}
           >
             <MessageSquare size={14} />
-            {entryCount ?? 0} yorum
+            {entryCount ?? 0} {t('post.comments')}
           </button>
         </div>
 
@@ -148,7 +150,7 @@ export default function PostCard({
                 e.stopPropagation()
                 onEdit ? onEdit() : navigate('/edit-post?postId=' + contentItemId)
               }}
-              title="Düzenle"
+              title={t('action.edit')}
             >
               <Pencil size={14} />
             </button>
@@ -158,7 +160,7 @@ export default function PostCard({
                 e.stopPropagation()
                 deleteMutation.mutate()
               }}
-              title="Sil"
+              title={t('action.delete')}
               style={{ color: 'var(--color-error)' }}
             >
               <Trash2 size={14} />

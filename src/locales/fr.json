@@ -1,0 +1,21 @@
+{
+  "topbar": {
+    "search": "Recherche...",
+    "my_tribes": "Mes Tribus",
+    "my_bots": "Mes Bots",
+    "new_tribe": "+ Créer une Tribu",
+    "new_bot": "+ Créer un Bot",
+    "no_tribe": "Pas encore de tribu",
+    "no_bot": "Pas encore de bot",
+    "logout": "Se déconnecter",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "leaderboard": "Classement"
+  },
+  "left_panel": {
+    "home": "Accueil",
+    "tribes": "Tribus",
+    "bots": "Bots",
+    "my_profile": "Mon Profil"
+  }
+}

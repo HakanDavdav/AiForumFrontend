@@ -5,6 +5,7 @@ import PostCard from '../components/content/PostCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams()
@@ -18,6 +19,7 @@ export default function SearchPage() {
 
   // Ensure orderType is never empty string
   const finalOrderType = orderType || 'None'
+  const { t } = useTranslation()
 
   console.log('SearchPage params:', { query, mode, orderType: finalOrderType, startDate, endDate })
 
@@ -63,7 +65,7 @@ export default function SearchPage() {
   })
 
   if (!query && mode === 'general') {
-    return <div className="empty-state">Aramak istediğiniz kelimeyi yukarıya yazın.</div>
+    return <div className="empty-state">{t('search.type_to_search')}</div>
   }
 
   if (isLoading) {
@@ -75,7 +77,7 @@ export default function SearchPage() {
   }
 
   if (isError) {
-    return <div className="empty-state form-error">Arama sırasında bir hata oluştu.</div>
+    return <div className="empty-state form-error">{t('search.error')}</div>
   }
 
   const renderResults = () => {
@@ -83,13 +85,13 @@ export default function SearchPage() {
       const g = data || { posts: [], actors: [], tribes: [] }
       const total = (g.posts?.length || 0) + (g.actors?.length || 0) + (g.tribes?.length || 0)
 
-      if (total === 0) return <div className="empty-state">"{query}" için sonuç bulunamadı.</div>
+      if (total === 0) return <div className="empty-state">{t('search.no_results_for', { query })}</div>
 
       return (
         <div className="flex-col gap-6">
           {g.actors?.length > 0 && (
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Aktörler</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.actors')}</h3>
               <div className="flex flex-col gap-2">
                 {g.actors.map((a) => (
                   <div key={a.actorId} className="card-surface">
@@ -101,7 +103,7 @@ export default function SearchPage() {
           )}
           {g.tribes?.length > 0 && (
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Tribeler</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.tribes')}</h3>
               <div className="flex flex-col gap-2">
                 {g.tribes.map((t) => (
                   <TribeMinimalCard key={t.tribeId} {...t} />
@@ -111,7 +113,7 @@ export default function SearchPage() {
           )}
           {g.posts?.length > 0 && (
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>Başlıklar</h3>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.posts')}</h3>
               <div className="flex flex-col gap-4">
                 {g.posts.map((p) => (
                   <PostCard key={p.contentItemId} {...p} />
@@ -126,7 +128,7 @@ export default function SearchPage() {
     if (!data || data.length === 0)
       return (
         <div className="empty-state">
-          {query ? `"${query}" için sonuç bulunamadı.` : 'Sonuç bulunamadı.'}
+          {query ? t('search.no_results_for', { query }) : t('search.no_results')}
         </div>
       )
 
@@ -162,7 +164,7 @@ export default function SearchPage() {
     <div className="flex-col gap-4">
       <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>
-          {query ? `"${query}" için arama sonuçları` : 'Arama sonuçları'}
+          {query ? t('search.results_for', { query }) : t('search.results')}
         </h1>
         {mode !== 'general' && (
           <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
@@ -177,13 +179,13 @@ export default function SearchPage() {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                Sıralama:{' '}
+                {t('search.order')}
                 {orderType === 'Oldest'
-                  ? 'En Eski'
+                  ? t('search.oldest')
                   : orderType === 'Newest'
-                    ? 'En Yeni'
+                    ? t('search.newest')
                     : orderType === 'MostLiked'
-                      ? 'En Çok Beğenilen'
+                      ? t('search.most_liked')
                       : orderType}
               </span>
             )}
@@ -198,7 +200,7 @@ export default function SearchPage() {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                Başlangıç: {new Date(startDate).toLocaleDateString('tr-TR')}
+                {t('search.start_date')}{new Date(startDate).toLocaleDateString(undefined)}
               </span>
             )}
             {endDate && (
@@ -212,7 +214,7 @@ export default function SearchPage() {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                Bitiş: {new Date(endDate).toLocaleDateString('tr-TR')}
+                {t('search.end_date')}{new Date(endDate).toLocaleDateString(undefined)}
               </span>
             )}
           </div>

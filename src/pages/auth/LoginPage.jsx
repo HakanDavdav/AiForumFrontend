@@ -5,6 +5,7 @@ import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false)
   const [twoFactorToken, setTwoFactorToken] = useState('')
   const [tempUserId, setTempUserId] = useState(null)
+  const { t } = useTranslation()
 
   const loginMutation = useMutation({
     mutationFn: (data) => identityApi.login(data),
@@ -85,14 +87,14 @@ export default function LoginPage() {
   if (requiresTwoFactor) {
     return (
       <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>2 Adımlı Doğrulama</h2>
+        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>{t('auth.two_factor')}</h2>
         <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
-          E-posta adresinize gönderilen 6 haneli doğrulama kodunu girin.
+          {t('auth.two_factor_desc')}
         </p>
 
         <form onSubmit={handleTwoFactorSubmit} className="flex-col gap-4">
           <div className="form-group">
-            <label className="form-label">Doğrulama Kodu</label>
+            <label className="form-label">{t('auth.two_factor_code')}</label>
             <input 
               className="input" 
               type="text" 
@@ -111,7 +113,7 @@ export default function LoginPage() {
             className="btn btn-primary w-full"
             disabled={twoFactorMutation.isPending || twoFactorToken.length < 6}
           >
-            {twoFactorMutation.isPending ? 'Doğrulanıyor...' : 'Doğrula'}
+            {twoFactorMutation.isPending ? t('auth.verifying') : t('auth.verify')}
           </button>
         </form>
       </div>
@@ -142,7 +144,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="form-group">
-            <label className="form-label">Kullanıcı Adı veya E-posta</label>
+            <label className="form-label">{t('auth.username_or_email')}</label>
             <input 
               className="input" 
               type="text" 
@@ -154,8 +156,8 @@ export default function LoginPage() {
 
           <div className="form-group">
             <div className="flex items-center justify-between">
-              <label className="form-label">Şifre</label>
-              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: 0 }} onClick={() => setIsForgotOpen(true)}>Şifremi Unuttum</button>
+              <label className="form-label">{t('auth.password')}</label>
+              <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: 0 }} onClick={() => setIsForgotOpen(true)}>{t('auth.forgot_password')}</button>
             </div>
             <input 
               className="input" 
@@ -174,12 +176,12 @@ export default function LoginPage() {
             disabled={loginMutation.isPending}
             style={{ marginTop: 24 }}
           >
-            {loginMutation.isPending ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+            {loginMutation.isPending ? t('auth.logging_in') : t('common.login')}
           </button>
         </form>
 
         <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-          Hesabınız yok mu? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/register')}>Kayıt Ol</button>
+          {t('auth.no_account')} <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/register')}>{t('common.register')}</button>
         </div>
       </div>
 

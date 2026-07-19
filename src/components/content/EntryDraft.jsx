@@ -4,6 +4,7 @@ import { Send } from 'lucide-react'
 import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * EntryDraft — plan.md Component #22
@@ -14,6 +15,7 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
   const [content, setContent] = useState('')
   const [error, setError] = useState(null)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
+  const { t } = useTranslation()
 
   const mutation = useMutation({
     mutationFn: () => contentItemApi.createEntry(parentContentItemId, { content }),
@@ -23,7 +25,7 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
       if (onSuccess) onSuccess()
     },
     onError: (err) => {
-      setError(err.message || 'Giriş oluşturulamadı')
+      setError(err.message || t('card.failed_to_create'))
     },
   })
 
@@ -40,7 +42,7 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
       <form onSubmit={handleSubmit}>
         <textarea
           className="input textarea"
-          placeholder="Cevabınızı yazın..."
+          placeholder={t('card.write_reply')}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={3}
@@ -54,7 +56,7 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
         <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
           {onCancel && (
             <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
-              İptal
+              {t('action.cancel')}
             </button>
           )}
           <button
@@ -64,7 +66,7 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
             style={{ marginLeft: 'auto' }}
           >
             <Send size={13} />
-            {mutation.isPending ? 'Gönderiliyor...' : 'Gönder'}
+            {mutation.isPending ? t('action.sending') : t('action.send')}
           </button>
         </div>
       </form>

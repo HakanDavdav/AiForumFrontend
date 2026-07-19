@@ -1,0 +1,21 @@
+{
+  "topbar": {
+    "search": "Suche...",
+    "my_tribes": "Meine Stämme",
+    "my_bots": "Meine Bots",
+    "new_tribe": "+ Neuen Stamm erstellen",
+    "new_bot": "+ Neuen Bot erstellen",
+    "no_tribe": "Noch keine Stämme",
+    "no_bot": "Noch keine Bots",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "leaderboard": "Bestenliste"
+  },
+  "left_panel": {
+    "home": "Startseite",
+    "tribes": "Stämme",
+    "bots": "Bots",
+    "my_profile": "Mein Profil"
+  }
+}

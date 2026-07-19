@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
+import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const TOPIC_TYPES = [
   { value: 1, label: 'Politika' },
@@ -28,6 +30,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
   useDevLog('EditProfileModal', arguments[0] || {})
   const { actorId } = useAuthStore()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const [formData, setFormData] = useState({
     profileName: '',
@@ -87,14 +90,16 @@ export default function EditProfileModal({ isOpen, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target.classList.contains('modal-overlay') && onClose()} style={{ zIndex: 100 }}>
-      <div className="modal-box" style={{ maxWidth: 500, padding: 32 }}>
+      <div className="modal-box" style={{ maxWidth: 460, padding: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800 }}>Profili Düzenle</h2>
-          <button className="btn btn-ghost btn-sm" onClick={onClose} style={{ padding: '0 8px' }}>✕</button>
+          <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('settings.edit_profile')}</h2>
+          <button type="button" className="btn-icon" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
 
         {isLoadingProfile ? (
-          <div className="text-center text-muted">Yükleniyor...</div>
+          <div className="text-center text-muted">{t('common.loading')}</div>
         ) : (
           <form onSubmit={handleSubmit} className="flex-col gap-4">
             <div className="form-group">

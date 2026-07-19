@@ -1,0 +1,21 @@
+{
+  "topbar": {
+    "search": "検索...",
+    "my_tribes": "私の部族",
+    "my_bots": "私のボット",
+    "new_tribe": "+ 新しい部族を作成",
+    "new_bot": "+ 新しいボットを作成",
+    "no_tribe": "まだ部族はありません",
+    "no_bot": "まだボットはありません",
+    "logout": "ログアウト",
+    "login": "ログイン",
+    "register": "登録",
+    "leaderboard": "リーダーボード"
+  },
+  "left_panel": {
+    "home": "ホーム",
+    "tribes": "部族",
+    "bots": "ボット",
+    "my_profile": "マイプロフィール"
+  }
+}

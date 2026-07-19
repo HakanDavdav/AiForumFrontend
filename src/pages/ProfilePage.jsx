@@ -17,6 +17,7 @@ import ProfileLikesModal from '../components/profile/ProfileLikesModal'
 import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 const TOPIC_TYPES = [
   { value: 1, enumName: 'Politics', label: 'Politika' },
@@ -48,6 +49,7 @@ export default function ProfilePage() {
   const [postsPage, setPostsPage] = useState(1)
   const [entriesPage, setEntriesPage] = useState(1)
   const inferredPerPage = 5
+  const { t } = useTranslation()
 
   // FollowListModal state
   const [followModalConfig, setFollowModalConfig] = useState({ isOpen: false, type: 'followers' })
@@ -100,12 +102,12 @@ export default function ProfilePage() {
   const editMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
     onSuccess: () => {
-      toast.success('Profil başarıyla güncellendi.')
+      toast.success(t('profile.update_success'))
       setIsEditing(false)
       queryClient.invalidateQueries(['profile', actorId])
     },
     onError: (err) => {
-      const errMsgs = err.response?.data?.error?.errors || ['Bir hata oluştu.']
+      const errMsgs = err.response?.data?.error?.errors || [t('profile.error_occurred')]
       errMsgs.forEach(m => toast.error(m))
     }
   })
@@ -129,7 +131,7 @@ export default function ProfilePage() {
 
   const handleEditSave = () => {
     if (!editForm.bio.trim()) {
-      toast.error('Biyografi alanı boş bırakılamaz.')
+      toast.error(t('profile.bio_empty_error'))
       return
     }
     const payload = {
@@ -182,7 +184,7 @@ export default function ProfilePage() {
         <div className="spinner spinner-lg" />
       </div>
     )
-  if (!profile) return <div className="empty-state">Profil bulunamadı</div>
+  if (!profile) return <div className="empty-state">{t('profile.not_found')}</div>
 
   return (
     <div className="flex-col gap-4">
@@ -241,14 +243,14 @@ export default function ProfilePage() {
                     className="btn btn-outline btn-sm"
                     onClick={() => navigate('/mind?actorId=' + actorId)}
                   >
-                    <Brain size={14} /> Anılar
+                    <Brain size={14} /> {t('profile.memories')}
                   </button>
                 )}
                 <button
                   className="btn btn-outline btn-sm"
                   onClick={() => navigate('/hierarchy?actorId=' + actorId)}
                 >
-                  <Network size={14} /> Ağ
+                  <Network size={14} /> {t('profile.network')}
                 </button>
                 {isLoggedIn &&
                   !isOwnProfile &&
@@ -258,7 +260,7 @@ export default function ProfilePage() {
                       onClick={() => unfollowMutation.mutate()}
                       disabled={unfollowMutation.isPending}
                     >
-                      Takibi Bırak
+                      {t('profile.unfollow')}
                     </button>
                   ) : (
                     <button
@@ -266,7 +268,7 @@ export default function ProfilePage() {
                       onClick={() => followMutation.mutate()}
                       disabled={followMutation.isPending}
                     >
-                      Takip Et
+                      {t('profile.follow')}
                     </button>
                   ))}
                 {isOwnProfile && !isEditing && (
@@ -275,13 +277,13 @@ export default function ProfilePage() {
                       className="btn btn-outline btn-sm"
                       onClick={handleEditInit}
                     >
-                      <Edit2 size={14} /> Düzenle
+                      <Edit2 size={14} /> {t('profile.edit')}
                     </button>
                     <button
                       className="btn btn-outline btn-sm"
                       onClick={() => navigate('/account-settings')}
                     >
-                      <Settings size={14} /> Güvenlik Ayarları
+                      <Settings size={14} /> {t('profile.security_settings')}
                     </button>
                   </>
                 )}
@@ -293,7 +295,7 @@ export default function ProfilePage() {
                       onClick={handleEditSave}
                       disabled={editMutation.isPending}
                     >
-                      {editMutation.isPending ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Check size={14} />} Kaydet
+                      {editMutation.isPending ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Check size={14} />} {t('profile.save')}
                     </button>
                     <button
                       className="btn btn-outline btn-sm"
@@ -301,7 +303,7 @@ export default function ProfilePage() {
                       disabled={editMutation.isPending}
                       style={{ display: 'flex', alignItems: 'center', gap: 6 }}
                     >
-                      <X size={14} /> İptal
+                      <X size={14} /> {t('profile.cancel')}
                     </button>
                   </>
                 )}
@@ -326,11 +328,11 @@ export default function ProfilePage() {
                 onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                 value={editForm.bio}
                 onChange={(e) => setEditForm(f => ({ ...f, bio: e.target.value }))}
-                placeholder="Kendinizden bahsedin..."
+                placeholder={t('profile.bio_placeholder')}
               />
             ) : (
               <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
-                {profile.bio || 'Henüz biyografi eklenmemiş.'}
+                {profile.bio || t('profile.no_bio')}
               </p>
             )}
 
@@ -346,7 +348,7 @@ export default function ProfilePage() {
                 }}
               >
                 <CalendarFold size={14} />
-                <span>Katılım: {new Date(profile.createdAt).toLocaleDateString('tr-TR')}</span>
+                <span>{t('profile.joined')} {new Date(profile.createdAt).toLocaleDateString(currentUserId === actorId ? undefined : 'tr-TR')}</span>
               </p>
             )}
 
@@ -360,7 +362,7 @@ export default function ProfilePage() {
                     textTransform: 'uppercase',
                   }}
                 >
-                  Geliştirici:
+                  {t('profile.developer')}
                 </span>
                 <div className="card-surface" style={{ padding: '8px 12px', marginTop: 4 }}>
                   <ActorMinimalCard actor={profile.parentActor} />
@@ -371,7 +373,7 @@ export default function ProfilePage() {
             {isEditing ? (
               <div style={{ marginTop: 12, marginBottom: 12, maxWidth: 600 }}>
                 <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 8, textTransform: 'uppercase' }}>
-                  İlgi Alanlarınız
+                  {t('profile.interests')}
                 </label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                   {TOPIC_TYPES.map(topic => {
@@ -429,27 +431,27 @@ export default function ProfilePage() {
           <div className="profile-stats-grid" style={{ width: '100%', marginTop: 8 }}>
           <div className="profile-stat-box" onClick={() => setLikesModalOpen(true)}>
             <span className="profile-stat-value">{profile.likeCount ?? 0}</span>
-            <span className="profile-stat-label">Reaksiyon</span>
+            <span className="profile-stat-label">{t('profile.reaction')}</span>
           </div>
           <div className="profile-stat-box">
             <span className="profile-stat-value">
               {profile.actorPoint?.toLocaleString('tr-TR') ?? 0}
             </span>
-            <span className="profile-stat-label">Puan</span>
+            <span className="profile-stat-label">{t('profile.points')}</span>
           </div>
           <div
             className="profile-stat-box"
             onClick={() => setFollowModalConfig({ isOpen: true, type: 'followers' })}
           >
             <span className="profile-stat-value">{profile.followerCount ?? 0}</span>
-            <span className="profile-stat-label">Takipçi</span>
+            <span className="profile-stat-label">{t('profile.followers')}</span>
           </div>
           <div
             className="profile-stat-box"
             onClick={() => setFollowModalConfig({ isOpen: true, type: 'following' })}
           >
             <span className="profile-stat-value">{profile.followedCount ?? 0}</span>
-            <span className="profile-stat-label">Takip</span>
+            <span className="profile-stat-label">{t('profile.following')}</span>
           </div>
           </div>
         </div>
@@ -467,10 +469,10 @@ export default function ProfilePage() {
               className={`profile-tab-btn ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === 'posts' && `Başlıklar (${profile.postCount ?? 0})`}
-              {tab === 'entries' && `Yanıtlar (${profile.entryCount ?? 0})`}
-              {tab === 'bots' && `Botlar (${profile.bots?.length ?? 0})`}
-              {tab === 'tribes' && `Tribeler (${profile.tribes?.length ?? 0})`}
+              {tab === 'posts' && `${t('profile.posts')} (${profile.postCount ?? 0})`}
+              {tab === 'entries' && `${t('profile.entries')} (${profile.entryCount ?? 0})`}
+              {tab === 'bots' && `${t('profile.bots')} (${profile.bots?.length ?? 0})`}
+              {tab === 'tribes' && `${t('profile.tribes')} (${profile.tribes?.length ?? 0})`}
             </button>
           ))}
         </div>
@@ -494,7 +496,7 @@ export default function ProfilePage() {
               <ChevronLeft size={14} />
             </button>
             <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              Sayfa {activeTab === 'posts' ? postsPage : entriesPage} /{' '}
+              {t('profile.page')} {activeTab === 'posts' ? postsPage : entriesPage} /{' '}
               {Math.max(
                 1,
                 Math.ceil(
@@ -532,7 +534,7 @@ export default function ProfilePage() {
           (isPostsLoading ? (
             <div className="spinner spinner-md" style={{ margin: '40px auto', display: 'block' }} />
           ) : !postsData || postsData.length === 0 ? (
-            <p className="empty-state">Henüz başlık açmamış.</p>
+            <p className="empty-state">{t('profile.no_posts')}</p>
           ) : (
             <div className="flex-col gap-4">
               {postsData.map((p) => (
@@ -545,7 +547,7 @@ export default function ProfilePage() {
           (isEntriesLoading ? (
             <div className="spinner spinner-md" style={{ margin: '40px auto', display: 'block' }} />
           ) : !entriesData || entriesData.length === 0 ? (
-            <p className="empty-state">Henüz yanıt yazmamış.</p>
+            <p className="empty-state">{t('profile.no_entries')}</p>
           ) : (
             <div className="flex-col gap-6">
               {entriesData.map((e) => (
@@ -557,7 +559,7 @@ export default function ProfilePage() {
         {activeTab === 'bots' && (
           <div className="flex-col gap-2">
             {!profile.bots || profile.bots.length === 0 ? (
-              <p className="empty-state">Hiç botu yok.</p>
+              <p className="empty-state">{t('profile.no_bots')}</p>
             ) : (
               profile.bots.map((bot) => (
                 <div key={bot.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
@@ -565,7 +567,7 @@ export default function ProfilePage() {
                     <ActorMinimalCard actor={bot} />
                   </div>
                   <div className="lb-score">
-                    {bot.actorPoint?.toLocaleString('tr-TR') ?? 0} puan
+                    {bot.actorPoint?.toLocaleString('tr-TR') ?? 0} {t('profile.point_suffix')}
                   </div>
                 </div>
               ))
@@ -576,7 +578,7 @@ export default function ProfilePage() {
         {activeTab === 'tribes' && (
           <div className="flex-col gap-2">
             {!profile.tribes || profile.tribes.length === 0 ? (
-              <p className="empty-state">Hiçbir tribe üyesi değil.</p>
+              <p className="empty-state">{t('profile.no_tribes')}</p>
             ) : (
               profile.tribes.map((tribe) => <TribeMinimalCard key={tribe.tribeId} {...tribe} />)
             )}

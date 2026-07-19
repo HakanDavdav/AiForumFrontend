@@ -5,6 +5,7 @@ import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import { PenSquare, Brain } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * TribeMinimalCard — plan.md Component #4
@@ -14,6 +15,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
   useDevLog('TribeMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
+  const { t } = useTranslation()
 
   const myTribes = useMyEntitiesStore((s) => s.myTribes)
 
@@ -56,7 +58,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
         <button
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
-          title="Zihin haritasını göster"
+          title="Show mind map"
           style={{ color: 'var(--color-text-muted)' }}
         >
           <Brain size={12} />
@@ -66,7 +68,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
         <button
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
-          title="Düzenle"
+          title="Edit"
           style={{ color: 'var(--color-text-muted)' }}
         >
           <PenSquare size={12} />

@@ -4,6 +4,7 @@ import { identityApi } from '../../api/identityApi'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { KeyRound, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const TOTAL_SECONDS = 120 // 2 dakika olarak ayarlıyoruz
 
@@ -14,6 +15,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
   const [isConfirmed, setIsConfirmed] = useState(false)
   const textareaRef = useRef(null)
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const confirmEmailMutation = useMutation({
     mutationFn: (data) => identityApi.confirmEmail(data),
@@ -98,10 +100,10 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
               animation: 'tkSuccessPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
             }}>✓</div>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
-              E-posta Onaylandı!
+              {t('auth.email_verified')}
             </h2>
             <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
-              Giriş ekranına yönlendiriliyorsunuz…
+              {t('auth.redirecting', 'Giriş ekranına yönlendiriliyorsunuz…')}
             </p>
           </div>
         ) : (
@@ -116,11 +118,11 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
             </div>
 
             <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
-              E-posta Doğrulama
+              {t('auth.email_verification')}
             </h2>
             <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
               <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{email}</span> adresine
-              {' '}gönderilen e-postadaki doğrulama kodunu aşağıya yapıştırın.
+              {' '}{t('auth.email_verification_desc')}
             </p>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -133,7 +135,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
                   className="input"
                   value={token}
                   onChange={handleChange}
-                  placeholder="Onay kodunu buraya yapıştırın"
+                  placeholder={t('auth.enter_code')}
                   spellCheck={false}
                   autoComplete="off"
                   required
@@ -154,7 +156,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
                     fontSize: 11, color: 'var(--color-primary)',
                     fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3,
                   }}>
-                    ✓ hazır
+                    ✓ {t('common.ready')}
                   </span>
                 )}
               </div>
@@ -180,7 +182,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
                   fontWeight: isLowTime ? 600 : 400,
                   transition: 'color 0.3s',
                 }}>
-                  Kodun geçerliliği: <strong>{formatTime(countdown)}</strong>
+                  {t('auth.code_expiry')}: <strong>{formatTime(countdown)}</strong>
                 </p>
               </div>
 
@@ -189,7 +191,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
                 className="btn btn-primary w-full"
                 disabled={!token.trim() || confirmEmailMutation.isPending}
               >
-                {confirmEmailMutation.isPending ? 'Doğrulanıyor…' : 'Doğrula'}
+                {confirmEmailMutation.isPending ? t('common.verifying') : t('action.verify')}
               </button>
             </form>
           </>

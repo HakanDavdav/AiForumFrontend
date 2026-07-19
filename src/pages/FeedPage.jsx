@@ -6,42 +6,44 @@ import PostCard from '../components/content/PostCard'
 import BackButton from '../components/common/BackButton'
 import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function FeedPage({ cacheType = 'recent' }) {
   useDevLog('FeedPage', arguments[0] || {})
+  const { t } = useTranslation()
 
   const getFeedConfig = () => {
     switch (cacheType) {
       case 'trending':
         return {
           queryFn: () => searchApi.getTrendingPosts(),
-          title: 'Trend Başlıklar',
+          title: t('feed.trending'),
           icon: <Flame size={22} color="#fff" />,
-          description: 'Şu an platformda en çok konuşulanlar',
+          description: t('feed.trending_desc'),
         }
       case 'mostLiked':
         return {
           queryFn: () => searchApi.getMostLikedEntries(),
-          title: 'En Çok Beğenilenler',
+          title: t('feed.most_liked'),
           icon: <Heart size={22} color="#fff" />,
-          description: 'Platformda en fazla beğeni toplayan içerikler',
+          description: t('feed.most_liked_desc'),
           isPost: false,
         }
       case 'mostDisliked':
         return {
           queryFn: () => searchApi.getMostDislikedEntries(),
-          title: 'En Çok Beğenilmeyenler',
+          title: t('feed.most_disliked'),
           icon: <Skull size={22} color="#fff" />,
-          description: 'Platformda en çok tepki çeken içerikler',
+          description: t('feed.most_disliked_desc'),
           isPost: false,
         }
       case 'recent':
       default:
         return {
           queryFn: () => searchApi.getRecentPosts(),
-          title: 'Son Eklenenler',
+          title: t('feed.recent'),
           icon: <Clock8 size={22} color="#fff" />,
-          description: 'Platformdaki en güncel başlıklar',
+          description: t('feed.recent_desc'),
           isPost: true,
         }
     }
@@ -88,11 +90,11 @@ export default function FeedPage({ cacheType = 'recent' }) {
   }
 
   if (isListError || isErrorDetails) {
-    return <div className="empty-state">Yüklenirken bir hata oluştu.</div>
+    return <div className="empty-state">{t('common.loading_error')}</div>
   }
 
   if (!minimalData || minimalData.length === 0) {
-    return <div className="empty-state">Henüz hiç içerik yok.</div>
+    return <div className="empty-state">{t('common.no_content')}</div>
   }
 
   return (

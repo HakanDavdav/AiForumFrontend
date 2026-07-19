@@ -86,6 +86,115 @@
   --transition-slow: 300ms ease;
 }
 
+/* ─── Dark Theme Overrides ─────────────────────────────────────────────── */
+:root.dark {
+  /* Colors */
+  --color-primary: #1d4ed8;
+  /* Daha koyu, doygun bir mavi (Blue 700) */
+  --color-primary-light: #1e3a8a;
+  /* Arkaplanlar için çok koyu lacivert (Blue 900) */
+  --color-primary-lighter: #172554;
+  /* Neredeyse siyah-mavi (Blue 950) */
+  --color-primary-dark: #60a5fa;
+  /* Yazılarda parlaması için açık mavi */
+  --color-primary-hover: #1e40af;
+  /* Buton hover efekti (Blue 800) */
+}
+
+:root.theme-green {
+  --color-primary: #10b981; /* Emerald 500 */
+  --color-primary-light: #d1fae5; /* Emerald 100 */
+  --color-primary-lighter: #ecfdf5; /* Emerald 50 */
+  --color-primary-dark: #047857; /* Emerald 700 */
+  --color-primary-hover: #059669; /* Emerald 600 */
+}
+
+:root.dark.theme-green {
+  --color-primary: #059669; /* Emerald 600 - Daha koyu ve oturaklı yeşil */
+  --color-primary-light: #064e3b; /* Emerald 900 */
+  --color-primary-lighter: #022c22; /* Emerald 950 */
+  --color-primary-dark: #10b981; /* Emerald 500 */
+  --color-primary-hover: #047857; /* Emerald 700 */
+}
+
+:root.dark {
+  --color-bg: #09090b;
+  /* Very dark slate/black */
+  --color-surface: #121214;
+  /* Dark surface (Left panel, headers) */
+  --color-surface-2: #1c1c20;
+  /* Lighter dark surface (Cards, activities) */
+  --color-surface-3: #27272a;
+  /* Even lighter (Hovers) */
+
+  --color-border: #1c1c20;
+  --color-border-light: #121214;
+
+  --color-text: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-faint: #64748b;
+
+  --color-bot: #8b5cf6;
+  --color-bot-light: #4c1d95;
+  --color-bot-dark: #a78bfa;
+
+  --color-error: #ef4444;
+  --color-error-light: #7f1d1d;
+  --color-success: #22c55e;
+  --color-success-light: #14532d;
+  --color-warning: #f59e0b;
+  --color-warning-light: #78350f;
+
+  /* Shadows for dark mode */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.6), 0 1px 2px -1px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.6);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.6);
+  --shadow-blue: 0 0 0 3px rgb(59 130 246 / 0.3);
+}
+
+:root.dark .glass {
+  background: rgba(24, 24, 27, 0.85);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+}
+
+:root.dark .skeleton {
+  background: linear-gradient(90deg,
+      var(--color-surface-2) 25%,
+      var(--color-surface-3) 50%,
+      var(--color-surface-2) 75%);
+}
+
+:root.dark ::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+:root.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+}
+
+:root.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-faint);
+}
+
+:root.dark .activity-item {
+  background: var(--color-surface-2); /* Gri */
+  border-color: var(--color-border);
+}
+:root.dark .activity-item:hover {
+  background: var(--color-surface-3); /* Daha açık Gri */
+  border-color: var(--color-primary-dark);
+}
+:root.dark .activity-item.unread {
+  background: var(--color-primary-lighter);
+  border-color: var(--color-primary-light);
+}
+:root.dark .activity-item.unread:hover {
+  background: var(--color-primary-light);
+}
+
 /* â”€â”€â”€ Reset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 *,
 *::before,
@@ -134,6 +243,7 @@ a {
   text-decoration: none;
   transition: color var(--transition-fast);
 }
+
 a:hover {
   color: var(--color-primary-dark);
 }
@@ -160,13 +270,16 @@ select {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-surface-3);
   border-radius: var(--radius-full);
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-faint);
 }
@@ -242,6 +355,7 @@ select {
   .layout-right {
     display: none;
   }
+
   .layout-left {
     width: 30%;
   }
@@ -263,6 +377,7 @@ select {
   .layout-left {
     display: none;
   }
+
   .layout-center {
     width: 100%;
   }
@@ -277,6 +392,7 @@ select {
   box-shadow: var(--shadow-xs);
   transition: box-shadow var(--transition-fast);
 }
+
 .card:hover {
   box-shadow: var(--shadow-sm);
 }
@@ -305,6 +421,7 @@ select {
   user-select: none;
   text-decoration: none;
 }
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -314,6 +431,7 @@ select {
   background: var(--color-primary);
   color: white;
 }
+
 .btn-primary:hover:not(:disabled) {
   background: var(--color-primary-hover);
 }
@@ -323,6 +441,7 @@ select {
   color: var(--color-primary);
   border: 1.5px solid var(--color-primary);
 }
+
 .btn-outline:hover:not(:disabled) {
   background: var(--color-primary-lighter);
 }
@@ -331,6 +450,7 @@ select {
   background: transparent;
   color: var(--color-text-muted);
 }
+
 .btn-ghost:hover:not(:disabled) {
   background: var(--color-surface-2);
   color: var(--color-text);
@@ -340,6 +460,7 @@ select {
   background: var(--color-error);
   color: white;
 }
+
 .btn-danger:hover:not(:disabled) {
   background: #dc2626;
 }
@@ -363,6 +484,7 @@ select {
   border: none;
   color: var(--color-text-muted);
 }
+
 .btn-icon:hover {
   background: var(--color-surface-2);
   color: var(--color-text);
@@ -382,13 +504,16 @@ select {
     box-shadow var(--transition-fast);
   outline: none;
 }
+
 .input:focus {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-blue);
 }
+
 .input::placeholder {
   color: var(--color-text-faint);
 }
+
 .input.error {
   border-color: var(--color-error);
 }
@@ -467,12 +592,15 @@ select {
   0% {
     transform: scale(1);
   }
+
   30% {
     transform: scale(1.4) rotate(-10deg);
   }
+
   60% {
     transform: scale(0.8) rotate(5deg);
   }
+
   100% {
     transform: scale(1) rotate(0);
   }
@@ -482,19 +610,24 @@ select {
   0% {
     transform: translateX(0) scale(1);
   }
+
   20% {
     transform: translateX(-3px) rotate(-15deg) scale(1.2);
     color: #dc2626;
   }
+
   40% {
     transform: translateX(3px) rotate(15deg) scale(1.2);
   }
+
   60% {
     transform: translateX(-3px) rotate(-15deg) scale(1.2);
   }
+
   80% {
     transform: translateX(3px) rotate(15deg) scale(1.2);
   }
+
   100% {
     transform: translateX(0) scale(1);
   }
@@ -511,6 +644,7 @@ select {
 .actor-avatar-bot-badge {
   background: var(--color-bot);
 }
+
 .actor-avatar-user-badge {
   background: var(--color-primary);
 }
@@ -520,26 +654,31 @@ select {
   object-fit: cover;
   flex-shrink: 0;
 }
+
 .avatar-sm {
   width: 28px;
   height: 28px;
   font-size: 11px;
 }
+
 .avatar-md {
   width: 36px;
   height: 36px;
   font-size: 14px;
 }
+
 .avatar-lg {
   width: 48px;
   height: 48px;
   font-size: 18px;
 }
+
 .avatar-xl {
   width: 72px;
   height: 72px;
   font-size: 26px;
 }
+
 .avatar-xxl {
   width: 128px;
   height: 128px;
@@ -593,18 +732,17 @@ select {
   0% {
     background-position: -400px 0;
   }
+
   100% {
     background-position: 400px 0;
   }
 }
 
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--color-surface-2) 25%,
-    var(--color-surface-3) 50%,
-    var(--color-surface-2) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--color-surface-2) 25%,
+      var(--color-surface-3) 50%,
+      var(--color-surface-2) 75%);
   background-size: 800px 100%;
   animation: shimmer 1.5s infinite linear;
   border-radius: var(--radius-md);
@@ -616,9 +754,11 @@ select {
     transform: rotate(360deg);
   }
 }
+
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
 .spinner {
   display: inline-block;
   border-radius: var(--radius-full);
@@ -626,14 +766,17 @@ select {
   border-top-color: var(--color-primary);
   animation: spin 0.7s linear infinite;
 }
+
 .spinner-sm {
   width: 16px;
   height: 16px;
 }
+
 .spinner-md {
   width: 24px;
   height: 24px;
 }
+
 .spinner-lg {
   width: 36px;
   height: 36px;
@@ -668,57 +811,74 @@ select {
 .flex {
   display: flex;
 }
+
 .flex-col {
   flex-direction: column;
 }
+
 .items-center {
   align-items: center;
 }
+
 .justify-between {
   justify-content: space-between;
 }
+
 .justify-center {
   justify-content: center;
 }
+
 .gap-1 {
   gap: var(--space-1);
 }
+
 .gap-2 {
   gap: var(--space-2);
 }
+
 .gap-3 {
   gap: var(--space-3);
 }
+
 .gap-4 {
   gap: var(--space-4);
 }
+
 .gap-6 {
   gap: var(--space-6);
 }
+
 .w-full {
   width: 100%;
 }
+
 .text-muted {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
+
 .text-sm {
   font-size: var(--font-size-sm);
 }
+
 .text-xs {
   font-size: var(--font-size-xs);
 }
+
 .font-medium {
   font-weight: 500;
 }
+
 .font-semibold {
   font-weight: 600;
 }
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .empty-state {
   text-align: center;
   padding: var(--space-10) var(--space-4);
@@ -740,6 +900,7 @@ select {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -751,6 +912,7 @@ select {
     opacity: 0;
     max-height: 0;
   }
+
   to {
     opacity: 1;
     max-height: 1000px;
@@ -762,6 +924,7 @@ select {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -771,6 +934,7 @@ select {
 .animate-fade-in {
   animation: fadeIn var(--transition-slow) ease forwards;
 }
+
 .animate-scale-in {
   animation: scaleIn var(--transition-base) ease forwards;
 }
@@ -799,10 +963,12 @@ select {
   cursor: pointer;
   transition: all var(--transition-fast);
 }
+
 .page-btn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+
 .page-btn.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
@@ -850,12 +1016,12 @@ select {
   margin-top: 2px;
 }
 
-.hierarchy-tree-container > .tree-node {
+.hierarchy-tree-container>.tree-node {
   margin-left: 0;
 }
 
-.hierarchy-tree-container > .tree-node::before,
-.hierarchy-tree-container > .tree-node > .tree-node-content::before {
+.hierarchy-tree-container>.tree-node::before,
+.hierarchy-tree-container>.tree-node>.tree-node-content::before {
   display: none;
 }
 
@@ -873,6 +1039,7 @@ select {
   transition: all var(--transition-fast) ease;
   box-shadow: var(--shadow-xs);
 }
+
 .actor-chip:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
@@ -973,6 +1140,7 @@ select {
   transition: all var(--transition-fast) ease;
   cursor: pointer;
 }
+
 .tribe-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
@@ -1016,6 +1184,7 @@ select {
   transition: background var(--transition-fast) ease;
   gap: 16px;
 }
+
 .post-minimal-card:hover {
   background: var(--color-surface-2);
 }
@@ -1321,7 +1490,7 @@ select {
   box-shadow: none !important;
 }
 
-/* â”€â”€â”€ Profile Page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€â”€ Profile Page & Tribe Page Headers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .profile-header-card {
   position: relative;
   background: linear-gradient(to bottom, var(--color-surface), var(--color-bg));
@@ -1333,6 +1502,10 @@ select {
   flex-direction: column;
   gap: var(--space-4);
   transition: all var(--transition-base) ease;
+}
+
+:root.dark .profile-header-card {
+  background: linear-gradient(to bottom, var(--color-surface-2), var(--color-surface));
 }
 
 .profile-stats-grid {
@@ -1510,14 +1683,17 @@ textarea {
 .activities-scrollbar::-webkit-scrollbar {
   width: 10px;
 }
+
 .activities-scrollbar::-webkit-scrollbar-track {
   background: var(--color-surface);
   border-radius: 10px;
 }
+
 .activities-scrollbar::-webkit-scrollbar-thumb {
   background: var(--color-primary-light);
   border-radius: 10px;
 }
+
 .activities-scrollbar::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary);
 }

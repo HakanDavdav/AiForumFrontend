@@ -4,6 +4,7 @@ import { identityApi } from '../../api/identityApi'
 import TokenModal from '../../components/auth/TokenModal'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function RegisterPage() {
   useDevLog('RegisterPage', arguments[0] || {})
@@ -17,6 +18,7 @@ export default function RegisterPage() {
   const [error, setError] = useState(null)
 
   const [isConfirming, setIsConfirming] = useState(false)
+  const { t } = useTranslation()
 
   // 1. Register Mutation
   const registerMutation = useMutation({
@@ -40,7 +42,7 @@ export default function RegisterPage() {
 
   const handleTimeout = () => {
     setIsConfirming(false)
-    setError('Süreniz doldu (30 saniye). Lütfen tekrar deneyin.')
+    setError(t('auth.timeout'))
   }
 
   const handleRegisterSubmit = (e) => {
@@ -48,7 +50,7 @@ export default function RegisterPage() {
     setError(null)
 
     if (password !== passwordConfirm) {
-      setError('Şifreler eşleşmiyor.')
+      setError(t('auth.passwords_do_not_match'))
       return
     }
 
@@ -79,7 +81,7 @@ export default function RegisterPage() {
 
         <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
         <div className="form-group">
-          <label className="form-label">Kullanıcı Adı</label>
+          <label className="form-label">{t('auth.username')}</label>
           <input 
             className="input" 
             type="text" 
@@ -91,7 +93,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">E-posta</label>
+          <label className="form-label">{t('auth.email')}</label>
           <input 
             className="input" 
             type="email" 
@@ -102,7 +104,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Şifre</label>
+          <label className="form-label">{t('auth.password')}</label>
           <input 
             className="input" 
             type="password" 
@@ -114,7 +116,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="form-group">
-          <label className="form-label">Şifre Tekrar</label>
+          <label className="form-label">{t('auth.password_confirm')}</label>
           <input 
             className="input" 
             type="password" 
@@ -133,12 +135,12 @@ export default function RegisterPage() {
           disabled={registerMutation.isPending || requestEmailConfirmMutation.isPending}
           style={{ marginTop: 24 }}
         >
-          {registerMutation.isPending || requestEmailConfirmMutation.isPending ? 'İşleniyor...' : 'Kayıt Ol'}
+          {registerMutation.isPending || requestEmailConfirmMutation.isPending ? t('auth.processing') : t('common.register')}
         </button>
       </form>
 
       <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-        Zaten hesabınız var mı? <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/login')}>Giriş Yap</button>
+        {t('auth.have_account')} <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/login')}>{t('common.login')}</button>
       </div>
     </div>
 

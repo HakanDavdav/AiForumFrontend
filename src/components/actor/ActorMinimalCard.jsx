@@ -1,4 +1,4 @@
-import { Network, Edit2, Brain } from 'lucide-react'
+import { Network, Edit2, Brain, PenSquare } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { actorApi } from '../../api/actorApi'
@@ -6,6 +6,7 @@ import ActorAvatar from './ActorAvatar'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * ActorMinimalCard — avatar + isim, hierarchy button.
@@ -23,6 +24,7 @@ export default function ActorMinimalCard({
 }) {
   useDevLog('ActorMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const currentUserId = useAuthStore((s) => s.actorId)
 
@@ -32,6 +34,7 @@ export default function ActorMinimalCard({
 
   const isMe = currentUserId === actor.actorId
   const isMyBot = myBots?.some((b) => b.actorId === actor.actorId)
+  const isOwner = isMe || isMyBot
 
   const handleActorClick = () => {
     if (!clickable) return
@@ -101,18 +104,18 @@ export default function ActorMinimalCard({
         <button
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
-          title="Zihin haritasını göster"
+          title={t('mind.show')}
         >
           <Brain size={12} />
         </button>
       )}
-      {showEditBtn && (isMe || isMyBot) && (
+      {showEditBtn && isOwner && (
         <button
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
-          title="Düzenle"
+          title={t('action.edit')}
         >
-          <Edit2 size={12} />
+          <PenSquare size={12} />
         </button>
       )}
       {showPoint && actor.actorPoint != null && (

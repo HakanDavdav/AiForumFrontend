@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
 import { KeyRound, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const TOTAL_SECONDS = 120 // 2 dakika olarak ayarlıyoruz
 
@@ -11,6 +12,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
   
   // Step: 'request' | 'confirm' | 'success'
   const [step, setStep] = useState('request')
+  const { t } = useTranslation()
   
   // Form fields
   const [emailOrUsername, setEmailOrUsername] = useState('')
@@ -125,10 +127,10 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
               animation: 'tkSuccessPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
             }}>✓</div>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
-              Şifre Değiştirildi!
+              {t('auth.password_changed')}
             </h2>
             <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
-              Artık yeni şifrenizle giriş yapabilirsiniz...
+              {t('auth.password_changed_desc')}
             </p>
           </div>
         ) : (
@@ -145,10 +147,10 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
             {step === 'request' && (
               <>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
-                  Şifremi Unuttum
+                  {t('auth.forgot_password_title')}
                 </h2>
                 <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
-                  Kayıtlı e-posta adresinizi veya kullanıcı adınızı girin. Size bir onay kodu göndereceğiz.
+                  {t('auth.forgot_password_desc')}
                 </p>
                 
                 <form onSubmit={handleRequestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -158,7 +160,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     value={emailOrUsername}
                     onChange={(e) => setEmailOrUsername(e.target.value)}
                     required 
-                    placeholder="E-posta veya Kullanıcı Adı"
+                    placeholder={t('auth.email_or_username')}
                     style={{ textAlign: 'center', padding: '14px', fontSize: 14 }}
                   />
 
@@ -168,7 +170,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     disabled={requestResetMutation.isPending || !emailOrUsername.trim()}
                     style={{ marginTop: 8 }}
                   >
-                    {requestResetMutation.isPending ? 'Gönderiliyor...' : 'Gönder'}
+                    {requestResetMutation.isPending ? t('common.sending') : t('action.send')}
                   </button>
                 </form>
               </>
@@ -177,11 +179,11 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
             {step === 'confirm' && (
               <>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
-                  Şifreyi Yenile
+                  {t('auth.reset_password')}
                 </h2>
                 <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
                   <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{emailOrUsername}</span> adresine
-                  {' '}gönderilen onay kodunu aşağıya yapıştırın ve yeni şifrenizi belirleyin.
+                  {' '}{t('auth.reset_password_desc')}
                 </p>
                 
                 <form onSubmit={handleConfirmSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -194,7 +196,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                       className="input"
                       value={confirmToken}
                       onChange={(e) => setConfirmToken(e.target.value)}
-                      placeholder="Onay kodunu buraya yapıştırın"
+                      placeholder={t('auth.enter_code')}
                       spellCheck={false}
                       autoComplete="off"
                       required
@@ -214,7 +216,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                         fontSize: 11, color: 'var(--color-primary)',
                         fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3,
                       }}>
-                        ✓ hazır
+                        ✓ {t('common.ready')}
                       </span>
                     )}
                   </div>
@@ -227,7 +229,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     required 
                     minLength={6}
-                    placeholder="Yeni Şifre"
+                    placeholder={t('auth.new_password')}
                     style={{ textAlign: 'center', padding: '14px', fontSize: 14 }}
                   />
 
@@ -252,7 +254,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                       fontWeight: isLowTime ? 600 : 400,
                       transition: 'color 0.3s',
                     }}>
-                      Kodun geçerliliği: <strong>{formatTime(countdown)}</strong>
+                      {t('auth.code_expiry')}: <strong>{formatTime(countdown)}</strong>
                     </p>
                   </div>
 
@@ -262,7 +264,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     disabled={confirmResetMutation.isPending || !confirmToken.trim() || !newPassword}
                     style={{ marginTop: 8 }}
                   >
-                    {confirmResetMutation.isPending ? 'Onaylanıyor...' : 'Şifreyi Değiştir'}
+                    {confirmResetMutation.isPending ? t('common.verifying') : t('settings.change_password')}
                   </button>
                 </form>
               </>

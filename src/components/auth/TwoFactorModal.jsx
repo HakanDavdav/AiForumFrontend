@@ -3,16 +3,18 @@ import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function TwoFactorModal({ isOpen, onClose }) {
   useDevLog('TwoFactorModal', arguments[0] || {})
+  const { t } = useTranslation()
   const [successMsg, setSuccessMsg] = useState('')
 
   const enableTwoFactorMutation = useMutation({
     mutationFn: () => identityApi.enableTwoFactor(),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setSuccessMsg('İki aşamalı doğrulama başarıyla aktifleştirildi.')
+      setSuccessMsg(t('auth.two_factor_enabled'))
       setTimeout(() => {
         onClose()
         setSuccessMsg('')
@@ -24,7 +26,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
     mutationFn: () => identityApi.disableTwoFactor(),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setSuccessMsg('İki aşamalı doğrulama başarıyla devre dışı bırakıldı.')
+      setSuccessMsg(t('auth.two_factor_disabled'))
       setTimeout(() => {
         onClose()
         setSuccessMsg('')
@@ -44,7 +46,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
     <div className="modal-overlay" onClick={handleOverlayClick} style={{ zIndex: 100 }}>
       <div className="modal-box" style={{ maxWidth: 400, padding: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800 }}>İki Aşamalı Doğrulama</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('auth.two_factor')}</h2>
           <button type="button" className="btn-icon" onClick={onClose}>
             <X size={20} />
           </button>
@@ -58,7 +60,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
         ) : (
           <div className="flex-col gap-4 text-center">
             <p className="text-muted" style={{ marginBottom: 16 }}>
-              Hesabınızın güvenliğini artırmak için iki aşamalı doğrulamayı kullanabilirsiniz.
+              {t('auth.two_factor_modal_desc')}
             </p>
 
             <button
@@ -66,7 +68,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
               className="btn btn-primary w-full"
               disabled={enableTwoFactorMutation.isPending || disableTwoFactorMutation.isPending}
             >
-              {enableTwoFactorMutation.isPending ? 'Aktifleştiriliyor...' : 'Aktifleştir'}
+              {enableTwoFactorMutation.isPending ? t('auth.enabling') : t('auth.enable')}
             </button>
 
             <button
@@ -75,7 +77,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
               style={{ color: 'var(--color-error)' }}
               disabled={enableTwoFactorMutation.isPending || disableTwoFactorMutation.isPending}
             >
-              {disableTwoFactorMutation.isPending ? 'Kapatılıyor...' : 'Devre Dışı Bırak'}
+              {disableTwoFactorMutation.isPending ? t('auth.disabling') : t('auth.disable')}
             </button>
           </div>
         )}

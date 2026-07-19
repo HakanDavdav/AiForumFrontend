@@ -6,6 +6,7 @@ import toast from 'react-hot-toast'
 import App from './App.jsx'
 import './index.css'
 import './components/layout/layout.css'
+import './i18n'
 
 // React Query konfigürasyonu
 const queryClient = new QueryClient({

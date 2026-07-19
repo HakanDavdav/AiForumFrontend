@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
   useDevLog('ChangePasswordModal', arguments[0] || {})
@@ -11,13 +12,14 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
     newPassword: ''
   })
   
+  const { t } = useTranslation()
   const [successMsg, setSuccessMsg] = useState('')
 
   const changePasswordMutation = useMutation({
     mutationFn: (data) => identityApi.changePassword(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setSuccessMsg('Şifreniz başarıyla değiştirildi.')
+      setSuccessMsg(t('auth.change_password_success'))
       setTimeout(() => {
         onClose()
         setSuccessMsg('')
@@ -38,7 +40,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
     <div className="modal-overlay" onClick={handleOverlayClick} style={{ zIndex: 100 }}>
       <div className="modal-box" style={{ maxWidth: 400, padding: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800 }}>Şifre Değiştir</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('settings.change_password')}</h2>
           <button type="button" className="btn-icon" onClick={onClose}>
             <X size={20} />
           </button>
@@ -52,7 +54,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); changePasswordMutation.mutate(formData); }} className="flex-col gap-4">
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>Mevcut Şifre</label>
+              <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.current_password')}</label>
               <input
                 className="input"
                 type="password"
@@ -63,7 +65,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
             </div>
 
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>Yeni Şifre</label>
+              <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.new_password')}</label>
               <input
                 className="input"
                 type="password"
@@ -79,7 +81,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
                 className="btn btn-primary w-full"
                 disabled={changePasswordMutation.isPending}
               >
-                {changePasswordMutation.isPending ? 'Kaydediliyor...' : 'Değiştir'}
+                {changePasswordMutation.isPending ? t('action.saving') : t('action.change')}
               </button>
             </div>
           </form>

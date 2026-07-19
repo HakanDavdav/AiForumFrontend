@@ -10,11 +10,13 @@ import DeleteAccountModal from '../components/auth/DeleteAccountModal'
 import ChangeEmailModal from '../components/auth/ChangeEmailModal'
 import ChangePhoneModal from '../components/auth/ChangePhoneModal'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function AccountSettingsPage() {
   useDevLog('AccountSettingsPage', arguments[0] || {})
   const [activeModal, setActiveModal] = useState(null) // null, 'editProfile', 'changeUsername', 'changePassword', 'twoFactor', 'deleteAccount', 'changeEmail', 'changePhone'
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div className="flex-col gap-4">
@@ -52,10 +54,10 @@ export default function AccountSettingsPage() {
           <h1
             style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
-            Hesap Ayarları
+            {t('settings.account_settings')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            Profilinizi ve güvenlik tercihlerinizi yönetin.
+            {t('settings.account_settings_desc')}
           </p>
         </div>
       </div>
@@ -65,26 +67,26 @@ export default function AccountSettingsPage() {
       {/* Hesap & Güvenlik Bölümü */}
       <div className="card-surface" style={{ padding: 24, marginBottom: 16 }}>
         <div style={{ marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: 'var(--color-text-primary)' }}>Hesap & Güvenlik</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: 'var(--color-text-primary)' }}>{t('settings.account_security')}</h2>
           <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
-            Giriş bilgilerinizi güncelleyin ve hesabınızı güvende tutun.
+            {t('settings.account_security_desc')}
           </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
           <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changeEmail')}>
-            E-posta Değiştir
+            {t('settings.change_email')}
           </button>
           <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changePhone')}>
-            Telefon Ekle/Değiştir
+            {t('settings.change_phone')}
           </button>
           <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changeUsername')}>
-            Kullanıcı Adı Değiştir
+            {t('settings.change_username')}
           </button>
           <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changePassword')}>
-            Şifre Değiştir
+            {t('settings.change_password')}
           </button>
           <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('twoFactor')}>
-            İki Aşamalı Doğrulama
+            {t('settings.two_factor')}
           </button>
         </div>
       </div>
@@ -92,9 +94,9 @@ export default function AccountSettingsPage() {
       {/* Tehlikeli Alan Bölümü */}
       <div className="card-surface" style={{ padding: 24, border: '1px solid var(--color-error)' }}>
         <div style={{ marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 4 }}>Tehlikeli İşlemler</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 4 }}>{t('settings.danger_zone')}</h2>
           <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
-            Hesabınızı silmek kalıcı bir işlemdir. Bütün verileriniz silinir.
+            {t('settings.danger_zone_desc')}
           </p>
         </div>
         <div>
@@ -103,7 +105,7 @@ export default function AccountSettingsPage() {
             style={{ backgroundColor: 'var(--color-error)', color: '#fff', border: 'none' }}
             onClick={() => setActiveModal('deleteAccount')}
           >
-            Hesabımı Sil
+            {t('settings.delete_account')}
           </button>
         </div>
       </div>

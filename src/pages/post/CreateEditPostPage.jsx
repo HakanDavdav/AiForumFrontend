@@ -15,6 +15,7 @@ import { contentItemApi } from '../../api/contentItemApi'
 import { TopicTypes } from '../../constants/TopicTypes'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function CreateEditPostPage() {
   useDevLog('CreateEditPostPage', arguments[0] || {})
@@ -22,6 +23,7 @@ export default function CreateEditPostPage() {
   const postId = searchParams.get('postId')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   // If postId is provided, we are in Edit mode
   const isEditMode = Boolean(postId)
@@ -146,12 +148,12 @@ export default function CreateEditPostPage() {
           <h1
             style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
-            {isEditMode ? 'Başlığı Düzenle' : 'Yeni Başlık Başlat'}
+            {isEditMode ? t('post.edit_title') : t('post.start_new_topic')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {isEditMode
-              ? 'Başlığınızı ve içeriğini güncelleyin.'
-              : 'Botlarla ve insanlarla tartışabileceğiniz yeni bir başlık açın.'}
+              ? t('post.edit_topic_desc')
+              : t('post.start_new_topic_desc')}
           </p>
         </div>
       </div>
@@ -172,7 +174,7 @@ export default function CreateEditPostPage() {
               textTransform: 'uppercase',
             }}
           >
-            Kabile (Tribe) Seçimi
+            {t('post.tribe_selection')}
           </label>
           <select
             value={formData.tribeId}
@@ -192,7 +194,7 @@ export default function CreateEditPostPage() {
               boxSizing: 'border-box',
             }}
           >
-            <option value="">Global (Genel)</option>
+            <option value="">{t('post.global')}</option>
             {myTribes?.map(t => (
               <option key={t.tribeId} value={t.tribeId}>{t.tribeName}</option>
             ))}
@@ -212,13 +214,13 @@ export default function CreateEditPostPage() {
               textTransform: 'uppercase',
             }}
           >
-            Başlık <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('post.title_label')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <input
               type="text"
               required
-              placeholder="Konunun ana fikri..."
+              placeholder={t('post.title_placeholder')}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -254,13 +256,13 @@ export default function CreateEditPostPage() {
               textTransform: 'uppercase',
             }}
           >
-            İçerik <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('post.content_label')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
               rows={8}
               required
-              placeholder="Detaylı bir şekilde başlığı açıklayın..."
+              placeholder={t('post.content_placeholder')}
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -299,7 +301,7 @@ export default function CreateEditPostPage() {
               textTransform: 'uppercase',
             }}
           >
-            Kategoriler (İsteğe Bağlı)
+            {t('post.categories_optional')}
           </label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {TopicTypes.map((topic) => {
@@ -353,8 +355,8 @@ export default function CreateEditPostPage() {
             <CheckCircle size={16} color="#22c55e" />
             <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
               {isEditMode
-                ? 'Başlık başarıyla güncellendi. Yönlendiriliyorsunuz...'
-                : 'Başlık başarıyla oluşturuldu. Yönlendiriliyorsunuz...'}
+                ? t('post.success_update')
+                : t('post.success_create')}
             </span>
           </div>
         )}
@@ -371,7 +373,7 @@ export default function CreateEditPostPage() {
             }}
           >
             <span style={{ fontSize: 13, color: '#ef4444', fontWeight: 500 }}>
-              {mutation.error?.response?.data?.errors?.[0] || 'Bir hata oluştu.'}
+              {mutation.error?.response?.data?.errors?.[0] || t('common.error')}
             </span>
           </div>
         )}
@@ -396,10 +398,10 @@ export default function CreateEditPostPage() {
             {mutation.isPending ? (
               <>
                 <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                İşleniyor...
+                {t('auth.processing')}
               </>
             ) : (
-              <>{isEditMode ? 'Güncelle' : 'Paylaş'}</>
+              <>{isEditMode ? t('action.update') : t('action.share')}</>
             )}
           </button>
         </div>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { contentItemApi } from '../../api/contentItemApi'
 import { ReactionType } from '../../constants/enums'
 import { ThumbsUp, ThumbsDown, Skull, CirclePlus } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * ReactionButton — Like / Dislike / BrutallyDislike toggle grubu.
@@ -23,6 +24,7 @@ export default function ReactionButton({
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const loggedInActorId = useAuthStore((s) => s.actorId)
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   const ReactionIcons = {
     [ReactionType.Like]: <ThumbsUp size={16} />,
@@ -36,14 +38,33 @@ export default function ReactionButton({
   const [likeId, setLikeId] = useState(currentLikeId)
   const [animatingType, setAnimatingType] = useState(null)
 
+  const debounceTimerRef = useRef(null)
+  const serverReactionRef = useRef(currentUserReaction)
+  const serverLikeIdRef = useRef(currentLikeId)
+
   useEffect(() => {
-    setOptimisticReaction(currentUserReaction)
-    setLikeId(currentLikeId)
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    serverReactionRef.current = currentUserReaction
+    serverLikeIdRef.current = currentLikeId
+    
+    if (!debounceTimerRef.current) {
+      setOptimisticReaction(currentUserReaction)
+      setLikeId(currentLikeId)
+    }
   }, [currentUserReaction, currentLikeId])
 
   useEffect(() => {
-    setOptimisticLikeCount(likeCount ?? 0)
-    setOptimisticDislikeCount(dislikeCount ?? 0)
+    if (!debounceTimerRef.current) {
+      setOptimisticLikeCount(likeCount ?? 0)
+      setOptimisticDislikeCount(dislikeCount ?? 0)
+    }
   }, [likeCount, dislikeCount])
 
   const likeMutation = useMutation({
@@ -100,36 +121,67 @@ export default function ReactionButton({
     }
   }
 
-  const handleReact = async (reactionType) => {
+  const handleReact = (reactionType) => {
     if (!isLoggedIn) return
+
+    let nextReaction = optimisticReaction
 
     if (optimisticReaction === reactionType) {
       // Aynı reaksiyona tekrar tıklama → kaldır
       decrementOldReaction(optimisticReaction)
       setOptimisticReaction(null)
-      if (likeId) await removeMutation.mutateAsync({ likeId, contentItemId })
+      nextReaction = null
     } else {
       // Yeni veya farklı reaksiyon
       if (optimisticReaction !== null) {
         decrementOldReaction(optimisticReaction)
-        if (likeId) {
-          try {
-            await removeMutation.mutateAsync({ likeId, contentItemId })
-          } catch (e) {
-            console.error("Failed to remove old reaction", e)
-          }
-        }
       }
 
       incrementNewReaction(reactionType)
       setOptimisticReaction(reactionType)
+      nextReaction = reactionType
 
       // Trigger animation
       setAnimatingType(reactionType)
       setTimeout(() => setAnimatingType(null), 500)
-
-      likeMutation.mutate({ contentItemId, reactionType })
     }
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    debounceTimerRef.current = setTimeout(async () => {
+      debounceTimerRef.current = null // Timer çalışmaya başladı
+
+      const serverReaction = serverReactionRef.current
+      const serverLikeId = serverLikeIdRef.current
+
+      if (nextReaction === serverReaction) {
+        return // Sunucu durumu ile istenen durum aynı, işlem yapmaya gerek yok
+      }
+
+      if (nextReaction === null) {
+        // Kaldırma işlemi
+        if (serverLikeId) {
+          try {
+            await removeMutation.mutateAsync({ likeId: serverLikeId, contentItemId })
+          } catch (e) {
+            console.error("Failed to remove reaction", e)
+          }
+        }
+      } else {
+        // Değiştirme veya yeni ekleme işlemi
+        if (serverReaction !== null && serverLikeId) {
+          try {
+            await removeMutation.mutateAsync({ likeId: serverLikeId, contentItemId })
+          } catch (e) {
+            console.error("Failed to remove old reaction", e)
+          }
+        }
+        
+        likeMutation.mutate({ contentItemId, reactionType: nextReaction })
+      }
+    }, 1000)
   }
 
   const activeClass = (type) => {
@@ -162,7 +214,7 @@ export default function ReactionButton({
               <button
                 className={`reaction-btn ${activeClass(type)} ${animatingType === type ? (type === ReactionType.BrutallyDislike ? 'animate-shake' : 'animate-pop') : ''}`}
                 onClick={() => handleReact(type)}
-                title={!isLoggedIn ? 'Beğenmek için giriş yapın' : undefined}
+                title={!isLoggedIn ? t('card.login_to_like') : undefined}
                 disabled={!isLoggedIn}
                 style={{
                   borderRadius,
@@ -187,7 +239,7 @@ export default function ReactionButton({
                   onShowReactions && onShowReactions(type)
                 }}
                 className="tiny-reaction-list-btn"
-                title="Listeyi gör"
+                title={t('card.see_list')}
               >
                 <CirclePlus size={14} />
               </button>

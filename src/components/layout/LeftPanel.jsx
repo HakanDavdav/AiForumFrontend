@@ -11,6 +11,7 @@ import ActivityItem from '../activity/ActivityItem'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function LeftPanel() {
   useDevLog('LeftPanel', arguments[0] || {})
@@ -20,6 +21,7 @@ export default function LeftPanel() {
     useUIStore()
   const queryClient = useQueryClient()
   const [isCacheExpanded, setIsCacheExpanded] = useState(true)
+  const { t } = useTranslation()
 
   // ─── Cache Widgets ────────────────────────────────────────────────────────
   const { data: recentPosts } = useQuery({
@@ -105,7 +107,7 @@ export default function LeftPanel() {
             style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
             onClick={() => navigate('/create-post')}
           >
-            Yeni Başlık Başlat
+            {t('left_panel.new_topic')}
           </button>
         </div>
       )}
@@ -117,7 +119,7 @@ export default function LeftPanel() {
           style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
           onClick={() => navigate('/enrich-news')}
         >
-          Bot Gündemini Zenginleştir
+          {t('left_panel.enrich_news')}
         </button>
       </div>
 
@@ -141,7 +143,7 @@ export default function LeftPanel() {
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              Aktiviteler
+              {t('left_panel.activities')}
               {unreadCount > 0 && (
                 <span
                   style={{
@@ -181,7 +183,7 @@ export default function LeftPanel() {
                   <div style={{ padding: '0 8px' }}>
                     {activities?.length === 0 && (
                       <p className="empty-state" style={{ padding: '12px 8px' }}>
-                        Aktivite yok
+                        {t('left_panel.no_activity')}
                       </p>
                     )}
                     {activities?.map((a) => (
@@ -193,7 +195,7 @@ export default function LeftPanel() {
                     ))}
                     {isFetchingNextPage && (
                       <p style={{ textAlign: 'center', padding: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
-                        Yükleniyor...
+                        {t('left_panel.loading')}
                       </p>
                     )}
                   </div>
@@ -208,16 +210,16 @@ export default function LeftPanel() {
 
       {/* ─── Cache Widgets ────── */}
       {activeLeftCacheType === 'recent' && (
-        <CacheWidget title="Yeni" items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('left_panel.cache_new')} items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'trending' && (
-        <CacheWidget title="Popüler" items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('left_panel.cache_trending')} items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'mostLiked' && (
-        <CacheWidget title="Deb" items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('left_panel.cache_deb')} items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'mostDisliked' && (
-        <CacheWidget title="Dene" items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('left_panel.cache_dene')} items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />
@@ -238,7 +240,7 @@ export default function LeftPanel() {
               fontWeight: 500,
             }}
           >
-            <span>✓</span> Oturum Açık
+            <span>✓</span> {t('left_panel.logged_in')}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -247,14 +249,14 @@ export default function LeftPanel() {
               style={{ width: '100%', fontSize: 13 }}
               onClick={() => navigate('/login')}
             >
-              Giriş Yap
+              {t('left_panel.login')}
             </button>
             <button
               className="btn btn-primary"
               style={{ width: '100%', fontSize: 13 }}
               onClick={() => navigate('/register')}
             >
-              Kayıt Ol
+              {t('left_panel.register')}
             </button>
           </div>
         )}
@@ -267,6 +269,7 @@ export default function LeftPanel() {
 
 function CacheWidget({ title, items, type, expanded, setExpanded }) {
   const [limit, setLimit] = useState(25)
+  const { t } = useTranslation()
 
   const maxItems = items ? items.length : 0
 
@@ -322,7 +325,7 @@ function CacheWidget({ title, items, type, expanded, setExpanded }) {
             <option value={25}>25</option>
             {maxItems > 25 && <option value={50}>50</option>}
             {maxItems > 50 && <option value={75}>75</option>}
-            <option value={maxItems}>Hepsi ({maxItems})</option>
+            <option value={maxItems}>{t('left_panel.show_all')} ({maxItems})</option>
           </select>
         )}
       </div>
@@ -331,7 +334,7 @@ function CacheWidget({ title, items, type, expanded, setExpanded }) {
         <div style={{ padding: '0 4px' }}>
           {!items || items.length === 0 ? (
             <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
-              Yükleniyor...
+              {t('left_panel.loading')}
             </p>
           ) : (
             items

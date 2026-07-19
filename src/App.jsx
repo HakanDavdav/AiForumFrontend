@@ -1,5 +1,7 @@
 import MainLayout from './components/layout/MainLayout'
 import useUIStore from './store/uiStore'
+import useThemeStore from './store/themeStore'
+import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import InitProfileGuard from './components/auth/InitProfileGuard'
 
@@ -28,6 +30,24 @@ import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
 import { Routes, Route, Navigate } from 'react-router-dom'
 
 export default function App() {
+  const { isDarkMode, isGreenMode } = useThemeStore()
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDarkMode])
+
+  useEffect(() => {
+    if (isGreenMode) {
+      document.documentElement.classList.add('theme-green')
+    } else {
+      document.documentElement.classList.remove('theme-green')
+    }
+  }, [isGreenMode])
+
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 4000 }} />

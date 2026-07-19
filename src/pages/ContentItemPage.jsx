@@ -7,6 +7,7 @@ import ContextualEntryThread from '../components/content/ContextualEntryThread'
 import BackButton from '../components/common/BackButton'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * ContentItemPage — plan.md "Contextual Entry Thread" (satır 167–178)
@@ -25,8 +26,10 @@ import useDevLog from '../utils/useDevLog'
 export default function ContentItemPage() {
   const [searchParams] = useSearchParams()
   const contentItemId = searchParams.get('contentItemId')
+  const sourceNodeId = searchParams.get('sourceNodeId')
   useDevLog('ContentItemPage', arguments[0] || {})
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['contentitem', contentItemId],
@@ -75,13 +78,13 @@ export default function ContentItemPage() {
   if (!entryDto) {
     return (
       <div className="empty-state">
-        Beklenmedik içerik formatı.
+        {t('common.unexpected_content')}
         <button
           className="btn btn-ghost"
           onClick={() => navigate(-1)}
           style={{ marginTop: 16 }}
         >
-          Geri Dön
+          {t('common.go_back')}
         </button>
       </div>
     )

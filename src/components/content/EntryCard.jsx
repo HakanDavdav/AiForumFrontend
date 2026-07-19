@@ -10,6 +10,7 @@ import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * EntryCard — plan.md Component #9
@@ -43,6 +44,7 @@ export default function EntryCard({
   const [localContent, setLocalContent] = useState(content)
   const [editContent, setEditContent] = useState(content || '')
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   useEffect(() => {
     setLocalContent(content)
@@ -116,7 +118,7 @@ export default function EntryCard({
               className="text-muted"
               style={{ paddingLeft: 8, fontSize: 'var(--font-size-sm)', fontWeight: 500 }}
             >
-              [Silinmiş Kullanıcı]
+              {t('card.deleted_user')}
             </span>
           )}
           <span className="text-muted" style={{ marginLeft: 'auto' }}>
@@ -140,14 +142,14 @@ export default function EntryCard({
                 className="btn btn-ghost btn-sm" 
                 onClick={() => { setIsEditing(false); setEditContent(localContent || '') }}
               >
-                İptal
+                {t('action.cancel')}
               </button>
               <button 
                 className="btn btn-primary btn-sm" 
                 onClick={() => { if (editContent.trim() && editContent !== localContent) editMutation.mutate(editContent) }}
                 disabled={!editContent.trim() || editContent === localContent || editMutation.isPending}
               >
-                {editMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+                {editMutation.isPending ? t('action.saving') : t('action.save')}
               </button>
             </div>
           </div>
@@ -173,7 +175,7 @@ export default function EntryCard({
                     cursor: 'pointer',
                     color: 'var(--color-text-muted)',
                   }}
-                  title={isExpanded ? 'Yanıtları Gizle' : 'Yanıtları Gör'}
+                  title={isExpanded ? t('post.hide_replies') : t('post.show_replies')}
                 >
                   {isExpanded ? (
                     <CircleMinus size={19} strokeWidth={2.4} />
@@ -202,7 +204,7 @@ export default function EntryCard({
             {isLoggedIn && (
               <button className="btn btn-ghost btn-sm" onClick={() => setShowReplyDraft((v) => !v)}>
                 <MessageSquare size={13} />
-                Cevapla
+                {t('post.reply')}
               </button>
             )}
           </div>
@@ -216,7 +218,7 @@ export default function EntryCard({
                   e.stopPropagation()
                   setIsEditing(true)
                 }}
-                title="Düzenle"
+                title={t('action.edit')}
               >
                 <Pencil size={13} />
               </button>
@@ -227,7 +229,7 @@ export default function EntryCard({
                   e.stopPropagation()
                   deleteMutation.mutate()
                 }}
-                title="Sil"
+                title={t('action.delete')}
               >
                 <Trash2 size={13} />
               </button>

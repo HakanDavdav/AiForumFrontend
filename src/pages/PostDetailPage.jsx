@@ -11,6 +11,7 @@ import EntryDraft from '../components/content/EntryDraft'
 import BackButton from '../components/common/BackButton'
 import useAuthStore from '../store/authStore'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function PostDetailPage() {
   const [searchParams] = useSearchParams()
@@ -19,6 +20,7 @@ export default function PostDetailPage() {
   const navigate = useNavigate()
   const { isLoggedIn } = useAuthStore()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   // Eğer prop olarak postId gelmediyse (initial view), en trend postu getir
   const { data: trendingData, isLoading: isTrendingLoading } = useQuery({
@@ -69,14 +71,14 @@ export default function PostDetailPage() {
   if (!postData) {
     return (
       <div className="empty-state">
-        Başlık bulunamadı.
+        {t('post.not_found')}
         <br />
         <button
           className="btn btn-ghost"
           onClick={() => navigate(-1)}
           style={{ marginTop: 16 }}
         >
-          Geri Dön
+          {t('common.go_back')}
         </button>
       </div>
     )
@@ -108,11 +110,11 @@ export default function PostDetailPage() {
         ) : (
           <div className="card-surface" style={{ textAlign: 'center', padding: '24px 16px' }}>
             <p style={{ color: 'var(--color-text-muted)', marginBottom: 12 }}>
-              Bu başlığa cevap yazabilmek için giriş yapmalısınız.
+              {t('post.login_to_reply')}
             </p>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              <button className="btn btn-outline btn-sm" onClick={() => navigate('/login')}>Giriş Yap</button>
-              <button className="btn btn-primary btn-sm" onClick={() => navigate('/register')}>Kayıt Ol</button>
+              <button className="btn btn-outline btn-sm" onClick={() => navigate('/login')}>{t('common.login')}</button>
+              <button className="btn btn-primary btn-sm" onClick={() => navigate('/register')}>{t('common.register')}</button>
             </div>
           </div>
         )}
@@ -128,12 +130,12 @@ export default function PostDetailPage() {
             borderBottom: '1px solid var(--color-border)',
           }}
         >
-          Yorumlar ({postData.entryCount ?? 0})
+          {t('post.comments')} ({postData.entryCount ?? 0})
         </h3>
 
         {!entriesData || entriesData.length === 0 ? (
           <p className="empty-state" style={{ paddingTop: 40 }}>
-            İlk yorumu siz yapın!
+            {t('post.be_first_to_comment')}
           </p>
         ) : (
           entriesData.map((entry) => (
@@ -165,10 +167,10 @@ export default function PostDetailPage() {
               disabled={page === 1 || isEntriesFetching}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
-              <ChevronLeft size={16} /> Önceki
+              <ChevronLeft size={16} /> {t('common.previous')}
             </button>
             <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              Sayfa {page} / {Math.max(1, Math.ceil((postData.entryCount || 0) / inferredPerPage))}
+              {t('profile.page')} {page} / {Math.max(1, Math.ceil((postData.entryCount || 0) / inferredPerPage))}
             </span>
             <button
               className="btn btn-outline btn-sm"
@@ -177,7 +179,7 @@ export default function PostDetailPage() {
               }
               onClick={() => setPage((p) => p + 1)}
             >
-              Sonraki <ChevronRight size={16} />
+              {t('common.next')} <ChevronRight size={16} />
             </button>
           </div>
         )}

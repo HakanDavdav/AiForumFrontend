@@ -14,7 +14,12 @@ import {
   ThumbsUp,
   Skull,
   Podium,
+  Sun,
+  Moon,
+  Bot,
+  Star,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { tribeApi } from '../../api/tribeApi'
@@ -29,6 +34,7 @@ import PostMinimalCard from '../content/PostMinimalCard'
 import ActorAvatar from '../actor/ActorAvatar'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
+import useThemeStore from '../../store/themeStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 
@@ -43,6 +49,25 @@ export default function TopBar() {
     activeLeftCacheType,
     setActiveLeftCacheType,
   } = useUIStore()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language || 'tr'
+  
+  const langs = [
+    { code: 'tr', label: 'Türkçe', flagUrl: 'https://flagcdn.com/w20/tr.png' },
+    { code: 'en', label: 'English', flagUrl: 'https://flagcdn.com/w20/us.png' },
+    { code: 'zh', label: '中文', flagUrl: 'https://flagcdn.com/w20/cn.png' },
+    { code: 'ja', label: '日本語', flagUrl: 'https://flagcdn.com/w20/jp.png' },
+    { code: 'hi', label: 'हिन्दी', flagUrl: 'https://flagcdn.com/w20/in.png' },
+    { code: 'ku', label: 'Kurdî', flagUrl: null, fallbackEmoji: '☀️' },
+    { code: 'de', label: 'Deutsch', flagUrl: 'https://flagcdn.com/w20/de.png' },
+    { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },
+    { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w20/sa.png' }
+  ]
+
+  const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
+  const [isBotShaking, setIsBotShaking] = useState(false)
+  const [isLangOpen, setIsLangOpen] = useState(false)
+  const [langDropdownPos, setLangDropdownPos] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isMyTribesOpen, setIsMyTribesOpen] = useState(false)
   const [searchModeDropdown, setSearchModeDropdown] = useState(false)
@@ -63,11 +88,18 @@ export default function TopBar() {
     setFilterOrderType(val)
   }
 
+  const handleBotClick = () => {
+    toggleGreenMode()
+    setIsBotShaking(true)
+    setTimeout(() => setIsBotShaking(false), 500)
+  }
+
   const queryClient = useQueryClient()
   const myTribesRef = useRef(null)
   const myBotsRef = useRef(null)
   const filterRef = useRef(null)
   const searchRef = useRef(null)
+  const langRef = useRef(null)
   const debounceTimerRef = useRef(null)
 
   // My Tribes & Bots from Global State
@@ -119,6 +151,9 @@ export default function TopBar() {
       }
       if (searchRef.current && !searchRef.current.contains(e.target)) {
         setShowSuggestions(false)
+      }
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setIsLangOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -204,12 +239,12 @@ export default function TopBar() {
       searchMode === 'general'
         ? { query: searchQuery, mode: searchMode }
         : {
-            query: searchQuery,
-            mode: searchMode,
-            orderType: filterOrderType || 'None',
-            startDate: filterStartDate || null,
-            endDate: filterEndDate || null,
-          }
+          query: searchQuery,
+          mode: searchMode,
+          orderType: filterOrderType || 'None',
+          startDate: filterStartDate || null,
+          endDate: filterEndDate || null,
+        }
 
     console.log('handleSearch - params:', params)
 
@@ -355,7 +390,7 @@ export default function TopBar() {
             <input
               className="input"
               style={{ paddingLeft: 32 }}
-              placeholder={`${searchModeOptions.find((o) => o.key === searchMode)?.label} ara...`}
+              placeholder={t('topbar.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => {
@@ -552,17 +587,17 @@ export default function TopBar() {
                               (!suggestions.actors || suggestions.actors.length === 0)) ||
                             (searchMode === 'tribes' &&
                               (!suggestions.tribes || suggestions.tribes.length === 0))) && (
-                            <div
-                              style={{
-                                padding: 16,
-                                textAlign: 'center',
-                                color: 'var(--color-text-faint)',
-                                fontSize: 13,
-                              }}
-                            >
-                              Sonuç bulunamadı
-                            </div>
-                          )}
+                              <div
+                                style={{
+                                  padding: 16,
+                                  textAlign: 'center',
+                                  color: 'var(--color-text-faint)',
+                                  fontSize: 13,
+                                }}
+                              >
+                                Sonuç bulunamadı
+                              </div>
+                            )}
                         </>
                       )}
                     </div>
@@ -580,7 +615,7 @@ export default function TopBar() {
               disabled={searchMode === 'general'}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               title={
-                searchMode === 'general' ? 'Genel aramada filtre uygulanamaz' : 'Arama Filtreleri'
+                searchMode === 'general' ? t('topbar.general_search_no_filter') : t('topbar.search_filters')
               }
             >
               <Filter size={14} />
@@ -631,18 +666,28 @@ export default function TopBar() {
                       value={filterOrderType}
                       onChange={handleOrderTypeChange}
                     >
-                      <option value="">Varsayılan</option>
+                      <option value="">{t('topbar.default', 'Varsayılan')}</option>
                       {searchMode === 'posts' && (
-                        <option value="MostLiked">En Çok Beğenilen</option>
+                        <option value="MostLiked">{t('topbar.most_liked', 'En Çok Beğenilen')}</option>
                       )}
-                      <option value="Newest">En Yeni</option>
-                      <option value="Oldest">En Eski</option>
+                      <option value="Newest">{t('sort.newest')}</option>
+                      <option value="Oldest">{t('topbar.oldest', 'En Eski')}</option>
                     </select>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      Başlangıç Tarihi
+                      {t('sort.label')}
+                    </label>
+                    <select value={filters.sortMode} onChange={e => handleFilterChange('sortMode', e.target.value)} className="input" style={{ width: '100%', height: 36, padding: '0 12px' }}>
+                      <option value="Newest">{t('sort.newest')}</option>
+                      <option value="Hot">{t('sort.hot')}</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                      {t('topbar.start_date')}
                     </label>
                     <input
                       type="date"
@@ -655,7 +700,7 @@ export default function TopBar() {
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      Bitiş Tarihi
+                      {t('topbar.end_date')}
                     </label>
                     <input
                       type="date"
@@ -671,12 +716,71 @@ export default function TopBar() {
           </div>
 
           <button type="submit" className="btn btn-primary btn-sm">
-            Ara
+            {t('topbar.search')}
           </button>
         </form>
 
         {/* Right: user info */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 'auto' }}>
+          {/* Language Selector */}
+          <div style={{ position: 'relative' }} ref={langRef}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setIsLangOpen((v) => !v)}
+              style={{ fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              {langs.find(l => l.code === currentLang)?.flagUrl ? (
+                <img src={langs.find(l => l.code === currentLang).flagUrl} alt={currentLang} style={{ width: 20, height: 15, borderRadius: 2 }} />
+              ) : (
+                <span>{langs.find(l => l.code === currentLang)?.fallbackEmoji || '🇹🇷'}</span>
+              )}
+            </button>
+            <AnimatePresence>
+              {isLangOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: 4,
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 12,
+                    boxShadow: 'var(--shadow-lg)',
+                    zIndex: 200,
+                    minWidth: 120,
+                    padding: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4
+                  }}
+                >
+                  {langs.map((l) => (
+                    <button
+                      key={l.code}
+                      className={`btn ${currentLang === l.code ? 'btn-primary' : 'btn-ghost'}`}
+                      style={{ width: '100%', justifyContent: 'flex-start', padding: '6px 12px', gap: 8 }}
+                      onClick={() => { 
+                        i18n.changeLanguage(l.code)
+                        setIsLangOpen(false) 
+                      }}
+                    >
+                      {l.flagUrl ? (
+                        <img src={l.flagUrl} alt={l.code} style={{ width: 20, height: 15, borderRadius: 2 }} />
+                      ) : (
+                        <span style={{ fontSize: 16, display: 'inline-block', width: 20, textAlign: 'center' }}>{l.fallbackEmoji}</span>
+                      )}
+                      <span style={{ fontSize: 13 }}>{l.label}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {/* Hakan Davdav Linkleri */}
           <div
             style={{
@@ -687,6 +791,21 @@ export default function TopBar() {
               paddingRight: 12,
             }}
           >
+            <button
+              className={`btn-icon ${isBotShaking ? 'animate-shake' : ''}`}
+              onClick={handleBotClick}
+              title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
+              style={{ color: 'var(--color-primary)' }}
+            >
+              <Bot size={18} strokeWidth={2.5} />
+            </button>
+            <button
+              className="btn-icon"
+              onClick={toggleTheme}
+              title={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
+            >
+              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
               Hakan Davdav
             </span>
@@ -740,16 +859,16 @@ export default function TopBar() {
           {isLoggedIn ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <ActorMinimalCard 
-                  actor={myProfile} 
-                  showHierarchyBtn={false} 
-                  clickable={true} 
+                <ActorMinimalCard
+                  actor={myProfile}
+                  showHierarchyBtn={false}
+                  clickable={true}
                 />
               </div>
               <button
                 className="btn-icon"
                 onClick={() => logoutMutation.mutate()}
-                title="Çıkış Yap"
+                title={t('topbar.logout')}
               >
                 <LogOut size={16} />
               </button>
@@ -757,10 +876,10 @@ export default function TopBar() {
           ) : (
             <div style={{ display: 'flex', gap: 6 }}>
               <button className="btn btn-ghost btn-sm" onClick={() => navigate('/login')}>
-                Giriş
+                {t('topbar.login')}
               </button>
               <button className="btn btn-primary btn-sm" onClick={() => navigate('/register')}>
-                Kayıt Ol
+                {t('topbar.register')}
               </button>
             </div>
           )}
@@ -784,22 +903,22 @@ export default function TopBar() {
           style={{ padding: '8px 16px', minWidth: '100px' }}
           onClick={() => setActiveLeftCacheType('trending')}
         >
-          <Flame size={14} /> Popüler
+          <Flame size={14} /> {t('sort.popular', 'Popüler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '8px 16px', minWidth: '100px' }}
           onClick={() => setActiveLeftCacheType('recent')}
         >
-          <Clock8 size={14} /> Yeni
+          <Clock8 size={14} /> {t('sort.new')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '8px 16px', minWidth: '100px' }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
-          title="dünün en beğenilenleri"
+          title={t('sort.most_liked_yesterday', 'dünün en beğenilenleri')}
         >
-          <ThumbsUp size={14} /> Deb
+          <Star size={14} /> {t('sort.best', 'En İyiler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
@@ -818,16 +937,17 @@ export default function TopBar() {
           style={{ padding: '8px 16px' }}
           onClick={() => navigate('/leaderboard?type=actor')}
         >
-          Leaderboard
+          {t('topbar.leaderboard')}
         </button>
 
         {/* My Tribes & My Bots dropdowns */}
         {isLoggedIn && (
-          <div style={{ display: 'flex', gap: 8, marginLeft: 4 }}>
+          <div style={{ display: 'flex', gap: 8, marginLeft: 'auto' }}>
             {/* My Tribes */}
             <div style={{ position: 'relative' }} ref={myTribesRef}>
               <button
-                className="btn btn-outline btn-sm"
+                className="btn btn-outline"
+                style={{ padding: '6px 14px', fontSize: 13 }}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect()
                   setTribesDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -836,7 +956,7 @@ export default function TopBar() {
                   setBotsDropdownPos(null)
                 }}
               >
-                Tribe'larım <ChevronDown size={12} />
+                {t('topbar.my_tribes')} <ChevronDown size={12} />
               </button>
               <AnimatePresence>
                 {isMyTribesOpen && tribesDropdownPos && (
@@ -869,11 +989,11 @@ export default function TopBar() {
                         setTribesDropdownPos(null)
                       }}
                     >
-                      + Yeni Tribe Oluştur
+                      {t('topbar.new_tribe')}
                     </button>
-                    {myTribes?.map((t) => (
+                    {myTribes?.map((tData) => (
                       <div
-                        key={t.tribeId}
+                        key={tData.tribeId}
                         style={{ display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0', cursor: 'pointer' }}
                         onClick={() => {
                           setIsMyTribesOpen(false)
@@ -881,13 +1001,13 @@ export default function TopBar() {
                         }}
                       >
                         <div style={{ flex: 1 }}>
-                          <TribeMinimalCard {...t} />
+                          <TribeMinimalCard {...tData} />
                         </div>
                       </div>
                     ))}
                     {(!myTribes || myTribes.length === 0) && (
                       <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>
-                        Henüz tribe yok
+                        {t('topbar.no_tribe')}
                       </p>
                     )}
                   </motion.div>
@@ -898,7 +1018,8 @@ export default function TopBar() {
             {/* My Bots */}
             <div style={{ position: 'relative' }} ref={myBotsRef}>
               <button
-                className="btn btn-outline btn-sm"
+                className="btn btn-outline"
+                style={{ padding: '6px 14px', fontSize: 13 }}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect()
                   setBotsDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -907,7 +1028,7 @@ export default function TopBar() {
                   setTribesDropdownPos(null)
                 }}
               >
-                Botlarım <ChevronDown size={12} />
+                {t('topbar.my_bots')} <ChevronDown size={12} />
               </button>
               <AnimatePresence>
                 {isMyBotsOpen && botsDropdownPos && (
@@ -940,7 +1061,7 @@ export default function TopBar() {
                         setBotsDropdownPos(null)
                       }}
                     >
-                      + Yeni Bot Üret
+                      {t('topbar.new_bot')}
                     </button>
                     {myBots?.map((b) => (
                       <div
@@ -961,7 +1082,7 @@ export default function TopBar() {
                     ))}
                     {(!myBots || myBots.length === 0) && (
                       <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>
-                        Henüz bot yok
+                        {t('topbar.no_bot')}
                       </p>
                     )}
                   </motion.div>

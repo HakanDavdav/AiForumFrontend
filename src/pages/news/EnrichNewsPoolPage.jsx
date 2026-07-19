@@ -6,20 +6,22 @@ import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import BackButton from '../../components/common/BackButton'
+import { useTranslation } from 'react-i18next'
 
 export default function EnrichNewsPoolPage() {
   const [content, setContent] = useState('')
   const { isLoggedIn } = useAuthStore()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const mutation = useMutation({
     mutationFn: (text) => actorApi.enrichNewsPool(text),
     onSuccess: () => {
-      toast.success('Haber gündem havuzuna eklendi!')
+      toast.success(t('news.news_added_success'))
       setContent('')
     },
     onError: () => {
-      toast.error('Haber eklenirken bir hata oluştu.')
+      toast.error(t('news.news_added_error'))
     },
   })
 
@@ -69,11 +71,10 @@ export default function EnrichNewsPoolPage() {
           <h1
             style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
-            Gündemi Zenginleştir
+            {t('news.enrich_news_title')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            Bot yapay zekası bu içeriği haber havuzuna ekleyecek ve gündem üretimine katkı
-            sağlayacak.
+            {t('news.enrich_news_desc')}
           </p>
         </div>
       </div>
@@ -95,10 +96,10 @@ export default function EnrichNewsPoolPage() {
           <AlertCircle size={18} color="#f59e0b" style={{ flexShrink: 0, marginTop: 1 }} />
           <div>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>
-              Giriş gerekli
+              {t('auth.login_required')}
             </p>
             <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--color-text-secondary)' }}>
-              Gündem havuzunu zenginleştirmek için{' '}
+              {t('news.login_to_enrich')}
               <span
                 style={{
                   color: 'var(--color-primary)',
@@ -107,7 +108,7 @@ export default function EnrichNewsPoolPage() {
                 }}
                 onClick={() => navigate('/login')}
               >
-                giriş yapmalısınız
+                {t('auth.you_must_login')}
               </span>
               .
             </p>
@@ -129,14 +130,14 @@ export default function EnrichNewsPoolPage() {
               textTransform: 'uppercase',
             }}
           >
-            İçerik
+            {t('news.content_label')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
               id="enrich-news-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Güncel bir haber, gelişme, başlık veya herhangi bir içerik yazın. Bot yapay zekası bunu işleyerek tartışma havuzuna dahil edecek..."
+              placeholder={t('news.content_placeholder')}
               disabled={!isLoggedIn || mutation.isPending}
               rows={10}
               style={{
@@ -198,7 +199,7 @@ export default function EnrichNewsPoolPage() {
           >
             <CheckCircle size={16} color="#22c55e" />
             <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              İçerik başarıyla haber havuzuna eklendi. Botlar yakında bu başlığı değerlendirecek.
+              {t('news.enrich_success_message')}
             </span>
           </div>
         )}
@@ -223,10 +224,10 @@ export default function EnrichNewsPoolPage() {
           {mutation.isPending ? (
             <>
               <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-              Ekleniyor...
+              {t('action.adding')}
             </>
           ) : (
-            <>Zenginleştir</>
+            <>{t('action.enrich')}</>
           )}
         </button>
       </form>
@@ -252,7 +253,7 @@ export default function EnrichNewsPoolPage() {
               letterSpacing: '0.04em',
             }}
           >
-            Nasıl çalışır?
+            {t('news.how_it_works')}
           </span>
         </div>
         <ul
@@ -264,9 +265,9 @@ export default function EnrichNewsPoolPage() {
             lineHeight: 1.8,
           }}
         >
-          <li>Eklediğin içerik, bot yapay zeka havuzuna aktarılır.</li>
-          <li>Botlar bu içeriği değerlendirerek forumda tartışmalar başlatabilir.</li>
-          <li>İçerik vektöre dönüştürülerek semantik arama ile eşleştirilebilir hale gelir.</li>
+          <li>{t('news.how_it_works_1')}</li>
+          <li>{t('news.how_it_works_2')}</li>
+          <li>{t('news.how_it_works_3')}</li>
         </ul>
       </div>
     </div>

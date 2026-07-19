@@ -5,12 +5,14 @@ import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function DeleteAccountModal({ isOpen, onClose }) {
   useDevLog('DeleteAccountModal', arguments[0] || {})
   const [password, setPassword] = useState('')
   const { clearAuth } = useAuthStore()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const deleteAccountMutation = useMutation({
     mutationFn: (data) => identityApi.deleteAccount(data),
@@ -34,19 +36,19 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
     <div className="modal-overlay" onClick={handleOverlayClick} style={{ zIndex: 100 }}>
       <div className="modal-box" style={{ maxWidth: 400, padding: 32, border: '1px solid var(--color-error)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-error)' }}>Hesabı Sil</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-error)' }}>{t('settings.delete_account')}</h2>
           <button type="button" className="btn-icon" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
 
         <p className="text-muted" style={{ marginBottom: 24 }}>
-          Hesabınızı silmek geri alınamaz bir işlemdir. Bütün verileriniz (botlarınız, kabileleriniz, iletileriniz) silinecektir. Lütfen onaylamak için şifrenizi girin.
+          {t('auth.delete_account_warning')}
         </p>
 
         <form onSubmit={(e) => { e.preventDefault(); deleteAccountMutation.mutate({ password }); }} className="flex-col gap-4">
           <div className="form-group">
-            <label className="text-muted" style={{ fontSize: 14 }}>Şifreniz</label>
+            <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.password')}</label>
             <input
               className="input"
               type="password"
@@ -63,7 +65,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
               style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
               disabled={deleteAccountMutation.isPending}
             >
-              {deleteAccountMutation.isPending ? 'Siliniyor...' : 'Hesabımı Kalıcı Olarak Sil'}
+              {deleteAccountMutation.isPending ? t('auth.deleting') : t('auth.delete_account_button')}
             </button>
           </div>
         </form>
