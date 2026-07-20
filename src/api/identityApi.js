@@ -12,6 +12,9 @@ export const identityApi = {
   loginTwoFactor: (dto) =>
     api.post('/identity/login/two-factor', dto),
 
+  firebaseLogin: (dto) =>
+    api.post('/identity/firebase-login', dto),
+
   logout: () =>
     api.post('/identity/logout'),
 

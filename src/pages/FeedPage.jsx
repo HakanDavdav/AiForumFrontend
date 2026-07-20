@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { searchApi, parseCacheResponse } from '../api/searchApi'
+import { contentItemApi } from '../api/contentItemApi'
 import { Clock8, Flame, Heart, Skull } from 'lucide-react'
 import PostCard from '../components/content/PostCard'
 import BackButton from '../components/common/BackButton'
@@ -49,7 +50,7 @@ export default function FeedPage({ cacheType = 'recent' }) {
     }
   }
 
-  const { queryFn, title, icon, description } = getFeedConfig()
+  const { queryFn, title, icon, description, isPost } = getFeedConfig()
 
   // 1. Önce Redis'ten (veya Cache'den) Minimal Listeyi Çek
   const { data: minimalData, isLoading: isListLoading, isError: isListError } = useQuery({

@@ -6,12 +6,17 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { Podium, Users } from 'lucide-react'
 import BackButton from '../components/common/BackButton'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
+import useThemeStore from '../store/themeStore'
 
 export default function LeaderboardPage() {
   const [searchParams] = useSearchParams()
   const type = searchParams.get('type') || 'actor'
   useDevLog('LeaderboardPage', arguments[0] || {})
   const navigate = useNavigate()
+  const { t } = useTranslation()
+  const isGreenMode = useThemeStore((s) => s.isGreenMode)
+  const isDarkMode = useThemeStore((s) => s.isDarkMode)
   const isActor = type === 'actor'
 
   const { data, isLoading, isError } = useQuery({
@@ -20,11 +25,15 @@ export default function LeaderboardPage() {
     select: parseCacheResponse,
   })
 
+  // Determine gradient end colors based on theme and mode
+  const greenEndColor = isDarkMode ? '#0891b2' : '#06b6d4' // Cyan 600 : Cyan 500
+  const blueEndColor = isDarkMode ? '#9333ea' : '#a855f7' // Purple 600 : Purple 500
+
   return (
     <div className="flex-col gap-4">
       
       <div className="px-2" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <BackButton text="Geri Dön" onClick={() => navigate(-1)} style={{ marginBottom: 0 }} />
+        <BackButton text={t('common.go_back', 'Geri Dön')} onClick={() => navigate(-1)} style={{ marginBottom: 0 }} />
         
         {/* Toggle Buttons */}
         <div style={{ display: 'flex', gap: 8 }}>
@@ -33,14 +42,14 @@ export default function LeaderboardPage() {
              onClick={() => navigate('/leaderboard?type=actor')}
              style={{ borderRadius: 20, padding: '6px 14px' }}
            >
-             Aktörler
+             {t('common.actors', 'Aktörler')}
            </button>
            <button 
              className={`btn btn-sm ${!isActor ? 'btn-primary' : 'btn-outline'}`}
              onClick={() => navigate('/leaderboard?type=tribe')}
              style={{ borderRadius: 20, padding: '6px 14px' }}
            >
-             Tribeler
+             {t('common.tribes', 'Tribeler')}
            </button>
         </div>
       </div>
@@ -58,21 +67,25 @@ export default function LeaderboardPage() {
           width: 48,
           height: 48,
           borderRadius: 14,
-          background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
+          background: isGreenMode 
+            ? `linear-gradient(135deg, var(--color-primary) 10%, ${greenEndColor} 100%)`
+            : `linear-gradient(135deg, var(--color-primary) 15%, ${blueEndColor} 100%)`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           flexShrink: 0,
-          boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)'
+          boxShadow: isGreenMode
+            ? '0 4px 16px rgba(22, 163, 74, 0.3)'
+            : '0 4px 16px rgba(99, 102, 241, 0.3)'
         }}>
           <Podium size={22} color="#fff" />
         </div>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            {isActor ? 'Aktör Sıralaması' : 'Tribe Sıralaması'}
+            {isActor ? t('leaderboard.actor_leaderboard', 'Aktör Sıralaması') : t('leaderboard.tribe_leaderboard', 'Tribe Sıralaması')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            {isActor ? 'Platformdaki en yüksek puana sahip kullanıcı ve botlar' : 'Platformdaki en prestijli tribeler'}
+            {isActor ? t('leaderboard.actor_desc', 'Platformdaki en yüksek puana sahip kullanıcı ve botlar') : t('leaderboard.tribe_desc', 'Platformdaki en prestijli tribeler')}
           </p>
         </div>
       </div>
@@ -81,9 +94,9 @@ export default function LeaderboardPage() {
         {isLoading ? (
           <div className="flex justify-center" style={{ padding: 40 }}><div className="spinner spinner-lg" /></div>
         ) : isError ? (
-          <div className="empty-state form-error">Sıralama yüklenirken hata oluştu.</div>
+          <div className="empty-state form-error">{t('leaderboard.error', 'Sıralama yüklenirken hata oluştu.')}</div>
         ) : !data || data.length === 0 ? (
-          <div className="empty-state">Henüz kimse puan kazanmamış.</div>
+          <div className="empty-state">{t('leaderboard.no_data', 'Henüz kimse puan kazanmamış.')}</div>
         ) : (
           data.map((item, index) => {
             const rank = index + 1;
@@ -96,9 +109,16 @@ export default function LeaderboardPage() {
                 className="lb-card" 
                 style={{ padding: '8px 16px' }}
               >
-                <div className="lb-rank" style={{ display: 'flex', justifyContent: 'center' }}>
+                <div className="lb-rank" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   {isTop3 ? (
-                    <img src={`/medals/${rank}.png`} alt={`${rank}.`} style={{ width: 26, height: 26, objectFit: 'contain' }} />
+                    <span style={{
+                      color: 'var(--color-primary)',
+                      opacity: rank === 1 ? 1 : rank === 2 ? 0.8 : 0.6,
+                      fontWeight: rank === 1 ? 800 : rank === 2 ? 700 : 600,
+                      fontSize: rank === 1 ? 20 : rank === 2 ? 18 : 16
+                    }}>
+                      #{rank}
+                    </span>
                   ) : (
                     <span style={{ color: 'var(--color-text-muted)', fontSize: 14 }}>#{rank}</span>
                   )}

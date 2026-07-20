@@ -210,16 +210,16 @@ export default function LeftPanel() {
 
       {/* ─── Cache Widgets ────── */}
       {activeLeftCacheType === 'recent' && (
-        <CacheWidget title={t('left_panel.cache_new')} items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.new', 'Yeni')} items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'trending' && (
-        <CacheWidget title={t('left_panel.cache_trending')} items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.popular', 'Popüler')} items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'mostLiked' && (
-        <CacheWidget title={t('left_panel.cache_deb')} items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.best', 'En İyiler')} items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
       {activeLeftCacheType === 'mostDisliked' && (
-        <CacheWidget title={t('left_panel.cache_dene')} items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.worst', 'En Kötüler')} items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
       )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />

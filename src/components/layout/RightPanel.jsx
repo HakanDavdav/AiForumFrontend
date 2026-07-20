@@ -11,10 +11,12 @@ import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function RightPanel() {
   useDevLog('RightPanel', arguments[0] || {})
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   // ─── Queries ────────────────────────────────────────────────────────
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
@@ -63,7 +65,7 @@ export default function RightPanel() {
       {/* ─── Actor Leaderboard Cache Widget ────── */}
       <div style={{ padding: '0 12px' }}>
         <CacheWidget
-          title="Aktör Sıralaması"
+          title={t('leaderboard.actor_leaderboard', 'Aktör Sıralaması')}
           items={actorLeaderboard}
           type="actor"
           onViewAll={() => navigate('/leaderboard?type=actor')}
@@ -75,7 +77,7 @@ export default function RightPanel() {
       {/* ─── Tribe Leaderboard Cache Widget ────── */}
       <div style={{ padding: '0 12px' }}>
         <CacheWidget
-          title="Tribe Sıralaması"
+          title={t('leaderboard.tribe_leaderboard', 'Tribe Sıralaması')}
           items={tribeLeaderboard}
           type="tribe"
           onViewAll={() => navigate('/leaderboard?type=tribe')}
@@ -159,17 +161,17 @@ export default function RightPanel() {
           }}
         >
           <a href="#" style={{ color: 'inherit' }}>
-            Hakkımızda
+            {t('footer.about', 'Hakkımızda')}
           </a>{' '}
           •
           <a href="#" style={{ color: 'inherit' }}>
-            Gizlilik
+            {t('footer.privacy', 'Gizlilik')}
           </a>{' '}
           •
           <a href="#" style={{ color: 'inherit' }}>
-            Şartlar
+            {t('footer.terms', 'Şartlar')}
           </a>{' '}
-          •<span>© 2026 TuringFest</span>
+          •<span>© 2026 Bletchly</span>
         </div>
       </div>
     </aside>
@@ -181,6 +183,7 @@ export default function RightPanel() {
 function CacheWidget({ title, items, type, onViewAll }) {
   const [expanded, setExpanded] = useState(true)
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div style={{ marginBottom: 4 }}>
@@ -218,7 +221,7 @@ function CacheWidget({ title, items, type, onViewAll }) {
             <div style={{ padding: '4px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {!items || items.length === 0 ? (
                 <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
-                  Yükleniyor...
+                  {t('common.loading', 'Yükleniyor...')}
                 </p>
               ) : (
                 items.slice(0, 3).map((item, index) => {
@@ -237,9 +240,16 @@ function CacheWidget({ title, items, type, onViewAll }) {
                         )
                       }
                     >
-                      <div className="lb-rank" style={{ minWidth: 24, display: 'flex', justifyContent: 'center' }}>
+                      <div className="lb-rank" style={{ minWidth: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                         {isTop3 ? (
-                          <img src={`/medals/${rank}.png`} alt={`${rank}.`} style={{ width: 20, height: 20, objectFit: 'contain' }} />
+                          <span style={{
+                            color: 'var(--color-primary)',
+                            opacity: rank === 1 ? 1 : rank === 2 ? 0.8 : 0.6,
+                            fontWeight: rank === 1 ? 800 : rank === 2 ? 700 : 600,
+                            fontSize: rank === 1 ? 18 : rank === 2 ? 16 : 14
+                          }}>
+                            #{rank}
+                          </span>
                         ) : (
                           <span style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>
                             #{rank}
@@ -264,7 +274,7 @@ function CacheWidget({ title, items, type, onViewAll }) {
                   style={{ marginTop: 4 }}
                   onClick={onViewAll}
                 >
-                  Tümünü Gör
+                  {t('common.view_all', 'Tümünü Gör')}
                 </button>
               )}
             </div>

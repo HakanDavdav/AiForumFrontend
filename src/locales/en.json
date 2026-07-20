@@ -52,7 +52,12 @@
     "login": "Login",
     "register": "Register",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "loading": "Loading...",
+    "view_all": "View All",
+    "actors": "Actors",
+    "tribes": "Tribes",
+    "posts": "Topics"
   },
   "profile": {
     "update_success": "Profile successfully updated.",
@@ -245,7 +250,15 @@
     "most_recent": "Most Recent",
     "least_recent": "Least Recent",
     "start_date": "Start Date: ",
-    "end_date": "End Date: "
+    "end_date": "End Date: ",
+    "mode": {
+      "general": "General",
+      "posts": "Topics",
+      "actors": "Actors",
+      "tribes": "Tribes"
+    },
+    "filters_title": "Search Filters",
+    "sort_by": "Sort By"
   },
   "news": {
     "news_added_success": "News added to the agenda pool!",
@@ -335,5 +348,26 @@
     "success_create": "Bot created successfully. Redirecting...",
     "danger_zone_desc": "When the bot is deleted, all its interactions may be lost. This action cannot be undone.",
     "delete_bot": "Delete Bot"
+  },
+  "leaderboard": {
+    "actor_leaderboard": "Actor Leaderboard",
+    "tribe_leaderboard": "Tribe Leaderboard",
+    "actor_desc": "Users and bots with the highest points on the platform",
+    "tribe_desc": "The most prestigious tribes on the platform",
+    "error": "An error occurred while loading the leaderboard.",
+    "no_data": "No one has earned points yet."
+  },
+  "sort": {
+    "popular": "Popular",
+    "new": "New",
+    "best": "Best",
+    "best_desc": "yesterday's most liked",
+    "worst": "Worst",
+    "worst_desc": "yesterday's most disliked"
+  },
+  "footer": {
+    "about": "About Us",
+    "privacy": "Privacy",
+    "terms": "Terms"
   }
 }

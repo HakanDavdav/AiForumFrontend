@@ -262,10 +262,10 @@ export default function TopBar() {
   }
 
   const searchModeOptions = [
-    { key: 'general', label: 'Genel' },
-    { key: 'posts', label: 'Başlıklar' },
-    { key: 'actors', label: 'Aktörler' },
-    { key: 'tribes', label: 'Tribeler' },
+    { key: 'general', label: t('search.mode.general', 'Genel') },
+    { key: 'posts', label: t('search.mode.posts', 'Başlıklar') },
+    { key: 'actors', label: t('search.mode.actors', 'Aktörler') },
+    { key: 'tribes', label: t('search.mode.tribes', 'Tribeler') },
   ]
 
   return (
@@ -308,10 +308,10 @@ export default function TopBar() {
               justifyContent: 'center',
             }}
           >
-            <span style={{ color: 'white', fontWeight: 800, fontSize: 16 }}>T</span>
+            <span style={{ color: 'white', fontWeight: 800, fontSize: 16 }}>B</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 18, color: 'var(--color-primary)' }}>
-            TuringFest
+            Bletchly
           </span>
         </div>
 
@@ -439,7 +439,7 @@ export default function TopBar() {
                                   textTransform: 'uppercase',
                                 }}
                               >
-                                Aktörler
+                                {t('common.actors', 'Aktörler')}
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {suggestions.actors.slice(0, 3).map((actor) => (
@@ -468,7 +468,7 @@ export default function TopBar() {
                                   textTransform: 'uppercase',
                                 }}
                               >
-                                Tribeler
+                                {t('common.tribes', 'Tribeler')}
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {suggestions.tribes.slice(0, 3).map((tribe) => (
@@ -497,7 +497,7 @@ export default function TopBar() {
                                   textTransform: 'uppercase',
                                 }}
                               >
-                                Başlıklar
+                                {t('common.posts', 'Başlıklar')}
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {suggestions.posts.slice(0, 4).map((post) => (
@@ -526,7 +526,7 @@ export default function TopBar() {
                                   fontSize: 13,
                                 }}
                               >
-                                Sonuç bulunamadı
+                                {t('search.no_results', 'Sonuç bulunamadı')}
                               </div>
                             )}
                         </>
@@ -595,7 +595,7 @@ export default function TopBar() {
                                   fontSize: 13,
                                 }}
                               >
-                                Sonuç bulunamadı
+                                {t('search.no_results', 'Sonuç bulunamadı')}
                               </div>
                             )}
                         </>
@@ -653,12 +653,12 @@ export default function TopBar() {
                       paddingBottom: 6,
                     }}
                   >
-                    Arama Filtreleri
+                    {t('search.filters_title', 'Arama Filtreleri')}
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      Sıralama
+                      {t('search.sort_by', 'Sıralama')}
                     </label>
                     <select
                       className="input"
@@ -916,7 +916,7 @@ export default function TopBar() {
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '8px 16px', minWidth: '100px' }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
-          title={t('sort.most_liked_yesterday', 'dünün en beğenilenleri')}
+          title={t('sort.best_desc', 'dünün en beğenilenleri')}
         >
           <Star size={14} /> {t('sort.best', 'En İyiler')}
         </button>
@@ -924,9 +924,9 @@ export default function TopBar() {
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '8px 16px', minWidth: '100px' }}
           onClick={() => setActiveLeftCacheType('mostDisliked')}
-          title="dünün en nefret edilenleri"
+          title={t('sort.worst_desc', 'dünün en nefret edilenleri')}
         >
-          <Skull size={14} /> Dene
+          <Skull size={14} /> {t('sort.worst', 'En Kötüler')}
         </button>
 
         <div style={{ width: 1, height: 20, background: 'var(--color-border)', margin: '0 4px' }} />

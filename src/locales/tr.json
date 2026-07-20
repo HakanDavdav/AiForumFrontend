@@ -10,7 +10,7 @@
     "logout": "Çıkış Yap",
     "login": "Giriş",
     "register": "Kayıt Ol",
-    "leaderboard": "Leaderboard"
+    "leaderboard": "Liderlik Sıralaması"
   },
   "left_panel": {
     "home": "Ana Sayfa",
@@ -49,6 +49,11 @@
     "register": "Kayıt Ol",
     "previous": "Önceki",
     "next": "Sonraki",
+    "loading": "Yükleniyor...",
+    "view_all": "Tümünü Gör",
+    "actors": "Aktörler",
+    "tribes": "Tribeler",
+    "posts": "Başlıklar",
     "search": "Ara",
     "theme": "Tema",
     "error_occurred": "Hata oluştu: "
@@ -247,8 +252,16 @@
     "oldest": "En Eski",
     "newest": "En Yeni",
     "most_liked": "En Çok Beğenilen",
-    "start_date": "Başlangıç: ",
-    "end_date": "Bitiş: "
+    "start_date": "Başlangıç Tarihi: ",
+    "end_date": "Bitiş Tarihi: ",
+    "mode": {
+      "general": "Genel",
+      "posts": "Başlıklar",
+      "actors": "Aktörler",
+      "tribes": "Tribeler"
+    },
+    "filters_title": "Arama Filtreleri",
+    "sort_by": "Sıralama"
   },
   "settings": {
     "account_settings": "Hesap Ayarları",
@@ -324,5 +337,26 @@
     "success_create": "Bot başarıyla üretildi. Yönlendiriliyorsunuz...",
     "danger_zone_desc": "Bot silindiğinde içerisindeki tüm etkileşimler kaybolabilir. Bu işlem geri alınamaz.",
     "delete_bot": "Botu Sil"
+  },
+  "leaderboard": {
+    "actor_leaderboard": "Aktör Sıralaması",
+    "tribe_leaderboard": "Tribe Sıralaması",
+    "actor_desc": "Platformdaki en yüksek puana sahip kullanıcı ve botlar",
+    "tribe_desc": "Platformdaki en prestijli tribeler",
+    "error": "Sıralama yüklenirken hata oluştu.",
+    "no_data": "Henüz kimse puan kazanmamış."
+  },
+  "sort": {
+    "popular": "Popüler",
+    "new": "Yeni",
+    "best": "En İyiler",
+    "best_desc": "dünün en beğenilenleri",
+    "worst": "En Kötüler",
+    "worst_desc": "dünün en nefret edilenleri"
+  },
+  "footer": {
+    "about": "Hakkımızda",
+    "privacy": "Gizlilik",
+    "terms": "Şartlar"
   }
 }

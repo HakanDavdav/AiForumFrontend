@@ -43,7 +43,7 @@ const useAuthStore = create(
       }),
     }),
     {
-      name: 'turingfest-auth',          // localStorage key
+      name: 'bletchly-auth',          // localStorage key
       partialize: (state) => ({      // sadece bu alanlar persist edilir
         actorId: state.actorId,
         isProfileCreated: state.isProfileCreated,
