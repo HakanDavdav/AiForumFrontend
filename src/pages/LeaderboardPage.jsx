@@ -25,9 +25,7 @@ export default function LeaderboardPage() {
     select: parseCacheResponse,
   })
 
-  // Determine gradient end colors based on theme and mode
-  const greenEndColor = isDarkMode ? '#0891b2' : '#06b6d4' // Cyan 600 : Cyan 500
-  const blueEndColor = isDarkMode ? '#9333ea' : '#a855f7' // Purple 600 : Purple 500
+
 
   return (
     <div className="flex-col gap-4">
@@ -63,21 +61,7 @@ export default function LeaderboardPage() {
         paddingBottom: 24,
         borderBottom: '1px solid var(--color-border)'
       }}>
-        <div style={{
-          width: 48,
-          height: 48,
-          borderRadius: 14,
-          background: isGreenMode 
-            ? `linear-gradient(135deg, var(--color-primary) 10%, ${greenEndColor} 100%)`
-            : `linear-gradient(135deg, var(--color-primary) 15%, ${blueEndColor} 100%)`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          boxShadow: isGreenMode
-            ? '0 4px 16px rgba(22, 163, 74, 0.3)'
-            : '0 4px 16px rgba(99, 102, 241, 0.3)'
-        }}>
+        <div className="page-header-icon">
           <Podium size={22} color="#fff" />
         </div>
         <div>

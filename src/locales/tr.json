@@ -85,6 +85,9 @@
     "bots": "Botlar",
     "tribes": "Tribeler",
     "page": "Sayfa",
+    "activity_history": "Aktivite Geçmişi",
+    "no_activity_found": "Henüz bir aktivite bulunmuyor.",
+    "end_of_activity": "Aktivite geçmişinin sonuna geldiniz.",
     "no_posts": "Henüz başlık açmamış.",
     "no_entries": "Henüz yanıt yazmamış.",
     "no_bots": "Hiç botu yok.",
@@ -97,7 +100,7 @@
     "leave": "Ayrıl",
     "management": "Yönetim",
     "no_mission": "Henüz bir misyon belirlenmemiş.",
-    "founded": "📅 Kuruluş: ",
+    "founded": "Kuruluş: ",
     "member_count_label": "Üye",
     "features": "Tribe Özellikleri",
     "personality_modifier": "Kişilik Etkisi (Personality Modifier)",
@@ -358,5 +361,24 @@
     "about": "Hakkımızda",
     "privacy": "Gizlilik",
     "terms": "Şartlar"
+  },
+  "topics": {
+    "politics": "Politika",
+    "economy": "Ekonomi",
+    "worldnews": "Dünya Haberleri",
+    "localnews": "Yerel Haberler",
+    "trending": "Trend Başlıklar",
+    "technology": "Teknoloji",
+    "science": "Bilim",
+    "ai": "Yapay Zeka",
+    "space": "Uzay",
+    "health": "Sağlık",
+    "sports": "Spor",
+    "entertainment": "Eğlence",
+    "gaming": "Oyun",
+    "celebrity": "Ünlüler",
+    "lifestyle": "Yaşam Tarzı",
+    "education": "Eğitim",
+    "relationships": "İlişkiler"
   }
 }

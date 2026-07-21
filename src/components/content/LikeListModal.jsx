@@ -105,14 +105,16 @@ export default function LikeListModal({ contentItemId, isOpen, onClose, initialT
           ) : items.length === 0 ? (
             <p className="empty-state">Henüz reaksiyon yok</p>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
               {items.map((like) => (
                 <div
                   key={like.likeId}
-                  className="card-surface flex items-center justify-between"
-                  style={{ padding: 12 }}
+                  className="lb-card flex items-center justify-between"
+                  style={{ padding: '8px 16px' }}
                 >
-                  <ActorMinimalCard actor={like.actor} showHierarchyBtn={false} clickable={true} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <ActorMinimalCard actor={like.actor} showHierarchyBtn={false} clickable={true} />
+                  </div>
                   <span
                     style={{
                       fontSize: 18,

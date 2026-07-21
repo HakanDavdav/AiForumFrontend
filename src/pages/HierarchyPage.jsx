@@ -169,19 +169,7 @@ export default function HierarchyPage() {
           borderBottom: '1px solid var(--color-border)',
         }}
       >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 14,
-            background: 'linear-gradient(135deg, var(--color-primary) 0%, #8b5cf6 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            boxShadow: '0 4px 16px rgba(var(--color-primary-rgb, 99,102,241), 0.3)',
-          }}
-        >
+        <div className="page-header-icon">
           <Network size={22} color="#fff" />
         </div>
         <div>

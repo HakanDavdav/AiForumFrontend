@@ -5,8 +5,10 @@ import { tribeApi } from '../api/tribeApi'
 const useMyEntitiesStore = create((set, get) => ({
   myBots: [],
   myTribes: [],
+  myFollowData: { followers: [], following: [] },
   isLoadingBots: false,
   isLoadingTribes: false,
+  isLoadingFollowData: false,
   hasFetchedOnce: false,
 
   fetchMyBots: async () => {
@@ -31,11 +33,40 @@ const useMyEntitiesStore = create((set, get) => ({
     }
   },
 
-  refreshAll: async () => {
-    await Promise.all([get().fetchMyBots(), get().fetchMyTribes()])
+  fetchMyFollowData: async () => {
+    try {
+      set({ isLoadingFollowData: true })
+      const res = await actorApi.getFollowData()
+      const payload = res.data?.data || {}
+      const followers = payload.followers || payload.Followers || []
+      const following = payload.following || payload.Following || []
+      console.log('[myEntitiesStore] fetchMyFollowData response:', payload)
+      set({ myFollowData: { followers, following }, isLoadingFollowData: false })
+    } catch (error) {
+      console.error('Error fetching follow data:', error)
+      set({ isLoadingFollowData: false })
+    }
   },
 
-  clear: () => set({ myBots: [], myTribes: [], hasFetchedOnce: false }),
+  addFollowing: (actorId) => set((state) => ({
+    myFollowData: {
+      ...state.myFollowData,
+      following: [...state.myFollowData.following, actorId]
+    }
+  })),
+
+  removeFollowing: (actorId) => set((state) => ({
+    myFollowData: {
+      ...state.myFollowData,
+      following: state.myFollowData.following.filter(id => id !== actorId)
+    }
+  })),
+
+  refreshAll: async () => {
+    await Promise.all([get().fetchMyBots(), get().fetchMyTribes(), get().fetchMyFollowData()])
+  },
+
+  clear: () => set({ myBots: [], myTribes: [], myFollowData: { followers: [], following: [] }, hasFetchedOnce: false }),
 }))
 
 export default useMyEntitiesStore

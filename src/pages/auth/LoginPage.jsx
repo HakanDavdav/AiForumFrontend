@@ -7,7 +7,7 @@ import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import { signInWithPopup } from 'firebase/auth'
-import { auth, googleProvider, facebookProvider } from '../../config/firebase'
+import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
@@ -79,7 +79,7 @@ export default function LoginPage() {
       const isProfileCreated = res.data?.data?.isProfileCreated
 
       if (actorId) {
-         setAuth(actorId, isProfileCreated)
+         setAuth(actorId, isProfileCreated, true)
          queryClient.invalidateQueries()
          if (isProfileCreated) {
            navigate('/')
@@ -235,15 +235,18 @@ export default function LoginPage() {
           </button>
           <button 
             className="btn w-full" 
-            style={{ background: '#1877F2', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ background: '#2F2F2F', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             type="button"
             disabled={firebaseLoginMutation.isPending}
-            onClick={() => handleProviderLogin(facebookProvider)}
+            onClick={() => handleProviderLogin(microsoftProvider)}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" style={{ marginRight: 8 }}>
-              <path fill="#fff" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            <svg width="18" height="18" viewBox="0 0 21 21" style={{ marginRight: 8 }}>
+              <path fill="#f25022" d="M1 1h9v9H1z"/>
+              <path fill="#00a4ef" d="M1 11h9v9H1z"/>
+              <path fill="#7fba00" d="M11 1h9v9h-9z"/>
+              <path fill="#ffb900" d="M11 11h9v9h-9z"/>
             </svg>
-            Facebook
+            Microsoft
           </button>
         </div>
 

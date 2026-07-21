@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
 import ActivityItem from '../activity/ActivityItem'
 import useDevLog from '../../utils/useDevLog'
+import useAuthStore from '../../store/authStore'
+import { useTranslation } from 'react-i18next'
 
 export default function ProfileActivitiesPanel({ actorId, profileName }) {
   useDevLog('ProfileActivitiesPanel', arguments[0] || {})
+  const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [activities, setActivities] = useState([])
   const [hasMore, setHasMore] = useState(true)
@@ -43,12 +46,15 @@ export default function ProfileActivitiesPanel({ actorId, profileName }) {
     }
   }
 
+  const { actorId: currentUserId } = useAuthStore()
+  const forceRead = actorId !== currentUserId
+
   return (
     <div className="profile-activities-panel">
-      <div className="profile-activities-header">Aktivite Geçmişi</div>
+      <div className="profile-activities-header">{t('profile.activity_history')}</div>
       <div className="profile-activities-list" onScroll={handleScroll}>
         {activities.map((a) => (
-          <ActivityItem key={a.activityId} activity={a} currentProfileName={profileName} />
+          <ActivityItem key={a.activityId} activity={a} currentProfileName={profileName} forceRead={forceRead} />
         ))}
         {isFetching && (
           <div style={{ textAlign: 'center', padding: 8 }}>
@@ -57,12 +63,12 @@ export default function ProfileActivitiesPanel({ actorId, profileName }) {
         )}
         {!isFetching && activities.length === 0 && (
           <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-            Henüz bir aktivite bulunmuyor.
+            {t('profile.no_activity_found')}
           </p>
         )}
         {!isFetching && !hasMore && activities.length > 0 && (
           <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-            Aktivite geçmişinin sonuna geldiniz.
+            {t('profile.end_of_activity')}
           </p>
         )}
       </div>

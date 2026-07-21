@@ -64,6 +64,7 @@ export default function LeftPanel() {
       return lastPage?.length === 10 ? allPages.length + 1 : undefined
     },
     enabled: isLoggedIn && !!actorId,
+    refetchInterval: 30 * 60 * 1000, // 30 minutes
   })
 
   const activities = React.useMemo(() => activitiesData?.pages?.flatMap((p) => p) || [], [activitiesData])

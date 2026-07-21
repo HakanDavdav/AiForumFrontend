@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot, Brain, Edit2, Check, X, Settings } from 'lucide-react'
+import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot, Brain, Edit2, Check, X, Settings, UserPlus, UserMinus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
@@ -16,6 +16,7 @@ import FollowListModal from '../components/profile/FollowListModal'
 import ProfileLikesModal from '../components/profile/ProfileLikesModal'
 import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel'
 import useAuthStore from '../store/authStore'
+import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
@@ -51,6 +52,28 @@ export default function ProfilePage() {
   const inferredPerPage = 5
   const { t } = useTranslation()
 
+  // Follow State & Debounce
+  const myFollowData = useMyEntitiesStore(state => state.myFollowData)
+  const addFollowing = useMyEntitiesStore(state => state.addFollowing)
+  const removeFollowing = useMyEntitiesStore(state => state.removeFollowing)
+
+  const globalIsFollowing = myFollowData?.following?.includes(actorId)
+  const [localIsFollowing, setLocalIsFollowing] = useState(globalIsFollowing)
+  const debounceTimerRef = useRef(null)
+  const [isBouncing, setIsBouncing] = useState(false)
+
+  useEffect(() => {
+    setLocalIsFollowing(globalIsFollowing)
+  }, [globalIsFollowing])
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
+  }, [])
+
   // FollowListModal state
   const [followModalConfig, setFollowModalConfig] = useState({ isOpen: false, type: 'followers' })
   const [likesModalOpen, setLikesModalOpen] = useState(false)
@@ -61,8 +84,8 @@ export default function ProfilePage() {
   const toggleTopic = (value) => {
     setEditForm(prev => ({
       ...prev,
-      topicTypes: prev.topicTypes.includes(value) 
-        ? prev.topicTypes.filter(v => v !== value) 
+      topicTypes: prev.topicTypes.includes(value)
+        ? prev.topicTypes.filter(v => v !== value)
         : [...prev.topicTypes, value]
     }))
   }
@@ -75,29 +98,43 @@ export default function ProfilePage() {
     enabled: !!actorId,
   })
 
-  const { data: isFollowing } = useQuery({
-    queryKey: ['check-follow', actorId],
-    queryFn: () => actorApi.checkFollow(actorId).then((r) => r.data?.data),
-    enabled: isLoggedIn && !isOwnProfile && !!actorId,
-  })
-
   const queryClient = useQueryClient()
 
   const followMutation = useMutation({
     mutationFn: () => actorApi.follow(actorId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['check-follow', actorId])
-      queryClient.invalidateQueries(['profile', actorId])
+      addFollowing(actorId)
+      queryClient.invalidateQueries({ queryKey: ['profile', actorId] })
     },
   })
 
   const unfollowMutation = useMutation({
     mutationFn: () => actorApi.unfollow(actorId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['check-follow', actorId])
-      queryClient.invalidateQueries(['profile', actorId])
+      removeFollowing(actorId)
+      queryClient.invalidateQueries({ queryKey: ['profile', actorId] })
     },
   })
+
+  const handleFollowClick = () => {
+    setIsBouncing(true)
+    setTimeout(() => setIsBouncing(false), 200)
+
+    const newStatus = !localIsFollowing
+    setLocalIsFollowing(newStatus)
+
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+
+    debounceTimerRef.current = setTimeout(() => {
+      if (newStatus === globalIsFollowing) return
+
+      if (newStatus) {
+        followMutation.mutate()
+      } else {
+        unfollowMutation.mutate()
+      }
+    }, 600)
+  }
 
   const editMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
@@ -194,9 +231,11 @@ export default function ProfilePage() {
 
       {/* ─── Profile Header ─── */}
       <div className="profile-header-card">
-        <div className="flex justify-between items-start w-full" style={{ gap: 24, width: '100%' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="flex items-center justify-between" style={{ gap: 16 }}>
+        <div className="flex justify-between" style={{ gap: 20, width: '100%', alignItems: 'stretch' }}>
+
+          {/* ─── LEFT COLUMN ─── */}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingBottom: 4 }}>
+            <div className="flex items-center" style={{ gap: 16 }}>
               <h1
                 style={{
                   fontSize: 24,
@@ -236,83 +275,11 @@ export default function ProfilePage() {
                   </span>
                 )}
               </h1>
-
-              <div className="flex gap-2" style={{ flexShrink: 0 }}>
-                {profile.discriminator === 'Bot' && (
-                  <button
-                    className="btn btn-outline btn-sm"
-                    onClick={() => navigate('/mind?actorId=' + actorId)}
-                  >
-                    <Brain size={14} /> {t('profile.memories')}
-                  </button>
-                )}
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => navigate('/hierarchy?actorId=' + actorId)}
-                >
-                  <Network size={14} /> {t('profile.network')}
-                </button>
-                {isLoggedIn &&
-                  !isOwnProfile &&
-                  (isFollowing ? (
-                    <button
-                      className="btn btn-outline btn-sm"
-                      onClick={() => unfollowMutation.mutate()}
-                      disabled={unfollowMutation.isPending}
-                    >
-                      {t('profile.unfollow')}
-                    </button>
-                  ) : (
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => followMutation.mutate()}
-                      disabled={followMutation.isPending}
-                    >
-                      {t('profile.follow')}
-                    </button>
-                  ))}
-                {isOwnProfile && !isEditing && (
-                  <>
-                    <button
-                      className="btn btn-outline btn-sm"
-                      onClick={handleEditInit}
-                    >
-                      <Edit2 size={14} /> {t('profile.edit')}
-                    </button>
-                    <button
-                      className="btn btn-outline btn-sm"
-                      onClick={() => navigate('/account-settings')}
-                    >
-                      <Settings size={14} /> {t('profile.security_settings')}
-                    </button>
-                  </>
-                )}
-                {isOwnProfile && isEditing && (
-                  <>
-                    <button
-                      className="btn btn-success btn-sm"
-                      style={{ background: 'var(--color-success)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-                      onClick={handleEditSave}
-                      disabled={editMutation.isPending}
-                    >
-                      {editMutation.isPending ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Check size={14} />} {t('profile.save')}
-                    </button>
-                    <button
-                      className="btn btn-outline btn-sm"
-                      onClick={() => setIsEditing(false)}
-                      disabled={editMutation.isPending}
-                      style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-                    >
-                      <X size={14} /> {t('profile.cancel')}
-                    </button>
-                  </>
-                )}
-              </div>
             </div>
 
             {isEditing ? (
               <textarea
-                style={{ 
+                style={{
                   margin: '8px 0', width: '100%', maxWidth: 600, minHeight: 80, fontSize: 14,
                   padding: '12px 16px',
                   borderRadius: 12,
@@ -364,8 +331,10 @@ export default function ProfilePage() {
                 >
                   {t('profile.developer')}
                 </span>
-                <div className="card-surface" style={{ padding: '8px 12px', marginTop: 4 }}>
-                  <ActorMinimalCard actor={profile.parentActor} />
+                <div className="lb-card" style={{ padding: '8px 16px', marginTop: 4 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <ActorMinimalCard actor={profile.parentActor} />
+                  </div>
                 </div>
               </div>
             )}
@@ -394,7 +363,7 @@ export default function ProfilePage() {
                           onChange={() => toggleTopic(topic.value)}
                           style={{ display: 'none' }}
                         />
-                        {topic.label}
+                        {t(`topics.${topic.enumName.toLowerCase()}`)}
                       </label>
                     )
                   })}
@@ -407,7 +376,7 @@ export default function ProfilePage() {
                     topicTypes={profile.topicTypes
                       .map((t) => {
                         const match = TOPIC_TYPES.find(opt => opt.enumName === t?.topicTypeName || opt.label === t?.topicTypeName);
-                        return match ? match.label : t?.topicTypeName;
+                        return match ? match.value : null;
                       })
                       .filter((v) => v != null)}
                   />
@@ -415,44 +384,120 @@ export default function ProfilePage() {
               )
             )}
 
+            <div style={{ flexGrow: 1 }} />
+
+            <div className="flex flex-wrap gap-2" style={{ paddingTop: 16 }}>
+              {profile.discriminator === 'Bot' && (
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={() => navigate('/mind?actorId=' + actorId)}
+                >
+                  <Brain size={14} /> {t('profile.memories')}
+                </button>
+              )}
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => navigate('/hierarchy?actorId=' + actorId)}
+              >
+                <Network size={14} /> {t('profile.network')}
+              </button>
+            </div>
           </div>
-          <ActorAvatar
-            profileName={profile.profileName}
-            imageUrl={profile.imageUrl}
-            discriminator={profile.discriminator}
-            actorId={profile.actorId}
-            size="xxl"
-            clickable={false}
-          />
+
+          {/* ─── VERTICAL DIVIDER ─── */}
+          <div style={{ width: 2, background: 'var(--color-border)', marginTop: 8, marginBottom: 8, borderRadius: 2 }} />
+
+          {/* ─── RIGHT COLUMN ─── */}
+          <div style={{ width: 144, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 4 }}>
+            <ActorAvatar
+              profileName={profile.profileName}
+              imageUrl={profile.imageUrl}
+              discriminator={profile.discriminator}
+              actorId={profile.actorId}
+              size="xxxl"
+              clickable={false}
+            />
+
+            <div className="flex flex-col gap-2" style={{ width: '100%', marginTop: 12 }}>
+              {isLoggedIn && !isOwnProfile && (
+                <button
+                  className={`btn btn-sm ${localIsFollowing ? 'btn-outline' : 'btn-primary'}`}
+                  onClick={handleFollowClick}
+                  style={{
+                    transform: isBouncing ? 'scale(1.15)' : 'scale(1)',
+                    transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    display: 'flex', alignItems: 'center', gap: 6
+                  }}
+                >
+                  {localIsFollowing ? (
+                    <><UserMinus size={14} /> {t('profile.unfollow')}</>
+                  ) : (
+                    <><UserPlus size={14} /> {t('profile.follow')}</>
+                  )}
+                </button>
+              )}
+              {isOwnProfile && !isEditing && (
+                <>
+                  <button className="btn btn-primary btn-sm" onClick={handleEditInit} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Edit2 size={14} /> {t('profile.edit')}
+                  </button>
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/account-settings')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Settings size={14} /> {t('profile.security_settings')}
+                  </button>
+                </>
+              )}
+              {isOwnProfile && isEditing && (
+                <>
+                  <button
+                    className="btn btn-success btn-sm"
+                    style={{ background: 'var(--color-success)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
+                    onClick={handleEditSave}
+                    disabled={editMutation.isPending}
+                  >
+                    {editMutation.isPending ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Check size={14} />} {t('profile.save')}
+                  </button>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    onClick={() => setIsEditing(false)}
+                    disabled={editMutation.isPending}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <X size={14} /> {t('profile.cancel')}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
+
         <div style={{ width: '100%' }}>
           <div style={{ height: 1, background: 'var(--color-border)', width: '100%' }} />
-          
+
           <div className="profile-stats-grid" style={{ width: '100%', marginTop: 8 }}>
-          <div className="profile-stat-box" onClick={() => setLikesModalOpen(true)}>
-            <span className="profile-stat-value">{profile.likeCount ?? 0}</span>
-            <span className="profile-stat-label">{t('profile.reaction')}</span>
-          </div>
-          <div className="profile-stat-box">
-            <span className="profile-stat-value">
-              {profile.actorPoint?.toLocaleString('tr-TR') ?? 0}
-            </span>
-            <span className="profile-stat-label">{t('profile.points')}</span>
-          </div>
-          <div
-            className="profile-stat-box"
-            onClick={() => setFollowModalConfig({ isOpen: true, type: 'followers' })}
-          >
-            <span className="profile-stat-value">{profile.followerCount ?? 0}</span>
-            <span className="profile-stat-label">{t('profile.followers')}</span>
-          </div>
-          <div
-            className="profile-stat-box"
-            onClick={() => setFollowModalConfig({ isOpen: true, type: 'following' })}
-          >
-            <span className="profile-stat-value">{profile.followedCount ?? 0}</span>
-            <span className="profile-stat-label">{t('profile.following')}</span>
-          </div>
+            <div className="profile-stat-box" onClick={() => setLikesModalOpen(true)}>
+              <span className="profile-stat-value">{profile.likeCount ?? 0}</span>
+              <span className="profile-stat-label">{t('profile.reaction')}</span>
+            </div>
+            <div className="profile-stat-box">
+              <span className="profile-stat-value">
+                {profile.actorPoint?.toLocaleString('tr-TR') ?? 0}
+              </span>
+              <span className="profile-stat-label">{t('profile.points')}</span>
+            </div>
+            <div
+              className="profile-stat-box"
+              onClick={() => setFollowModalConfig({ isOpen: true, type: 'followers' })}
+            >
+              <span className="profile-stat-value">{profile.followerCount ?? 0}</span>
+              <span className="profile-stat-label">{t('profile.followers')}</span>
+            </div>
+            <div
+              className="profile-stat-box"
+              onClick={() => setFollowModalConfig({ isOpen: true, type: 'following' })}
+            >
+              <span className="profile-stat-value">{profile.followedCount ?? 0}</span>
+              <span className="profile-stat-label">{t('profile.following')}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -501,7 +546,7 @@ export default function ProfilePage() {
                 1,
                 Math.ceil(
                   (activeTab === 'posts' ? profile.postCount || 0 : profile.entryCount || 0) /
-                    inferredPerPage
+                  inferredPerPage
                 )
               )}
             </span>
@@ -509,10 +554,10 @@ export default function ProfilePage() {
               className="btn btn-outline btn-sm"
               disabled={
                 (activeTab === 'posts' ? postsPage : entriesPage) >=
-                  Math.ceil(
-                    (activeTab === 'posts' ? profile.postCount || 0 : profile.entryCount || 0) /
-                      inferredPerPage
-                  ) ||
+                Math.ceil(
+                  (activeTab === 'posts' ? profile.postCount || 0 : profile.entryCount || 0) /
+                  inferredPerPage
+                ) ||
                 isPostsFetching ||
                 isEntriesFetching
               }
@@ -564,10 +609,7 @@ export default function ProfilePage() {
               profile.bots.map((bot) => (
                 <div key={bot.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <ActorMinimalCard actor={bot} />
-                  </div>
-                  <div className="lb-score">
-                    {bot.actorPoint?.toLocaleString('tr-TR') ?? 0} {t('profile.point_suffix')}
+                    <ActorMinimalCard actor={bot} showPoint={true} />
                   </div>
                 </div>
               ))

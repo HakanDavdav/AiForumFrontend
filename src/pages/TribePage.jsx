@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { LogOut, UserPlus, Settings, ChevronLeft, ChevronRight, Brain } from 'lucide-react'
+import { LogOut, UserPlus, Settings, ChevronLeft, ChevronRight, Brain, CalendarFold } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
@@ -22,6 +22,7 @@ export default function TribePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { t } = useTranslation()
+  const [isBouncing, setIsBouncing] = useState(false)
 
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
@@ -65,75 +66,77 @@ export default function TribePage() {
 
       {/* ─── Tribe Header ─── */}
       <div className="profile-header-card" style={{ position: 'relative' }}>
-        <div className="flex justify-between items-start w-full" style={{ gap: 24, width: '100%' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="flex items-center justify-between">
-              <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{tribe.tribeName}</h1>
-              
-              <div className="flex gap-2">
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => navigate('/mind?tribeId=' + tribeId)}
-                >
-                  <Brain size={14} /> {t('profile.memories')}
-                </button>
-                {isLoggedIn && !isMember && (
-                  <button 
-                    className="btn btn-primary btn-sm" 
-                    onClick={() => joinMutation.mutate()}
-                    disabled={joinMutation.isPending}
-                  >
-                    <UserPlus size={14} /> {t('tribe.join')}
-                  </button>
-                )}
-                {isLoggedIn && isMember && !isLeader && (
-                  <button 
-                    className="btn btn-outline btn-sm" 
-                    onClick={() => leaveMutation.mutate()}
-                    disabled={leaveMutation.isPending}
-                    style={{ color: 'var(--color-error)', borderColor: 'var(--color-error)' }}
-                  >
-                    <LogOut size={14} /> {t('tribe.leave')}
-                  </button>
-                )}
-                {isLoggedIn && isLeader && (
-                  <button 
-                    className="btn btn-outline btn-sm"
-                    onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)}
-                  >
-                    <Settings size={14} /> {t('tribe.management')}
-                  </button>
-                )}
+        <div className="flex justify-between" style={{ gap: 20, width: '100%', alignItems: 'stretch' }}>
+
+          {/* ─── LEFT COLUMN ─── */}
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingBottom: 4 }}>
+            <div>
+              <div className="flex items-center" style={{ gap: 16 }}>
+                <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{tribe.tribeName}</h1>
               </div>
+
+              <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
+                {tribe.mission || t('tribe.no_mission')}
+              </p>
+
+              {tribe.createdAt && (
+                <p className="text-muted" style={{ margin: '4px 0 0 0', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <CalendarFold size={14} />
+                  <span>{t('tribe.founded')}{new Date(tribe.createdAt).toLocaleDateString('tr-TR')}</span>
+                </p>
+              )}
             </div>
 
-            <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
-              {tribe.mission || t('tribe.no_mission')}
-            </p>
+            <div style={{ flexGrow: 1 }} />
 
-            {tribe.createdAt && (
-              <p className="text-muted" style={{ margin: '4px 0 12px 0', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span>{t('tribe.founded')}{new Date(tribe.createdAt).toLocaleDateString(currentUserId ? undefined : 'tr-TR')}</span>
-              </p>
-            )}
+            <div style={{ paddingTop: 16 }}>
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={() => navigate('/mind?tribeId=' + tribeId)}
+              >
+                <Brain size={14} /> {t('profile.memories')}
+              </button>
+            </div>
           </div>
 
-          <div style={{ width: 120, height: 120, flexShrink: 0 }}>
+          {/* ─── VERTICAL DIVIDER ─── */}
+          <div style={{ width: 2, background: 'var(--color-border)', marginTop: 8, marginBottom: 8, borderRadius: 2 }} />
+
+          {/* ─── RIGHT COLUMN ─── */}
+          <div style={{ width: 144, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 4 }}>
             {tribe.imageUrl ? (
-              <img src={tribe.imageUrl} alt={tribe.tribeName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '4px solid var(--color-surface)' }} />
+              <img src={tribe.imageUrl} alt={tribe.tribeName} style={{ width: 144, height: 144, objectFit: 'cover', borderRadius: 24, border: '4px solid var(--color-surface)' }} />
             ) : (
               <div
                 style={{
-                  width: '100%', height: '100%',
+                  width: 144, height: 144,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)',
-                  fontWeight: 800, fontSize: 48, borderRadius: '50%',
+                  fontWeight: 800, fontSize: 48, borderRadius: 24,
                   border: '4px solid var(--color-surface)'
                 }}
               >
                 {tribe.tribeName?.[0] || 'T'}
               </div>
             )}
+
+            <div className="flex flex-col gap-2" style={{ width: '100%', marginTop: 12 }}>
+              {isLoggedIn && !isMember && (
+                <button className="btn btn-primary btn-sm" onClick={() => { setIsBouncing(true); setTimeout(() => setIsBouncing(false), 200); joinMutation.mutate(); }} disabled={joinMutation.isPending} style={{ transform: isBouncing ? 'scale(1.15)' : 'scale(1)', transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <UserPlus size={14} /> {t('tribe.join')}
+                </button>
+              )}
+              {isLoggedIn && isMember && !isLeader && (
+                <button className="btn btn-outline btn-sm" onClick={() => { setIsBouncing(true); setTimeout(() => setIsBouncing(false), 200); leaveMutation.mutate(); }} disabled={leaveMutation.isPending} style={{ transform: isBouncing ? 'scale(1.15)' : 'scale(1)', transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <LogOut size={14} /> {t('tribe.leave')}
+                </button>
+              )}
+              {isLoggedIn && isLeader && (
+                <button className="btn btn-primary btn-sm" onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Settings size={14} /> {t('tribe.management')}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -184,8 +187,10 @@ export default function TribePage() {
         ) : (
           tribe.tribeMemberships?.map(member => (
             member.actor ? (
-              <div key={member.actor.actorId} className="card-surface flex items-center justify-between" style={{ padding: '8px 12px' }}>
-                <ActorMinimalCard actor={member.actor} />
+              <div key={member.actor.actorId} className="lb-card flex items-center justify-between" style={{ padding: '8px 16px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <ActorMinimalCard actor={member.actor} />
+                </div>
                 <div className="flex items-center gap-4">
                   <span className="badge" style={{ background: member.roleName === 'TribeLeader' ? 'var(--color-primary-light)' : 'var(--color-surface-3)', color: member.roleName === 'TribeLeader' ? 'var(--color-primary)' : 'var(--color-text-secondary)' }}>
                     {member.roleName === 'TribeLeader' ? t('tribe.leader') : member.roleName || t('tribe.member')}
@@ -198,10 +203,12 @@ export default function TribePage() {
       </div>
 
       {/* ─── Posts Section ─── */}
-      <div className="flex items-center justify-between" style={{ paddingBottom: 8, borderBottom: '1px solid var(--color-border)', marginTop: 24 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 700 }}>
-          {t('profile.posts')} ({tribe.postCount ?? 0})
-        </h3>
+      <div className="profile-tabs-container" style={{ marginTop: 24 }}>
+        <div className="profile-tab-group">
+          <button className="profile-tab-btn active" style={{ cursor: 'default' }}>
+            {t('profile.posts')} ({tribe.postCount ?? 0})
+          </button>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             className="btn btn-outline btn-sm"
@@ -229,7 +236,7 @@ export default function TribePage() {
         {isPostsLoading ? (
           <div className="spinner spinner-md" style={{ margin: '40px auto', display: 'block' }} />
         ) : !postsData || postsData.length === 0 ? (
-          <p className="empty-state">{t('tribe.no_posts')}</p>
+          <p className="empty-state">{t('tribe.empty_posts')}</p>
         ) : (
           <div className="flex-col gap-4">
             {postsData.map((p) => (

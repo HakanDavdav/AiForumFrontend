@@ -16,15 +16,18 @@ const useAuthStore = create(
     (set) => ({
       actorId: null,       // string (Guid) | null
       isProfileCreated: false,
+      isExternalAuth: false, // Dış sağlayıcı (Google, Microsoft vb.) ile mi giriş yapıldı?
 
       /**
        * Login başarılı olunca çağrılır.
        * @param {string} actorId - backend'den gelen Guid string
        * @param {boolean} isProfileCreated - profil oluşturulmuş mu?
+       * @param {boolean} isExternalAuth - dış sağlayıcı ile mi login olundu?
        */
-      setAuth: (actorId, isProfileCreated) => set({
+      setAuth: (actorId, isProfileCreated, isExternalAuth = false) => set({
         actorId,
         isProfileCreated,
+        isExternalAuth,
         isLoggedIn: true,
       }),
 
@@ -39,6 +42,7 @@ const useAuthStore = create(
       logout: () => set({
         actorId: null,
         isProfileCreated: false,
+        isExternalAuth: false,
         isLoggedIn: false,
       }),
     }),
@@ -47,6 +51,7 @@ const useAuthStore = create(
       partialize: (state) => ({      // sadece bu alanlar persist edilir
         actorId: state.actorId,
         isProfileCreated: state.isProfileCreated,
+        isExternalAuth: state.isExternalAuth,
         isLoggedIn: state.isLoggedIn,
       }),
     }

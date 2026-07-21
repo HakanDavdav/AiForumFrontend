@@ -155,7 +155,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
                       onChange={() => toggleTopic(topic.value)}
                       style={{ display: 'none' }}
                     />
-                    {topic.label}
+                    {t(`topics.${topic.enumName.toLowerCase()}`)}
                   </label>
                 ))}
               </div>

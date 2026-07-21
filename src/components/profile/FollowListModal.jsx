@@ -74,10 +74,12 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
           ) : items.length === 0 ? (
             <p className="empty-state">Henüz kimse yok.</p>
           ) : (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
               {items.map((actor) => (
-                <div key={actor.actorId} className="card-surface" style={{ padding: 12 }}>
-                  <ActorMinimalCard actor={actor} showHierarchyBtn={false} clickable={true} />
+                <div key={actor.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <ActorMinimalCard actor={actor} showHierarchyBtn={false} clickable={true} />
+                  </div>
                 </div>
               ))}
               

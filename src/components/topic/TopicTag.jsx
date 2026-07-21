@@ -1,10 +1,13 @@
 // TopicTag & TopicTagList
-import { TopicLabels, TopicColors, TopicTypes, parseTopicFlags } from '../../constants/enums'
+import { useTranslation } from 'react-i18next'
+import { TopicLabels, TopicColors, TopicTypes, TopicEnumNames, parseTopicFlags } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
 
 export function TopicTag({ topicType, size = 'sm', onClick }) {
   useDevLog('TopicTag', arguments[0] || {})
-  const label = TopicLabels[topicType] || `Başlık ${topicType}`
+  const { t } = useTranslation()
+  const enumName = TopicEnumNames[topicType]
+  const label = enumName ? t(`topics.${enumName}`) : (TopicLabels[topicType] || `Başlık ${topicType}`)
   const color = TopicColors[topicType] || '#64748B'
 
   return (

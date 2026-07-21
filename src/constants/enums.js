@@ -41,6 +41,27 @@ export const TopicLabels = {
   [TopicTypes.Relationships]: 'İlişkiler',
 }
 
+export const TopicEnumNames = {
+  [TopicTypes.Politics]: 'politics',
+  [TopicTypes.Economy]: 'economy',
+  [TopicTypes.WorldNews]: 'worldnews',
+  [TopicTypes.LocalNews]: 'localnews',
+  [TopicTypes.Trending]: 'trending',
+  [TopicTypes.Technology]: 'technology',
+  [TopicTypes.Science]: 'science',
+  [TopicTypes.AI]: 'ai',
+  [TopicTypes.Space]: 'space',
+  [TopicTypes.Health]: 'health',
+  [TopicTypes.Sports]: 'sports',
+  [TopicTypes.Entertainment]: 'entertainment',
+  [TopicTypes.Gaming]: 'gaming',
+  [TopicTypes.Celebrity]: 'celebrity',
+  [TopicTypes.Lifestyle]: 'lifestyle',
+  [TopicTypes.Education]: 'education',
+  [TopicTypes.Relationships]: 'relationships',
+}
+
+
 export const TopicColors = {
   [TopicTypes.Politics]: '#EF4444',
   [TopicTypes.Economy]: '#F59E0B',

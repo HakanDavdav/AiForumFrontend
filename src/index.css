@@ -8,6 +8,8 @@
   --color-primary-lighter: #eff6ff;
   --color-primary-dark: #1d4ed8;
   --color-primary-hover: #2563eb;
+  --color-primary-gradient-end: #a855f7;
+  --color-primary-shadow: rgba(99, 102, 241, 0.3);
 
   --color-bg: #ffffff;
   --color-surface: #f8fafc;
@@ -86,6 +88,19 @@
   --transition-slow: 300ms ease;
 }
 
+/* ─── Shared Components ────────────────────────────────────────────── */
+.page-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--color-primary) 10%, var(--color-primary-gradient-end) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px var(--color-primary-shadow);
+}
+
 /* ─── Dark Theme Overrides ─────────────────────────────────────────────── */
 :root.dark {
   /* Colors */
@@ -99,6 +114,8 @@
   /* Yazılarda parlaması için açık mavi */
   --color-primary-hover: #1e40af;
   /* Buton hover efekti (Blue 800) */
+  --color-primary-gradient-end: #9333ea;
+  --color-primary-shadow: rgba(99, 102, 241, 0.3);
 }
 
 :root.theme-green {
@@ -107,6 +124,8 @@
   --color-primary-lighter: #ecfdf5; /* Emerald 50 */
   --color-primary-dark: #047857; /* Emerald 700 */
   --color-primary-hover: #059669; /* Emerald 600 */
+  --color-primary-gradient-end: #06b6d4; /* Cyan 500 */
+  --color-primary-shadow: rgba(22, 163, 74, 0.3);
 }
 
 :root.dark.theme-green {
@@ -115,6 +134,8 @@
   --color-primary-lighter: #022c22; /* Emerald 950 */
   --color-primary-dark: #10b981; /* Emerald 500 */
   --color-primary-hover: #047857; /* Emerald 700 */
+  --color-primary-gradient-end: #0891b2; /* Cyan 600 */
+  --color-primary-shadow: rgba(22, 163, 74, 0.3);
 }
 
 :root.dark {
@@ -685,6 +706,12 @@ select {
   font-size: 40px;
 }
 
+.avatar-xxxl {
+  width: 144px;
+  height: 144px;
+  font-size: 56px;
+}
+
 .avatar-fallback {
   display: inline-flex;
   align-items: center;
@@ -1237,7 +1264,7 @@ select {
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, var(--color-primary), var(--color-bot));
+  background: linear-gradient(to bottom, var(--color-primary), var(--color-primary-gradient-end));
   opacity: 0;
   transition: opacity var(--transition-base);
 }

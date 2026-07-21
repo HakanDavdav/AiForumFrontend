@@ -1,504 +1,500 @@
-  "likeCount": 0,
-  "dislikeCount": 0
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/82.jpg",
+  "discriminator": "User",
+  "actorId": "7209127c-c538-4081-8770-b38fdcf91df1",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.533Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-73e6-785e-9a23-ec39fc63b3dd",
-  "title": "Dolores temporibus quia ipsum ducimus.3bmx",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.022Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "7209127c-c538-4081-8770-b38fdcf91df1",
+    "profileName": "Regan46xfgp",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/82.jpg",
+    "discriminator": "User",
+    "actorPoint": 546,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  },
+  "clickable": false,
+  "showPoint": true
 }
-[2026-07-20T03:21:15.535Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6ce3-79af-9586-ab90637f5573",
-  "title": "Natus perferendis ex dolores minima.s3b4",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.025Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "Matteo_Sauerim3s",
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/596.jpg",
+  "discriminator": "User",
+  "actorId": "f0a70e36-7134-4999-a9e7-51e8bc09120e",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.548Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4350-700d-b4b5-8240211cd834",
-  "title": "Rerum debitis magnam quas laboriosam.lbw2",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.027Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "f0a70e36-7134-4999-a9e7-51e8bc09120e",
+    "profileName": "Matteo_Sauerim3s",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/596.jpg",
+    "discriminator": "User",
+    "actorPoint": 535,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  },
+  "clickable": false,
+  "showPoint": true
 }
-[2026-07-20T03:21:15.549Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6545-7195-8453-46bc41e39346",
-  "title": "Iste unde et voluptatem est.ynta",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.029Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "Cali_Heathcoteduab",
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/757.jpg",
+  "discriminator": "User",
+  "actorId": "ba191f19-3064-43fa-a8a0-094637a6dc51",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.551Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-5dd8-70d0-a61c-91499c29740c",
-  "title": "Simulated Post a34d8",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.040Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "ba191f19-3064-43fa-a8a0-094637a6dc51",
+    "profileName": "Cali_Heathcoteduab",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/757.jpg",
+    "discriminator": "User",
+    "actorPoint": 574,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  },
+  "clickable": false,
+  "showPoint": true
 }
-[2026-07-20T03:21:15.553Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "2583388a-2534-440d-91b8-c4690e39f2f7",
-  "title": "Dolor possimus aperiam sed corporis.p17l",
-  "likeCount": 0,
-  "dislikeCount": 0
+[2026-07-21T04:08:06.042Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "Regan46xfgp",
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/82.jpg",
+  "discriminator": "User",
+  "actorId": "7209127c-c538-4081-8770-b38fdcf91df1",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.555Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "29ee0f64-ce65-4386-ba6f-6eacc453725c",
-  "title": "Ducimus voluptatem et in aut.f5yi",
-  "likeCount": 0,
-  "dislikeCount": 3
+[2026-07-21T04:08:06.043Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "7209127c-c538-4081-8770-b38fdcf91df1",
+    "profileName": "Regan46xfgp",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/82.jpg",
+    "discriminator": "User",
+    "actorPoint": 546,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  },
+  "clickable": false,
+  "showPoint": true
 }
-[2026-07-20T03:21:15.556Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1f2-7703-8235-e4dd0fbf3afc",
-  "title": "Quis quo nobis ipsam qui.shl1",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.046Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "Matteo_Sauerim3s",
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/596.jpg",
+  "discriminator": "User",
+  "actorId": "f0a70e36-7134-4999-a9e7-51e8bc09120e",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.569Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1fe-7a54-a0be-ae2235a1bfc1",
-  "title": "Tenetur commodi illum quo facere.7pz6",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.047Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "f0a70e36-7134-4999-a9e7-51e8bc09120e",
+    "profileName": "Matteo_Sauerim3s",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/596.jpg",
+    "discriminator": "User",
+    "actorPoint": 535,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  },
+  "clickable": false,
+  "showPoint": true
 }
-[2026-07-20T03:21:15.571Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6718-74bb-a07e-593535396dd6",
-  "title": "Sit saepe vel vel quisquam.25kq",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.049Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "Bot_D1_Shane.Batz16cso",
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/645.jpg",
+  "discriminator": "Bot",
+  "actorId": "e2d44ea2-3040-469d-ad85-1e6c0930141a",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.573Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3eb8-7ebf-bfb8-ac9c065d9e9b",
-  "title": "Et sed consequatur non quis.ah0w",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.060Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "e2d44ea2-3040-469d-ad85-1e6c0930141a",
+    "profileName": "Bot_D1_Shane.Batz16cso",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/645.jpg",
+    "discriminator": "Bot",
+    "actorPoint": 124,
+    "parentActorId": "c0febbd1-d0e3-47a7-bb88-47b757670296",
+    "parentActor": null,
+    "bots": null
+  }
 }
-[2026-07-20T03:21:15.574Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4332-7544-8a7f-21f5c1a49e20",
-  "title": "Quidem molestiae modi quas voluptatem.u6gu",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.062Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "asdasd",
+  "imageUrl": "",
+  "discriminator": "User",
+  "actorId": "4ecfda63-da26-4705-bcab-0fe534821c8a",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.576Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-1839-7bd4-9bd0-0a27dec5a119",
-  "title": "Et itaque alias consectetur eos.6p0k",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.064Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "4ecfda63-da26-4705-bcab-0fe534821c8a",
+    "profileName": "asdasd",
+    "imageUrl": "",
+    "discriminator": "User",
+    "actorPoint": 151,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  }
 }
-[2026-07-20T03:21:15.578Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-18a9-76bd-ba9d-7d565bba77c6",
-  "title": "Aliquid deleniti quidem illo at.vnyw",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.066Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "Bot_D1_Shane.Batz16cso",
+  "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/645.jpg",
+  "discriminator": "Bot",
+  "actorId": "e2d44ea2-3040-469d-ad85-1e6c0930141a",
+  "size": "sm"
 }
-[2026-07-20T03:21:15.592Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3eb7-744d-98c5-25f070de85f4",
-  "title": "Simulated Post a62ac",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:06.067Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "e2d44ea2-3040-469d-ad85-1e6c0930141a",
+    "profileName": "Bot_D1_Shane.Batz16cso",
+    "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/645.jpg",
+    "discriminator": "Bot",
+    "actorPoint": 124,
+    "parentActorId": "c0febbd1-d0e3-47a7-bb88-47b757670296",
+    "parentActor": null,
+    "bots": null
+  }
 }
-[2026-07-20T03:21:15.595Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "854d2505-7f54-4f5b-9491-0e210a48c159",
+[2026-07-21T04:08:06.069Z] [LOG] [INIT] ActorAvatar {
+  "profileName": "asdasd",
+  "imageUrl": "",
+  "discriminator": "User",
+  "actorId": "4ecfda63-da26-4705-bcab-0fe534821c8a",
+  "size": "sm"
+}
+[2026-07-21T04:08:06.084Z] [LOG] [INIT] ActorMinimalCard {
+  "actor": {
+    "actorId": "4ecfda63-da26-4705-bcab-0fe534821c8a",
+    "profileName": "asdasd",
+    "imageUrl": "",
+    "discriminator": "User",
+    "actorPoint": 151,
+    "parentActorId": null,
+    "parentActor": null,
+    "bots": null
+  }
+}
+[2026-07-21T04:08:06.989Z] [LOG] [API ➤] GET /api/tribe/678ef4f2-a5a7-40d7-8ba1-882eeb892805/posts {
+  "params": {
+    "page": 1
+  }
+}
+[2026-07-21T04:08:06.999Z] [LOG] [API ✗] GET /tribe/678ef4f2-a5a7-40d7-8ba1-882eeb892805/posts — HTTP 404 {
+  "error": {
+    "succeeded": false,
+    "errors": [
+      "No posts found for tribe"
+    ]
+  }
+}
+[2026-07-21T04:08:10.759Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "aa58ec01-c087-47e5-a361-49afcee899f6",
+  "title": "Quasi mollitia temporibus ad minima.tfsy",
+  "likeCount": 3,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.761Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "4c75721c-b1c0-4210-9ff4-956ce3ef7cd5",
   "title": "Et ut harum ad et.jxse",
-  "likeCount": 1,
-  "dislikeCount": 3
+  "likeCount": 0,
+  "dislikeCount": 0
 }
-[2026-07-20T03:21:15.597Z] [LOG] [INIT] EntryMinimalCard {
+[2026-07-21T04:08:10.763Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "f3780468-b7b5-4b77-ae56-1d0566f5aebe",
+  "title": "Maiores omnis maxime cumque quod.azhe",
+  "likeCount": 3,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.765Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "9d4b06e2-9ab2-47dc-8363-d387941a71a9",
+  "title": "Dolorum fuga autem quia ipsum.9k0h",
+  "likeCount": 3,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.767Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "07de7cbe-5766-454e-85cc-622b483c53c2",
+  "title": "Et est sed incidunt possimus.hyi4",
+  "likeCount": 2,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.770Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "78cff5bc-3ffa-4bde-b127-21e44d96c8c3",
+  "title": "Dolorum fuga autem quia ipsum.9k0h",
+  "likeCount": 2,
+  "dislikeCount": 2
+}
+[2026-07-21T04:08:10.781Z] [LOG] [INIT] EntryMinimalCard {
   "contentItemId": "cdf3adde-b867-47ba-bd75-d0cef6bf74ca",
   "title": "Impedit qui sint aut consequatur.cmjv",
   "likeCount": 2,
   "dislikeCount": 2
 }
-[2026-07-20T03:21:15.599Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-64eb-79d6-931e-ab352987c4ef",
-  "title": "Ullam sunt nulla excepturi esse.9xp3",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.783Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "ef953a31-a849-4c8d-8b03-385f40041576",
+  "title": "Veritatis perferendis itaque eaque velit.wf7y",
+  "likeCount": 2,
+  "dislikeCount": 0
 }
-[2026-07-20T03:21:15.602Z] [LOG] [INIT] EntryMinimalCard {
+[2026-07-21T04:08:10.785Z] [LOG] [INIT] EntryMinimalCard {
   "contentItemId": "1cf69eac-4245-4347-9c3c-5a7f1ab45ed5",
   "title": "Amet non veniam libero officiis.d23q",
-  "likeCount": 1,
+  "likeCount": 2,
   "dislikeCount": 1
 }
-[2026-07-20T03:21:15.604Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-644d-7f82-b4b9-df5c7d56bab7",
-  "title": "Simulated Post 766d2",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.622Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "3e5c410c-5f00-44d1-9a0f-907203a7b3bd",
+[2026-07-21T04:08:10.786Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "a7c33912-ce13-433a-b21f-33668d52a6cd",
   "title": "Qui libero repellat a architecto.j1ao",
-  "likeCount": 1,
+  "likeCount": 0,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.788Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "5b6368be-4328-411e-b4d3-259eccfb6b51",
+  "title": "Et qui facilis quia rem.blun",
+  "likeCount": 2,
   "dislikeCount": 1
 }
-[2026-07-20T03:21:15.624Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1dd-7188-a954-9f0e62835cf0",
-  "title": "Illo enim ad explicabo dicta.hktf",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.626Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3ae7-7408-a922-0625237f843c",
-  "title": "Ut est maxime ratione odio.o6xv",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.629Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-885d-7896-a303-657403129eda",
-  "title": "Inventore pariatur dignissimos quis ea.4mxj",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.631Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "261468d5-fb4f-4bba-8414-2ac032aa7cd2",
-  "title": "Illo necessitatibus aliquid facilis qui.jd0l",
-  "likeCount": 0,
+[2026-07-21T04:08:10.790Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "f63d7422-9485-484f-b94b-967e131b030b",
+  "title": "Excepturi et fugit deleniti non.wix9",
+  "likeCount": 2,
   "dislikeCount": 0
 }
-[2026-07-20T03:21:15.633Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-73e6-785e-9a23-ec39fc63b3dd",
-  "title": "Dolores temporibus quia ipsum ducimus.3bmx",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.794Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "d05a62b9-76b3-4cd0-9e68-c52d63414f9f",
+  "title": "Quam ratione quia repellendus sit.9vd8",
+  "likeCount": 2,
+  "dislikeCount": 1
 }
-[2026-07-20T03:21:15.654Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6ce3-79af-9586-ab90637f5573",
-  "title": "Natus perferendis ex dolores minima.s3b4",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.657Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4350-700d-b4b5-8240211cd834",
-  "title": "Rerum debitis magnam quas laboriosam.lbw2",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.660Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6545-7195-8453-46bc41e39346",
-  "title": "Iste unde et voluptatem est.ynta",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.662Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-5dd8-70d0-a61c-91499c29740c",
-  "title": "Simulated Post a34d8",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:21:15.664Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "2583388a-2534-440d-91b8-c4690e39f2f7",
-  "title": "Dolor possimus aperiam sed corporis.p17l",
-  "likeCount": 0,
-  "dislikeCount": 0
-}
-[2026-07-20T03:21:29.303Z] [ERROR] {
-  "code": "auth/configuration-not-found",
-  "customData": {},
-  "name": "FirebaseError"
-}
-[2026-07-20T03:21:43.757Z] [ERROR] {
-  "code": "auth/configuration-not-found",
-  "customData": {},
-  "name": "FirebaseError"
-}
-[2026-07-20T03:22:05.941Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "29ee0f64-ce65-4386-ba6f-6eacc453725c",
-  "title": "Ducimus voluptatem et in aut.f5yi",
-  "likeCount": 0,
-  "dislikeCount": 3
-}
-[2026-07-20T03:22:05.945Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1f2-7703-8235-e4dd0fbf3afc",
-  "title": "Quis quo nobis ipsam qui.shl1",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.947Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1fe-7a54-a0be-ae2235a1bfc1",
-  "title": "Tenetur commodi illum quo facere.7pz6",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.952Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6718-74bb-a07e-593535396dd6",
-  "title": "Sit saepe vel vel quisquam.25kq",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.954Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3eb8-7ebf-bfb8-ac9c065d9e9b",
-  "title": "Et sed consequatur non quis.ah0w",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.955Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4332-7544-8a7f-21f5c1a49e20",
-  "title": "Quidem molestiae modi quas voluptatem.u6gu",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.956Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-1839-7bd4-9bd0-0a27dec5a119",
-  "title": "Et itaque alias consectetur eos.6p0k",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.961Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-18a9-76bd-ba9d-7d565bba77c6",
-  "title": "Aliquid deleniti quidem illo at.vnyw",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.963Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3eb7-744d-98c5-25f070de85f4",
-  "title": "Simulated Post a62ac",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.964Z] [LOG] [INIT] EntryMinimalCard {
+[2026-07-21T04:08:10.796Z] [LOG] [INIT] EntryMinimalCard {
   "contentItemId": "854d2505-7f54-4f5b-9491-0e210a48c159",
   "title": "Et ut harum ad et.jxse",
   "likeCount": 1,
   "dislikeCount": 3
 }
-[2026-07-20T03:22:05.971Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "cdf3adde-b867-47ba-bd75-d0cef6bf74ca",
-  "title": "Impedit qui sint aut consequatur.cmjv",
+[2026-07-21T04:08:10.798Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "69b27c55-38ec-46bd-abc6-3c56cb2c4b74",
+  "title": "Et ut harum ad et.jxse",
   "likeCount": 2,
-  "dislikeCount": 2
+  "dislikeCount": 4
 }
-[2026-07-20T03:22:05.975Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-64eb-79d6-931e-ab352987c4ef",
-  "title": "Ullam sunt nulla excepturi esse.9xp3",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.977Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "1cf69eac-4245-4347-9c3c-5a7f1ab45ed5",
-  "title": "Amet non veniam libero officiis.d23q",
-  "likeCount": 1,
-  "dislikeCount": 1
-}
-[2026-07-20T03:22:05.989Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-644d-7f82-b4b9-df5c7d56bab7",
-  "title": "Simulated Post 766d2",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.990Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "3e5c410c-5f00-44d1-9a0f-907203a7b3bd",
-  "title": "Qui libero repellat a architecto.j1ao",
-  "likeCount": 1,
-  "dislikeCount": 1
-}
-[2026-07-20T03:22:05.991Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1dd-7188-a954-9f0e62835cf0",
-  "title": "Illo enim ad explicabo dicta.hktf",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.992Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3ae7-7408-a922-0625237f843c",
-  "title": "Ut est maxime ratione odio.o6xv",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.993Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-885d-7896-a303-657403129eda",
-  "title": "Inventore pariatur dignissimos quis ea.4mxj",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:05.994Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "261468d5-fb4f-4bba-8414-2ac032aa7cd2",
-  "title": "Illo necessitatibus aliquid facilis qui.jd0l",
-  "likeCount": 0,
+[2026-07-21T04:08:10.799Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "19071863-120c-43e7-b71f-94a4b1a8e56c",
+  "title": "Quae dolorum nostrum ut sed.k11v",
+  "likeCount": 2,
   "dislikeCount": 0
 }
-[2026-07-20T03:22:06.004Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-73e6-785e-9a23-ec39fc63b3dd",
-  "title": "Dolores temporibus quia ipsum ducimus.3bmx",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.006Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6ce3-79af-9586-ab90637f5573",
-  "title": "Natus perferendis ex dolores minima.s3b4",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.007Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4350-700d-b4b5-8240211cd834",
-  "title": "Rerum debitis magnam quas laboriosam.lbw2",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.008Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6545-7195-8453-46bc41e39346",
-  "title": "Iste unde et voluptatem est.ynta",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.009Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-5dd8-70d0-a61c-91499c29740c",
-  "title": "Simulated Post a34d8",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.010Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "2583388a-2534-440d-91b8-c4690e39f2f7",
-  "title": "Dolor possimus aperiam sed corporis.p17l",
-  "likeCount": 0,
-  "dislikeCount": 0
-}
-[2026-07-20T03:22:06.021Z] [LOG] [INIT] EntryMinimalCard {
+[2026-07-21T04:08:10.801Z] [LOG] [INIT] EntryMinimalCard {
   "contentItemId": "29ee0f64-ce65-4386-ba6f-6eacc453725c",
   "title": "Ducimus voluptatem et in aut.f5yi",
   "likeCount": 0,
   "dislikeCount": 3
 }
-[2026-07-20T03:22:06.022Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1f2-7703-8235-e4dd0fbf3afc",
-  "title": "Quis quo nobis ipsam qui.shl1",
+[2026-07-21T04:08:10.803Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "90ce15bd-fdc7-4de1-9a88-8f5b88e9a0b4",
+  "title": "Quia est autem ut architecto.fwbq",
   "likeCount": 0,
-  "dislikeCount": null
+  "dislikeCount": 0
 }
-[2026-07-20T03:22:06.023Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1fe-7a54-a0be-ae2235a1bfc1",
-  "title": "Tenetur commodi illum quo facere.7pz6",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.816Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "21d0ef99-7880-4751-a7bb-78f7584d98d1",
+  "title": "Aliquam molestias dolor quidem quasi.2ds0",
+  "likeCount": 1,
+  "dislikeCount": 0
 }
-[2026-07-20T03:22:06.024Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6718-74bb-a07e-593535396dd6",
-  "title": "Sit saepe vel vel quisquam.25kq",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.025Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3eb8-7ebf-bfb8-ac9c065d9e9b",
-  "title": "Et sed consequatur non quis.ah0w",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.026Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4332-7544-8a7f-21f5c1a49e20",
-  "title": "Quidem molestiae modi quas voluptatem.u6gu",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.038Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-1839-7bd4-9bd0-0a27dec5a119",
-  "title": "Et itaque alias consectetur eos.6p0k",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.039Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-18a9-76bd-ba9d-7d565bba77c6",
-  "title": "Aliquid deleniti quidem illo at.vnyw",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.042Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3eb7-744d-98c5-25f070de85f4",
-  "title": "Simulated Post a62ac",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.043Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "854d2505-7f54-4f5b-9491-0e210a48c159",
+[2026-07-21T04:08:10.818Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "51ac23d1-6061-47ea-866e-65cbee2103b0",
   "title": "Et ut harum ad et.jxse",
   "likeCount": 1,
-  "dislikeCount": 3
+  "dislikeCount": 2
 }
-[2026-07-20T03:22:06.044Z] [LOG] [INIT] EntryMinimalCard {
+[2026-07-21T04:08:10.819Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "fc0fd6aa-45ea-4264-9a02-42445667de39",
+  "title": "Deleniti est et dolores omnis.0i6u",
+  "likeCount": 1,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.821Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "7f4c9c4e-38d5-4d73-9071-d6ce602d0d6d",
+  "title": "Quia quod at autem cumque.ibo5",
+  "likeCount": 0,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.822Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "01e29d9d-d9d4-4a1f-a090-5e5706685dbd",
+  "title": "Provident sed ex aut distinctio.rl83",
+  "likeCount": 1,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.824Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "ba647eb2-35d7-4429-abca-0809ed35000f",
+  "title": "Harum at aut porro quibusdam.jvym",
+  "likeCount": 1,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.836Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "b3f9585a-68d6-4ebd-b6a4-f4efa86e4cde",
+  "title": "Tempore perferendis incidunt enim quod.rur6",
+  "likeCount": 1,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.838Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "aa58ec01-c087-47e5-a361-49afcee899f6",
+  "title": "Quasi mollitia temporibus ad minima.tfsy",
+  "likeCount": 3,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.839Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "4c75721c-b1c0-4210-9ff4-956ce3ef7cd5",
+  "title": "Et ut harum ad et.jxse",
+  "likeCount": 0,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.841Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "f3780468-b7b5-4b77-ae56-1d0566f5aebe",
+  "title": "Maiores omnis maxime cumque quod.azhe",
+  "likeCount": 3,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.844Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "9d4b06e2-9ab2-47dc-8363-d387941a71a9",
+  "title": "Dolorum fuga autem quia ipsum.9k0h",
+  "likeCount": 3,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.846Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "07de7cbe-5766-454e-85cc-622b483c53c2",
+  "title": "Et est sed incidunt possimus.hyi4",
+  "likeCount": 2,
+  "dislikeCount": 1
+}
+[2026-07-21T04:08:10.864Z] [LOG] [INIT] EntryMinimalCard {
   "contentItemId": "cdf3adde-b867-47ba-bd75-d0cef6bf74ca",
   "title": "Impedit qui sint aut consequatur.cmjv",
   "likeCount": 2,
   "dislikeCount": 2
 }
-[2026-07-20T03:22:06.044Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-64eb-79d6-931e-ab352987c4ef",
-  "title": "Ullam sunt nulla excepturi esse.9xp3",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.866Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "78cff5bc-3ffa-4bde-b127-21e44d96c8c3",
+  "title": "Dolorum fuga autem quia ipsum.9k0h",
+  "likeCount": 2,
+  "dislikeCount": 2
 }
-[2026-07-20T03:22:06.054Z] [LOG] [INIT] EntryMinimalCard {
+[2026-07-21T04:08:10.867Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "ef953a31-a849-4c8d-8b03-385f40041576",
+  "title": "Veritatis perferendis itaque eaque velit.wf7y",
+  "likeCount": 2,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.868Z] [LOG] [INIT] EntryMinimalCard {
   "contentItemId": "1cf69eac-4245-4347-9c3c-5a7f1ab45ed5",
   "title": "Amet non veniam libero officiis.d23q",
-  "likeCount": 1,
+  "likeCount": 2,
   "dislikeCount": 1
 }
-[2026-07-20T03:22:06.055Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-644d-7f82-b4b9-df5c7d56bab7",
-  "title": "Simulated Post 766d2",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.056Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "3e5c410c-5f00-44d1-9a0f-907203a7b3bd",
+[2026-07-21T04:08:10.870Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "a7c33912-ce13-433a-b21f-33668d52a6cd",
   "title": "Qui libero repellat a architecto.j1ao",
-  "likeCount": 1,
+  "likeCount": 0,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.871Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "5b6368be-4328-411e-b4d3-259eccfb6b51",
+  "title": "Et qui facilis quia rem.blun",
+  "likeCount": 2,
   "dislikeCount": 1
 }
-[2026-07-20T03:22:06.058Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f5e0d-d1dd-7188-a954-9f0e62835cf0",
-  "title": "Illo enim ad explicabo dicta.hktf",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.887Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "f63d7422-9485-484f-b94b-967e131b030b",
+  "title": "Excepturi et fugit deleniti non.wix9",
+  "likeCount": 2,
+  "dislikeCount": 0
 }
-[2026-07-20T03:22:06.059Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-3ae7-7408-a922-0625237f843c",
-  "title": "Ut est maxime ratione odio.o6xv",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.889Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "d05a62b9-76b3-4cd0-9e68-c52d63414f9f",
+  "title": "Quam ratione quia repellendus sit.9vd8",
+  "likeCount": 2,
+  "dislikeCount": 1
 }
-[2026-07-20T03:22:06.060Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-885d-7896-a303-657403129eda",
-  "title": "Inventore pariatur dignissimos quis ea.4mxj",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.891Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "854d2505-7f54-4f5b-9491-0e210a48c159",
+  "title": "Et ut harum ad et.jxse",
+  "likeCount": 1,
+  "dislikeCount": 3
 }
-[2026-07-20T03:22:06.071Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "261468d5-fb4f-4bba-8414-2ac032aa7cd2",
-  "title": "Illo necessitatibus aliquid facilis qui.jd0l",
+[2026-07-21T04:08:10.892Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "69b27c55-38ec-46bd-abc6-3c56cb2c4b74",
+  "title": "Et ut harum ad et.jxse",
+  "likeCount": 2,
+  "dislikeCount": 4
+}
+[2026-07-21T04:08:10.894Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "19071863-120c-43e7-b71f-94a4b1a8e56c",
+  "title": "Quae dolorum nostrum ut sed.k11v",
+  "likeCount": 2,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.895Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "29ee0f64-ce65-4386-ba6f-6eacc453725c",
+  "title": "Ducimus voluptatem et in aut.f5yi",
+  "likeCount": 0,
+  "dislikeCount": 3
+}
+[2026-07-21T04:08:10.909Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "90ce15bd-fdc7-4de1-9a88-8f5b88e9a0b4",
+  "title": "Quia est autem ut architecto.fwbq",
   "likeCount": 0,
   "dislikeCount": 0
 }
-[2026-07-20T03:22:06.072Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-73e6-785e-9a23-ec39fc63b3dd",
-  "title": "Dolores temporibus quia ipsum ducimus.3bmx",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.910Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "21d0ef99-7880-4751-a7bb-78f7584d98d1",
+  "title": "Aliquam molestias dolor quidem quasi.2ds0",
+  "likeCount": 1,
+  "dislikeCount": 0
 }
-[2026-07-20T03:22:06.073Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6ce3-79af-9586-ab90637f5573",
-  "title": "Natus perferendis ex dolores minima.s3b4",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.911Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "51ac23d1-6061-47ea-866e-65cbee2103b0",
+  "title": "Et ut harum ad et.jxse",
+  "likeCount": 1,
+  "dislikeCount": 2
 }
-[2026-07-20T03:22:06.074Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-4350-700d-b4b5-8240211cd834",
-  "title": "Rerum debitis magnam quas laboriosam.lbw2",
-  "likeCount": 0,
-  "dislikeCount": null
+[2026-07-21T04:08:10.912Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "fc0fd6aa-45ea-4264-9a02-42445667de39",
+  "title": "Deleniti est et dolores omnis.0i6u",
+  "likeCount": 1,
+  "dislikeCount": 0
 }
-[2026-07-20T03:22:06.076Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7295-6545-7195-8453-46bc41e39346",
-  "title": "Iste unde et voluptatem est.ynta",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.077Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "019f7296-5dd8-70d0-a61c-91499c29740c",
-  "title": "Simulated Post a34d8",
-  "likeCount": 0,
-  "dislikeCount": null
-}
-[2026-07-20T03:22:06.088Z] [LOG] [INIT] EntryMinimalCard {
-  "contentItemId": "2583388a-2534-440d-91b8-c4690e39f2f7",
-  "title": "Dolor possimus aperiam sed corporis.p17l",
+[2026-07-21T04:08:10.913Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "7f4c9c4e-38d5-4d73-9071-d6ce602d0d6d",
+  "title": "Quia quod at autem cumque.ibo5",
   "likeCount": 0,
   "dislikeCount": 0
 }
-[2026-07-20T03:34:40.638Z] [ERROR] {
-  "code": "auth/configuration-not-found",
-  "customData": {},
-  "name": "FirebaseError"
+[2026-07-21T04:08:10.914Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "01e29d9d-d9d4-4a1f-a090-5e5706685dbd",
+  "title": "Provident sed ex aut distinctio.rl83",
+  "likeCount": 1,
+  "dislikeCount": 0
 }
+[2026-07-21T04:08:10.925Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "ba647eb2-35d7-4429-abca-0809ed35000f",
+  "title": "Harum at aut porro quibusdam.jvym",
+  "likeCount": 1,
+  "dislikeCount": 0
+}
+[2026-07-21T04:08:10.926Z] [LOG] [INIT] EntryMinimalCard {
+  "contentItemId": "b3f9585a-68d6-4ebd-b6a4-f4efa86e4cde",
+  "title": "Tempore perferendis incidunt enim quod.rur6",
+  "likeCount": 1,
+  "dislikeCount": 0
+}
+[2026-07-21T04:09:14.402Z] [LOG] [INIT] ForgotPasswordModal {
+  "isOpen": false
+}
+[2026-07-21T04:09:14.405Z] [LOG] [INIT] LoginPage {}
+[2026-07-21T04:09:14.406Z] [LOG] [INIT] ForgotPasswordModal {
+  "isOpen": false
+}
+[2026-07-21T04:09:14.407Z] [LOG] [INIT] LoginPage {}

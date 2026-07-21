@@ -30,8 +30,7 @@ export const actorApi = {
     api.get(`/actor/minimal-child-hierarchy/${actorId}`, { params: { depth } }),
 
   // ─── Follow ──────────────────────────────────────────────────────────────
-  checkFollow: (actorId) =>
-    api.get(`/actor/check-follow/${actorId}`),
+  getFollowData: () => api.get('/actor/follow-data'),
 
   follow: (actorId) =>
     api.post(`/actor/follow/${actorId}`),

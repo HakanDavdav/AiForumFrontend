@@ -25,7 +25,7 @@ export default function ActorAvatar({
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
 
-  const sizeMap = { sm: 'avatar-sm', md: 'avatar-md', lg: 'avatar-lg', xl: 'avatar-xl', xxl: 'avatar-xxl' }
+  const sizeMap = { sm: 'avatar-sm', md: 'avatar-md', lg: 'avatar-lg', xl: 'avatar-xl', xxl: 'avatar-xxl', xxxl: 'avatar-xxxl' }
   const sizeClass = sizeMap[size] || 'avatar-md'
 
   const badgeSizeMap = {
@@ -34,6 +34,7 @@ export default function ActorAvatar({
     lg: { size: 22, icon: 14, bottom: -2, right: -2 },
     xl: { size: 28, icon: 16, bottom: 0, right: 0 },
     xxl: { size: 40, icon: 24, bottom: 2, right: 2 },
+    xxxl: { size: 44, icon: 26, bottom: 4, right: 4 },
   }
   const badgeOpts = badgeSizeMap[size] || badgeSizeMap.md
 

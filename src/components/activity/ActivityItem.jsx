@@ -9,14 +9,15 @@ import { useTranslation } from 'react-i18next'
  * ActivityItem — plan.md Component #5
  * Bildirim/aktivite öğesi. Okunmamışlar vurgulanır.
  */
-export default function ActivityItem({ activity, onMarkRead, currentProfileName }) {
+export default function ActivityItem({ activity, onMarkRead, currentProfileName, forceRead }) {
   useDevLog('ActivityItem', arguments[0] || {})
   const navigate = useNavigate()
   const { t } = useTranslation()
 
   if (!activity) return null
 
-  const { activityId, message, isRead, createdAt, additionalIdType, additionalId } = activity
+  const { activityId, message, createdAt, additionalIdType, additionalId } = activity
+  const isRead = forceRead ? true : activity.isRead
 
   const timeAgo = getShortTimeAgo(createdAt)
 

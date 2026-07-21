@@ -14,7 +14,7 @@ export default function SearchPage() {
   const orderType = searchParams.get('orderType') || ''
   const startDate = searchParams.get('startDate') || ''
   const endDate = searchParams.get('endDate') || ''
-  
+
   useDevLog('SearchPage', arguments[0] || {})
 
   // Ensure orderType is never empty string
@@ -94,8 +94,10 @@ export default function SearchPage() {
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.actors')}</h3>
               <div className="flex flex-col gap-2">
                 {g.actors.map((a) => (
-                  <div key={a.actorId} className="card-surface">
-                    <ActorMinimalCard actor={a} />
+                  <div key={a.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <ActorMinimalCard actor={a} />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -144,8 +146,10 @@ export default function SearchPage() {
       return (
         <div className="flex flex-col gap-2">
           {data.map((a) => (
-            <div key={a.actorId} className="card-surface">
-              <ActorMinimalCard actor={a} />
+            <div key={a.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <ActorMinimalCard actor={a} />
+              </div>
             </div>
           ))}
         </div>
