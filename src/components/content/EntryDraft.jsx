@@ -10,28 +10,47 @@ import { useTranslation } from 'react-i18next'
  * EntryDraft — plan.md Component #22
  * Post veya Entry altında inline yanıt yazma kutusu.
  */
-export default function EntryDraft({ parentContentItemId, onSuccess, onCancel }) {
+export default function EntryDraft({ parentContentItemId, editContentItemId = null, initialContent = '', onSuccess, onCancel }) {
   useDevLog('EntryDraft', arguments[0] || {})
-  const [content, setContent] = useState('')
-  const [error, setError] = useState(null)
+  const [content, setContent] = useState(initialContent)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const { t } = useTranslation()
 
   const mutation = useMutation({
-    mutationFn: () => contentItemApi.createEntry(parentContentItemId, { content }),
-    onSuccess: () => {
-      setContent('')
-      setError(null)
-      if (onSuccess) onSuccess()
+    mutationFn: () => {
+      if (editContentItemId) return contentItemApi.editEntry(editContentItemId, { content })
+      return contentItemApi.createEntry(parentContentItemId, { content })
     },
-    onError: (err) => {
-      setError(err.message || t('card.failed_to_create'))
+    meta: { showErrorToast: true },
+    onSuccess: () => {
+      if (!editContentItemId) setContent('')
+      if (onSuccess) onSuccess(content)
     },
   })
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = content.trim() !== '' && !mutation.isPending
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!content.trim()) return
+    
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
+
     mutation.mutate()
   }
 
@@ -39,20 +58,26 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
 
   return (
     <div className="entry-draft">
-      <form onSubmit={handleSubmit}>
+      <form noValidate onSubmit={handleSubmit}>
         <textarea
           className="input textarea"
-          placeholder={t('card.write_reply')}
+          placeholder={editContentItemId ? t('action.edit') : t('card.write_reply')}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={3}
-          style={{ border: 'none', background: 'transparent', padding: 0 }}
+          style={{ 
+            border: `1px solid ${getBorderColor('content', content, true)}`, 
+            background: 'var(--color-surface)', 
+            padding: '12px',
+            borderRadius: '8px',
+            outline: 'none',
+            transition: 'border-color 0.2s',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+          onFocus={() => setFocused('content')}
+          onBlur={() => setFocused(null)}
         />
-        {error && (
-          <p className="form-error" style={{ marginBottom: 4 }}>
-            {error}
-          </p>
-        )}
         <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
           {onCancel && (
             <button type="button" className="btn btn-ghost btn-sm" onClick={onCancel}>
@@ -62,11 +87,13 @@ export default function EntryDraft({ parentContentItemId, onSuccess, onCancel })
           <button
             type="submit"
             className="btn btn-primary btn-sm"
-            disabled={!content.trim() || mutation.isPending}
+            disabled={mutation.isPending}
             style={{ marginLeft: 'auto' }}
           >
             <Send size={13} />
-            {mutation.isPending ? t('action.sending') : t('action.send')}
+            {mutation.isPending 
+              ? (editContentItemId ? t('action.saving') : t('action.sending')) 
+              : (editContentItemId ? t('action.save') : t('action.send'))}
           </button>
         </div>
       </form>

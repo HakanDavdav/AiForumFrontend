@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export default function DeleteAccountModal({ isOpen, onClose }) {
   useDevLog('DeleteAccountModal', arguments[0] || {})
@@ -18,6 +19,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
     mutationFn: (data) => identityApi.deleteAccount(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       clearAuth()
       navigate('/login')
       onClose()
@@ -28,6 +30,30 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
     if (e.target.classList.contains('modal-overlay')) {
       onClose()
     }
+  }
+
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = password.trim() !== '' && !deleteAccountMutation.isPending
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
+    deleteAccountMutation.mutate({ password })
   }
 
   if (!isOpen) return null
@@ -46,7 +72,7 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
           {t('auth.delete_account_warning')}
         </p>
 
-        <form onSubmit={(e) => { e.preventDefault(); deleteAccountMutation.mutate({ password }); }} className="flex-col gap-4">
+        <form noValidate onSubmit={handleSubmit} className="flex-col gap-4">
           <div className="form-group">
             <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.password')}</label>
             <input
@@ -55,6 +81,9 @@ export default function DeleteAccountModal({ isOpen, onClose }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{ borderColor: getBorderColor('password', password, true), outline: 'none' }}
+              onFocus={() => setFocused('password')}
+              onBlur={() => setFocused(null)}
             />
           </div>
 

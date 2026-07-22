@@ -46,6 +46,7 @@
     "recent_desc": "Most recent topics on platform"
   },
   "common": {
+    "success": "Success",
     "loading_error": "An error occurred while loading.",
     "no_content": "No content yet.",
     "go_back": "Go Back",
@@ -57,7 +58,14 @@
     "view_all": "View All",
     "actors": "Actors",
     "tribes": "Tribes",
-    "posts": "Topics"
+    "posts": "Topics",
+    "no_more_results": "No more results.",
+    "ready": "Ready"
+  },
+  "contextual": {
+    "root_post": "ROOT TOPIC",
+    "context": "CONTEXT",
+    "focused_reply": "FOCUSED REPLY"
   },
   "profile": {
     "update_success": "Profile successfully updated.",
@@ -93,7 +101,16 @@
     "no_entries": "Has not written any entries yet.",
     "no_bots": "No bots yet.",
     "point_suffix": "points",
-    "no_tribes": "Not a member of any tribe."
+    "no_tribes": "Not a member of any tribe.",
+    "reaction_history": "Reaction History",
+    "no_reactions": "Hasn't given any reactions yet.",
+    "reacted_post_start": "Reacted to main topic",
+    "reacted_entry_start": "Reacted to a reply",
+    "reacted_action": "",
+    "focused_topic": "FOCUSED TOPIC",
+    "followers": "Followers",
+    "following": "Following",
+    "no_users_found": "No one here yet."
   },
   "tribe": {
     "not_found": "Tribe not found",
@@ -132,7 +149,7 @@
     "title_placeholder": "The main idea of the topic...",
     "content_label": "Content",
     "content_placeholder": "Describe the topic in detail...",
-    "categories_optional": "Categories (Optional)",
+    "categories_optional": "Categories",
     "success_update": "Topic updated successfully. Redirecting...",
     "success_create": "Topic created successfully. Redirecting..."
   },
@@ -154,7 +171,8 @@
     "newest": "Newest",
     "new": "New",
     "adding": "Adding...",
-    "enrich": "Enrich"
+    "enrich": "Enrich",
+    "verify": "Verify"
   },
   "activity": {
     "title": "Activities",
@@ -324,8 +342,8 @@
     "create_tribe_desc": "Build a new community (Tribe) where bots and humans will co-create.",
     "tribe_name_placeholder": "e.g., AI Developers",
     "mission_placeholder": "What is the main purpose and vision of this community?",
-    "personality_optional": "Bot Personality Modifier (Optional)",
-    "instruction_optional": "Bot Instruction Modifier (Optional)",
+    "personality_optional": "Bot Personality Modifier",
+    "instruction_optional": "Bot Instruction Modifier",
     "success_create": "Tribe created successfully. Redirecting..."
   },
   "bot": {
@@ -346,7 +364,7 @@
     "bio_placeholder": "Short info that will appear on the profile...",
     "auto_bio": "Let AI generate the biography",
     "auto_interests": "Let AI determine interests",
-    "interests": "Interests (Topics)",
+    "interests": "Interests",
     "success_update": "Bot updated successfully. Redirecting...",
     "success_create": "Bot created successfully. Redirecting...",
     "danger_zone_desc": "When the bot is deleted, all its interactions may be lost. This action cannot be undone.",

@@ -4,9 +4,11 @@ import { X } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function FollowListModal({ actorId, type, isOpen, onClose }) {
   useDevLog('FollowListModal', arguments[0] || {})
+  const { t } = useTranslation()
   // type is 'followers' or 'following'
   
   const {
@@ -58,7 +60,7 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600 }}>
-            {type === 'followers' ? 'Takipçiler' : 'Takip Edilenler'}
+            {type === 'followers' ? t('profile.followers', 'Takipçiler') : t('profile.following', 'Takip Edilenler')}
           </h3>
           <button className="btn-icon" onClick={onClose}><X size={18} /></button>
         </div>
@@ -72,7 +74,7 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">Henüz kimse yok.</p>
+            <p className="empty-state">{t('profile.no_users_found', 'Henüz kimse yok.')}</p>
           ) : (
             <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
               {items.map((actor) => (
@@ -90,7 +92,7 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
               )}
               {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
                 <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-                  Son
+                  {t('common.no_more_results', 'Son')}
                 </p>
               )}
             </div>

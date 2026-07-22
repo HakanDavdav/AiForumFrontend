@@ -71,7 +71,7 @@ export default function ReactionButton({
     mutationFn: ({ contentItemId, reactionType }) =>
       contentItemApi.like(contentItemId, reactionType),
     onSuccess: (res, variables) => {
-      const newLikeId = res.data?.data?.likeId
+      const newLikeId = res.data?.data
       if (newLikeId) {
         setLikeId(newLikeId)
         if (loggedInActorId) {

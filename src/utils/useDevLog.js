@@ -12,9 +12,9 @@ import { useEffect } from 'react'
  */
 const useDevLog = (componentName, props) => {
   useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log(`[INIT] ${componentName}`, { ...props })
-    }
+    // if (import.meta.env.DEV) {
+    //   console.log(`[INIT] ${componentName}`, { ...props })
+    // }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 }
 

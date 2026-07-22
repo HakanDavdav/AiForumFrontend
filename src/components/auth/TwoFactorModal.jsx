@@ -4,6 +4,7 @@ import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export default function TwoFactorModal({ isOpen, onClose }) {
   useDevLog('TwoFactorModal', arguments[0] || {})
@@ -14,6 +15,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
     mutationFn: () => identityApi.enableTwoFactor(),
     meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       setSuccessMsg(t('auth.two_factor_enabled'))
       setTimeout(() => {
         onClose()
@@ -26,6 +28,7 @@ export default function TwoFactorModal({ isOpen, onClose }) {
     mutationFn: () => identityApi.disableTwoFactor(),
     meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       setSuccessMsg(t('auth.two_factor_disabled'))
       setTimeout(() => {
         onClose()

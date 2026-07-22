@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import TokenModal from '../../components/auth/TokenModal'
@@ -21,7 +22,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
-  const [error, setError] = useState(null)
 
   const [isConfirming, setIsConfirming] = useState(false)
   const { t } = useTranslation()
@@ -51,21 +51,16 @@ export default function RegisterPage() {
            navigate('/init-profile')
          }
       }
-    },
-    onError: (err) => {
-      setError(err?.response?.data?.errors?.[0]?.description || err.message)
     }
   })
 
   const handleProviderLogin = async (provider) => {
     try {
-      setError(null)
       const result = await signInWithPopup(auth, provider)
       const idToken = await result.user.getIdToken()
       firebaseLoginMutation.mutate({ idToken })
     } catch (err) {
       console.error(err)
-      setError(err.message)
     }
   }
 
@@ -81,15 +76,39 @@ export default function RegisterPage() {
 
   const handleTimeout = () => {
     setIsConfirming(false)
-    setError(t('auth.timeout'))
+    toast.error(t('auth.timeout', 'Zaman aşımı'))
   }
+
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmitRegister = username.trim() !== '' && email.trim() !== '' && password.trim() !== '' && passwordConfirm.trim() !== '' && !registerMutation.isPending && !requestEmailConfirmMutation.isPending
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
-    setError(null)
+    
+    if (!canSubmitRegister) {
+      setHasSubmitted(true)
+      return
+    }
 
     if (password !== passwordConfirm) {
-      setError(t('auth.passwords_do_not_match'))
+      // It's technically a logic error, but user wants it passed to backend, OR since it's password match, maybe just show the toast error manually.
+      // Wait, password mismatch can be handled here because it's a critical frontend check or we let backend handle it?
+      // "doluluk boş olma durumları dışında textbox boyama frontend ön kontrolü yapma"
+      // If we don't check it here, backend might not check if passwordConfirm matches (usually only frontend checks confirmPassword, backend only receives `password`!)
+      // Wait, register endpoint only takes { username, email, password }. `passwordConfirm` is purely frontend! So we MUST check it here.
+      toast.error(t('auth.passwords_do_not_match', 'Şifreler eşleşmiyor'))
       return
     }
 
@@ -118,7 +137,7 @@ export default function RegisterPage() {
           </span>
         </div>
 
-        <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
+        <form noValidate onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
         <div className="form-group">
           <label className="form-label">{t('auth.username')}</label>
           <input 
@@ -126,8 +145,9 @@ export default function RegisterPage() {
             type="text" 
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            required 
-            minLength={3}
+            style={{ borderColor: getBorderColor('username', username, true), outline: 'none' }}
+            onFocus={() => setFocused('username')}
+            onBlur={() => setFocused(null)}
           />
         </div>
 
@@ -138,7 +158,9 @@ export default function RegisterPage() {
             type="email" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required 
+            style={{ borderColor: getBorderColor('email', email, true), outline: 'none' }}
+            onFocus={() => setFocused('email')}
+            onBlur={() => setFocused(null)}
           />
         </div>
 
@@ -149,8 +171,9 @@ export default function RegisterPage() {
             type="password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required 
-            minLength={6}
+            style={{ borderColor: getBorderColor('password', password, true), outline: 'none' }}
+            onFocus={() => setFocused('password')}
+            onBlur={() => setFocused(null)}
           />
         </div>
 
@@ -161,13 +184,11 @@ export default function RegisterPage() {
             type="password" 
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
-            required 
-            minLength={6}
+            style={{ borderColor: getBorderColor('passwordConfirm', passwordConfirm, true), outline: 'none' }}
+            onFocus={() => setFocused('passwordConfirm')}
+            onBlur={() => setFocused(null)}
           />
         </div>
-
-        {error && <div className="form-error text-center">{error}</div>}
-
         <button 
           type="submit" 
           className="btn btn-primary w-full"

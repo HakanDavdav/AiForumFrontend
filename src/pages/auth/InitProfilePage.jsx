@@ -7,25 +7,26 @@ import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { PersonStanding } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 const TOPIC_TYPES = [
-  { value: 1, label: 'Politika' },
-  { value: 32, label: 'Teknoloji' },
-  { value: 128, label: 'Yapay Zeka' },
-  { value: 64, label: 'Bilim' },
-  { value: 4, label: 'Dünya Haberleri' },
-  { value: 8, label: 'Yerel Haberler' },
-  { value: 2, label: 'Ekonomi' },
-  { value: 16, label: 'Trend Başlıklar' },
-  { value: 1024, label: 'Spor' },
-  { value: 2048, label: 'Eğlence' },
-  { value: 4096, label: 'Oyun' },
-  { value: 8192, label: 'Ünlüler' },
-  { value: 16384, label: 'Yaşam Tarzı' },
-  { value: 512, label: 'Sağlık' },
-  { value: 256, label: 'Uzay' },
-  { value: 32768, label: 'Eğitim' },
-  { value: 65536, label: 'İlişkiler' },
+  { value: 1, enumName: 'Politics', label: 'Politika' },
+  { value: 2, enumName: 'Economy', label: 'Ekonomi' },
+  { value: 4, enumName: 'WorldNews', label: 'Dünya Haberleri' },
+  { value: 8, enumName: 'LocalNews', label: 'Yerel Haberler' },
+  { value: 16, enumName: 'Trending', label: 'Trend Başlıklar' },
+  { value: 32, enumName: 'Technology', label: 'Teknoloji' },
+  { value: 64, enumName: 'Science', label: 'Bilim' },
+  { value: 128, enumName: 'AI', label: 'Yapay Zeka' },
+  { value: 256, enumName: 'Space', label: 'Uzay' },
+  { value: 512, enumName: 'Health', label: 'Sağlık' },
+  { value: 1024, enumName: 'Sports', label: 'Spor' },
+  { value: 2048, enumName: 'Entertainment', label: 'Eğlence' },
+  { value: 4096, enumName: 'Gaming', label: 'Oyun' },
+  { value: 8192, enumName: 'Celebrity', label: 'Ünlüler' },
+  { value: 16384, enumName: 'Lifestyle', label: 'Yaşam Tarzı' },
+  { value: 32768, enumName: 'Education', label: 'Eğitim' },
+  { value: 65536, enumName: 'Relationships', label: 'İlişkiler' },
 ]
 
 export default function InitProfilePage() {
@@ -37,13 +38,13 @@ export default function InitProfilePage() {
   const [profileName, setProfileName] = useState('')
   const [bio, setBio] = useState('')
   const [selectedTopics, setSelectedTopics] = useState([])
-  const [error, setError] = useState(null)
   const { t } = useTranslation()
 
   const initProfileMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
     meta: { showErrorToast: true },
     onSuccess: async () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       try {
         await identityApi.refreshClaims()
       } catch (err) {
@@ -61,9 +62,28 @@ export default function InitProfilePage() {
     )
   }
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = profileName.trim() !== '' && bio.trim() !== '' && !initProfileMutation.isPending
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    setError(null)
+
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
 
     const payload = {
       userId: actorId,
@@ -108,7 +128,7 @@ export default function InitProfilePage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* Profile Name */}
         <div>
           <label
@@ -122,7 +142,7 @@ export default function InitProfilePage() {
               textTransform: 'uppercase',
             }}
           >
-            Görünen Ad <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('auth.display_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <input
@@ -136,7 +156,7 @@ export default function InitProfilePage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('profileName', profileName, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -145,8 +165,8 @@ export default function InitProfilePage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box',
               }}
-              onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+              onFocus={() => setFocused('profileName')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -164,20 +184,19 @@ export default function InitProfilePage() {
               textTransform: 'uppercase',
             }}
           >
-            {t('auth.bio')}
+            {t('auth.bio')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
               placeholder={t('profile.bio_placeholder')}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              disabled={initProfileMutation.isPending || initProfileMutation.isSuccess}
               rows={4}
               style={{
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('bio', bio, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -189,8 +208,8 @@ export default function InitProfilePage() {
                 boxSizing: 'border-box',
                 lineHeight: 1.5,
               }}
-              onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+              onFocus={() => setFocused('bio')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>

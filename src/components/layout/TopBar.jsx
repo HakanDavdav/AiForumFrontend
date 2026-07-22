@@ -126,6 +126,7 @@ export default function TopBar() {
       storeLogout()
       clearEntities()
       queryClient.clear()
+      navigate('/')
     },
   })
 
@@ -684,19 +685,10 @@ export default function TopBar() {
                     </select>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      {t('sort.label')}
-                    </label>
-                    <select value={filters.sortMode} onChange={e => handleFilterChange('sortMode', e.target.value)} className="input" style={{ width: '100%', height: 36, padding: '0 12px' }}>
-                      <option value="Newest">{t('sort.newest')}</option>
-                      <option value="Hot">{t('sort.hot')}</option>
-                    </select>
-                  </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      {t('topbar.start_date')}
+                      {t('search.start_date', 'Başlangıç Tarihi')}
                     </label>
                     <input
                       type="date"
@@ -709,7 +701,7 @@ export default function TopBar() {
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                      {t('topbar.end_date')}
+                      {t('search.end_date', 'Bitiş Tarihi')}
                     </label>
                     <input
                       type="date"
@@ -796,7 +788,6 @@ export default function TopBar() {
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              paddingRight: 8,
             }}
           >
             <button
@@ -805,17 +796,18 @@ export default function TopBar() {
               title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
               style={{ color: 'var(--color-primary)' }}
             >
-              <Bot size={20} strokeWidth={2.5} />
+              <Bot size={18} strokeWidth={2.5} />
             </button>
             <button
               className="btn-icon"
               onClick={toggleTheme}
               title={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
+              style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }}
             >
-              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-            <div style={{ width: 1, height: 24, background: 'var(--color-border)', margin: '0 4px' }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-secondary)', marginRight: 6 }}>
+            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 4px' }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
               Hakan Davdav
             </span>
             <a
@@ -827,8 +819,8 @@ export default function TopBar() {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -850,8 +842,8 @@ export default function TopBar() {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -863,7 +855,7 @@ export default function TopBar() {
                 <path d="M9 18c-4.5 1.5-5-2.5-7-3" />
               </svg>
             </a>
-            <div style={{ width: 1, height: 24, background: 'var(--color-border)', margin: '0 8px 0 4px' }} />
+            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 0 0 4px' }} />
           </div>
 
           {isLoggedIn ? (
@@ -873,6 +865,7 @@ export default function TopBar() {
                   actor={myProfile}
                   showHierarchyBtn={false}
                   clickable={true}
+                  chipStyle={{ maxWidth: 220 }}
                 />
               </div>
               <button

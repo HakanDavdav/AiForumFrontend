@@ -181,7 +181,7 @@ export default function RightPanel() {
 // ─── Cache Widget sub-component ───────────────────────────────────────────────
 
 function CacheWidget({ title, items, type, onViewAll }) {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
   const navigate = useNavigate()
   const { t } = useTranslation()
 

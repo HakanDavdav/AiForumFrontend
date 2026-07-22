@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { getShortTimeAgo } from '../../utils/formatTime'
 import { Pencil, Trash2, MessageSquare, ChevronDown, ChevronUp, Smile } from 'lucide-react'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
+import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import ReactionButton from './ReactionButton'
 import EntryDraft from './EntryDraft'
 import LikeListModal from './LikeListModal'
@@ -29,6 +30,7 @@ export default function PostCard({
   updatedAt,
   topicTypes,
   actor,
+  tribe,
   isOwner = false,
   isSticky = false,
   onDelete,
@@ -43,7 +45,8 @@ export default function PostCard({
   const loggedInActorId = useAuthStore((s) => s.actorId)
   const { t } = useTranslation()
 
-  const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
+  const isDeletedPost = title === '[Deleted]' && content === '[Deleted]'
+  const isOwnerInternal = !isDeletedPost && (isOwner || (loggedInActorId && actor?.actorId === loggedInActorId))
 
   // --- Start ActorLike Query ---
   const { data: actorLike } = useQuery({
@@ -87,15 +90,23 @@ export default function PostCard({
           : {}
       }
     >
-      {/* Header: ActorMinimalCard + zaman */}
-      <div className="flex items-start">
-        {actor ? (
-          <ActorMinimalCard actor={actor} />
-        ) : (
-          <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>
-            {t('card.deleted_user')}
-          </span>
-        )}
+      {/* Header: ActorMinimalCard + tribe badge + zaman */}
+      <div className="flex items-start" style={{ flexWrap: 'wrap', gap: '6px' }}>
+        <div className="flex items-center" style={{ gap: 6 }}>
+          {actor ? (
+            <ActorMinimalCard actor={actor} />
+          ) : (
+            <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>
+              {t('card.deleted_user')}
+            </span>
+          )}
+          {tribe && (
+            <>
+              <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)' }}>›</span>
+              <TribeMinimalCard {...tribe} showPoint={false} showMindBtn={false} showEditBtn={false} />
+            </>
+          )}
+        </div>
         <span className="text-muted" style={{ marginLeft: 'auto' }}>{timeAgo}</span>
       </div>
 

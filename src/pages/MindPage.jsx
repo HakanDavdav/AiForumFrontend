@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import useThemeStore from '../store/themeStore'
 import ForceGraph3D from 'react-force-graph-3d'
 import * as THREE from 'three'
 import { actorApi } from '../api/actorApi'
@@ -153,11 +154,13 @@ function strHash(str) {
 // Global shader uniforms
 const globalUniforms = {
   uTime: { value: 0 },
+  uPulseColor: { value: new THREE.Vector3(1.0, 0.05, 0.05) },
 }
 
 // Shader enjeksiyonu: Kan nabzı efekti (kalp atışı ritmi)
 const injectPulseShader = (shader) => {
   shader.uniforms.uTime = globalUniforms.uTime
+  shader.uniforms.uPulseColor = globalUniforms.uPulseColor
 
   // vertexShader: uv koordinatlarını varying olarak frag shader'a gönder
   shader.vertexShader = `
@@ -172,6 +175,7 @@ const injectPulseShader = (shader) => {
   // fragmentShader: emissive rengine dalga fonksiyonu ekle
   shader.fragmentShader = `
     uniform float uTime;
+    uniform vec3 uPulseColor;
     varying vec2 vUvPulse;
     ${shader.fragmentShader}
   `.replace(
@@ -187,7 +191,7 @@ const injectPulseShader = (shader) => {
     float pulse = exp(-18.0 * beat) + 0.6 * exp(-18.0 * fract(beat + 0.15));
     
     // Parlak kan kırmızısı ışıma
-    vec3 pulseColor = vec3(1.0, 0.05, 0.05) * pulse * 2.8;
+    vec3 pulseColor = uPulseColor * pulse * 2.8;
     vec3 totalEmissiveRadiance = emissive + pulseColor;
     `
   )
@@ -381,6 +385,7 @@ function updateCapillaryPosition(obj, { start, end }, link) {
 const TOPBAR_HEIGHT = 'var(--topbar-height)'
 
 function NodeDetailPanel({ node, onClose }) {
+  const { isDarkMode } = useThemeStore()
   const { core, glow } = getNeuronColor(node.label)
   const icon = node.label === 'Persona' ? '🧠' : node.label === 'Topic' ? '📌' : '💠'
 
@@ -394,15 +399,15 @@ function NodeDetailPanel({ node, onClose }) {
         width: 600,
         maxHeight: '85vh',
         overflowY: 'auto',
-        background: 'rgba(10, 5, 20, 0.75)',
+        background: isDarkMode ? 'rgba(10, 5, 20, 0.75)' : 'rgba(255, 255, 255, 0.85)',
         backdropFilter: 'blur(32px)',
         WebkitBackdropFilter: 'blur(32px)',
-        border: `1px solid rgba(192,132,252,0.2)`,
+        border: isDarkMode ? `1px solid rgba(192,132,252,0.2)` : `1px solid rgba(0,0,0,0.1)`,
         borderTop: `4px solid ${core}`,
         borderRadius: 24,
         padding: 32,
-        color: '#f0e6ff',
-        boxShadow: `0 32px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(192,132,252,0.1)`,
+        color: isDarkMode ? '#f0e6ff' : '#000000',
+        boxShadow: isDarkMode ? `0 32px 80px rgba(0,0,0,0.9), inset 0 0 40px rgba(192,132,252,0.1)` : `0 32px 80px rgba(0,0,0,0.1)`,
         display: 'flex',
         flexDirection: 'column',
         gap: 24,
@@ -447,20 +452,20 @@ function NodeDetailPanel({ node, onClose }) {
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(255,255,255,0.1)',
+            background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
             border: 'none',
             borderRadius: '50%',
             width: 32,
             height: 32,
-            color: '#fff',
+            color: isDarkMode ? '#fff' : '#000',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             transition: 'background 0.2s',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
-          onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+          onMouseEnter={(e) => (e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)')}
         >
           ✕
         </button>
@@ -486,16 +491,16 @@ function NodeDetailPanel({ node, onClose }) {
             <div
               key={key}
               style={{
-                background: 'rgba(255,255,255,0.02)',
+                background: isDarkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)',
                 padding: '12px 16px',
                 borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.03)',
+                border: isDarkMode ? '1px solid rgba(255,255,255,0.03)' : '1px solid rgba(0,0,0,0.05)',
               }}
             >
               <div
                 style={{
                   fontSize: 11,
-                  color: 'rgba(192,132,252,0.7)',
+                  color: isDarkMode ? 'rgba(192,132,252,0.7)' : 'rgba(0,0,0,0.5)',
                   marginBottom: 6,
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
@@ -507,7 +512,7 @@ function NodeDetailPanel({ node, onClose }) {
               <div
                 style={{
                   fontSize: 14,
-                  color: '#e0d4f5',
+                  color: isDarkMode ? '#e0d4f5' : '#374151',
                   lineHeight: 1.6,
                   wordBreak: 'break-word',
                   whiteSpace: 'pre-wrap',
@@ -530,6 +535,33 @@ export default function MindPage() {
   const actorId = searchParams.get('actorId')
   const tribeId = searchParams.get('tribeId')
   const navigate = useNavigate()
+  const isGreenMode = useThemeStore((s) => s.isGreenMode)
+  const isDarkMode = useThemeStore((s) => s.isDarkMode)
+
+  const bgColor = isDarkMode ? '#09090b' : '#ffffff'
+  const headerBg = isDarkMode ? 'rgba(9, 9, 11, 0.85)' : 'rgba(255, 255, 255, 0.85)'
+  const borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.1)'
+  
+  const btnColor = isGreenMode ? '#10b981' : '#3b82f6'
+  const btnBg = isGreenMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(59, 130, 246, 0.08)'
+  const btnBgHover = isGreenMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)'
+  const btnBorder = isGreenMode ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(59, 130, 246, 0.3)'
+
+  useEffect(() => {
+    if (isGreenMode) {
+      _vesselMat.color.set('#059669')
+      _vesselMat.emissive.set('#022c22')
+      _branchMat.color.set('#10b981')
+      _branchMat.emissive.set('#064e3b')
+      globalUniforms.uPulseColor.value.set(0.05, 1.0, 0.2)
+    } else {
+      _vesselMat.color.set('#2563eb')
+      _vesselMat.emissive.set('#1e3a8a')
+      _branchMat.color.set('#3b82f6')
+      _branchMat.emissive.set('#1e40af')
+      globalUniforms.uPulseColor.value.set(0.05, 0.5, 1.0)
+    }
+  }, [isGreenMode])
 
   const [isLoading, setIsLoading] = useState(true)
   const [rawData, setRawData] = useState([])
@@ -851,7 +883,7 @@ export default function MindPage() {
           zIndex: 50,
           display: 'flex',
           flexDirection: 'column',
-          background: '#050010',
+          background: bgColor,
           overflow: 'hidden',
         }}
       >
@@ -862,9 +894,9 @@ export default function MindPage() {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '10px 20px',
-            background: 'rgba(5,0,16,0.85)',
+            background: headerBg,
             backdropFilter: 'blur(16px)',
-            borderBottom: '1px solid rgba(192,132,252,0.2)',
+            borderBottom: `1px solid ${borderColor}`,
             flexShrink: 0,
             height: 56,
           }}
@@ -876,30 +908,30 @@ export default function MindPage() {
               style={{
                 padding: 8,
                 borderRadius: '50%',
-                border: '1px solid rgba(192,132,252,0.3)',
-                background: 'rgba(192,132,252,0.08)',
+                border: btnBorder,
+                background: btnBg,
                 cursor: 'pointer',
-                color: '#c084fc',
+                color: btnColor,
                 display: 'flex',
                 alignItems: 'center',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(192,132,252,0.2)'
+                e.currentTarget.style.background = btnBgHover
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(192,132,252,0.08)'
+                e.currentTarget.style.background = btnBg
               }}
             >
               <ArrowLeft size={18} />
             </button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Brain size={20} style={{ color: '#c084fc' }} />
+              <Brain size={20} style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }} />
               <div>
                 <h1
                   style={{
                     fontSize: 16,
                     fontWeight: 700,
-                    color: '#f0e6ff',
+                    color: isGreenMode ? '#10b981' : '#3b82f6',
                     margin: 0,
                     letterSpacing: '0.02em',
                   }}
@@ -928,7 +960,7 @@ export default function MindPage() {
                   }}
                 />
                 <span
-                  style={{ fontSize: 11, color: 'rgba(240,230,255,0.5)', letterSpacing: '0.04em' }}
+                  style={{ fontSize: 11, color: isDarkMode ? 'rgba(240,230,255,0.5)' : 'rgba(0,0,0,0.6)', letterSpacing: '0.04em' }}
                 >
                   {label}
                 </span>
@@ -940,7 +972,7 @@ export default function MindPage() {
         {/* Graph Alanı */}
         <div
           ref={containerRef}
-          style={{ flex: 1, width: '100%', position: 'relative', background: '#050010' }}
+          style={{ flex: 1, width: '100%', position: 'relative', background: bgColor }}
         >
           {isLoading ? (
             <div
@@ -987,7 +1019,7 @@ export default function MindPage() {
                 width={dimensions.width}
                 height={dimensions.height}
                 graphData={graphData}
-                backgroundColor="#050010"
+                backgroundColor={bgColor}
                 // Custom Three.js parlayan nöron objeleri
                 nodeThreeObject={buildNeuronObject}
                 nodeThreeObjectExtend={false}
@@ -1061,10 +1093,10 @@ export default function MindPage() {
               top: 24,
               right: 24,
               padding: '10px 18px',
-              background: 'rgba(10, 5, 20, 0.75)',
-              border: '1px solid rgba(192, 132, 252, 0.3)',
+              background: headerBg,
+              border: `1px solid ${borderColor}`,
               borderRadius: 12,
-              color: '#f0e6ff',
+              color: isDarkMode ? '#f0e6ff' : '#000000',
               cursor: 'pointer',
               zIndex: 100,
               display: 'flex',
@@ -1079,13 +1111,13 @@ export default function MindPage() {
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(192, 132, 252, 0.15)';
-              e.currentTarget.style.borderColor = 'rgba(192, 132, 252, 0.6)';
+              e.currentTarget.style.background = isDarkMode ? 'rgba(192, 132, 252, 0.15)' : 'rgba(0, 0, 0, 0.05)';
+              e.currentTarget.style.borderColor = isDarkMode ? 'rgba(192, 132, 252, 0.6)' : 'rgba(0, 0, 0, 0.2)';
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(10, 5, 20, 0.75)';
-              e.currentTarget.style.borderColor = 'rgba(192, 132, 252, 0.3)';
+              e.currentTarget.style.background = headerBg;
+              e.currentTarget.style.borderColor = borderColor;
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >

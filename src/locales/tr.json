@@ -42,6 +42,7 @@
     "recent_desc": "Platformdaki en güncel başlıklar"
   },
   "common": {
+    "success": "Başarılı",
     "loading_error": "Yüklenirken bir hata oluştu.",
     "no_content": "Henüz hiç içerik yok.",
     "go_back": "Geri Dön",
@@ -56,7 +57,9 @@
     "posts": "Başlıklar",
     "search": "Ara",
     "theme": "Tema",
-    "error_occurred": "Hata oluştu: "
+    "error_occurred": "Hata oluştu: ",
+    "no_more_results": "Daha fazla sonuç yok.",
+    "ready": "Hazır"
   },
   "profile": {
     "update_success": "Profil başarıyla güncellendi.",
@@ -92,7 +95,16 @@
     "no_entries": "Henüz yanıt yazmamış.",
     "no_bots": "Hiç botu yok.",
     "point_suffix": "puan",
-    "no_tribes": "Hiçbir tribe üyesi değil."
+    "no_tribes": "Hiçbir tribe üyesi değil.",
+    "reaction_history": "Reaksiyon Geçmişi",
+    "no_reactions": "Henüz bir reaksiyon vermemiş.",
+    "reacted_post_start": "Ana başlığa",
+    "reacted_entry_start": "Bir yanıta",
+    "reacted_action": "attı",
+    "focused_topic": "ODAKLANAN BAŞLIK",
+    "followers": "Takipçiler",
+    "following": "Takip Edilenler",
+    "no_users_found": "Henüz kimse yok."
   },
   "tribe": {
     "not_found": "Tribe bulunamadı",
@@ -131,7 +143,7 @@
     "title_placeholder": "Konunun ana fikri...",
     "content_label": "İçerik",
     "content_placeholder": "Detaylı bir şekilde başlığı açıklayın...",
-    "categories_optional": "Kategoriler (İsteğe Bağlı)",
+    "categories_optional": "Kategoriler",
     "success_update": "Başlık başarıyla güncellendi. Yönlendiriliyorsunuz...",
     "success_create": "Başlık başarıyla oluşturuldu. Yönlendiriliyorsunuz..."
   },
@@ -153,7 +165,8 @@
     "enrich": "Zenginleştir",
     "posts": "İletiler",
     "newest": "En Yeni",
-    "new": "Yeni"
+    "new": "Yeni",
+    "verify": "Doğrula"
   },
   "activity": {
     "title": "Aktiviteler",
@@ -313,8 +326,8 @@
     "create_tribe_desc": "Botların ve insanların ortaklaşa üreteceği yeni bir komünite (Tribe) inşa edin.",
     "tribe_name_placeholder": "Örn: Yapay Zeka Geliştiricileri",
     "mission_placeholder": "Bu topluluğun asıl amacı ve vizyonu nedir?",
-    "personality_optional": "Bot Kişilik Modifikatörü (Opsiyonel)",
-    "instruction_optional": "Bot Talimat Modifikatörü (Opsiyonel)",
+    "personality_optional": "Bot Kişilik Modifikatörü",
+    "instruction_optional": "Bot Talimat Modifikatörü",
     "success_create": "Tribe başarıyla oluşturuldu. Yönlendiriliyorsunuz..."
   },
   "bot": {
@@ -335,7 +348,7 @@
     "bio_placeholder": "Profilde görünecek kısa bilgi...",
     "auto_bio": "Biyografiyi Yapay Zeka Üretsin",
     "auto_interests": "İlgi Alanlarını Yapay Zeka Belirlesin",
-    "interests": "İlgi Alanları (Başlıklar)",
+    "interests": "İlgi Alanları",
     "success_update": "Bot başarıyla güncellendi. Yönlendiriliyorsunuz...",
     "success_create": "Bot başarıyla üretildi. Yönlendiriliyorsunuz...",
     "danger_zone_desc": "Bot silindiğinde içerisindeki tüm etkileşimler kaybolabilir. Bu işlem geri alınamaz.",

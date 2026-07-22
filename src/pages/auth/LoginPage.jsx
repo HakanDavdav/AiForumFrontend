@@ -17,7 +17,6 @@ export default function LoginPage() {
 
   const [identifier, setIdentifier] = useState('') // email veya username
   const [password, setPassword] = useState('')
-  const [error, setError] = useState(null)
   
   // Forgot Password state
   const [isForgotOpen, setIsForgotOpen] = useState(false)
@@ -87,36 +86,54 @@ export default function LoginPage() {
            navigate('/init-profile')
          }
       }
-    },
-    onError: (err) => {
-      setError(err?.response?.data?.errors?.[0]?.description || err.message)
     }
   })
 
   const handleProviderLogin = async (provider) => {
     try {
-      setError(null)
       const result = await signInWithPopup(auth, provider)
       const idToken = await result.user.getIdToken()
       firebaseLoginMutation.mutate({ idToken })
     } catch (err) {
       console.error(err)
-      setError(err.message)
     }
   }
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmitLogin = identifier.trim() !== '' && password.trim() !== '' && !loginMutation.isPending
+  const canSubmitTwoFactor = twoFactorToken.trim() !== '' && !twoFactorMutation.isPending
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    setError(null)
     
-    // Backend login metodumuz username ve email istiyor, biz identifier'ı her ikisine de yolluyoruz.
-    // Backend veritabanında önce username, sonra email üzerinden kontrol ediyor.
+    if (!canSubmitLogin) {
+      setHasSubmitted(true)
+      return
+    }
+
     loginMutation.mutate({ username: identifier, email: identifier, password })
   }
 
   const handleTwoFactorSubmit = (e) => {
     e.preventDefault()
-    setError(null)
+    
+    if (!canSubmitTwoFactor) {
+      setHasSubmitted(true)
+      return
+    }
+
     twoFactorMutation.mutate({ userId: tempUserId, twoFactorToken, provider: 'Email' })
   }
 
@@ -128,7 +145,7 @@ export default function LoginPage() {
           {t('auth.two_factor_desc')}
         </p>
 
-        <form onSubmit={handleTwoFactorSubmit} className="flex-col gap-4">
+        <form noValidate onSubmit={handleTwoFactorSubmit} className="flex-col gap-4">
           <div className="form-group">
             <label className="form-label">{t('auth.two_factor_code')}</label>
             <input 
@@ -138,16 +155,15 @@ export default function LoginPage() {
               onChange={(e) => setTwoFactorToken(e.target.value)}
               required 
               maxLength={6}
-              style={{ textAlign: 'center', fontSize: 24, letterSpacing: 4 }}
+              style={{ textAlign: 'center', fontSize: 24, letterSpacing: 4, borderColor: getBorderColor('twoFactorToken', twoFactorToken, true), outline: 'none' }}
+              onFocus={() => setFocused('twoFactorToken')}
+              onBlur={() => setFocused(null)}
             />
           </div>
-
-          {error && <div className="form-error" style={{ textAlign: 'center' }}>{error}</div>}
-
           <button 
             type="submit" 
             className="btn btn-primary w-full"
-            disabled={twoFactorMutation.isPending || twoFactorToken.length < 6}
+            disabled={twoFactorMutation.isPending}
           >
             {twoFactorMutation.isPending ? t('auth.verifying') : t('auth.verify')}
           </button>
@@ -178,7 +194,7 @@ export default function LoginPage() {
           </span>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="form-group">
             <label className="form-label">{t('auth.username_or_email')}</label>
             <input 
@@ -186,7 +202,9 @@ export default function LoginPage() {
               type="text" 
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              required 
+              style={{ borderColor: getBorderColor('identifier', identifier, true), outline: 'none' }}
+              onFocus={() => setFocused('identifier')}
+              onBlur={() => setFocused(null)}
             />
           </div>
 
@@ -200,12 +218,11 @@ export default function LoginPage() {
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required 
+              style={{ borderColor: getBorderColor('password', password, true), outline: 'none' }}
+              onFocus={() => setFocused('password')}
+              onBlur={() => setFocused(null)}
             />
           </div>
-
-          {error && <div className="form-error text-center">{error}</div>}
-
           <button 
             type="submit" 
             className="btn btn-primary w-full"

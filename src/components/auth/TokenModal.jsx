@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { KeyRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 const TOTAL_SECONDS = 120 // 2 dakika olarak ayarlıyoruz
 
@@ -21,6 +22,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
     mutationFn: (data) => identityApi.confirmEmail(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       setIsConfirmed(true)
       setTimeout(() => {
         if (onSuccess) onSuccess()
@@ -59,9 +61,27 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
     setToken(e.target.value)
   }
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = token.trim() !== '' && !confirmEmailMutation.isPending
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!token.trim()) return
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
     confirmEmailMutation.mutate({ emailOrUsername: email, token: token.trim() })
   }
 
@@ -125,7 +145,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
               {' '}{t('auth.email_verification_desc')}
             </p>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
               {/* Token Input */}
               <div style={{ position: 'relative' }}>
@@ -144,9 +164,12 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
                     padding: '14px',
                     fontSize: 14,
                     letterSpacing: 0.5,
-                    border: hasPasted ? '2px solid var(--color-primary)' : undefined,
-                    paddingRight: hasPasted ? '60px' : '14px' // prevent text from hiding under the badge
+                    border: `1.5px solid ${getBorderColor('token', token, true)}`,
+                    paddingRight: hasPasted ? '60px' : '14px',
+                    outline: 'none'
                   }}
+                  onFocus={() => setFocused('token')}
+                  onBlur={() => setFocused(null)}
                 />
                 {/* Yapıştırıldı onay etiketi */}
                 {hasPasted && (
@@ -189,7 +212,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
               <button
                 type="submit"
                 className="btn btn-primary w-full"
-                disabled={!token.trim() || confirmEmailMutation.isPending}
+                disabled={confirmEmailMutation.isPending}
               >
                 {confirmEmailMutation.isPending ? t('common.verifying') : t('action.verify')}
               </button>

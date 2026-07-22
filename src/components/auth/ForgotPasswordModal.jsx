@@ -4,15 +4,20 @@ import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
 import { KeyRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
+import confetti from 'canvas-confetti'
+import { useNavigate } from 'react-router-dom'
 
-const TOTAL_SECONDS = 120 // 2 dakika olarak ayarlıyoruz
+const VERIFY_SECONDS = 120
+const PASSWORD_SECONDS = 180
 
 export default function ForgotPasswordModal({ isOpen, onClose }) {
   useDevLog('ForgotPasswordModal', arguments[0] || {})
   
-  // Step: 'request' | 'confirm' | 'success'
+  // Step: 'request' | 'verify_token' | 'set_password' | 'success'
   const [step, setStep] = useState('request')
   const { t } = useTranslation()
+  const navigate = useNavigate()
   
   // Form fields
   const [emailOrUsername, setEmailOrUsername] = useState('')
@@ -20,7 +25,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
   const [newPassword, setNewPassword] = useState('')
 
   // Countdown
-  const [countdown, setCountdown] = useState(TOTAL_SECONDS)
+  const [countdown, setCountdown] = useState(VERIFY_SECONDS)
   const textareaRef = useRef(null)
 
   // 1. Request Password Reset Mutation
@@ -28,35 +33,48 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     mutationFn: (data) => identityApi.requestPasswordReset(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setStep('confirm')
-      setCountdown(TOTAL_SECONDS)
+      setStep('verify_token')
+      setCountdown(VERIFY_SECONDS)
     }
   })
 
-  // 2. Confirm Password Reset Mutation
+  // 2. Verify Token Mutation
+  const verifyTokenMutation = useMutation({
+    mutationFn: (data) => identityApi.verifyPasswordResetToken(data),
+    meta: { showErrorToast: true },
+    onSuccess: () => {
+      setStep('set_password')
+      setCountdown(PASSWORD_SECONDS)
+    }
+  })
+
+  // 3. Confirm Password Reset Mutation
   const confirmResetMutation = useMutation({
     mutationFn: (data) => identityApi.confirmPasswordReset(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setStep('success')
-      setTimeout(() => {
-        handleClose()
-      }, 2000)
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
+      onClose()
     }
   })
 
   // Countdown Logic
   useEffect(() => {
     let timer = null
-    if (isOpen && step === 'confirm') {
+    if (isOpen && (step === 'verify_token' || step === 'set_password')) {
       if (countdown > 0) {
         timer = setInterval(() => {
           setCountdown((prev) => prev - 1)
         }, 1000)
       } else if (countdown === 0) {
-        setStep('request')
-        setConfirmToken('')
-        setNewPassword('')
+        if (step === 'verify_token') {
+          setStep('request')
+          setConfirmToken('')
+        } else if (step === 'set_password') {
+          toast.error(t('common.session_timeout', 'Oturum zaman aşımına uğradı.'))
+          handleClose()
+          navigate('/register')
+        }
       }
     }
     return () => {
@@ -65,7 +83,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
   }, [isOpen, step, countdown])
 
   useEffect(() => {
-    if (isOpen && step === 'confirm') {
+    if (isOpen && step === 'verify_token') {
       setTimeout(() => textareaRef.current?.focus(), 150)
     }
   }, [isOpen, step])
@@ -77,25 +95,60 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
       setEmailOrUsername('')
       setConfirmToken('')
       setNewPassword('')
-      setCountdown(TOTAL_SECONDS)
+      setCountdown(VERIFY_SECONDS)
+      setHasSubmitted(false)
     }, 300)
   }
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmitRequest = emailOrUsername.trim() !== '' && !requestResetMutation.isPending
+  const canSubmitVerify = confirmToken.trim() !== '' && !verifyTokenMutation.isPending
+  const canSubmitConfirm = newPassword.trim() !== '' && !confirmResetMutation.isPending
+
   const handleRequestSubmit = (e) => {
     e.preventDefault()
-    // distributionStrategy: 0 (Email)
+    if (!canSubmitRequest) {
+      setHasSubmitted(true)
+      return
+    }
     requestResetMutation.mutate({ emailOrUsername, distributionStrategy: 0 })
+  }
+
+  const handleVerifySubmit = (e) => {
+    e.preventDefault()
+    if (!canSubmitVerify) {
+      setHasSubmitted(true)
+      return
+    }
+    verifyTokenMutation.mutate({ emailOrUsername, token: confirmToken.trim() })
   }
 
   const handleConfirmSubmit = (e) => {
     e.preventDefault()
-    if (!confirmToken.trim() || !newPassword) return
+    if (!canSubmitConfirm) {
+      setHasSubmitted(true)
+      return
+    }
     confirmResetMutation.mutate({ emailOrUsername, token: confirmToken.trim(), newPassword })
   }
 
   const formatTime = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
-  const progressPct = (countdown / TOTAL_SECONDS) * 100
+  
+  const currentTotalSeconds = step === 'set_password' ? PASSWORD_SECONDS : VERIFY_SECONDS
+  const progressPct = (countdown / currentTotalSeconds) * 100
   const isLowTime = countdown <= 60
   const hasPastedToken = confirmToken.length > 10
 
@@ -117,24 +170,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
           <X size={20} />
         </button>
 
-        {step === 'success' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{
-              width: 72, height: 72, borderRadius: '50%',
-              background: 'var(--color-success-light)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 34, color: 'var(--color-success)',
-              animation: 'tkSuccessPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            }}>✓</div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
-              {t('auth.password_changed')}
-            </h2>
-            <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
-              {t('auth.password_changed_desc')}
-            </p>
-          </div>
-        ) : (
-          <>
+
             <div style={{
               width: 56, height: 56, borderRadius: '50%',
               background: 'var(--color-primary-lighter)',
@@ -153,7 +189,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                   {t('auth.forgot_password_desc')}
                 </p>
                 
-                <form onSubmit={handleRequestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <form noValidate onSubmit={handleRequestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <input 
                     className="input" 
                     type="text" 
@@ -161,13 +197,15 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     onChange={(e) => setEmailOrUsername(e.target.value)}
                     required 
                     placeholder={t('auth.email_or_username')}
-                    style={{ textAlign: 'center', padding: '14px', fontSize: 14 }}
+                    style={{ textAlign: 'center', padding: '14px', fontSize: 14, borderColor: getBorderColor('emailOrUsername', emailOrUsername, true), outline: 'none' }}
+                    onFocus={() => setFocused('emailOrUsername')}
+                    onBlur={() => setFocused(null)}
                   />
 
                   <button 
                     type="submit" 
                     className="btn btn-primary w-full"
-                    disabled={requestResetMutation.isPending || !emailOrUsername.trim()}
+                    disabled={requestResetMutation.isPending}
                     style={{ marginTop: 8 }}
                   >
                     {requestResetMutation.isPending ? t('common.sending') : t('action.send')}
@@ -176,7 +214,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
               </>
             )}
 
-            {step === 'confirm' && (
+            {step === 'verify_token' && (
               <>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
                   {t('auth.reset_password')}
@@ -186,7 +224,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                   {' '}{t('auth.reset_password_desc')}
                 </p>
                 
-                <form onSubmit={handleConfirmSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <form noValidate onSubmit={handleVerifySubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   
                   {/* Token Input */}
                   <div style={{ position: 'relative' }}>
@@ -205,9 +243,12 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                         padding: '14px',
                         fontSize: 14,
                         letterSpacing: 0.5,
-                        border: hasPastedToken ? '2px solid var(--color-primary)' : undefined,
-                        paddingRight: hasPastedToken ? '60px' : '14px' // prevent text from hiding under the badge
+                        border: `1.5px solid ${getBorderColor('confirmToken', confirmToken, true)}`,
+                        paddingRight: hasPastedToken ? '60px' : '14px',
+                        outline: 'none'
                       }}
+                      onFocus={() => setFocused('confirmToken')}
+                      onBlur={() => setFocused(null)}
                     />
                     {hasPastedToken && (
                       <span style={{
@@ -221,6 +262,54 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     )}
                   </div>
 
+                  {/* Geri Sayım */}
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{
+                      height: 3, borderRadius: 99,
+                      background: 'var(--color-border)',
+                      overflow: 'hidden', marginBottom: 6,
+                    }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${progressPct}%`,
+                        borderRadius: 99,
+                        background: isLowTime ? 'var(--color-error)' : 'var(--color-primary)',
+                        transition: 'width 1s linear, background 0.3s',
+                      }} />
+                    </div>
+                    <p style={{
+                      fontSize: 12, margin: 0,
+                      color: isLowTime ? 'var(--color-error)' : 'var(--color-text-muted)',
+                      fontWeight: isLowTime ? 600 : 400,
+                      transition: 'color 0.3s',
+                    }}>
+                      {t('auth.code_expiry')}: <strong>{formatTime(countdown)}</strong>
+                    </p>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary w-full"
+                    disabled={verifyTokenMutation.isPending}
+                    style={{ marginTop: 8 }}
+                  >
+                    {verifyTokenMutation.isPending ? t('common.verifying') : t('action.verify')}
+                  </button>
+                </form>
+              </>
+            )}
+
+            {step === 'set_password' && (
+              <>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
+                  {t('settings.change_password')}
+                </h2>
+                <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
+                  Lütfen yeni şifrenizi belirleyin.
+                </p>
+                
+                <form noValidate onSubmit={handleConfirmSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  
                   {/* New Password */}
                   <input 
                     className="input" 
@@ -230,7 +319,9 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                     required 
                     minLength={6}
                     placeholder={t('auth.new_password')}
-                    style={{ textAlign: 'center', padding: '14px', fontSize: 14 }}
+                    style={{ textAlign: 'center', padding: '14px', fontSize: 14, borderColor: getBorderColor('newPassword', newPassword, true), outline: 'none' }}
+                    onFocus={() => setFocused('newPassword')}
+                    onBlur={() => setFocused(null)}
                   />
 
                   {/* Geri Sayım */}
@@ -261,7 +352,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                   <button 
                     type="submit" 
                     className="btn btn-primary w-full"
-                    disabled={confirmResetMutation.isPending || !confirmToken.trim() || !newPassword}
+                    disabled={confirmResetMutation.isPending}
                     style={{ marginTop: 8 }}
                   >
                     {confirmResetMutation.isPending ? t('common.verifying') : t('settings.change_password')}
@@ -269,16 +360,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
                 </form>
               </>
             )}
-          </>
-        )}
       </div>
-
-      <style>{`
-        @keyframes tkSuccessPop {
-          from { transform: scale(0.5); opacity: 0; }
-          to   { transform: scale(1);   opacity: 1; }
-        }
-      `}</style>
     </div>
   )
 }

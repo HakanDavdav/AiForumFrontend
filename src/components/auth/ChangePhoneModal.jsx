@@ -5,6 +5,8 @@ import useDevLog from '../../utils/useDevLog'
 import { X, CheckCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
+import toast from 'react-hot-toast'
+import confetti from 'canvas-confetti'
 
 const TOTAL_SECONDS = 120
 
@@ -52,20 +54,42 @@ export default function ChangePhoneModal({ isOpen, onClose }) {
     mutationFn: (data) => identityApi.confirmPhone(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setStep(3)
-      setTimeout(() => {
-        onClose()
-      }, 2000)
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
+      onClose()
     }
   })
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmitRequest = phoneNumber.trim() !== '' && !requestMutation.isPending
+  const canSubmitConfirm = token.trim() !== '' && !confirmMutation.isPending
+
   const handleRequestSubmit = (e) => {
     e.preventDefault()
+    if (!canSubmitRequest) {
+      setHasSubmitted(true)
+      return
+    }
     requestMutation.mutate({ phoneNumber })
   }
 
   const handleConfirmSubmit = (e) => {
     e.preventDefault()
+    if (!canSubmitConfirm) {
+      setHasSubmitted(true)
+      return
+    }
     confirmMutation.mutate({ token })
   }
 
@@ -98,7 +122,7 @@ export default function ChangePhoneModal({ isOpen, onClose }) {
               <p className="text-muted" style={{ marginBottom: 24, fontSize: 14 }}>
                 {t('auth.change_phone_desc')}
               </p>
-              <form onSubmit={handleRequestSubmit} className="flex-col gap-4">
+              <form noValidate onSubmit={handleRequestSubmit} className="flex-col gap-4">
                 <div className="form-group">
                   <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.phone_label')}</label>
                   <input
@@ -108,6 +132,9 @@ export default function ChangePhoneModal({ isOpen, onClose }) {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     placeholder="+905..."
                     required
+                    style={{ borderColor: getBorderColor('phoneNumber', phoneNumber, true), outline: 'none' }}
+                    onFocus={() => setFocused('phoneNumber')}
+                    onBlur={() => setFocused(null)}
                   />
                 </div>
                 <div style={{ marginTop: 16 }}>
@@ -130,7 +157,7 @@ export default function ChangePhoneModal({ isOpen, onClose }) {
                 {t('auth.code_sent_desc', { phone: phoneNumber })}
               </p>
               
-              <form onSubmit={handleConfirmSubmit} className="flex-col gap-4">
+              <form noValidate onSubmit={handleConfirmSubmit} className="flex-col gap-4">
                 <div style={{ position: 'relative' }}>
                   <input
                     type="text"
@@ -146,9 +173,12 @@ export default function ChangePhoneModal({ isOpen, onClose }) {
                       padding: '14px',
                       fontSize: 14,
                       letterSpacing: 0.5,
-                      border: hasPastedToken ? '2px solid var(--color-primary)' : undefined,
-                      paddingRight: hasPastedToken ? '60px' : '14px'
+                      border: `1.5px solid ${getBorderColor('token', token, true)}`,
+                      paddingRight: hasPastedToken ? '60px' : '14px',
+                      outline: 'none'
                     }}
+                    onFocus={() => setFocused('token')}
+                    onBlur={() => setFocused(null)}
                   />
                   {hasPastedToken && (
                     <span style={{
@@ -190,28 +220,12 @@ export default function ChangePhoneModal({ isOpen, onClose }) {
                 <button 
                   type="submit" 
                   className="btn btn-primary w-full"
-                  disabled={confirmMutation.isPending || !token.trim()}
+                  disabled={confirmMutation.isPending || isLowTime}
+                  style={{ opacity: (confirmMutation.isPending || isLowTime) ? 0.7 : 1 }}
                 >
                   {confirmMutation.isPending ? t('common.verifying') : t('auth.confirm_change')}
                 </button>
               </form>
-            </motion.div>
-          )}
-
-          {step === 3 && (
-            <motion.div 
-              key="step3" 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              animate={{ opacity: 1, scale: 1 }} 
-              className="text-center"
-            >
-              <div style={{ display: 'inline-flex', justifyContent: 'center', alignItems: 'center', width: 64, height: 64, borderRadius: '50%', background: 'rgba(34, 197, 94, 0.1)', color: 'var(--color-success)', marginBottom: 24 }}>
-                <CheckCircle size={32} />
-              </div>
-              <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16, color: 'var(--color-success)' }}>{t('auth.success_title')}</h2>
-              <p className="text-muted">
-                {t('auth.change_phone_success')}
-              </p>
             </motion.div>
           )}
         </AnimatePresence>

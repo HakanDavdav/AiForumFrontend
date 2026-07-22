@@ -8,6 +8,7 @@ import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export default function CreateTribePage() {
   useDevLog('CreateTribePage', arguments[0] || {})
@@ -27,6 +28,7 @@ export default function CreateTribePage() {
     mutationFn: (data) => tribeApi.createTribe(data),
     meta: { showErrorToast: true },
     onSuccess: (res) => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['myTribes'] })
       useMyEntitiesStore.getState().fetchMyTribes()
       setTimeout(() => {
@@ -42,14 +44,31 @@ export default function CreateTribePage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
     mutation.mutate(formData)
   }
 
-  const canSubmit = formData.tribeName.trim().length > 2 && !mutation.isPending
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.toString().trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = formData.tribeName.trim() !== '' && formData.mission.trim() !== '' && formData.personalityModifier.trim() !== '' && !mutation.isPending
 
   return (
     <div className="flex-col gap-4">
-      
+
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
         <BackButton style={{ marginBottom: 0 }} />
       </div>
@@ -77,8 +96,8 @@ export default function CreateTribePage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        
+      <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
         <div>
           <label style={{
             display: 'block',
@@ -92,8 +111,8 @@ export default function CreateTribePage() {
             {t('tribe_settings.tribe_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="text" 
+            <input
+              type="text"
               required
               placeholder={t('tribe_settings.tribe_name_placeholder')}
               value={formData.tribeName}
@@ -103,7 +122,7 @@ export default function CreateTribePage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('tribeName', formData.tribeName, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -112,8 +131,8 @@ export default function CreateTribePage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('tribeName')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -131,8 +150,8 @@ export default function CreateTribePage() {
             {t('tribe_settings.cover_image')}
           </label>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="url" 
+            <input
+              type="url"
               placeholder="https://..."
               value={formData.imageUrl}
               onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
@@ -141,7 +160,7 @@ export default function CreateTribePage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('imageUrl', formData.imageUrl, false)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -150,8 +169,8 @@ export default function CreateTribePage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('imageUrl')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -169,7 +188,7 @@ export default function CreateTribePage() {
             {t('tribe_settings.mission')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               rows={3}
               placeholder={t('tribe_settings.mission_placeholder')}
               value={formData.mission}
@@ -181,7 +200,7 @@ export default function CreateTribePage() {
                 minHeight: 100,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('mission', formData.mission, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -191,8 +210,8 @@ export default function CreateTribePage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('mission')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -210,7 +229,7 @@ export default function CreateTribePage() {
             {t('tribe_settings.personality_optional')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               rows={2}
               placeholder={t('tribe_settings.personality_placeholder')}
               value={formData.personalityModifier}
@@ -222,7 +241,7 @@ export default function CreateTribePage() {
                 minHeight: 80,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('personalityModifier', formData.personalityModifier, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -232,8 +251,8 @@ export default function CreateTribePage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('personalityModifier')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -251,7 +270,7 @@ export default function CreateTribePage() {
             {t('tribe_settings.instruction_optional')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               rows={2}
               placeholder={t('tribe_settings.instruction_placeholder')}
               value={formData.instructionModifier}
@@ -263,7 +282,7 @@ export default function CreateTribePage() {
                 minHeight: 80,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('instructionModifier', formData.instructionModifier, false)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -273,37 +292,19 @@ export default function CreateTribePage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('instructionModifier')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
 
-        {/* Success message */}
-        {mutation.isSuccess && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '12px 16px',
-            borderRadius: 10,
-            background: 'rgba(34, 197, 94, 0.08)',
-            border: '1px solid rgba(34, 197, 94, 0.25)',
-            marginTop: 8,
-          }}>
-            <CheckCircle size={16} color="#22c55e" />
-            <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              {t('tribe_settings.success_create')}
-            </span>
-          </div>
-        )}
 
         {/* Submit button */}
         <div style={{ marginTop: 32 }}>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary"
-            disabled={!canSubmit || mutation.isSuccess}
+            disabled={mutation.isPending}
             style={{
               width: '100%',
               padding: '13px 24px',
@@ -311,8 +312,8 @@ export default function CreateTribePage() {
               fontWeight: 600,
               gap: 8,
               borderRadius: 12,
-              opacity: (!canSubmit || mutation.isSuccess) ? 0.5 : 1,
-              cursor: (!canSubmit || mutation.isSuccess) ? 'not-allowed' : 'pointer',
+              opacity: mutation.isPending ? 0.5 : 1,
+              cursor: mutation.isPending ? 'not-allowed' : 'pointer'
             }}
           >
             {mutation.isPending ? (

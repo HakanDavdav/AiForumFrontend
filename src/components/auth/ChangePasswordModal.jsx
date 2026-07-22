@@ -4,6 +4,8 @@ import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
+import confetti from 'canvas-confetti'
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
   useDevLog('ChangePasswordModal', arguments[0] || {})
@@ -19,12 +21,10 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
     mutationFn: (data) => identityApi.changePassword(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      setSuccessMsg(t('auth.change_password_success'))
-      setTimeout(() => {
-        onClose()
-        setSuccessMsg('')
-        setFormData({ currentPassword: '', newPassword: '' })
-      }, 2000)
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
+      onClose()
+      setFormData({ currentPassword: '', newPassword: '' })
+      setHasSubmitted(false)
     }
   })
 
@@ -32,6 +32,30 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
     if (e.target.classList.contains('modal-overlay')) {
       onClose()
     }
+  }
+
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = formData.currentPassword.trim() !== '' && formData.newPassword.trim() !== '' && !changePasswordMutation.isPending
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
+    changePasswordMutation.mutate(formData)
   }
 
   if (!isOpen) return null
@@ -46,13 +70,7 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        {successMsg ? (
-          <div className="text-center" style={{ color: 'var(--color-success)', fontWeight: 600 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-            {successMsg}
-          </div>
-        ) : (
-          <form onSubmit={(e) => { e.preventDefault(); changePasswordMutation.mutate(formData); }} className="flex-col gap-4">
+        <form noValidate onSubmit={handleSubmit} className="flex-col gap-4">
             <div className="form-group">
               <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.current_password')}</label>
               <input
@@ -61,6 +79,9 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
                 value={formData.currentPassword}
                 onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
                 required
+                style={{ borderColor: getBorderColor('currentPassword', formData.currentPassword, true), outline: 'none' }}
+                onFocus={() => setFocused('currentPassword')}
+                onBlur={() => setFocused(null)}
               />
             </div>
 
@@ -72,6 +93,9 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
                 value={formData.newPassword}
                 onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
                 required
+                style={{ borderColor: getBorderColor('newPassword', formData.newPassword, true), outline: 'none' }}
+                onFocus={() => setFocused('newPassword')}
+                onBlur={() => setFocused(null)}
               />
             </div>
 
@@ -85,7 +109,6 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
               </button>
             </div>
           </form>
-        )}
       </div>
     </div>
   )

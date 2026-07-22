@@ -16,6 +16,7 @@ import { TopicTypes } from '../../constants/TopicTypes'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export default function CreateEditPostPage() {
   useDevLog('CreateEditPostPage', arguments[0] || {})
@@ -58,7 +59,9 @@ export default function CreateEditPostPage() {
   const mutation = useMutation({
     mutationFn: (data) =>
       isEditMode ? contentItemApi.editPost(postId, data) : contentItemApi.createPost(data),
+    meta: { showErrorToast: true },
     onSuccess: (res) => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['feed'] })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })
       queryClient.invalidateQueries({ queryKey: ['contentitem', postId] })
@@ -80,6 +83,10 @@ export default function CreateEditPostPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
     const payload = {
       ...formData,
       tribeId: formData.tribeId ? formData.tribeId : null
@@ -98,8 +105,20 @@ export default function CreateEditPostPage() {
     })
   }
 
-  const canSubmit =
-    formData.title.trim().length > 3 && formData.content.trim().length > 10 && !mutation.isPending
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.toString().trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = formData.title.trim() !== '' && formData.content.trim() !== '' && !mutation.isPending
 
   if (isEditMode && isLoadingExisting) {
     return (
@@ -147,8 +166,8 @@ export default function CreateEditPostPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        
+      <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
         {/* Tribe Selection */}
         <div>
           <label
@@ -216,7 +235,7 @@ export default function CreateEditPostPage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('title', formData.title, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -225,8 +244,8 @@ export default function CreateEditPostPage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box',
               }}
-              onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+              onFocus={() => setFocused('title')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -260,7 +279,7 @@ export default function CreateEditPostPage() {
                 minHeight: 150,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('content', formData.content, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -270,8 +289,8 @@ export default function CreateEditPostPage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box',
               }}
-              onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
-              onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+              onFocus={() => setFocused('content')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -326,52 +345,14 @@ export default function CreateEditPostPage() {
           </div>
         </div>
 
-        {/* Success message */}
-        {mutation.isSuccess && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '12px 16px',
-              borderRadius: 10,
-              background: 'rgba(34, 197, 94, 0.08)',
-              border: '1px solid rgba(34, 197, 94, 0.25)',
-              marginTop: 8,
-            }}
-          >
-            <CheckCircle size={16} color="#22c55e" />
-            <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              {isEditMode
-                ? t('post.success_update')
-                : t('post.success_create')}
-            </span>
-          </div>
-        )}
 
-        {/* Error message */}
-        {mutation.isError && (
-          <div
-            style={{
-              padding: '12px 16px',
-              borderRadius: 10,
-              background: 'rgba(239, 68, 68, 0.08)',
-              border: '1px solid rgba(239, 68, 68, 0.25)',
-              marginTop: 8,
-            }}
-          >
-            <span style={{ fontSize: 13, color: '#ef4444', fontWeight: 500 }}>
-              {mutation.error?.response?.data?.errors?.[0] || t('common.error')}
-            </span>
-          </div>
-        )}
 
         {/* Submit button */}
         <div style={{ marginTop: 32 }}>
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={!canSubmit || mutation.isSuccess}
+            disabled={mutation.isPending}
             style={{
               width: '100%',
               padding: '13px 24px',
@@ -379,8 +360,8 @@ export default function CreateEditPostPage() {
               fontWeight: 600,
               gap: 8,
               borderRadius: 12,
-              opacity: !canSubmit || mutation.isSuccess ? 0.5 : 1,
-              cursor: !canSubmit || mutation.isSuccess ? 'not-allowed' : 'pointer',
+              opacity: mutation.isPending ? 0.5 : 1,
+              cursor: mutation.isPending ? 'not-allowed' : 'pointer',
             }}
           >
             {mutation.isPending ? (

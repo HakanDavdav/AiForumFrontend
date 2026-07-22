@@ -9,6 +9,7 @@ import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export default function CreateEditBotPage() {
   useDevLog('CreateEditBotPage', arguments[0] || {})
@@ -17,7 +18,7 @@ export default function CreateEditBotPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { t } = useTranslation()
-  
+
   // If botId is provided, we are in Edit mode
   const isEditMode = Boolean(botId)
 
@@ -60,10 +61,11 @@ export default function CreateEditBotPage() {
     mutationFn: (data) => isEditMode ? actorApi.editBot(botId, data) : actorApi.createBot(data),
     meta: { showErrorToast: true },
     onSuccess: (res) => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
       useMyEntitiesStore.getState().fetchMyBots()
-      
+
       setTimeout(() => {
         const newBotId = isEditMode ? botId : (typeof res.data?.data === 'string' ? res.data?.data : res.data?.data?.actorId)
         if (newBotId) {
@@ -79,6 +81,7 @@ export default function CreateEditBotPage() {
     mutationFn: () => actorApi.deleteBot(botId),
     meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
       useMyEntitiesStore.getState().fetchMyBots()
@@ -94,7 +97,21 @@ export default function CreateEditBotPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    mutation.mutate(formData)
+
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
+
+    const payload = { ...formData }
+    if (payload.autoBio) {
+      payload.bio = ''
+    }
+    if (payload.autoInterests) {
+      payload.topicTypes = []
+    }
+
+    mutation.mutate(payload)
   }
 
   const handleTopicToggle = (value) => {
@@ -108,7 +125,24 @@ export default function CreateEditBotPage() {
     })
   }
 
-  const canSubmit = formData.profileName.trim().length > 2 && !mutation.isPending
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.toString().trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = formData.profileName.trim() !== '' &&
+    formData.botPersonality.trim() !== '' &&
+    formData.instructions.trim() !== '' &&
+    (formData.autoBio || formData.bio.trim() !== '') &&
+    !mutation.isPending
 
   if (isEditMode && isLoadingExisting) {
     return (
@@ -120,7 +154,7 @@ export default function CreateEditBotPage() {
 
   return (
     <div className="flex-col gap-4">
-      
+
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
         <BackButton style={{ marginBottom: 0 }} />
       </div>
@@ -148,8 +182,8 @@ export default function CreateEditBotPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        
+      <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
         <div>
           <label style={{
             display: 'block',
@@ -163,8 +197,8 @@ export default function CreateEditBotPage() {
             {t('bot.bot_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="text" 
+            <input
+              type="text"
               required
               placeholder={t('bot.bot_name_placeholder')}
               value={formData.profileName}
@@ -174,7 +208,7 @@ export default function CreateEditBotPage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('profileName', formData.profileName, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -183,8 +217,8 @@ export default function CreateEditBotPage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('profileName')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -202,8 +236,8 @@ export default function CreateEditBotPage() {
             {t('bot.profile_image')}
           </label>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="url" 
+            <input
+              type="url"
               placeholder="https://..."
               value={formData.imageUrl}
               onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
@@ -212,7 +246,7 @@ export default function CreateEditBotPage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('imageUrl', formData.imageUrl, false)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -221,8 +255,8 @@ export default function CreateEditBotPage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('imageUrl')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -240,7 +274,7 @@ export default function CreateEditBotPage() {
             {t('bot.bot_mode')}
           </label>
           <div style={{ position: 'relative' }}>
-            <select 
+            <select
               value={formData.botMode}
               onChange={e => setFormData({ ...formData, botMode: parseInt(e.target.value) })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -281,7 +315,7 @@ export default function CreateEditBotPage() {
             {t('bot.bot_personality')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               rows={3}
               placeholder={t('bot.bot_personality_placeholder')}
               value={formData.botPersonality}
@@ -293,7 +327,7 @@ export default function CreateEditBotPage() {
                 minHeight: 100,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('botPersonality', formData.botPersonality, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -303,8 +337,8 @@ export default function CreateEditBotPage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('botPersonality')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -322,7 +356,7 @@ export default function CreateEditBotPage() {
             {t('bot.special_instructions')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               rows={3}
               placeholder={t('bot.special_instructions_placeholder')}
               value={formData.instructions}
@@ -334,7 +368,7 @@ export default function CreateEditBotPage() {
                 minHeight: 100,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
+                border: `1.5px solid ${getBorderColor('instructions', formData.instructions, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -344,8 +378,8 @@ export default function CreateEditBotPage() {
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              onFocus={() => setFocused('instructions')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -364,7 +398,7 @@ export default function CreateEditBotPage() {
               {t('bot.bio')}
             </label>
             <div style={{ position: 'relative' }}>
-              <textarea 
+              <textarea
                 rows={2}
                 placeholder={t('bot.bio_placeholder')}
                 value={formData.bio}
@@ -376,7 +410,7 @@ export default function CreateEditBotPage() {
                   minHeight: 80,
                   padding: '14px 16px',
                   borderRadius: 12,
-                  border: '1.5px solid var(--color-border)',
+                  border: `1.5px solid ${getBorderColor('bio', formData.bio, !formData.autoBio)}`,
                   background: 'var(--color-surface)',
                   color: 'var(--color-text-primary)',
                   fontSize: 14,
@@ -386,8 +420,8 @@ export default function CreateEditBotPage() {
                   transition: 'border-color 0.2s',
                   boxSizing: 'border-box'
                 }}
-                onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-                onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+                onFocus={() => setFocused('bio')}
+                onBlur={() => setFocused(null)}
               />
             </div>
           </div>
@@ -395,8 +429,8 @@ export default function CreateEditBotPage() {
 
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--color-text-secondary)' }}>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={formData.autoBio}
               onChange={e => setFormData({ ...formData, autoBio: e.target.checked })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -404,8 +438,8 @@ export default function CreateEditBotPage() {
             {t('bot.auto_bio')}
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--color-text-secondary)' }}>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={formData.autoInterests}
               onChange={e => setFormData({ ...formData, autoInterests: e.target.checked })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -431,7 +465,7 @@ export default function CreateEditBotPage() {
               {TopicTypes.map(topic => {
                 const isSelected = formData.topicTypes.includes(topic.value)
                 return (
-                  <div 
+                  <div
                     key={topic.value}
                     onClick={() => {
                       if (!mutation.isPending && !mutation.isSuccess) {
@@ -459,31 +493,13 @@ export default function CreateEditBotPage() {
           </div>
         )}
 
-        {/* Success message */}
-        {mutation.isSuccess && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '12px 16px',
-            borderRadius: 10,
-            background: 'rgba(34, 197, 94, 0.08)',
-            border: '1px solid rgba(34, 197, 94, 0.25)',
-            marginTop: 8,
-          }}>
-            <CheckCircle size={16} color="#22c55e" />
-            <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              {isEditMode ? t('bot.success_update') : t('bot.success_create')}
-            </span>
-          </div>
-        )}
 
         {/* Submit button */}
         <div style={{ marginTop: 32 }}>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary"
-            disabled={!canSubmit || mutation.isSuccess}
+            disabled={mutation.isPending}
             style={{
               width: '100%',
               padding: '13px 24px',
@@ -491,8 +507,8 @@ export default function CreateEditBotPage() {
               fontWeight: 600,
               gap: 8,
               borderRadius: 12,
-              opacity: (!canSubmit || mutation.isSuccess) ? 0.5 : 1,
-              cursor: (!canSubmit || mutation.isSuccess) ? 'not-allowed' : 'pointer',
+              opacity: mutation.isPending ? 0.5 : 1,
+              cursor: mutation.isPending ? 'not-allowed' : 'pointer'
             }}
           >
             {mutation.isPending ? (
@@ -523,8 +539,8 @@ export default function CreateEditBotPage() {
           <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 16px 0', lineHeight: 1.5 }}>
             {t('bot.danger_zone_desc')}
           </p>
-          <button 
-            className="btn btn-primary" 
+          <button
+            className="btn btn-primary"
             style={{ background: '#ef4444', borderColor: '#ef4444', width: '100%', gap: 8 }}
             onClick={handleDeleteBot}
             disabled={deleteMutation.isPending}

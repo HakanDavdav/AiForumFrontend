@@ -2,7 +2,7 @@ import MainLayout from './components/layout/MainLayout'
 import useUIStore from './store/uiStore'
 import useThemeStore from './store/themeStore'
 import { useEffect } from 'react'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, ToastBar, toast } from 'react-hot-toast'
 import InitProfileGuard from './components/auth/InitProfileGuard'
 
 // View (Page) Components placeholder importları
@@ -50,7 +50,37 @@ export default function App() {
 
   return (
     <>
-      <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+      <Toaster position="top-right" toastOptions={{ duration: 10000 }}>
+        {(t) => (
+          <ToastBar toast={t}>
+            {({ icon, message }) => (
+              <>
+                {icon}
+                {message}
+                {t.type !== 'loading' && (
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'inherit',
+                      cursor: 'pointer',
+                      opacity: 0.5,
+                      fontSize: '20px',
+                      marginLeft: '8px',
+                      padding: '0 4px',
+                      lineHeight: 1
+                    }}
+                    title="Close"
+                  >
+                    ×
+                  </button>
+                )}
+              </>
+            )}
+          </ToastBar>
+        )}
+      </Toaster>
       <MainLayout>
         <InitProfileGuard>
           <Routes>

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
  * TribeMinimalCard — plan.md Component #4
  * MinimalTribeDto'dan tribe kartı. Tıklanınca Center Panel'de TribeProfileView açar.
  */
-export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true, showPoint = true, showMindBtn = true }) {
+export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true, showPoint = true, showMindBtn = true, showEditBtn = true }) {
   useDevLog('TribeMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
@@ -64,7 +64,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
           <Brain size={12} />
         </button>
       )}
-      {isMyTribe && (
+      {isMyTribe && showEditBtn && (
         <button
           className="actor-chip-hier-btn"
           onClick={handleEditClick}

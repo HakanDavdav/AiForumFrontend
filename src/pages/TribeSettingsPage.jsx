@@ -6,6 +6,7 @@ import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import useAuthStore from '../store/authStore'
+import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
@@ -50,26 +51,33 @@ export default function TribeSettingsPage() {
   // Mutations
   const editMutation = useMutation({
     mutationFn: (dto) => tribeApi.editTribe(tribeId, dto),
+    meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('tribe_settings.success_update', 'Değişiklikler kaydedildi'))
       queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
-    },
-    onError: (err) => alert(t('common.error_occurred') + err.message)
+    }
   })
 
   const expelMutation = useMutation({
     mutationFn: (memberActorId) => tribeApi.expelMember(tribeId, memberActorId),
+    meta: { showErrorToast: true },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
   })
 
   const rankMutation = useMutation({
     mutationFn: ({ memberActorId, promotionType }) => tribeApi.changeRank(tribeId, memberActorId, promotionType),
+    meta: { showErrorToast: true },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => tribeApi.deleteTribe(tribeId),
+    meta: { showErrorToast: true },
     onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'))
       queryClient.invalidateQueries({ queryKey: ['tribe'] })
+      queryClient.invalidateQueries({ queryKey: ['myTribes'] })
+      useMyEntitiesStore.getState().fetchMyTribes()
       navigate('/')
     }
   })
@@ -94,8 +102,29 @@ export default function TribeSettingsPage() {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = formData.tribeName.trim() !== '' && !editMutation.isPending
+
   const handleSave = (e) => {
     e.preventDefault()
+    
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
+
     editMutation.mutate(formData)
   }
 
@@ -129,11 +158,11 @@ export default function TribeSettingsPage() {
     textTransform: 'uppercase'
   }
 
-  const canSubmit = formData.tribeName.trim().length > 2 && !editMutation.isPending
+
 
   return (
     <div className="flex-col gap-4">
-      
+
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
         <BackButton onClick={() => navigate('/tribe?tribeId=' + tribeId)} style={{ marginBottom: 0 }} />
       </div>
@@ -161,23 +190,23 @@ export default function TribeSettingsPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        
+      <form noValidate onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
         <div>
           <label style={labelStyle}>
             {t('tribe_settings.tribe_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="tribeName"
               required
               value={formData.tribeName}
               onChange={handleChange}
               disabled={editMutation.isPending}
-              style={inputStyle}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              style={{ ...inputStyle, borderColor: getBorderColor('tribeName', formData.tribeName, true) }}
+              onFocus={() => setFocused('tribeName')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -187,16 +216,16 @@ export default function TribeSettingsPage() {
             {t('tribe_settings.cover_image')}
           </label>
           <div style={{ position: 'relative' }}>
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="imageUrl"
               placeholder="https://..."
               value={formData.imageUrl}
               onChange={handleChange}
               disabled={editMutation.isPending}
-              style={inputStyle}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              style={{ ...inputStyle, borderColor: getBorderColor('imageUrl', formData.imageUrl, false) }}
+              onFocus={() => setFocused('imageUrl')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -206,15 +235,15 @@ export default function TribeSettingsPage() {
             {t('tribe_settings.mission')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               name="mission"
               rows={3}
               value={formData.mission}
               onChange={handleChange}
               disabled={editMutation.isPending}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 100, lineHeight: 1.65 }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
+              style={{ ...inputStyle, resize: 'vertical', minHeight: 100, lineHeight: 1.65, borderColor: getBorderColor('mission', formData.mission, false) }}
+              onFocus={() => setFocused('mission')}
+              onBlur={() => setFocused(null)}
             />
           </div>
         </div>
@@ -224,7 +253,7 @@ export default function TribeSettingsPage() {
             {t('tribe_settings.personality')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               name="personalityModifier"
               rows={2}
               placeholder={t('tribe_settings.personality_placeholder')}
@@ -243,7 +272,7 @@ export default function TribeSettingsPage() {
             {t('tribe_settings.instruction')}
           </label>
           <div style={{ position: 'relative' }}>
-            <textarea 
+            <textarea
               name="instructionModifier"
               rows={2}
               placeholder={t('tribe_settings.instruction_placeholder')}
@@ -257,31 +286,14 @@ export default function TribeSettingsPage() {
           </div>
         </div>
 
-        {/* Success message */}
-        {editMutation.isSuccess && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '12px 16px',
-            borderRadius: 10,
-            background: 'rgba(34, 197, 94, 0.08)',
-            border: '1px solid rgba(34, 197, 94, 0.25)',
-            marginTop: 8,
-          }}>
-            <CheckCircle size={16} color="#22c55e" />
-            <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              {t('tribe_settings.success_update')}
-            </span>
-          </div>
-        )}
+
 
         {/* Submit button */}
         <div style={{ marginTop: 16 }}>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn btn-primary"
-            disabled={!canSubmit}
+            disabled={editMutation.isPending}
             style={{
               width: '100%',
               padding: '13px 24px',
@@ -336,59 +348,59 @@ export default function TribeSettingsPage() {
         }}>
           {tribe.tribeMemberships?.map((member, index) => (
             member.actor ? (
-            <div 
-              key={member.actor.actorId} 
-              className="lb-card flex items-center justify-between" 
-              style={{ padding: '8px 16px', marginBottom: 8 }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <ActorMinimalCard actor={member.actor} />
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <span className="badge" style={{ background: 'var(--color-surface-raised)', marginRight: 8 }}>
-                  {member.roleName === 'TribeLeader' ? t('tribe_settings.leader') : member.roleName || t('tribe_settings.member')}
-                </span>
-                
-                {member.actor.actorId !== currentUserId && (
-                  <>
-                    {member.roleName === 'Member' || !member.roleName ? (
-                      <button 
-                        className="btn btn-ghost btn-sm" 
-                        title={t('tribe_settings.make_moderator')}
-                        onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 1 })}
-                        disabled={rankMutation.isPending}
-                      >
-                        <Shield size={14} /> {t('tribe_settings.promote')}
-                      </button>
-                    ) : (
-                      <button 
-                        className="btn btn-ghost btn-sm" 
-                        title={t('tribe_settings.demote_desc')}
-                        onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 2 })}
-                        disabled={rankMutation.isPending}
-                      >
-                        <Shield size={14} /> {t('tribe_settings.demote')}
-                      </button>
-                    )}
+              <div
+                key={member.actor.actorId}
+                className="lb-card flex items-center justify-between"
+                style={{ padding: '8px 16px', marginBottom: 8 }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <ActorMinimalCard actor={member.actor} />
+                </div>
 
-                    <button 
-                      className="btn btn-ghost btn-sm" 
-                      style={{ color: '#ef4444' }}
-                      title={t('tribe_settings.expel_desc')}
-                      onClick={() => {
-                        if (window.confirm(t('tribe_settings.confirm_expel'))) {
-                          expelMutation.mutate(member.actor.actorId)
-                        }
-                      }}
-                      disabled={expelMutation.isPending}
-                    >
-                      <UserMinus size={14} /> {t('tribe_settings.expel')}
-                    </button>
-                  </>
-                )}
+                <div className="flex items-center gap-2">
+                  <span className="badge" style={{ background: 'var(--color-surface-raised)', marginRight: 8 }}>
+                    {member.roleName === 'TribeLeader' ? t('tribe_settings.leader') : member.roleName || t('tribe_settings.member')}
+                  </span>
+
+                  {member.actor.actorId !== currentUserId && (
+                    <>
+                      {member.roleName === 'Member' || !member.roleName ? (
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          title={t('tribe_settings.make_moderator')}
+                          onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 1 })}
+                          disabled={rankMutation.isPending}
+                        >
+                          <Shield size={14} /> {t('tribe_settings.promote')}
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          title={t('tribe_settings.demote_desc')}
+                          onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 2 })}
+                          disabled={rankMutation.isPending}
+                        >
+                          <Shield size={14} /> {t('tribe_settings.demote')}
+                        </button>
+                      )}
+
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        style={{ color: '#ef4444' }}
+                        title={t('tribe_settings.expel_desc')}
+                        onClick={() => {
+                          if (window.confirm(t('tribe_settings.confirm_expel'))) {
+                            expelMutation.mutate(member.actor.actorId)
+                          }
+                        }}
+                        disabled={expelMutation.isPending}
+                      >
+                        <UserMinus size={14} /> {t('tribe_settings.expel')}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
             ) : null
           ))}
         </div>
@@ -406,8 +418,8 @@ export default function TribeSettingsPage() {
         <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 20px 0', lineHeight: 1.5 }}>
           {t('tribe_settings.danger_zone_desc')}
         </p>
-        <button 
-          className="btn btn-primary" 
+        <button
+          className="btn btn-primary"
           style={{ background: '#ef4444', borderColor: '#ef4444', width: '100%', gap: 8, padding: '13px 24px', fontSize: 14, fontWeight: 600, borderRadius: 12 }}
           onClick={handleDeleteTribe}
           disabled={deleteMutation.isPending}

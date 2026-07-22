@@ -7,23 +7,23 @@ import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const TOPIC_TYPES = [
-  { value: 1, label: 'Politika' },
-  { value: 32, label: 'Teknoloji' },
-  { value: 128, label: 'Yapay Zeka' },
-  { value: 64, label: 'Bilim' },
-  { value: 4, label: 'Dünya Haberleri' },
-  { value: 8, label: 'Yerel Haberler' },
-  { value: 2, label: 'Ekonomi' },
-  { value: 16, label: 'Trend Başlıklar' },
-  { value: 1024, label: 'Spor' },
-  { value: 2048, label: 'Eğlence' },
-  { value: 4096, label: 'Oyun' },
-  { value: 8192, label: 'Ünlüler' },
-  { value: 16384, label: 'Yaşam Tarzı' },
-  { value: 512, label: 'Sağlık' },
-  { value: 256, label: 'Uzay' },
-  { value: 32768, label: 'Eğitim' },
-  { value: 65536, label: 'İlişkiler' },
+  { value: 1, enumName: 'Politics', label: 'Politika' },
+  { value: 2, enumName: 'Economy', label: 'Ekonomi' },
+  { value: 4, enumName: 'WorldNews', label: 'Dünya Haberleri' },
+  { value: 8, enumName: 'LocalNews', label: 'Yerel Haberler' },
+  { value: 16, enumName: 'Trending', label: 'Trend Başlıklar' },
+  { value: 32, enumName: 'Technology', label: 'Teknoloji' },
+  { value: 64, enumName: 'Science', label: 'Bilim' },
+  { value: 128, enumName: 'AI', label: 'Yapay Zeka' },
+  { value: 256, enumName: 'Space', label: 'Uzay' },
+  { value: 512, enumName: 'Health', label: 'Sağlık' },
+  { value: 1024, enumName: 'Sports', label: 'Spor' },
+  { value: 2048, enumName: 'Entertainment', label: 'Eğlence' },
+  { value: 4096, enumName: 'Gaming', label: 'Oyun' },
+  { value: 8192, enumName: 'Celebrity', label: 'Ünlüler' },
+  { value: 16384, enumName: 'Lifestyle', label: 'Yaşam Tarzı' },
+  { value: 32768, enumName: 'Education', label: 'Eğitim' },
+  { value: 65536, enumName: 'Relationships', label: 'İlişkiler' },
 ]
 
 export default function EditProfileModal({ isOpen, onClose }) {
@@ -73,8 +73,29 @@ export default function EditProfileModal({ isOpen, onClose }) {
     )
   }
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
+  const canSubmit = formData.profileName.trim() !== '' && formData.bio.trim() !== '' && !editUserMutation.isPending
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
+
     editUserMutation.mutate({
       userId: actorId,
       ...formData,
@@ -101,7 +122,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
         {isLoadingProfile ? (
           <div className="text-center text-muted">{t('common.loading')}</div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex-col gap-4">
+          <form noValidate onSubmit={handleSubmit} className="flex-col gap-4">
             <div className="form-group">
               <label className="text-muted" style={{ fontSize: 14 }}>Profil Adı</label>
               <input
@@ -111,6 +132,9 @@ export default function EditProfileModal({ isOpen, onClose }) {
                 onChange={(e) => setFormData({ ...formData, profileName: e.target.value })}
                 placeholder="Profil Adınız"
                 maxLength={50}
+                style={{ borderColor: getBorderColor('profileName', formData.profileName, true), outline: 'none' }}
+                onFocus={() => setFocused('profileName')}
+                onBlur={() => setFocused(null)}
               />
             </div>
 
@@ -122,11 +146,14 @@ export default function EditProfileModal({ isOpen, onClose }) {
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                 placeholder="https://..."
+                style={{ borderColor: getBorderColor('imageUrl', formData.imageUrl, false), outline: 'none' }}
+                onFocus={() => setFocused('imageUrl')}
+                onBlur={() => setFocused(null)}
               />
             </div>
 
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>Hakkında</label>
+              <label className="text-muted" style={{ fontSize: 14 }}>Hakkında <span style={{ color: 'var(--color-primary)' }}>*</span></label>
               <textarea
                 className="input"
                 value={formData.bio}
@@ -134,6 +161,9 @@ export default function EditProfileModal({ isOpen, onClose }) {
                 placeholder="Kısa bir biyografi..."
                 rows={4}
                 maxLength={300}
+                style={{ borderColor: getBorderColor('bio', formData.bio, true), outline: 'none' }}
+                onFocus={() => setFocused('bio')}
+                onBlur={() => setFocused(null)}
               />
             </div>
 
@@ -162,10 +192,11 @@ export default function EditProfileModal({ isOpen, onClose }) {
             </div>
 
             <div style={{ marginTop: 16 }}>
-              <button
-                type="submit"
+              <button 
+                type="submit" 
                 className="btn btn-primary w-full"
                 disabled={editUserMutation.isPending}
+                style={{ marginTop: 24 }}
               >
                 {editUserMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
               </button>

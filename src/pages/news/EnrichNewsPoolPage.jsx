@@ -16,24 +16,40 @@ export default function EnrichNewsPoolPage() {
 
   const mutation = useMutation({
     mutationFn: (text) => actorApi.enrichNewsPool(text),
+    meta: { showErrorToast: true },
     onSuccess: () => {
-      toast.success(t('news.news_added_success'))
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       setContent('')
-    },
-    onError: () => {
-      toast.error(t('news.news_added_error'))
+      setTimeout(() => navigate('/'), 1000)
     },
   })
 
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
+
+  const getBorderColor = (fieldName, value, isRequired) => {
+    if (isOverLimit) return 'var(--color-danger, #ef4444)'
+    if (focused === fieldName) return 'var(--color-primary)'
+    if (!hasSubmitted) return 'var(--color-border)'
+    
+    if (isRequired) {
+      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+    }
+    return 'var(--color-border)'
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!content.trim()) return
+    if (!canSubmit) {
+      setHasSubmitted(true)
+      return
+    }
     mutation.mutate(content.trim())
   }
 
   const charCount = content.length
   const isOverLimit = charCount > 5000
-  const canSubmit = content.trim().length > 10 && !isOverLimit && !mutation.isPending
+  const canSubmit = content.trim() !== '' && !isOverLimit && !mutation.isPending
 
   return (
     <div className="flex-col gap-4">
@@ -105,7 +121,7 @@ export default function EnrichNewsPoolPage() {
       )}
 
       {/* Form */}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ marginBottom: 8 }}>
           <label
             style={{
@@ -134,7 +150,7 @@ export default function EnrichNewsPoolPage() {
                 minHeight: 200,
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: `1.5px solid ${isOverLimit ? 'var(--color-danger, #ef4444)' : 'var(--color-border)'}`,
+                border: `1.5px solid ${getBorderColor('content', content, true)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -145,14 +161,8 @@ export default function EnrichNewsPoolPage() {
                 boxSizing: 'border-box',
                 opacity: !isLoggedIn ? 0.5 : 1,
               }}
-              onFocus={(e) => {
-                if (!isOverLimit) e.target.style.borderColor = 'var(--color-primary)'
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = isOverLimit
-                  ? 'var(--color-danger, #ef4444)'
-                  : 'var(--color-border)'
-              }}
+              onFocus={() => setFocused('content')}
+              onBlur={() => setFocused(null)}
             />
           </div>
           {/* Char count */}
@@ -171,32 +181,12 @@ export default function EnrichNewsPoolPage() {
           </div>
         </div>
 
-        {/* Success message */}
-        {mutation.isSuccess && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '12px 16px',
-              borderRadius: 10,
-              background: 'rgba(34, 197, 94, 0.08)',
-              border: '1px solid rgba(34, 197, 94, 0.25)',
-              marginBottom: 16,
-            }}
-          >
-            <CheckCircle size={16} color="#22c55e" />
-            <span style={{ fontSize: 13, color: '#22c55e', fontWeight: 500 }}>
-              {t('news.enrich_success_message')}
-            </span>
-          </div>
-        )}
 
         {/* Submit button */}
         <button
           id="enrich-news-submit-btn"
           type="submit"
-          disabled={!canSubmit || !isLoggedIn}
+          disabled={!isLoggedIn || mutation.isPending}
           className="btn btn-primary"
           style={{
             width: '100%',
@@ -205,8 +195,8 @@ export default function EnrichNewsPoolPage() {
             fontWeight: 600,
             gap: 8,
             borderRadius: 12,
-            opacity: !canSubmit || !isLoggedIn ? 0.5 : 1,
-            cursor: !canSubmit || !isLoggedIn ? 'not-allowed' : 'pointer',
+            opacity: (!isLoggedIn || mutation.isPending) ? 0.5 : 1,
+            cursor: (!isLoggedIn || mutation.isPending) ? 'not-allowed' : 'pointer',
           }}
         >
           {mutation.isPending ? (

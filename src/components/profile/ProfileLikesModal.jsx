@@ -7,10 +7,12 @@ import ContextualEntryThread from '../content/ContextualEntryThread'
 import { ReactionEmojis, ReactionType } from '../../constants/enums'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
   useDevLog('ProfileLikesModal', arguments[0] || {})
   const { isLoggedIn, actorId: currentUserId } = useAuthStore()
+  const { t, i18n } = useTranslation()
 
   const ReactionIcons = {
     [ReactionType.Like]: <ThumbsUp size={14} />,
@@ -66,7 +68,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
         }}
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600 }}>Reaksiyon Geçmişi</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 600 }}>{t('profile.reaction_history', 'Reaksiyon Geçmişi')}</h3>
           <button className="btn-icon" onClick={onClose}>
             <X size={18} />
           </button>
@@ -78,7 +80,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">Henüz bir reaksiyon vermemiş.</p>
+            <p className="empty-state">{t('profile.no_reactions', 'Henüz bir reaksiyon vermemiş.')}</p>
           ) : (
             <div className="flex flex-col gap-4">
               {items.map((like) => {
@@ -109,11 +111,11 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
                           gap: 4,
                         }}
                       >
-                        {isPost ? 'Ana başlığa' : 'Bir yanıta'} {ReactionIcons[like.reactionType]}{' '}
-                        attı
+                        {isPost ? t('profile.reacted_post_start', 'Ana başlığa') : t('profile.reacted_entry_start', 'Bir yanıta')} {ReactionIcons[like.reactionType]}{' '}
+                        {t('profile.reacted_action', 'attı')}
                       </span>
                       <span style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-                        {new Date(like.createdAt).toLocaleDateString('tr-TR')}
+                        {new Date(like.createdAt).toLocaleDateString(i18n.language)}
                       </span>
                     </div>
 
@@ -130,7 +132,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
                             paddingLeft: 4,
                           }}
                         >
-                          ODAKLANAN BAŞLIK
+                          {t('profile.focused_topic', 'ODAKLANAN BAŞLIK')}
                         </p>
                         <div
                           style={{
@@ -158,9 +160,9 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
               {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
                 <p
                   className="text-muted"
-                  style={{ padding: 16, textAlign: 'center', fontSize: 13 }}
+                  style={{ textAlign: 'center', fontSize: 13, marginTop: 8 }}
                 >
-                  Son
+                  {t('common.no_more_results', 'No more results.')}
                 </p>
               )}
             </div>

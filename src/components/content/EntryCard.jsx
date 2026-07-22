@@ -42,16 +42,12 @@ export default function EntryCard({
   const loggedInActorId = useAuthStore((s) => s.actorId)
   const [isEditing, setIsEditing] = useState(false)
   const [localContent, setLocalContent] = useState(content)
-  const [editContent, setEditContent] = useState(content || '')
   const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   useEffect(() => {
     setLocalContent(content)
-    if (!isEditing) {
-      setEditContent(content || '')
-    }
-  }, [content, isEditing])
+  }, [content])
 
   // Eğer entryCount > 0 ise veya halihazırda childEntries dizisi doluysa çocukları var demektir
   const hasChildren =
@@ -82,22 +78,14 @@ export default function EntryCard({
       ? childEntries
       : fetchedChildEntriesRes?.data?.data || []
 
-  const isOwnerInternal = isOwner || (loggedInActorId && actor?.actorId === loggedInActorId)
+  const isDeletedEntry = content === '[Deleted]'
+  const isOwnerInternal = !isDeletedEntry && (isOwner || (loggedInActorId && actor?.actorId === loggedInActorId))
 
   const deleteMutation = useMutation({
     mutationFn: () => contentItemApi.deleteEntry(contentItemId),
     onSuccess: () => {
       if (queryKey) queryClient.invalidateQueries({ queryKey })
       if (onDelete) onDelete()
-    },
-  })
-
-  const editMutation = useMutation({
-    mutationFn: (newContent) => contentItemApi.editEntry(contentItemId, { content: newContent }),
-    onSuccess: (res, newContent) => {
-      setIsEditing(false)
-      setLocalContent(newContent)
-      if (queryKey) queryClient.invalidateQueries({ queryKey })
     },
   })
 
@@ -129,29 +117,16 @@ export default function EntryCard({
         {/* Content */}
         {isEditing ? (
           <div style={{ marginTop: 8, marginBottom: 8 }}>
-            <textarea
-              className="input textarea"
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              rows={3}
-              style={{ fontSize: 'var(--font-size-sm)', padding: 8 }}
-              autoFocus
+            <EntryDraft
+              editContentItemId={contentItemId}
+              initialContent={localContent}
+              onSuccess={(newContent) => {
+                setIsEditing(false)
+                setLocalContent(newContent)
+                if (queryKey) queryClient.invalidateQueries({ queryKey })
+              }}
+              onCancel={() => setIsEditing(false)}
             />
-            <div className="flex justify-end gap-2" style={{ marginTop: 8 }}>
-              <button 
-                className="btn btn-ghost btn-sm" 
-                onClick={() => { setIsEditing(false); setEditContent(localContent || '') }}
-              >
-                {t('action.cancel')}
-              </button>
-              <button 
-                className="btn btn-primary btn-sm" 
-                onClick={() => { if (editContent.trim() && editContent !== localContent) editMutation.mutate(editContent) }}
-                disabled={!editContent.trim() || editContent === localContent || editMutation.isPending}
-              >
-                {editMutation.isPending ? t('action.saving') : t('action.save')}
-              </button>
-            </div>
           </div>
         ) : (
           <p className="entry-card-content">{localContent || '—'}</p>

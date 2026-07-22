@@ -4,6 +4,7 @@ import { searchApi } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
+import BackButton from '../components/common/BackButton'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
@@ -90,9 +91,9 @@ export default function SearchPage() {
       return (
         <div className="flex-col gap-6">
           {g.actors?.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.actors')}</h3>
-              <div className="flex flex-col gap-2">
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('search.actors')}</h3>
+              <div className="flex flex-col">
                 {g.actors.map((a) => (
                   <div key={a.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
@@ -104,18 +105,22 @@ export default function SearchPage() {
             </div>
           )}
           {g.tribes?.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.tribes')}</h3>
-              <div className="flex flex-col gap-2">
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('search.tribes')}</h3>
+              <div className="flex flex-col">
                 {g.tribes.map((t) => (
-                  <TribeMinimalCard key={t.tribeId} {...t} />
+                  <div key={t.tribeId} className="lb-card" style={{ padding: '8px 16px' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <TribeMinimalCard {...t} />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           )}
           {g.posts?.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('search.posts')}</h3>
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('search.posts')}</h3>
               <div className="flex flex-col gap-4">
                 {g.posts.map((p) => (
                   <PostCard key={p.contentItemId} {...p} />
@@ -144,7 +149,7 @@ export default function SearchPage() {
       )
     if (mode === 'actors')
       return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           {data.map((a) => (
             <div key={a.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -156,9 +161,13 @@ export default function SearchPage() {
       )
     if (mode === 'tribes')
       return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
           {data.map((t) => (
-            <TribeMinimalCard key={t.tribeId} {...t} />
+            <div key={t.tribeId} className="lb-card" style={{ padding: '8px 16px' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <TribeMinimalCard {...t} />
+              </div>
+            </div>
           ))}
         </div>
       )
@@ -167,6 +176,7 @@ export default function SearchPage() {
   return (
     <div className="flex-col gap-4">
       <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
+        <BackButton />
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>
           {query ? t('search.results_for', { query }) : t('search.results')}
         </h1>

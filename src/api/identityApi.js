@@ -51,6 +51,9 @@ export const identityApi = {
   requestPasswordReset: (dto) =>
     api.post('/identity/password/reset/request', dto),
 
+  verifyPasswordResetToken: (dto) =>
+    api.post('/identity/password/reset/verify', dto),
+
   confirmPasswordReset: (dto) =>
     api.post('/identity/password/reset/confirm', dto),
 

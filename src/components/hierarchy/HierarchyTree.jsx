@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Minus } from 'lucide-react'
+import { CirclePlus, CircleMinus } from 'lucide-react'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import { actorApi } from '../../api/actorApi'
 import useDevLog from '../../utils/useDevLog'
@@ -90,9 +90,9 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
           clickable={true} 
           variant="expanded"
           chipStyle={isRoot ? {
-            background: 'var(--color-success-light)',
-            borderColor: '#15803D',
-            boxShadow: '0 4px 12px rgba(21, 128, 61, 0.2)'
+            background: 'var(--color-primary-light)',
+            borderColor: 'var(--color-primary-dark)',
+            boxShadow: '0 4px 12px var(--color-primary-shadow)'
           } : {
             background: 'var(--color-bg)',
             boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
@@ -101,23 +101,24 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
         
         {!noMoreChildren && (
           <button 
-            className="btn-icon" 
             onClick={handleToggle}
             disabled={isExpanding}
             style={{ 
-              width: 24, height: 24, 
-              background: hasChildren ? (isCollapsed ? 'var(--color-bg)' : 'var(--color-primary-light)') : 'var(--color-success-light)',
-              color: hasChildren ? (isCollapsed ? 'var(--color-text)' : 'var(--color-primary)') : '#15803D',
-              border: `1px solid ${hasChildren ? 'var(--color-border)' : 'transparent'}`,
-              borderRadius: 6,
-              transition: 'all 0.2s'
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: 0,
+              paddingRight: 4,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--color-text-muted)',
             }}
             title={hasChildren ? (isCollapsed ? "Genişlet" : "Daralt") : "Alt botları yükle"}
           >
             {isExpanding ? (
-              <div className="spinner spinner-sm" style={{ width: 12, height: 12, borderWidth: 2 }} />
+              <div className="spinner spinner-sm" style={{ width: 16, height: 16, borderWidth: 2.4 }} />
             ) : (
-              hasChildren && !isCollapsed ? <Minus size={14} /> : <Plus size={14} />
+              hasChildren && !isCollapsed ? <CircleMinus size={19} strokeWidth={2.4} /> : <CirclePlus size={19} strokeWidth={2.4} />
             )}
           </button>
         )}
