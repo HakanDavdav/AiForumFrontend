@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { LogOut, UserPlus, Settings, ChevronLeft, ChevronRight, Brain, CalendarFold } from 'lucide-react'
+import { LogOut, UserPlus, Settings, ChevronLeft, ChevronRight, Brain, CalendarFold, Sparkles, Terminal } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
@@ -157,21 +157,48 @@ export default function TribePage() {
 
       {/* ─── Tribe Modifiers (Only for Leaders usually) ─── */}
       {(tribe.personalityModifier || tribe.instructionModifier) && (
-        <div className="card-surface" style={{ padding: '16px' }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t('tribe.features')}</h3>
-          <div className="flex-col gap-4">
+        <div style={{ marginTop: 24, marginBottom: 8 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, paddingBottom: 12, borderBottom: '1px solid var(--color-border)', marginBottom: 16 }}>
+            {t('tribe.features')}
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            
             {tribe.personalityModifier && (
-              <div>
-                <span className="text-xs font-semibold text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('tribe.personality_modifier')}</span>
-                <div className="bg-surface p-3 rounded-lg mt-1 text-sm border border-border">{tribe.personalityModifier}</div>
+              <div className="lb-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'var(--color-surface)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary)' }}>
+                  <Sparkles size={18} />
+                  <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t('tribe.personality_modifier')}
+                  </span>
+                </div>
+                <div style={{ fontSize: 14, color: 'var(--color-text-primary)', lineHeight: 1.6, fontStyle: 'italic', position: 'relative', zIndex: 1 }}>
+                  "{tribe.personalityModifier}"
+                </div>
+                {/* Decorative background element */}
+                <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.04, color: 'var(--color-primary)', pointerEvents: 'none' }}>
+                  <Sparkles size={120} />
+                </div>
               </div>
             )}
+
             {tribe.instructionModifier && (
-              <div>
-                <span className="text-xs font-semibold text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('tribe.instruction_modifier')}</span>
-                <div className="bg-surface p-3 rounded-lg mt-1 text-sm border border-border">{tribe.instructionModifier}</div>
+              <div className="lb-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'var(--color-surface)', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-primary)' }}>
+                  <Terminal size={18} />
+                  <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {t('tribe.instruction_modifier')}
+                  </span>
+                </div>
+                <div style={{ fontSize: 14, color: 'var(--color-text-primary)', lineHeight: 1.6, fontFamily: 'monospace', background: 'var(--color-surface-2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--color-border)', position: 'relative', zIndex: 1 }}>
+                  {tribe.instructionModifier}
+                </div>
+                {/* Decorative background element */}
+                <div style={{ position: 'absolute', top: -20, right: -20, opacity: 0.04, color: 'var(--color-primary)', pointerEvents: 'none' }}>
+                  <Terminal size={120} />
+                </div>
               </div>
             )}
+            
           </div>
         </div>
       )}

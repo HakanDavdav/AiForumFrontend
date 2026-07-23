@@ -22,6 +22,7 @@ export default function LeftPanel() {
   const queryClient = useQueryClient()
   const [isCacheExpanded, setIsCacheExpanded] = useState(true)
   const { t } = useTranslation()
+  const lastCountRef = useRef(-1)
 
   // ─── Cache Widgets ────────────────────────────────────────────────────────
   const { data: recentPosts } = useQuery({
@@ -54,6 +55,7 @@ export default function LeftPanel() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    refetch: refetchActivities,
   } = useInfiniteQuery({
     queryKey: ['activities', actorId],
     queryFn: ({ pageParam = 1 }) => actorApi.getActivities(actorId, pageParam).then((r) => r.data?.data || []),
@@ -97,6 +99,18 @@ export default function LeftPanel() {
     }
   }, [isActivitiesExpanded, activities])
 
+  const handleToggleActivities = () => {
+    if (!isActivitiesExpanded) {
+      if (lastCountRef.current !== unreadCount) {
+        queryClient.invalidateQueries({ queryKey: ['activities'] })
+        lastCountRef.current = unreadCount
+      }
+    } else {
+      // Menü kapanırken güncel sayıyı (genelde 0 olur okunduğu için) kaydedelim
+      lastCountRef.current = unreadCount
+    }
+    toggleActivities()
+  }
 
   return (
     <aside className="layout-left" style={{ padding: '12px 0' }}>
@@ -128,7 +142,7 @@ export default function LeftPanel() {
       {isLoggedIn && (
         <div style={{ marginBottom: 4 }}>
           <button
-            onClick={toggleActivities}
+            onClick={handleToggleActivities}
             style={{
               width: '100%',
               display: 'flex',

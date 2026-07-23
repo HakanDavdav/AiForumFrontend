@@ -65,6 +65,10 @@ export default function CreateEditPostPage() {
       queryClient.invalidateQueries({ queryKey: ['feed'] })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })
       queryClient.invalidateQueries({ queryKey: ['contentitem', postId] })
+      if (formData.tribeId) {
+        queryClient.invalidateQueries({ queryKey: ['tribe', formData.tribeId] })
+        queryClient.invalidateQueries({ queryKey: ['tribe-posts', formData.tribeId] })
+      }
 
       setTimeout(() => {
         const newPostId = isEditMode
