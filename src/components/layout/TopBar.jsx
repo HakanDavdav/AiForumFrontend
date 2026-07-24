@@ -18,6 +18,7 @@ import {
   Moon,
   Bot,
   Star,
+  CirclePlus,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -723,6 +724,83 @@ export default function TopBar() {
 
         {/* Right: user info */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 'auto' }}>
+          {/* Hakan Davdav Linkleri */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+              Hakan Davdav
+            </span>
+            <a
+              href="https://www.linkedin.com/in/hakan-davdav-0ba19629a/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center', transform: 'translateY(-1px)' }}
+              title="LinkedIn"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect width="4" height="12" x="2" y="9" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
+            <a
+              href="https://github.com/HakanDavdav"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center', transform: 'translateY(-1px)' }}
+              title="GitHub"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3-.3 6-1.5 6-6.5a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 5 3 6.2 6 6.5a4.8 4.8 0 0 0-1 3.2v4" />
+                <path d="M9 18c-4.5 1.5-5-2.5-7-3" />
+              </svg>
+            </a>
+            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 8px' }} />
+
+            <button
+              className={`btn-icon ${isBotShaking ? 'animate-shake' : ''}`}
+              onClick={handleBotClick}
+              title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
+              style={{ color: 'var(--color-primary)' }}
+            >
+              <Bot size={18} strokeWidth={2.5} />
+            </button>
+            <button
+              className="btn-icon"
+              onClick={toggleTheme}
+              title={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
+              style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }}
+            >
+              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 0 0 4px' }} />
+          </div>
+
           {/* Language Selector */}
           <div style={{ position: 'relative' }} ref={langRef}>
             <button
@@ -782,82 +860,6 @@ export default function TopBar() {
             </AnimatePresence>
           </div>
 
-          {/* Hakan Davdav Linkleri */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            <button
-              className={`btn-icon ${isBotShaking ? 'animate-shake' : ''}`}
-              onClick={handleBotClick}
-              title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
-              style={{ color: 'var(--color-primary)' }}
-            >
-              <Bot size={18} strokeWidth={2.5} />
-            </button>
-            <button
-              className="btn-icon"
-              onClick={toggleTheme}
-              title={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
-              style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }}
-            >
-              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 4px' }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-              Hakan Davdav
-            </span>
-            <a
-              href="https://www.linkedin.com/in/hakan-davdav-0ba19629a/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }}
-              title="LinkedIn"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                <rect width="4" height="12" x="2" y="9" />
-                <circle cx="4" cy="4" r="2" />
-              </svg>
-            </a>
-            <a
-              href="https://github.com/HakanDavdav"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }}
-              title="GitHub"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3-.3 6-1.5 6-6.5a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 5 3 6.2 6 6.5a4.8 4.8 0 0 0-1 3.2v4" />
-                <path d="M9 18c-4.5 1.5-5-2.5-7-3" />
-              </svg>
-            </a>
-            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 0 0 4px' }} />
-          </div>
-
           {isLoggedIn ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -903,21 +905,21 @@ export default function TopBar() {
         {/* Cache buttons */}
         <button
           className={`btn ${activeLeftCacheType === 'trending' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '8px 16px', minWidth: '100px' }}
+          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
           onClick={() => setActiveLeftCacheType('trending')}
         >
           <Flame size={14} /> {t('sort.popular', 'Popüler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '8px 16px', minWidth: '100px' }}
+          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
           onClick={() => setActiveLeftCacheType('recent')}
         >
           <Clock8 size={14} /> {t('sort.new')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '8px 16px', minWidth: '100px' }}
+          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
           title={t('sort.best_desc', 'dünün en beğenilenleri')}
         >
@@ -925,7 +927,7 @@ export default function TopBar() {
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '8px 16px', minWidth: '100px' }}
+          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
           onClick={() => setActiveLeftCacheType('mostDisliked')}
           title={t('sort.worst_desc', 'dünün en nefret edilenleri')}
         >
@@ -942,7 +944,7 @@ export default function TopBar() {
               <div style={{ position: 'relative' }} ref={myTribesRef}>
                 <button
                   className="btn btn-outline"
-                  style={{ padding: '6px 14px', fontSize: 13 }}
+                  style={{ padding: '5px 12px', fontSize: 13 }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     setTribesDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -977,17 +979,6 @@ export default function TopBar() {
                         padding: 8,
                       }}
                     >
-                      <button
-                        className="btn btn-primary btn-sm"
-                        style={{ width: '100%', marginBottom: 8 }}
-                        onClick={() => {
-                          navigate('/create-tribe')
-                          setIsMyTribesOpen(false)
-                          setTribesDropdownPos(null)
-                        }}
-                      >
-                        {t('topbar.new_tribe')}
-                      </button>
                       {myTribes?.map((tData) => (
                         <div
                           key={tData.tribeId}
@@ -1007,6 +998,27 @@ export default function TopBar() {
                           {t('topbar.no_tribe')}
                         </p>
                       )}
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8, marginBottom: 4 }}>
+                        <button
+                          onClick={() => {
+                            navigate('/create-tribe')
+                            setIsMyTribesOpen(false)
+                            setTribesDropdownPos(null)
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title={t('topbar.new_tribe')}
+                        >
+                          <CirclePlus size={19} strokeWidth={2.4} />
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -1016,7 +1028,7 @@ export default function TopBar() {
               <div style={{ position: 'relative' }} ref={myBotsRef}>
                 <button
                   className="btn btn-outline"
-                  style={{ padding: '6px 14px', fontSize: 13 }}
+                  style={{ padding: '5px 12px', fontSize: 13 }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     setBotsDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -1051,17 +1063,6 @@ export default function TopBar() {
                         padding: 8,
                       }}
                     >
-                      <button
-                        className="btn btn-primary btn-sm"
-                        style={{ width: '100%', marginBottom: 8 }}
-                        onClick={() => {
-                          navigate('/create-bot')
-                          setIsMyBotsOpen(false)
-                          setBotsDropdownPos(null)
-                        }}
-                      >
-                        {t('topbar.new_bot')}
-                      </button>
                       {myBots?.map((b) => (
                         <div
                           key={b.actorId}
@@ -1086,6 +1087,27 @@ export default function TopBar() {
                           {t('topbar.no_bot')}
                         </p>
                       )}
+                      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8, marginBottom: 4 }}>
+                        <button
+                          onClick={() => {
+                            navigate('/create-bot')
+                            setIsMyBotsOpen(false)
+                            setBotsDropdownPos(null)
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title={t('topbar.new_bot')}
+                        >
+                          <CirclePlus size={19} strokeWidth={2.4} />
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -1098,7 +1120,7 @@ export default function TopBar() {
         {/* Leaderboard */}
         <button
           className="btn btn-ghost"
-          style={{ padding: '8px 16px' }}
+          style={{ padding: '5px 12px', fontSize: 13 }}
           onClick={() => navigate('/leaderboard?type=actor')}
         >
           {t('topbar.leaderboard')}

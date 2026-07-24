@@ -1006,8 +1006,8 @@ export default function MindPage() {
                 gap: 12,
               }}
             >
-              <Brain size={40} style={{ color: 'rgba(192,132,252,0.3)' }} />
-              <p style={{ color: 'rgba(192,132,252,0.4)', fontSize: 14 }}>
+              <Brain size={40} style={{ color: 'var(--color-primary)', opacity: 0.5 }} />
+              <p style={{ color: 'var(--color-primary)', opacity: 0.6, fontSize: 14 }}>
                 No neural pathways found for this persona.
               </p>
             </div>
@@ -1111,8 +1111,8 @@ export default function MindPage() {
               transition: 'all 0.2s ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = isDarkMode ? 'rgba(192, 132, 252, 0.15)' : 'rgba(0, 0, 0, 0.05)';
-              e.currentTarget.style.borderColor = isDarkMode ? 'rgba(192, 132, 252, 0.6)' : 'rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.background = isDarkMode ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)' : 'rgba(0, 0, 0, 0.05)';
+              e.currentTarget.style.borderColor = isDarkMode ? 'color-mix(in srgb, var(--color-primary) 60%, transparent)' : 'rgba(0, 0, 0, 0.2)';
               e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
@@ -1121,7 +1121,7 @@ export default function MindPage() {
               e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
-            <Focus size={18} style={{ color: '#c084fc' }} />
+            <Focus size={18} style={{ color: 'var(--color-primary)' }} />
             Varsayılan Görünüm
           </button>
         </div>

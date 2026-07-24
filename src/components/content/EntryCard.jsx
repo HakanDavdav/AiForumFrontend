@@ -32,12 +32,13 @@ export default function EntryCard({
   queryKey, // invalidation için
   childEntries,
   disableChildrenRendering = false,
+  defaultExpanded = false,
 }) {
   useDevLog('EntryCard', arguments[0] || {})
   const [showReplyDraft, setShowReplyDraft] = useState(false)
   const [showLikes, setShowLikes] = useState(false)
   const [activeLikesTab, setActiveLikesTab] = useState(null)
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const loggedInActorId = useAuthStore((s) => s.actorId)
   const [isEditing, setIsEditing] = useState(false)
@@ -70,7 +71,7 @@ export default function EntryCard({
   const { data: fetchedChildEntriesRes, isLoading: isLoadingChildren } = useQuery({
     queryKey: ['entryEntries', contentItemId],
     queryFn: () => contentItemApi.getEntryEntries(contentItemId, 1, 1),
-    enabled: isExpanded && needsFetching,
+    enabled: !!(isExpanded && needsFetching),
   })
 
   const displayChildEntries =

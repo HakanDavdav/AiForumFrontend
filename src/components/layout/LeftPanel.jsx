@@ -119,7 +119,7 @@ export default function LeftPanel() {
         <div style={{ padding: '0 12px 8px' }}>
           <button
             className="btn btn-primary"
-            style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
+            style={{ width: '100%', gap: 8, fontSize: 13, padding: '7px 13px' }}
             onClick={() => navigate('/create-post')}
           >
             {t('left_panel.new_topic')}
@@ -131,7 +131,7 @@ export default function LeftPanel() {
       <div style={{ padding: isLoggedIn ? '0 12px 12px' : '0 12px 12px' }}>
         <button
           className="btn btn-primary"
-          style={{ width: '100%', gap: 8, fontSize: 14, padding: '10px 16px' }}
+          style={{ width: '100%', gap: 8, fontSize: 13, padding: '7px 13px' }}
           onClick={() => navigate('/enrich-news')}
         >
           {t('left_panel.enrich_news')}
@@ -380,7 +380,7 @@ function ActivitiesScrollArea({ children, onScrollBottom }) {
     const handleWheel = (e) => {
       // Sadece mouse tekerleğiyle kaydırmayı engelle
       e.preventDefault()
-      
+
       // Kaydırma hareketini doğrudan sol panele (parent'a) aktar
       const parent = el.closest('.layout-left')
       if (parent) {

@@ -106,54 +106,24 @@ export default function ContextualEntryThread({
   if (readMode === 'parentToChild') {
     return (
       <div
-        className={
-          hideCardStyle ? 'flex-col gap-4' : depth === 0 ? 'flex-col gap-4 card' : 'flex-col gap-2'
-        }
-        style={hideCardStyle || depth > 0 ? {} : { padding: '16px', background: 'var(--color-bg)' }}
+        className={hideCardStyle ? 'flex-col gap-4' : 'flex-col gap-4 card'}
+        style={hideCardStyle ? {} : { padding: '16px', background: 'var(--color-bg)' }}
       >
-        {depth === 0 && !hideRootPost && rootPost && (
+        {!hideRootPost && rootPost && (
           <div>
-            <SectionLabel color="var(--color-text-faint)">ANA BAŞLIK</SectionLabel>
+            <SectionLabel color="var(--color-text-faint)">{t('contextual.root_post', 'ANA BAŞLIK')}</SectionLabel>
             <PostCard {...rootPost} isOwner={isOwner(rootPost)} />
           </div>
         )}
 
-        <div
-          style={
-            depth > 0
-              ? {
-                  marginLeft: 14,
-                  borderLeft: '2px solid var(--color-border)',
-                  paddingLeft: 12,
-                  paddingTop: 4,
-                  paddingBottom: 4,
-                }
-              : {}
-          }
-        >
+        <div>
           <EntryCard
-            {...(depth >= 1 ? { ...entryDto, childEntries: undefined } : entryDto)}
-            disableChildrenRendering={depth < 1}
-            depth={depth}
+            {...entryDto}
+            depth={0}
+            defaultExpanded={true}
             isOwner={isOwner(entryDto)}
             queryKey={queryKey}
           />
-
-          {depth < 1 && entryDto.childEntries && entryDto.childEntries.length > 0 && (
-            <div className="flex-col gap-2" style={{ marginTop: 8 }}>
-              {entryDto.childEntries.map((childEntry) => (
-                <ContextualEntryThread
-                  key={childEntry.contentItemId}
-                  entryDto={childEntry}
-                  hideCardStyle={true}
-                  readMode="parentToChild"
-                  depth={depth + 1}
-                  queryKey={queryKey}
-                  hideRootPost={hideRootPost}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </div>
     )
