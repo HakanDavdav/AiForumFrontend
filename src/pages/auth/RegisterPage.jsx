@@ -10,6 +10,8 @@ import { signInWithPopup } from 'firebase/auth'
 import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 import useAuthStore from '../../store/authStore'
 import { useQueryClient } from '@tanstack/react-query'
+import { triggerConfetti } from '../../utils/confetti'
+
 
 export default function RegisterPage() {
   useDevLog('RegisterPage', arguments[0] || {})
@@ -71,6 +73,18 @@ export default function RegisterPage() {
     onSuccess: () => {
       // Onay modalını aç
       setIsConfirming(true)
+    }
+  })
+
+  // 3. Confirm Email Mutation
+  const confirmEmailMutation = useMutation({
+    mutationFn: (data) => identityApi.confirmEmail(data),
+    meta: { showErrorToast: true },
+    onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
+      setIsConfirming(false)
+      triggerConfetti()
+      navigate('/login')
     }
   })
 
@@ -240,9 +254,10 @@ export default function RegisterPage() {
 
     <TokenModal 
       isOpen={isConfirming} 
-      email={email}
+      targetText={email}
+      onSubmit={(token) => confirmEmailMutation.mutate({ emailOrUsername: email, token })}
+      isPending={confirmEmailMutation.isPending}
       onTimeout={handleTimeout}
-      onSuccess={() => setIsConfirming(false)}
       onClose={() => setIsConfirming(false)}
     />
   </>

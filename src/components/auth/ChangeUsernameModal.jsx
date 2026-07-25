@@ -5,7 +5,7 @@ import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
-import confetti from 'canvas-confetti'
+import { triggerConfetti } from '../../utils/confetti'
 
 export default function ChangeUsernameModal({ isOpen, onClose }) {
   useDevLog('ChangeUsernameModal', arguments[0] || {})
@@ -21,8 +21,8 @@ export default function ChangeUsernameModal({ isOpen, onClose }) {
     mutationFn: (data) => identityApi.changeUsername(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
       onClose()
+      triggerConfetti()
       setFormData({ newUsername: '', password: '' })
       setHasSubmitted(false)
     }

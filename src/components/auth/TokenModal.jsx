@@ -1,61 +1,48 @@
 import { useState, useEffect, useRef } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { identityApi } from '../../api/identityApi'
-import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { KeyRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import toast from 'react-hot-toast'
 
-const TOTAL_SECONDS = 120 // 2 dakika olarak ayarlıyoruz
-
-export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClose }) {
+export default function TokenModal({
+  isOpen,
+  title,
+  description,
+  targetText,
+  email, // backward compatibility
+  onSubmit,
+  isPending = false,
+  onTimeout,
+  onClose,
+  totalSeconds = 120
+}) {
   useDevLog('TokenModal', arguments[0] || {})
   const [token, setToken] = useState('')
-  const [countdown, setCountdown] = useState(TOTAL_SECONDS)
-  const [isConfirmed, setIsConfirmed] = useState(false)
+  const [countdown, setCountdown] = useState(totalSeconds)
   const textareaRef = useRef(null)
-  const navigate = useNavigate()
   const { t } = useTranslation()
 
-  const confirmEmailMutation = useMutation({
-    mutationFn: (data) => identityApi.confirmEmail(data),
-    meta: { showErrorToast: true },
-    onSuccess: () => {
-      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
-      setIsConfirmed(true)
-      setTimeout(() => {
-        if (onSuccess) onSuccess()
-        navigate('/login')
-      }, 2000)
-    },
-    onError: () => {
-      setToken('')
-      textareaRef.current?.focus()
-    }
-  })
+  const displayTarget = targetText || email
 
   useEffect(() => {
     let timer = null
     if (isOpen) {
-      if (countdown > 0 && !isConfirmed) {
+      if (countdown > 0) {
         timer = setInterval(() => setCountdown((prev) => prev - 1), 1000)
-      } else if (countdown === 0 && !isConfirmed) {
+      } else if (countdown === 0) {
         if (onTimeout) onTimeout()
       }
     } else {
-      setCountdown(TOTAL_SECONDS)
+      setCountdown(totalSeconds)
       setToken('')
-      setIsConfirmed(false)
     }
     return () => { if (timer) clearInterval(timer) }
-  }, [isOpen, countdown, isConfirmed, onTimeout])
+  }, [isOpen, countdown, onTimeout, totalSeconds])
 
   useEffect(() => {
-    if (isOpen && !isConfirmed) {
+    if (isOpen) {
       setTimeout(() => textareaRef.current?.focus(), 150)
     }
-  }, [isOpen, isConfirmed])
+  }, [isOpen])
 
   const handleChange = (e) => {
     setToken(e.target.value)
@@ -74,7 +61,7 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
     return 'var(--color-border)'
   }
 
-  const canSubmit = token.trim() !== '' && !confirmEmailMutation.isPending
+  const canSubmit = token.trim() !== '' && !isPending
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -82,12 +69,14 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
       setHasSubmitted(true)
       return
     }
-    confirmEmailMutation.mutate({ emailOrUsername: email, token: token.trim() })
+    if (onSubmit) {
+      onSubmit(token.trim())
+    }
   }
 
   const formatTime = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
-  const progressPct = (countdown / TOTAL_SECONDS) * 100
+  const progressPct = (countdown / totalSeconds) * 100
   const isLowTime = countdown <= 60
   const hasPasted = token.length > 10
 
@@ -110,123 +99,103 @@ export default function TokenModal({ isOpen, email, onSuccess, onTimeout, onClos
             <X size={20} />
           </button>
         )}
-        {isConfirmed ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+
+        <div style={{
+          width: 56, height: 56, borderRadius: '50%',
+          background: 'var(--color-primary-lighter)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 20px',
+        }}>
+          <KeyRound size={26} color="var(--color-primary)" strokeWidth={2} />
+        </div>
+
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
+          {title || t('auth.email_verification')}
+        </h2>
+
+        {displayTarget ? (
+          <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
+            <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{displayTarget}</span> adresine
+            {' '}{description || t('auth.email_verification_desc')}
+          </p>
+        ) : (
+          <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
+            {description || t('auth.email_verification_desc')}
+          </p>
+        )}
+
+        <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* Token Input */}
+          <div style={{ position: 'relative' }}>
+            <input
+              ref={textareaRef}
+              type="text"
+              className="input"
+              value={token}
+              onChange={handleChange}
+              placeholder={t('auth.enter_code')}
+              spellCheck={false}
+              autoComplete="off"
+              required
+              style={{
+                textAlign: 'center',
+                padding: '14px',
+                fontSize: 14,
+                letterSpacing: 0.5,
+                border: `1.5px solid ${getBorderColor('token', token, true)}`,
+                paddingRight: hasPasted ? '60px' : '14px',
+                outline: 'none'
+              }}
+              onFocus={() => setFocused('token')}
+              onBlur={() => setFocused(null)}
+            />
+            {/* Yapıştırıldı onay etiketi */}
+            {hasPasted && (
+              <span style={{
+                position: 'absolute', top: '50%', right: 14,
+                transform: 'translateY(-50%)',
+                fontSize: 11, color: 'var(--color-primary)',
+                fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3,
+              }}>
+                ✓ {t('common.ready')}
+              </span>
+            )}
+          </div>
+
+          {/* Geri Sayım */}
+          <div>
             <div style={{
-              width: 72, height: 72, borderRadius: '50%',
-              background: 'var(--color-success-light)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 34, color: 'var(--color-success)',
-              animation: 'tkSuccessPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            }}>✓</div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: 0 }}>
-              {t('auth.email_verified')}
-            </h2>
-            <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
-              {t('auth.redirecting', 'Giriş ekranına yönlendiriliyorsunuz…')}
+              height: 3, borderRadius: 99,
+              background: 'var(--color-border)',
+              overflow: 'hidden', marginBottom: 6,
+            }}>
+              <div style={{
+                height: '100%',
+                width: `${progressPct}%`,
+                borderRadius: 99,
+                background: isLowTime ? 'var(--color-error)' : 'var(--color-primary)',
+                transition: 'width 1s linear, background 0.3s',
+              }} />
+            </div>
+            <p style={{
+              fontSize: 12, margin: 0,
+              color: isLowTime ? 'var(--color-error)' : 'var(--color-text-muted)',
+              fontWeight: isLowTime ? 600 : 400,
+              transition: 'color 0.3s',
+            }}>
+              {t('auth.code_expiry')}: <strong>{formatTime(countdown)}</strong>
             </p>
           </div>
-        ) : (
-          <>
-            <div style={{
-              width: 56, height: 56, borderRadius: '50%',
-              background: 'var(--color-primary-lighter)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              margin: '0 auto 20px',
-            }}>
-              <KeyRound size={26} color="var(--color-primary)" strokeWidth={2} />
-            </div>
 
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text)', margin: '0 0 20px' }}>
-              {t('auth.email_verification')}
-            </h2>
-            <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
-              <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{email}</span> adresine
-              {' '}{t('auth.email_verification_desc')}
-            </p>
-
-            <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-              {/* Token Input */}
-              <div style={{ position: 'relative' }}>
-                <input
-                  ref={textareaRef}
-                  type="text"
-                  className="input"
-                  value={token}
-                  onChange={handleChange}
-                  placeholder={t('auth.enter_code')}
-                  spellCheck={false}
-                  autoComplete="off"
-                  required
-                  style={{
-                    textAlign: 'center',
-                    padding: '14px',
-                    fontSize: 14,
-                    letterSpacing: 0.5,
-                    border: `1.5px solid ${getBorderColor('token', token, true)}`,
-                    paddingRight: hasPasted ? '60px' : '14px',
-                    outline: 'none'
-                  }}
-                  onFocus={() => setFocused('token')}
-                  onBlur={() => setFocused(null)}
-                />
-                {/* Yapıştırıldı onay etiketi */}
-                {hasPasted && (
-                  <span style={{
-                    position: 'absolute', top: '50%', right: 14,
-                    transform: 'translateY(-50%)',
-                    fontSize: 11, color: 'var(--color-primary)',
-                    fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3,
-                  }}>
-                    ✓ {t('common.ready')}
-                  </span>
-                )}
-              </div>
-
-              {/* Geri Sayım */}
-              <div>
-                <div style={{
-                  height: 3, borderRadius: 99,
-                  background: 'var(--color-border)',
-                  overflow: 'hidden', marginBottom: 6,
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${progressPct}%`,
-                    borderRadius: 99,
-                    background: isLowTime ? 'var(--color-error)' : 'var(--color-primary)',
-                    transition: 'width 1s linear, background 0.3s',
-                  }} />
-                </div>
-                <p style={{
-                  fontSize: 12, margin: 0,
-                  color: isLowTime ? 'var(--color-error)' : 'var(--color-text-muted)',
-                  fontWeight: isLowTime ? 600 : 400,
-                  transition: 'color 0.3s',
-                }}>
-                  {t('auth.code_expiry')}: <strong>{formatTime(countdown)}</strong>
-                </p>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary w-full"
-                disabled={confirmEmailMutation.isPending}
-              >
-                {confirmEmailMutation.isPending ? t('common.verifying') : t('action.verify')}
-              </button>
-            </form>
-          </>
-        )}
+          <button
+            type="submit"
+            className="btn btn-primary w-full"
+            disabled={isPending}
+          >
+            {isPending ? t('common.verifying') : t('action.verify')}
+          </button>
+        </form>
       </div>
-
-      <style>{`
-        @keyframes tkSuccessPop {
-          from { transform: scale(0.5); opacity: 0; }
-          to   { transform: scale(1);   opacity: 1; }
-        }
-      `}</style>
     </div>
   )
 }

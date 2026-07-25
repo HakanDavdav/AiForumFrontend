@@ -5,7 +5,7 @@ import useDevLog from '../../utils/useDevLog'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
-import confetti from 'canvas-confetti'
+import { triggerConfetti } from '../../utils/confetti'
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
   useDevLog('ChangePasswordModal', arguments[0] || {})
@@ -21,8 +21,8 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
     mutationFn: (data) => identityApi.changePassword(data),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
       onClose()
+      triggerConfetti()
       setFormData({ currentPassword: '', newPassword: '' })
       setHasSubmitted(false)
     }
