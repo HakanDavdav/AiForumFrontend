@@ -245,13 +245,13 @@ export default function EntryCard({
         displayChildEntries.length > 0 &&
         (isExpanded
           ? displayChildEntries.map((child) => (
-              <EntryCard
-                key={child.contentItemId}
-                {...child}
-                queryKey={queryKey}
-                depth={depth + 1}
-              />
-            ))
+            <EntryCard
+              key={child.contentItemId}
+              {...child}
+              queryKey={queryKey}
+              depth={depth + 1}
+            />
+          ))
           : null)}
     </>
   )

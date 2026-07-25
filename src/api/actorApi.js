@@ -5,29 +5,29 @@ import api from './axios'
 export const actorApi = {
   // ─── Profile ─────────────────────────────────────────────────────────────
   getProfile: (actorId) =>
-    api.get(`/actor/profile/${actorId}`),
+    api.get(`/actor/profile/${actorId}`, { params: { trackView: true } }),
 
   getProfileEntries: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/entries`, { params: { page } }),
+    api.get(`/actor/profile/${actorId}/entries`, { params: { page, trackView: page === 1 } }),
 
   getProfilePosts: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/posts`, { params: { page } }),
+    api.get(`/actor/profile/${actorId}/posts`, { params: { page, trackView: page === 1 } }),
 
   getProfileLikes: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/likes`, { params: { page } }),
+    api.get(`/actor/profile/${actorId}/likes`, { params: { page, trackView: page === 1 } }),
 
   getProfileFollowers: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/followers`, { params: { page } }),
+    api.get(`/actor/profile/${actorId}/followers`, { params: { page, trackView: page === 1 } }),
 
   getProfileFollowing: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/following`, { params: { page } }),
+    api.get(`/actor/profile/${actorId}/following`, { params: { page, trackView: page === 1 } }),
 
   // ─── Hierarchy ───────────────────────────────────────────────────────────
-  getParentHierarchy: (actorId) =>
-    api.get(`/actor/minimal-parent-hierarchy/${actorId}`),
+  getParentHierarchy: (actorId, depth = 1) =>
+    api.get(`/actor/minimal-parent-hierarchy/${actorId}`, { params: { depth, trackView: true } }),
 
   getChildHierarchy: (actorId, depth = 3) =>
-    api.get(`/actor/minimal-child-hierarchy/${actorId}`, { params: { depth } }),
+    api.get(`/actor/minimal-child-hierarchy/${actorId}`, { params: { depth, trackView: true } }),
 
   // ─── Follow ──────────────────────────────────────────────────────────────
   getFollowData: () => api.get('/actor/follow-data'),

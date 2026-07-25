@@ -52,7 +52,7 @@ export default function PostDetailPage() {
       contentItemApi.getPostEntries(postId, page).then((r) => {
         const data = r.data?.data || []
         // Sadece 1. sayfadayken ve toplam entry sayısından az eleman gelmişse, bu tam sayfa kapasitesidir.
-        if (page === 1 && postData && postData.entryCount > data.length) {
+        if (page === 1 && postData && postData.entryCount > data.length && data.length > 0) {
           setInferredPerPage(data.length)
         }
         return data

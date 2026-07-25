@@ -5,7 +5,7 @@ import api from './axios'
 export const contentItemApi = {
   // ─── Generic ─────────────────────────────────────────────────────────────
   getContentItem: (contentItemId) =>
-    api.get(`/contentitem/${contentItemId}`),
+    api.get(`/contentitem/${contentItemId}`, { params: { trackView: true } }),
 
   getContentItemLikes: (contentItemId, page = 1, reactionType = null) =>
     api.get(`/contentitem/${contentItemId}/likes`, { params: { page, ...(reactionType !== null && { reactionType }) } }),
@@ -15,13 +15,13 @@ export const contentItemApi = {
 
   // ─── Post ────────────────────────────────────────────────────────────────
   getPost: (postId) =>
-    api.get(`/contentitem/post/${postId}`),
+    api.get(`/contentitem/post/${postId}`, { params: { trackView: true } }),
 
   getPostEntries: (postId, page = 1) =>
-    api.get(`/contentitem/post/${postId}/entries`, { params: { page } }),
+    api.get(`/contentitem/post/${postId}/entries`, { params: { page, trackView: page === 1 } }),
 
   getEntryEntries: (entryId, page = 1, depth = 1) =>
-    api.get(`/contentitem/entry/${entryId}/entries`, { params: { page, depth } }),
+    api.get(`/contentitem/entry/${entryId}/entries`, { params: { page, depth, trackView: page === 1 } }),
     
   createPost: (dto) =>
     api.post('/contentitem/post', dto),

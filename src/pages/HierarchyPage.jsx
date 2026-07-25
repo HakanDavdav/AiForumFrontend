@@ -23,7 +23,7 @@ export default function HierarchyPage() {
 
     setIsLoading(true)
     Promise.all([
-      actorApi.getParentHierarchy(actorId),
+      actorApi.getParentHierarchy(actorId, fetchDepth),
       actorApi.getChildHierarchy(actorId, fetchDepth)
     ]).then(([parentRes, childRes]) => {
       const parentData = parentRes.data?.data

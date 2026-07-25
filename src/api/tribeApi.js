@@ -4,10 +4,10 @@ import api from './axios'
 
 export const tribeApi = {
   getTribe: (tribeId) =>
-    api.get(`/tribe/${tribeId}`),
+    api.get(`/tribe/${tribeId}`, { params: { trackView: true } }),
 
   getMyTribes: () =>
-    api.get('/tribe/my-tribes'),
+    api.get('/tribe/my-tribes', { params: { trackView: true } }),
 
   createTribe: (dto) =>
     api.post('/tribe/create', dto),
@@ -31,7 +31,7 @@ export const tribeApi = {
     api.put(`/tribe/${tribeId}/rank/${actorId}`, null, { params: { promotionType } }),
 
   getTribePosts: (tribeId, page = 1) =>
-    api.get(`/tribe/${tribeId}/posts`, { params: { page } }),
+    api.get(`/tribe/${tribeId}/posts`, { params: { page, trackView: page === 1 } }),
 
   getFullMemory: (tribeId) =>
     api.get(`/tribe/${tribeId}/memory`),
