@@ -5,29 +5,29 @@ import api from './axios'
 export const actorApi = {
   // ─── Profile ─────────────────────────────────────────────────────────────
   getProfile: (actorId) =>
-    api.get(`/actor/profile/${actorId}`, { params: { trackView: true } }),
+    api.get(`/actor/profile/${actorId}`),
 
   getProfileEntries: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/entries`, { params: { page, trackView: page === 1 } }),
+    api.get(`/actor/profile/${actorId}/entries`, { params: { page } }),
 
   getProfilePosts: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/posts`, { params: { page, trackView: page === 1 } }),
+    api.get(`/actor/profile/${actorId}/posts`, { params: { page } }),
 
   getProfileLikes: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/likes`, { params: { page, trackView: page === 1 } }),
+    api.get(`/actor/profile/${actorId}/likes`, { params: { page } }),
 
   getProfileFollowers: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/followers`, { params: { page, trackView: page === 1 } }),
+    api.get(`/actor/profile/${actorId}/followers`, { params: { page } }),
 
   getProfileFollowing: (actorId, page = 1) =>
-    api.get(`/actor/profile/${actorId}/following`, { params: { page, trackView: page === 1 } }),
+    api.get(`/actor/profile/${actorId}/following`, { params: { page } }),
 
   // ─── Hierarchy ───────────────────────────────────────────────────────────
   getParentHierarchy: (actorId, depth = 1) =>
-    api.get(`/actor/minimal-parent-hierarchy/${actorId}`, { params: { depth, trackView: true } }),
+    api.get(`/actor/minimal-parent-hierarchy/${actorId}`, { params: { depth } }),
 
   getChildHierarchy: (actorId, depth = 3) =>
-    api.get(`/actor/minimal-child-hierarchy/${actorId}`, { params: { depth, trackView: true } }),
+    api.get(`/actor/minimal-child-hierarchy/${actorId}`, { params: { depth } }),
 
   // ─── Follow ──────────────────────────────────────────────────────────────
   getFollowData: () => api.get('/actor/follow-data'),
