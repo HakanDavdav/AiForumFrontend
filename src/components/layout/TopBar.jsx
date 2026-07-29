@@ -780,7 +780,7 @@ export default function TopBar() {
                 <path d="M9 18c-4.5 1.5-5-2.5-7-3" />
               </svg>
             </a>
-            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 8px' }} />
+            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 12px 0 16px' }} />
 
             <button
               className={`btn-icon ${isBotShaking ? 'animate-shake' : ''}`}
@@ -798,66 +798,67 @@ export default function TopBar() {
             >
               {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 0 0 4px' }} />
-          </div>
 
-          {/* Language Selector */}
-          <div style={{ position: 'relative' }} ref={langRef}>
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => setIsLangOpen((v) => !v)}
-              style={{ fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            >
-              {langs.find(l => l.code === currentLang)?.flagUrl ? (
-                <img src={langs.find(l => l.code === currentLang).flagUrl} alt={currentLang} style={{ width: 20, height: 15, borderRadius: 2 }} />
-              ) : (
-                <span>{langs.find(l => l.code === currentLang)?.fallbackEmoji || '🇹🇷'}</span>
-              )}
-            </button>
-            <AnimatePresence>
-              {isLangOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    marginTop: 4,
-                    background: 'var(--color-bg)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 12,
-                    boxShadow: 'var(--shadow-lg)',
-                    zIndex: 200,
-                    minWidth: 120,
-                    padding: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 4
-                  }}
-                >
-                  {langs.map((l) => (
-                    <button
-                      key={l.code}
-                      className={`btn ${currentLang === l.code ? 'btn-primary' : 'btn-ghost'}`}
-                      style={{ width: '100%', justifyContent: 'flex-start', padding: '6px 12px', gap: 8 }}
-                      onClick={() => {
-                        i18n.changeLanguage(l.code)
-                        setIsLangOpen(false)
-                      }}
-                    >
-                      {l.flagUrl ? (
-                        <img src={l.flagUrl} alt={l.code} style={{ width: 20, height: 15, borderRadius: 2 }} />
-                      ) : (
-                        <span style={{ fontSize: 16, display: 'inline-block', width: 20, textAlign: 'center' }}>{l.fallbackEmoji}</span>
-                      )}
-                      <span style={{ fontSize: 13 }}>{l.label}</span>
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Language Selector */}
+            <div style={{ position: 'relative' }} ref={langRef}>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => setIsLangOpen((v) => !v)}
+                style={{ fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {langs.find(l => l.code === currentLang)?.flagUrl ? (
+                  <img src={langs.find(l => l.code === currentLang).flagUrl} alt={currentLang} style={{ width: 20, height: 15, borderRadius: 2 }} />
+                ) : (
+                  <span>{langs.find(l => l.code === currentLang)?.fallbackEmoji || '🇹🇷'}</span>
+                )}
+              </button>
+              <AnimatePresence>
+                {isLangOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: 4,
+                      background: 'var(--color-bg)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 12,
+                      boxShadow: 'var(--shadow-lg)',
+                      zIndex: 200,
+                      minWidth: 120,
+                      padding: 8,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4
+                    }}
+                  >
+                    {langs.map((l) => (
+                      <button
+                        key={l.code}
+                        className={`btn ${currentLang === l.code ? 'btn-primary' : 'btn-ghost'}`}
+                        style={{ width: '100%', justifyContent: 'flex-start', padding: '6px 12px', gap: 8 }}
+                        onClick={() => {
+                          i18n.changeLanguage(l.code)
+                          setIsLangOpen(false)
+                        }}
+                      >
+                        {l.flagUrl ? (
+                          <img src={l.flagUrl} alt={l.code} style={{ width: 20, height: 15, borderRadius: 2 }} />
+                        ) : (
+                          <span style={{ fontSize: 16, display: 'inline-block', width: 20, textAlign: 'center' }}>{l.fallbackEmoji}</span>
+                        )}
+                        <span style={{ fontSize: 13 }}>{l.label}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 0 0 4px' }} />
           </div>
 
           {isLoggedIn ? (
