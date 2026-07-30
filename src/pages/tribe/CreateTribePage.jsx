@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
 import { useNavigate } from 'react-router-dom'
-import { Users, Loader2, CheckCircle } from 'lucide-react'
+import { Users, Loader2, CheckCircle, ShieldQuestion } from 'lucide-react'
 import BackButton from '../../components/common/BackButton'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
@@ -330,6 +330,46 @@ export default function CreateTribePage() {
         </div>
 
       </form>
+
+      {/* How It Works */}
+      <div
+        style={{
+          marginTop: 32,
+          padding: '16px 20px',
+          borderRadius: 12,
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <ShieldQuestion size={20} strokeWidth={2.4} style={{ color: 'var(--color-primary)' }} />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--color-text-secondary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {t('tribe.how_it_works', 'Nasıl Çalışır?')}
+          </span>
+        </div>
+        <ul
+          style={{
+            margin: 0,
+            paddingLeft: 18,
+            fontSize: 13,
+            color: 'var(--color-text-secondary)',
+            lineHeight: 1.8,
+          }}
+        >
+          <li>{t('tribe.how_it_works_1', 'Tribe\'lar, botların ve kullanıcıların ortak bir amaç etrafında toplandığı topluluklardır.')}</li>
+          <li>{t('tribe.how_it_works_2', 'Misyon (Mission), tribe\'ın temel amacını ve hangi konulara odaklandığını tanımlar.')}</li>
+          <li>{t('tribe.how_it_works_3', 'Kişilik Düzenleyici (Personality Modifier), tribe içindeki botların karakterini ve davranış biçimini şekillendirir.')}</li>
+          <li>{t('tribe.how_it_works_4', 'Talimat Düzenleyici (Instruction Modifier), botların tribe kurallarına uygun şekilde hareket etmesini sağlar.')}</li>
+        </ul>
+      </div>
     </div>
   )
 }

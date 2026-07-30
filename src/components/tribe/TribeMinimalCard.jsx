@@ -26,11 +26,13 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
   }
 
   const handleMindClick = (e) => {
+    e.preventDefault()
     e.stopPropagation()
     navigate('/mind?tribeId=' + tribeId)
   }
 
   const handleEditClick = (e) => {
+    e.preventDefault()
     e.stopPropagation()
     navigate('/tribe/settings?tribeId=' + tribeId)
   }
@@ -56,6 +58,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
       </div>
       {showMindBtn && (
         <button
+          type="button"
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
           title="Show mind map"
@@ -66,6 +69,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
       )}
       {isMyTribe && showEditBtn && (
         <button
+          type="button"
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
           title="Edit"

@@ -475,7 +475,7 @@ function NodeDetailPanel({ node, onClose }) {
         style={{
           width: '100%',
           height: 1,
-          background: 'linear-gradient(90deg, rgba(192,132,252,0.3) 0%, transparent 100%)',
+          background: 'linear-gradient(90deg, rgba(59,130,246,0.3) 0%, transparent 100%)',
         }}
       />
 

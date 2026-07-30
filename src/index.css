@@ -8,8 +8,8 @@
   --color-primary-lighter: #eff6ff;
   --color-primary-dark: #1d4ed8;
   --color-primary-hover: #2563eb;
-  --color-primary-gradient-end: #a855f7;
-  --color-primary-shadow: rgba(99, 102, 241, 0.3);
+  --color-primary-gradient-end: #1d4ed8;
+  --color-primary-shadow: rgba(59, 130, 246, 0.3);
 
   --color-bg: #ffffff;
   --color-surface: #f8fafc;
@@ -114,8 +114,8 @@
   /* Yazılarda parlaması için açık mavi */
   --color-primary-hover: #1e40af;
   /* Buton hover efekti (Blue 800) */
-  --color-primary-gradient-end: #9333ea;
-  --color-primary-shadow: rgba(99, 102, 241, 0.3);
+  --color-primary-gradient-end: #60a5fa;
+  --color-primary-shadow: rgba(59, 130, 246, 0.3);
 }
 
 :root.theme-green {

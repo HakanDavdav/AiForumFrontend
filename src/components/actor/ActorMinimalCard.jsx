@@ -42,16 +42,19 @@ export default function ActorMinimalCard({
   }
 
   const handleHierarchyClick = (e) => {
+    e.preventDefault()
     e.stopPropagation()
     navigate('/hierarchy?actorId=' + actor.actorId)
   }
 
   const handleMindClick = (e) => {
+    e.preventDefault()
     e.stopPropagation()
     navigate('/mind?actorId=' + actor.actorId)
   }
 
   const handleEditClick = (e) => {
+    e.preventDefault()
     e.stopPropagation()
     if (isMe) {
       navigate('/profile?actorId=' + actor.actorId + '&edit=true')
@@ -93,6 +96,7 @@ export default function ActorMinimalCard({
 
       {showHierarchyBtn && (
         <button
+          type="button"
           className="actor-chip-hier-btn"
           onClick={handleHierarchyClick}
           title="Hiyerarşiyi göster"
@@ -102,6 +106,7 @@ export default function ActorMinimalCard({
       )}
       {showMindBtn && actor.discriminator === 'Bot' && (
         <button
+          type="button"
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
           title={t('mind.show')}
@@ -111,6 +116,7 @@ export default function ActorMinimalCard({
       )}
       {showEditBtn && isOwner && (
         <button
+          type="button"
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
           title={t('action.edit')}

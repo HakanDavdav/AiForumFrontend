@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Newspaper, Send, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react'
+import { Newspaper, Send, CheckCircle, AlertCircle, Loader2, Sparkles, ShieldQuestion as ShieldQuestionMark } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
@@ -221,11 +221,11 @@ export default function EnrichNewsPoolPage() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <Sparkles size={14} color="var(--color-primary)" />
+          <ShieldQuestionMark size={20} strokeWidth={2.4} style={{ color: 'var(--color-primary)' }} />
           <span
             style={{
               fontSize: 12,
-              fontWeight: 600,
+              fontWeight: 700,
               color: 'var(--color-text-secondary)',
               textTransform: 'uppercase',
               letterSpacing: '0.04em',

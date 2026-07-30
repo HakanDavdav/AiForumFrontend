@@ -20,7 +20,6 @@ export default function LeftPanel() {
   const { isActivitiesExpanded, toggleActivities, activeLeftCacheType } =
     useUIStore()
   const queryClient = useQueryClient()
-  const [isCacheExpanded, setIsCacheExpanded] = useState(true)
   const { t } = useTranslation()
   const lastCountRef = useRef(-1)
 
@@ -118,25 +117,83 @@ export default function LeftPanel() {
       {isLoggedIn && (
         <div style={{ padding: '0 12px 8px' }}>
           <button
-            className="btn btn-primary"
-            style={{ width: '100%', gap: 8, fontSize: 13, padding: '7px 13px' }}
+            type="button"
             onClick={() => navigate('/create-post')}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justify: 'center',
+              gap: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              padding: '9px 14px',
+              color: '#ffffff',
+              background: 'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 50%, var(--color-primary-gradient-end) 100%)',
+              borderRadius: 10,
+              border: 'none',
+              boxShadow: '0 3px 12px 0 var(--color-primary-shadow)',
+              cursor: 'pointer',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              letterSpacing: '0.01em',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-1.5px)'
+              e.currentTarget.style.boxShadow = '0 5px 16px 0 var(--color-primary-shadow)'
+              e.currentTarget.style.filter = 'brightness(1.05)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 3px 12px 0 var(--color-primary-shadow)'
+              e.currentTarget.style.filter = 'none'
+            }}
           >
-            {t('left_panel.new_topic')}
+            <PenSquare size={16} style={{ color: 'rgba(255, 255, 255, 0.85)', filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))' }} />
+            <span>{t('left_panel.new_topic')}</span>
           </button>
         </div>
       )}
 
       {/* ─── Enrich News Pool Button (always visible) ── */}
-      <div style={{ padding: isLoggedIn ? '0 12px 12px' : '0 12px 12px' }}>
+      <div style={{ padding: '0 12px 12px' }}>
         <button
-          className="btn btn-primary"
-          style={{ width: '100%', gap: 8, fontSize: 13, padding: '7px 13px' }}
+          type="button"
           onClick={() => navigate('/enrich-news')}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justify: 'center',
+            gap: 8,
+            fontSize: 13,
+            fontWeight: 600,
+            padding: '9px 14px',
+            color: '#ffffff',
+            background: 'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 50%, var(--color-primary-gradient-end) 100%)',
+            borderRadius: 10,
+            border: 'none',
+            boxShadow: '0 3px 12px 0 var(--color-primary-shadow)',
+            cursor: 'pointer',
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            letterSpacing: '0.01em',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1.5px)'
+            e.currentTarget.style.boxShadow = '0 5px 16px 0 var(--color-primary-shadow)'
+            e.currentTarget.style.filter = 'brightness(1.05)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = '0 3px 12px 0 var(--color-primary-shadow)'
+            e.currentTarget.style.filter = 'none'
+          }}
         >
-          {t('left_panel.enrich_news')}
+          <Sparkles size={16} style={{ color: 'rgba(255, 255, 255, 0.85)', filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))' }} />
+          <span>{t('left_panel.enrich_news')}</span>
         </button>
       </div>
+
+      <hr className="divider" style={{ margin: '4px 0' }} />
 
       {/* ─── Activities ──────── */}
       {isLoggedIn && (
@@ -225,16 +282,16 @@ export default function LeftPanel() {
 
       {/* ─── Cache Widgets ────── */}
       {activeLeftCacheType === 'recent' && (
-        <CacheWidget title={t('sort.new', 'Yeni')} items={recentPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.new', 'Yeni')} items={recentPosts} type="post" />
       )}
       {activeLeftCacheType === 'trending' && (
-        <CacheWidget title={t('sort.popular', 'Popüler')} items={trendingPosts} type="post" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.popular', 'Popüler')} items={trendingPosts} type="post" />
       )}
       {activeLeftCacheType === 'mostLiked' && (
-        <CacheWidget title={t('sort.best', 'En İyiler')} items={mostLikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.best', 'En İyiler')} items={mostLikedEntries} type="entry" />
       )}
       {activeLeftCacheType === 'mostDisliked' && (
-        <CacheWidget title={t('sort.worst', 'En Kötüler')} items={mostDislikedEntries} type="entry" expanded={isCacheExpanded} setExpanded={setIsCacheExpanded} />
+        <CacheWidget title={t('sort.worst', 'En Kötüler')} items={mostDislikedEntries} type="entry" />
       )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />
@@ -282,7 +339,7 @@ export default function LeftPanel() {
 
 // ─── Cache Widget sub-component ───────────────────────────────────────────────
 
-function CacheWidget({ title, items, type, expanded, setExpanded }) {
+function CacheWidget({ title, items, type }) {
   const [limit, setLimit] = useState(25)
   const { t } = useTranslation()
 
@@ -295,73 +352,162 @@ function CacheWidget({ title, items, type, expanded, setExpanded }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '6px 16px',
+          padding: '8px 16px 8px',
+          borderRadius: 8,
         }}
       >
-        <button
-          onClick={() => setExpanded((v) => !v)}
+        <span
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
             fontSize: 12,
-            fontWeight: 600,
+            fontWeight: 700,
             color: 'var(--color-text-muted)',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            padding: 0,
-            flex: 1,
-            textAlign: 'left'
+            letterSpacing: '0.08em',
+            lineHeight: 1,
           }}
         >
           {title}
-          {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        </button>
+        </span>
 
-        {expanded && maxItems > 0 && (
-          <select
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value))}
+        {maxItems > 0 && (
+          <div
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
-              borderRadius: 4,
-              color: 'var(--color-text-secondary)',
-              fontSize: 11,
-              padding: '2px 4px',
-              outline: 'none',
-              cursor: 'pointer'
+              borderRadius: 6,
+              padding: '2px 6px',
+              minWidth: 40,
+              justifyContent: 'center',
             }}
-            title="Gösterilecek öğe sayısı"
           >
-            <option value={25}>25</option>
-            {maxItems > 25 && <option value={50}>50</option>}
-            {maxItems > 50 && <option value={75}>75</option>}
-            <option value={maxItems}>{t('left_panel.show_all')} ({maxItems})</option>
-          </select>
+            <LimitDropdown
+              limit={limit}
+              onChange={setLimit}
+              maxItems={maxItems}
+              t={t}
+            />
+          </div>
         )}
       </div>
 
-      {expanded && (
-        <div style={{ padding: '0 4px' }}>
-          {!items || items.length === 0 ? (
-            <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
-              {t('left_panel.loading')}
-            </p>
-          ) : (
-            items
-              .slice(0, limit)
-              .map((item) =>
-                type === 'post' ? (
-                  <PostMinimalCard key={item.contentItemId} {...item} />
-                ) : (
-                  <EntryMinimalCard key={item.contentItemId} {...item} />
-                )
+      <div style={{ padding: '2px 4px 0' }}>
+        {!items || items.length === 0 ? (
+          <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
+            {t('left_panel.loading')}
+          </p>
+        ) : (
+          items
+            .slice(0, limit)
+            .map((item) =>
+              type === 'post' ? (
+                <PostMinimalCard key={item.contentItemId} {...item} />
+              ) : (
+                <EntryMinimalCard key={item.contentItemId} {...item} />
               )
-          )}
+            )
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── ActivitiesScrollArea sub-component ──────────────────────────────────────────
+
+// ─── Limit Dropdown sub-component ──────────────────────────────────────────────
+
+function LimitDropdown({ limit, onChange, maxItems, t }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const options = [
+    { value: 25, label: '25' },
+    ...(maxItems > 25 ? [{ value: 50, label: '50' }] : []),
+    ...(maxItems > 50 ? [{ value: 75, label: '75' }] : []),
+    { value: maxItems, label: `${t('left_panel.show_all')} (${maxItems})` },
+  ]
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        onMouseDown={(e) => e.preventDefault()}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          background: 'none',
+          border: 'none',
+          color: 'var(--color-text-secondary)',
+          fontSize: 12,
+          fontWeight: 600,
+          cursor: 'pointer',
+          padding: '2px 0',
+          fontFamily: 'inherit',
+          lineHeight: 1,
+          outline: 'none',
+        }}
+      >
+        {limit}
+        <ChevronDown size={10} style={{ opacity: 0.6 }} />
+      </button>
+      {open && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(100% + 4px)',
+            right: 0,
+            background: 'var(--color-surface-2)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 8,
+            padding: 4,
+            zIndex: 100,
+            minWidth: 80,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          }}
+        >
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+              onMouseDown={(e) => e.preventDefault()}
+              style={{
+                display: 'block',
+                width: '100%',
+                background: opt.value === limit ? 'var(--color-primary-light)' : 'none',
+                border: 'none',
+                color: opt.value === limit ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
+                fontSize: 11,
+                fontWeight: opt.value === limit ? 700 : 500,
+                padding: '5px 10px',
+                borderRadius: 5,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: 'inherit',
+                lineHeight: 1,
+                outline: 'none',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                if (opt.value !== limit) e.currentTarget.style.background = 'var(--color-surface)'
+              }}
+              onMouseLeave={(e) => {
+                if (opt.value !== limit) e.currentTarget.style.background = 'none'
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
       )}
     </div>

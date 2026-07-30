@@ -75,7 +75,7 @@ export default function InitProfilePage() {
     return 'var(--color-border)'
   }
 
-  const canSubmit = profileName.trim() !== '' && bio.trim() !== '' && !initProfileMutation.isPending
+  const canSubmit = profileName.trim() !== '' && !initProfileMutation.isPending
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -184,7 +184,7 @@ export default function InitProfilePage() {
               textTransform: 'uppercase',
             }}
           >
-            {t('auth.bio')} <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('auth.bio')}
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
@@ -196,7 +196,7 @@ export default function InitProfilePage() {
                 width: '100%',
                 padding: '14px 16px',
                 borderRadius: 12,
-                border: `1.5px solid ${getBorderColor('bio', bio, true)}`,
+                border: `1.5px solid ${getBorderColor('bio', bio, false)}`,
                 background: 'var(--color-surface)',
                 color: 'var(--color-text-primary)',
                 fontSize: 14,
@@ -255,31 +255,25 @@ export default function InitProfilePage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-          <button
-            type="submit"
-            disabled={initProfileMutation.isPending || initProfileMutation.isSuccess}
-            style={{
-              background: 'var(--color-primary)',
-              color: '#fff',
-              border: 'none',
-              padding: '12px 28px',
-              borderRadius: 12,
-              fontSize: 15,
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'opacity 0.2s, transform 0.2s',
-              opacity: initProfileMutation.isPending ? 0.7 : 1,
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
-            onMouseOut={(e) => (e.currentTarget.style.transform = 'none')}
-          >
-            {initProfileMutation.isPending ? t('action.saving') : t('auth.save_and_start')}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={initProfileMutation.isPending || initProfileMutation.isSuccess}
+          className="btn btn-primary"
+          style={{
+            width: '100%',
+            padding: '13px 24px',
+            fontSize: 14,
+            fontWeight: 600,
+            gap: 8,
+            borderRadius: 12,
+            opacity: (initProfileMutation.isPending || initProfileMutation.isSuccess) ? 0.7 : 1,
+            cursor: (initProfileMutation.isPending || initProfileMutation.isSuccess) ? 'not-allowed' : 'pointer',
+            justifyContent: 'center',
+            marginTop: 8,
+          }}
+        >
+          {initProfileMutation.isPending ? t('action.saving') : t('auth.save_and_start')}
+        </button>
       </form>
     </div>
   )

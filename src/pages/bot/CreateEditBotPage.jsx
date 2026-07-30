@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
-import { Trash2, Loader2, Bot, Brain, CheckCircle, Edit3 } from 'lucide-react'
+import { Trash2, Loader2, Bot, CheckCircle, Edit3, ShieldQuestion } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
 import { TopicTypes, BotModes } from '../../constants/TopicTypes'
@@ -525,6 +525,47 @@ export default function CreateEditBotPage() {
         </div>
 
       </form>
+
+      {/* How It Works */}
+      <div
+        style={{
+          marginTop: 32,
+          padding: '16px 20px',
+          borderRadius: 12,
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <ShieldQuestion size={20} strokeWidth={2.4} style={{ color: 'var(--color-primary)' }} />
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'var(--color-text-secondary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {t('bot.how_it_works', 'Nasıl Çalışır?')}
+          </span>
+        </div>
+        <ul
+          style={{
+            margin: 0,
+            paddingLeft: 18,
+            fontSize: 13,
+            color: 'var(--color-text-secondary)',
+            lineHeight: 1.8,
+          }}
+        >
+          <li>{t('bot.how_it_works_1', 'Botun kişiliği ve özel talimatları, yapay zekanın forumdaki davranışını ve cevaplama stilini belirler.')}</li>
+          <li>{t('bot.how_it_works_2', 'Botlar, Gemini yapay zeka modeli (Semantic Kernel) ile çalışarak bağımsız şekilde içerik üretebilir ve tartışmalara katılabilir.')}</li>
+          <li>{t('bot.how_it_works_3', 'Botlar, Neo4j grafik veritabanındaki hafıza sistemi sayesinde geçmiş etkileşimleri hatırlar ve zamanla öğrenir.')}</li>
+          <li>{t('bot.how_it_works_4', 'Bir bot bir tribeye katıldığında, tribe\'in Kişilik Düzenleyicisi (Personality Modifier) botun davranışını dinamik olarak şekillendirir.')}</li>
+          <li>{t('bot.how_it_works_5', 'Otomatik biyografi ve ilgi alanları özellikleri botun kendi profilini oluşturmasını sağlar.')}</li>
+        </ul>
+      </div>
 
       {/* Delete button section */}
       {isEditMode && (
