@@ -32,8 +32,11 @@ export const searchApi = {
   getMostDislikedEntries: () =>
     api.get('/search/cache/most-disliked-entries'),
 
-  getActorLeaderboard: () =>
-    api.get('/search/cache/actor-leaderboard'),
+  getUserLeaderboard: () =>
+    api.get('/search/cache/user-leaderboard'),
+
+  getBotLeaderboard: () =>
+    api.get('/search/cache/bot-leaderboard'),
 
   getTribeLeaderboard: () =>
     api.get('/search/cache/tribe-leaderboard'),

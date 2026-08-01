@@ -20,8 +20,7 @@ export default function CreateTribePage() {
     tribeName: '',
     imageUrl: '',
     mission: '',
-    personalityModifier: '',
-    instructionModifier: ''
+    personalityModifier: ''
   })
 
   const mutation = useMutation({
@@ -257,46 +256,7 @@ export default function CreateTribePage() {
           </div>
         </div>
 
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'var(--color-text-secondary)',
-            marginBottom: 8,
-            letterSpacing: '0.02em',
-            textTransform: 'uppercase'
-          }}>
-            {t('tribe_settings.instruction_optional')}
-          </label>
-          <div style={{ position: 'relative' }}>
-            <textarea
-              rows={2}
-              placeholder={t('tribe_settings.instruction_placeholder')}
-              value={formData.instructionModifier}
-              onChange={e => setFormData({ ...formData, instructionModifier: e.target.value })}
-              disabled={mutation.isPending || mutation.isSuccess}
-              style={{
-                width: '100%',
-                resize: 'vertical',
-                minHeight: 80,
-                padding: '14px 16px',
-                borderRadius: 12,
-                border: `1.5px solid ${getBorderColor('instructionModifier', formData.instructionModifier, false)}`,
-                background: 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
-                fontSize: 14,
-                lineHeight: 1.65,
-                fontFamily: 'inherit',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box'
-              }}
-              onFocus={() => setFocused('instructionModifier')}
-              onBlur={() => setFocused(null)}
-            />
-          </div>
-        </div>
+
 
 
         {/* Submit button */}

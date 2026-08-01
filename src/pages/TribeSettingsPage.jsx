@@ -25,7 +25,6 @@ export default function TribeSettingsPage() {
     imageUrl: '',
     mission: '',
     personalityModifier: '',
-    instructionModifier: '',
   })
 
   // Fetch Tribe
@@ -43,7 +42,6 @@ export default function TribeSettingsPage() {
         imageUrl: tribe.imageUrl || '',
         mission: tribe.mission || '',
         personalityModifier: tribe.personalityModifier || '',
-        instructionModifier: tribe.instructionModifier || '',
       })
     }
   }, [tribe])
@@ -267,24 +265,7 @@ export default function TribeSettingsPage() {
           </div>
         </div>
 
-        <div>
-          <label style={labelStyle}>
-            {t('tribe_settings.instruction')}
-          </label>
-          <div style={{ position: 'relative' }}>
-            <textarea
-              name="instructionModifier"
-              rows={2}
-              placeholder={t('tribe_settings.instruction_placeholder')}
-              value={formData.instructionModifier}
-              onChange={handleChange}
-              disabled={editMutation.isPending}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 80, lineHeight: 1.65 }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
-            />
-          </div>
-        </div>
+
 
 
 

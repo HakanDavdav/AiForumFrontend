@@ -17,10 +17,3 @@ export const TopicTypes = [
   { value: 32768, label: 'Eğitim, Tutorial' },
   { value: 65536, label: 'İlişkiler, Romantizm' }
 ];
-
-export const BotModes = [
-  { value: 0, label: 'Standart (Normal)' },
-  { value: 1, label: 'Agresif (Aggressive)' },
-  { value: 2, label: 'Eğlenceli (Funny)' },
-  { value: 3, label: 'Profesyonel (Professional)' }
-];

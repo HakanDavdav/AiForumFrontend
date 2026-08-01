@@ -22,7 +22,8 @@ import ContentItemPage from './pages/ContentItemPage'
 import CreateEditBotPage from './pages/bot/CreateEditBotPage'
 import CreateTribePage from './pages/tribe/CreateTribePage'
 import CreateEditPostPage from './pages/post/CreateEditPostPage'
-
+import PersonalityCardPage from './pages/card/PersonalityCardPage'
+import MarketplacePage from './pages/card/MarketplacePage'
 import HierarchyPage from './pages/HierarchyPage'
 import MindPage from './pages/MindPage'
 import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
@@ -103,6 +104,8 @@ export default function App() {
             <Route path="/account-settings" element={<AccountSettingsPage />} />
             <Route path="/hierarchy" element={<HierarchyPage />} />
             <Route path="/mind" element={<MindPage />} />
+            <Route path="/cards" element={<PersonalityCardPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/enrich-news" element={<EnrichNewsPoolPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

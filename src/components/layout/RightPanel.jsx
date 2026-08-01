@@ -23,9 +23,15 @@ export default function RightPanel() {
 
   const myBots = useMyEntitiesStore((s) => s.myBots)
 
-  const { data: actorLeaderboard } = useQuery({
-    queryKey: ['cache', 'actor-leaderboard'],
-    queryFn: () => searchApi.getActorLeaderboard().then(parseCacheResponse),
+  const { data: userLeaderboard } = useQuery({
+    queryKey: ['cache', 'user-leaderboard'],
+    queryFn: () => searchApi.getUserLeaderboard().then(parseCacheResponse),
+    staleTime: 60_000,
+  })
+
+  const { data: botLeaderboard } = useQuery({
+    queryKey: ['cache', 'bot-leaderboard'],
+    queryFn: () => searchApi.getBotLeaderboard().then(parseCacheResponse),
     staleTime: 60_000,
   })
 
@@ -62,13 +68,25 @@ export default function RightPanel() {
         </div>
       )}
 
-      {/* ─── Actor Leaderboard Cache Widget ────── */}
+      {/* ─── User Leaderboard Cache Widget ────── */}
       <div style={{ padding: '0 12px' }}>
         <CacheWidget
-          title={t('leaderboard.actor_leaderboard', 'Aktör Sıralaması')}
-          items={actorLeaderboard}
-          type="actor"
-          onViewAll={() => navigate('/leaderboard?type=actor')}
+          title={t('leaderboard.user_leaderboard', 'Kullanıcı Sıralaması')}
+          items={userLeaderboard}
+          type="user"
+          onViewAll={() => navigate('/leaderboard?type=user')}
+        />
+      </div>
+
+      <hr className="divider" style={{ margin: '8px 12px' }} />
+
+      {/* ─── Bot Leaderboard Cache Widget ────── */}
+      <div style={{ padding: '0 12px' }}>
+        <CacheWidget
+          title={t('leaderboard.bot_leaderboard', 'Bot Sıralaması')}
+          items={botLeaderboard}
+          type="bot"
+          onViewAll={() => navigate('/leaderboard?type=bot')}
         />
       </div>
 
@@ -227,16 +245,16 @@ function CacheWidget({ title, items, type, onViewAll }) {
                 items.slice(0, 3).map((item, index) => {
                   const rank = index + 1
                   const isTop3 = rank <= 3
-                  const score = type === 'actor' ? item.actorPoint : item.tribePoint
+                  const score = type !== 'tribe' ? item.actorPoint : item.tribePoint
 
                   return (
                     <div
-                      key={type === 'actor' ? item.actorId : item.tribeId}
+                      key={type !== 'tribe' ? item.actorId : item.tribeId}
                       className="lb-card"
                       style={{ padding: '6px 8px', margin: '2px 0' }}
                       onClick={() =>
                         navigate(
-                          type === 'actor' ? '/profile?actorId=' + item.actorId : '/tribe?tribeId=' + item.tribeId
+                          type !== 'tribe' ? '/profile?actorId=' + item.actorId : '/tribe?tribeId=' + item.tribeId
                         )
                       }
                     >
@@ -258,7 +276,7 @@ function CacheWidget({ title, items, type, onViewAll }) {
                       </div>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        {type === 'actor' ? (
+                        {type !== 'tribe' ? (
                           <ActorMinimalCard actor={item} clickable={false} showPoint={true} />
                         ) : (
                           <TribeMinimalCard {...item} clickable={false} />

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
+import { personalityCardApi } from '../../api/personalityCardApi'
 import { Trash2, Loader2, Bot, CheckCircle, Edit3, ShieldQuestion } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
-import { TopicTypes, BotModes } from '../../constants/TopicTypes'
+import { TopicTypes } from '../../constants/TopicTypes'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
@@ -27,11 +28,15 @@ export default function CreateEditBotPage() {
     imageUrl: '',
     bio: '',
     botPersonality: '',
-    instructions: '',
     autoInterests: false,
     autoBio: false,
     topicTypes: [],
-    botMode: 0
+    selectedCardId: ''
+  })
+
+  const { data: myCards } = useQuery({
+    queryKey: ['myPersonalityCards'],
+    queryFn: () => personalityCardApi.getMyCards().then(res => res.data?.data || [])
   })
 
   // Fetch existing data if in Edit Mode
@@ -48,11 +53,9 @@ export default function CreateEditBotPage() {
         imageUrl: existingBot.imageUrl || '',
         bio: existingBot.bio || '',
         botPersonality: existingBot.botSettings?.botPersonality || '',
-        instructions: existingBot.botSettings?.instructions || '',
         autoInterests: existingBot.botSettings?.autoInterests || false,
         autoBio: existingBot.botSettings?.autoBio || false,
-        topicTypes: existingBot.botSettings?.topicTypes || [],
-        botMode: existingBot.botSettings?.botMode ?? 0
+        topicTypes: existingBot.botSettings?.topicTypes || []
       })
     }
   }, [isEditMode, existingBot])
@@ -60,14 +63,23 @@ export default function CreateEditBotPage() {
   const mutation = useMutation({
     mutationFn: (data) => isEditMode ? actorApi.editBot(botId, data) : actorApi.createBot(data),
     meta: { showErrorToast: true },
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
+      const newBotId = isEditMode ? botId : (typeof res.data?.data === 'string' ? res.data?.data : res.data?.data?.actorId)
+      
+      if (newBotId && formData.selectedCardId) {
+        try {
+          await personalityCardApi.assignCards(newBotId, { assignments: [{ ownershipId: formData.selectedCardId, slotOrder: 0 }] })
+        } catch(e) {
+          console.error('Assign card error', e)
+        }
+      }
+
       toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
       useMyEntitiesStore.getState().fetchMyBots()
 
       setTimeout(() => {
-        const newBotId = isEditMode ? botId : (typeof res.data?.data === 'string' ? res.data?.data : res.data?.data?.actorId)
         if (newBotId) {
           navigate('/profile?actorId=' + newBotId)
         } else {
@@ -140,7 +152,6 @@ export default function CreateEditBotPage() {
 
   const canSubmit = formData.profileName.trim() !== '' &&
     formData.botPersonality.trim() !== '' &&
-    formData.instructions.trim() !== '' &&
     (formData.autoBio || formData.bio.trim() !== '') &&
     !mutation.isPending
 
@@ -261,46 +272,7 @@ export default function CreateEditBotPage() {
           </div>
         </div>
 
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'var(--color-text-secondary)',
-            marginBottom: 8,
-            letterSpacing: '0.02em',
-            textTransform: 'uppercase'
-          }}>
-            {t('bot.bot_mode')}
-          </label>
-          <div style={{ position: 'relative' }}>
-            <select
-              value={formData.botMode}
-              onChange={e => setFormData({ ...formData, botMode: parseInt(e.target.value) })}
-              disabled={mutation.isPending || mutation.isSuccess}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                borderRadius: 12,
-                border: '1.5px solid var(--color-border)',
-                background: 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
-                fontSize: 14,
-                fontFamily: 'inherit',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box',
-                appearance: 'none'
-              }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
-            >
-              {BotModes.map(mode => (
-                <option key={mode.value} value={mode.value}>{mode.label}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+
 
         <div>
           <label style={{
@@ -343,46 +315,7 @@ export default function CreateEditBotPage() {
           </div>
         </div>
 
-        <div>
-          <label style={{
-            display: 'block',
-            fontSize: 13,
-            fontWeight: 600,
-            color: 'var(--color-text-secondary)',
-            marginBottom: 8,
-            letterSpacing: '0.02em',
-            textTransform: 'uppercase'
-          }}>
-            {t('bot.special_instructions')}
-          </label>
-          <div style={{ position: 'relative' }}>
-            <textarea
-              rows={3}
-              placeholder={t('bot.special_instructions_placeholder')}
-              value={formData.instructions}
-              onChange={e => setFormData({ ...formData, instructions: e.target.value })}
-              disabled={mutation.isPending || mutation.isSuccess}
-              style={{
-                width: '100%',
-                resize: 'vertical',
-                minHeight: 100,
-                padding: '14px 16px',
-                borderRadius: 12,
-                border: `1.5px solid ${getBorderColor('instructions', formData.instructions, true)}`,
-                background: 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
-                fontSize: 14,
-                lineHeight: 1.65,
-                fontFamily: 'inherit',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box'
-              }}
-              onFocus={() => setFocused('instructions')}
-              onBlur={() => setFocused(null)}
-            />
-          </div>
-        </div>
+
 
         {!formData.autoBio && (
           <div>
@@ -426,6 +359,47 @@ export default function CreateEditBotPage() {
             </div>
           </div>
         )}
+
+        <div>
+          <label style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            marginBottom: 8,
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase'
+          }}>
+            {t('card.select_card', 'Kişilik Kartı Seç (Opsiyonel)')}
+          </label>
+          <select 
+            value={formData.selectedCardId}
+            onChange={e => setFormData({ ...formData, selectedCardId: e.target.value })}
+            disabled={mutation.isPending || mutation.isSuccess}
+            style={{
+                width: '100%',
+                padding: '14px 16px',
+                borderRadius: 12,
+                border: '1.5px solid var(--color-border)',
+                background: 'var(--color-surface)',
+                color: 'var(--color-text-primary)',
+                fontSize: 14,
+                fontFamily: 'inherit',
+                outline: 'none',
+                boxSizing: 'border-box'
+            }}
+          >
+            <option value="">{t('card.no_card', 'Kart Seçilmedi')}</option>
+            {myCards?.map(card => (
+              <option key={card.ownershipId} value={card.ownershipId}>
+                {card.card?.cardName || card.cardName}
+              </option>
+            ))}
+          </select>
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+            Seçtiğiniz kart botun mevcut kişiliği ile füzyon oluşturarak yeni bir karakter sentezler.
+          </p>
+        </div>
 
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'var(--color-text-secondary)' }}>

@@ -11,21 +11,22 @@ import useThemeStore from '../store/themeStore'
 
 export default function LeaderboardPage() {
   const [searchParams] = useSearchParams()
-  const type = searchParams.get('type') || 'actor'
+  const type = searchParams.get('type') || 'user'
   useDevLog('LeaderboardPage', arguments[0] || {})
   const navigate = useNavigate()
   const { t } = useTranslation()
   const isGreenMode = useThemeStore((s) => s.isGreenMode)
   const isDarkMode = useThemeStore((s) => s.isDarkMode)
-  const isActor = type === 'actor'
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['leaderboard', type],
-    queryFn: () => isActor ? searchApi.getActorLeaderboard() : searchApi.getTribeLeaderboard(),
+    queryFn: () => {
+      if (type === 'user') return searchApi.getUserLeaderboard();
+      if (type === 'bot') return searchApi.getBotLeaderboard();
+      return searchApi.getTribeLeaderboard();
+    },
     select: parseCacheResponse,
   })
-
-
 
   return (
     <div className="flex-col gap-4">
@@ -36,14 +37,21 @@ export default function LeaderboardPage() {
         {/* Toggle Buttons */}
         <div style={{ display: 'flex', gap: 8 }}>
            <button 
-             className={`btn btn-sm ${isActor ? 'btn-primary' : 'btn-outline'}`}
-             onClick={() => navigate('/leaderboard?type=actor')}
+             className={`btn btn-sm ${type === 'user' ? 'btn-primary' : 'btn-outline'}`}
+             onClick={() => navigate('/leaderboard?type=user')}
              style={{ borderRadius: 20, padding: '6px 14px' }}
            >
-             {t('common.actors', 'Aktörler')}
+             {t('common.users', 'Kullanıcılar')}
            </button>
            <button 
-             className={`btn btn-sm ${!isActor ? 'btn-primary' : 'btn-outline'}`}
+             className={`btn btn-sm ${type === 'bot' ? 'btn-primary' : 'btn-outline'}`}
+             onClick={() => navigate('/leaderboard?type=bot')}
+             style={{ borderRadius: 20, padding: '6px 14px' }}
+           >
+             {t('common.bots', 'Botlar')}
+           </button>
+           <button 
+             className={`btn btn-sm ${type === 'tribe' ? 'btn-primary' : 'btn-outline'}`}
              onClick={() => navigate('/leaderboard?type=tribe')}
              style={{ borderRadius: 20, padding: '6px 14px' }}
            >
@@ -66,10 +74,10 @@ export default function LeaderboardPage() {
         </div>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            {isActor ? t('leaderboard.actor_leaderboard', 'Aktör Sıralaması') : t('leaderboard.tribe_leaderboard', 'Tribe Sıralaması')}
+            {type === 'user' ? t('leaderboard.user_leaderboard', 'Kullanıcı Sıralaması') : type === 'bot' ? t('leaderboard.bot_leaderboard', 'Bot Sıralaması') : t('leaderboard.tribe_leaderboard', 'Tribe Sıralaması')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            {isActor ? t('leaderboard.actor_desc', 'Platformdaki en yüksek puana sahip kullanıcı ve botlar') : t('leaderboard.tribe_desc', 'Platformdaki en prestijli tribeler')}
+            {type === 'user' ? t('leaderboard.user_desc', 'Platformdaki en yüksek puana sahip kullanıcılar') : type === 'bot' ? t('leaderboard.bot_desc', 'Platformdaki en popüler ve başarılı botlar') : t('leaderboard.tribe_desc', 'Platformdaki en prestijli tribeler')}
           </p>
         </div>
       </div>
@@ -85,11 +93,11 @@ export default function LeaderboardPage() {
           data.map((item, index) => {
             const rank = index + 1;
             const isTop3 = rank <= 3;
-            const score = isActor ? item.actorPoint : item.tribePoint;
+            const score = type !== 'tribe' ? item.actorPoint : item.tribePoint;
             
             return (
               <div 
-                key={isActor ? item.actorId : item.tribeId}
+                key={type !== 'tribe' ? item.actorId : item.tribeId}
                 className="lb-card" 
                 style={{ padding: '8px 16px' }}
               >
@@ -109,7 +117,7 @@ export default function LeaderboardPage() {
                 </div>
                 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  {isActor ? (
+                  {type !== 'tribe' ? (
                     <ActorMinimalCard actor={item} clickable={true} showPoint={true} />
                   ) : (
                     <TribeMinimalCard 

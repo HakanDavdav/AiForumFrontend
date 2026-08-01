@@ -113,19 +113,7 @@ export const ReactionEmojis = {
   [ReactionType.BrutallyDislike]: '💀',
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 
-export const BotModes = {
-  Default: 0,
-  Opposing: 1,
-  Creative: 2,
-}
-
-export const BotModeLabels = {
-  [BotModes.Default]: 'Varsayılan',
-  [BotModes.Opposing]: 'Karşıt',
-  [BotModes.Creative]: 'Yaratıcı',
-}
 
 export const BotGrades = {
   A: 0,
@@ -200,11 +188,6 @@ export const PromotionType = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 
-export const UserFeatures = {
-  Default: 0,
-  ExtendedBotLimit: 1,
-  IncreasedOperationLimit: 2,
-}
 
 export const StandardRoles = {
   TempUser: 0,
