@@ -7,6 +7,8 @@ import BackButton from '../../components/common/BackButton'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 
+import CardSlots from '../../components/card/CardSlots'
+
 export default function PersonalityCardPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -107,6 +109,16 @@ export default function PersonalityCardPage() {
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {t('card.my_cards_desc', 'Oluşturduğunuz ve satın aldığınız kişilik kartları')}
           </p>
+        </div>
+      </div>
+
+      {/* Slots Section */}
+      <div style={{ marginBottom: 32, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div>
+          <h3 style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            {t('card.ownership_slots', 'Kart Sahiplik Yuvaları (10 Slot)')}
+          </h3>
+          <CardSlots cards={myCards} slotCount={10} />
         </div>
       </div>
 

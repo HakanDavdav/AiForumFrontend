@@ -14,6 +14,9 @@ export const searchApi = {
   filterTribes: (params) =>
     api.get('/search/tribes/filter', { params }),
 
+  filterCards: (params) =>
+    api.get('/search/cards/filter', { params }),
+
   general: (query) =>
     api.get('/search/general', { params: { query } }),
 

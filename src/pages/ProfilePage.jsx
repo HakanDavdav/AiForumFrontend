@@ -8,6 +8,7 @@ import { personalityCardApi } from '../api/personalityCardApi'
 import { BotGradeColors, BotCapabilities } from '../constants/enums'
 import BackButton from '../components/common/BackButton'
 import ActorAvatar from '../components/actor/ActorAvatar'
+import CardSlots from '../components/card/CardSlots'
 import { TopicTagList } from '../components/topic/TopicTag'
 import PostCard from '../components/content/PostCard'
 import EntryCard from '../components/content/EntryCard'
@@ -100,11 +101,16 @@ export default function ProfilePage() {
     enabled: !!actorId,
   })
 
-  const { data: botCards } = useQuery({
-    queryKey: ['botCards', actorId],
-    queryFn: () => personalityCardApi.getBotCards(actorId).then((r) => r.data?.data),
+  const { data: ownedCards } = useQuery({
+    queryKey: ['ownedCards', actorId],
+    queryFn: () => personalityCardApi.getOwnedCards(actorId, null).then((r) => r.data?.data || []),
+    enabled: !!actorId,
+  })
+
+  const { data: assignedCards } = useQuery({
+    queryKey: ['assignedCards', actorId],
+    queryFn: () => personalityCardApi.getAssignedCards(actorId, null).then((r) => r.data?.data || []),
     enabled: !!actorId && profile?.discriminator === 'Bot',
-    refetchInterval: (query) => query.state.data?.fusionStatus === 1 ? 5000 : false
   })
 
   const queryClient = useQueryClient()
@@ -428,70 +434,17 @@ export default function ProfilePage() {
                   <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     {t('card.personality_slots', 'Kişilik Kartları')}
                   </span>
-                  {botCards?.fusionStatus === 1 && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}>
-                      {t('card.fusion_in_progress', 'Füzyon sürüyor...')}
-                    </span>
-                  )}
-                  {botCards?.fusionStatus === 2 && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}>
-                      {t('card.fusion_done', 'Füzyon tamamlandı')}
-                    </span>
-                  )}
-                  {botCards?.fusionStatus === 3 && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 12, background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444' }}>
-                      {t('card.fusion_failed', 'Füzyon başarısız')}
-                    </span>
-                  )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(72px, 1fr))', gap: 8 }}>
-                  {Array.from({ length: (profile.botSettings?.maxCardSlots || 4) }, (_, i) => {
-                    const slot = botCards?.slots?.find(s => s.slotOrder === i)
-                    const filled = !!slot
-                    return (
-                      <div key={i} style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 4,
-                        padding: '10px 6px',
-                        borderRadius: 10,
-                        border: `1.5px solid ${filled ? '#22c55e' : 'var(--color-border)'}`,
-                        background: filled ? 'rgba(34, 197, 94, 0.08)' : 'var(--color-surface)',
-                        minWidth: 0
-                      }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--color-text-faint)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          {i === 0 ? t('card.active_slot', 'Aktif') : `Slot ${i + 1}`}
-                        </span>
-                        <span style={{
-                          fontSize: 11,
-                          fontWeight: 600,
-                          color: filled ? '#16a34a' : 'var(--color-text-faint)',
-                          textAlign: 'center',
-                          lineHeight: 1.3,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          maxWidth: '100%'
-                        }}>
-                          {filled ? (slot.ownership?.cardName || slot.ownership?.originalCard?.cardName || t('card.card', 'Kart')) : '—'}
-                        </span>
-                      </div>
-                    )
-                  })}
+                <CardSlots cards={assignedCards} slotCount={profile.botSettings?.maxCardSlots || 4} />
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, marginTop: 16, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    {t('card.owned_cards', 'Sahip Olunan Kartlar')}
+                  </span>
                 </div>
 
-                {botCards?.activeCard && (
-                  <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 10, background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>
-                      {t('card.active_personality', 'Aktif Kişilik')}
-                    </div>
-                    <p style={{ margin: 0, fontSize: 12.5, color: 'var(--color-text-secondary)', lineHeight: 1.55, maxHeight: 90, overflow: 'hidden' }}>
-                      {botCards.activeCard.cardHint || botCards.activeCard.personalityPrompt}
-                    </p>
-                  </div>
-                )}
+                <CardSlots cards={ownedCards} slotCount={10} />
               </div>
             )}
 

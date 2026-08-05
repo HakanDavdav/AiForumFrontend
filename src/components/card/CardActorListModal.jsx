@@ -1,0 +1,101 @@
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { X } from 'lucide-react'
+import { personalityCardApi } from '../../api/personalityCardApi'
+import ActorMinimalCard from '../actor/ActorMinimalCard'
+import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
+
+export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
+  useDevLog('CardActorListModal', arguments[0] || {})
+  const { t } = useTranslation()
+  // type is 'owners' or 'assignees'
+
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['card-actor-list', cardId, type],
+    queryFn: async ({ pageParam = 1 }) => {
+      try {
+        const res = type === 'owners'
+          ? await personalityCardApi.getCardOwners(cardId, pageParam)
+          : await personalityCardApi.getCardAssignees(cardId, pageParam)
+        return {
+          items: res.data?.data || [],
+          nextPage: (res.data?.data?.length === 10) ? pageParam + 1 : undefined,
+        }
+      } catch (err) {
+        return { items: [], nextPage: undefined }
+      }
+    },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    enabled: isOpen && !!cardId,
+  })
+
+  const items = data?.pages?.flatMap(page => page.items) || []
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target
+    if (scrollHeight - scrollTop <= clientHeight + 50) {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    }
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
+      <div
+        className="modal-box"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: 400, height: '60vh', display: 'flex', flexDirection: 'column' }}
+      >
+        <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 600 }}>
+            {type === 'owners' ? t('card.owners', 'Sahipler') : t('card.assignees', 'Atanmış Botlar')}
+          </h3>
+          <button className="btn-icon" onClick={onClose}><X size={18} /></button>
+        </div>
+
+        <div
+          style={{ flex: 1, overflowY: 'auto', paddingRight: 8 }}
+          onScroll={handleScroll}
+        >
+          {isLoading ? (
+            <div style={{ textAlign: 'center', padding: 24 }}>
+              <div className="spinner spinner-md" />
+            </div>
+          ) : items.length === 0 ? (
+            <p className="empty-state">{t('card.no_actors', 'Henüz kimse yok.')}</p>
+          ) : (
+            <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
+              {items.map((actor) => (
+                <div key={actor.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <ActorMinimalCard actor={actor} showHierarchyBtn={false} clickable={true} />
+                  </div>
+                </div>
+              ))}
+
+              {isFetchingNextPage && (
+                <div style={{ textAlign: 'center', padding: 16 }}>
+                  <div className="spinner spinner-sm" />
+                </div>
+              )}
+              {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
+                <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
+                  {t('common.no_more_results', 'Son')}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
