@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Save, Trash2, Shield, UserMinus, Settings, Users, Loader2, CheckCircle } from 'lucide-react'
+import { Save, Trash2, Shield, UserMinus, Settings, Users, Loader2 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
+import { personalityCardApi } from '../api/personalityCardApi'
 import BackButton from '../components/common/BackButton'
+import CardSelectionSlots from '../components/card/CardSelectionSlots'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 
 export default function TribeSettingsPage() {
   const [searchParams] = useSearchParams()
@@ -24,14 +27,24 @@ export default function TribeSettingsPage() {
     tribeName: '',
     imageUrl: '',
     mission: '',
-    personalityModifier: '',
   })
+  const [selectedCardIds, setSelectedCardIds] = useState([])
+  const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [focused, setFocused] = useState(null)
 
   // Fetch Tribe
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
-    queryFn: () => tribeApi.getTribe(tribeId).then(r => r.data?.data),
+    queryFn: () => tribeApi.getTribe(tribeId).then((r) => r.data?.data),
     enabled: !!tribeId,
+  })
+
+  const { data: myCards = [] } = useQuery({
+    queryKey: ['myPersonalityCards', currentUserId],
+    queryFn: () =>
+      personalityCardApi.getOwnedCards(currentUserId).then((res) => res.data?.data || []),
+    enabled: Boolean(currentUserId),
+    meta: { showErrorToast: true },
   })
 
   // Populate form
@@ -41,8 +54,10 @@ export default function TribeSettingsPage() {
         tribeName: tribe.tribeName || '',
         imageUrl: tribe.imageUrl || '',
         mission: tribe.mission || '',
-        personalityModifier: tribe.personalityModifier || '',
       })
+      setSelectedCardIds(
+        (tribe.personalityCards || []).map((card) => card.personalityCardId).filter(Boolean)
+      )
     }
   }, [tribe])
 
@@ -53,19 +68,21 @@ export default function TribeSettingsPage() {
     onSuccess: () => {
       toast.success(t('tribe_settings.success_update', 'Değişiklikler kaydedildi'))
       queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
-    }
+      queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
+    },
   })
 
   const expelMutation = useMutation({
     mutationFn: (memberActorId) => tribeApi.expelMember(tribeId, memberActorId),
     meta: { showErrorToast: true },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] }),
   })
 
   const rankMutation = useMutation({
-    mutationFn: ({ memberActorId, promotionType }) => tribeApi.changeRank(tribeId, memberActorId, promotionType),
+    mutationFn: ({ memberActorId, promotionType }) =>
+      tribeApi.changeRank(tribeId, memberActorId, promotionType),
     meta: { showErrorToast: true },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] }),
   })
 
   const deleteMutation = useMutation({
@@ -77,19 +94,33 @@ export default function TribeSettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['myTribes'] })
       useMyEntitiesStore.getState().fetchMyTribes()
       navigate('/')
-    }
+    },
   })
 
-  if (isLoading) return <div className="flex justify-center" style={{ padding: 40 }}><Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }} /></div>
+  if (isLoading)
+    return (
+      <div className="flex justify-center" style={{ padding: 40 }}>
+        <Loader2
+          size={32}
+          style={{ animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }}
+        />
+      </div>
+    )
   if (!tribe) return <div className="empty-state">{t('tribe_settings.not_found')}</div>
 
-  const isLeader = tribe.tribeMemberships?.some(m => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader')
+  const isLeader = tribe.tribeMemberships?.some(
+    (m) => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader'
+  )
   if (!isLeader) {
     return (
       <div className="empty-state">
         <h2 style={{ color: 'var(--color-error)' }}>{t('tribe_settings.unauthorized')}</h2>
         <p>{t('tribe_settings.unauthorized_desc')}</p>
-        <button className="btn btn-primary" onClick={() => navigate('/tribe?tribeId=' + tribeId)} style={{ marginTop: 16 }}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate('/tribe?tribeId=' + tribeId)}
+          style={{ marginTop: 16 }}
+        >
           {t('tribe_settings.return_to_tribe')}
         </button>
       </div>
@@ -97,18 +128,23 @@ export default function TribeSettingsPage() {
   }
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  const [hasSubmitted, setHasSubmitted] = useState(false)
-  const [focused, setFocused] = useState(null)
+  const toggleCard = (cardId) => {
+    setSelectedCardIds((current) =>
+      current.includes(cardId)
+        ? current.filter((selectedId) => selectedId !== cardId)
+        : [...current, cardId]
+    )
+  }
 
   const getBorderColor = (fieldName, value, isRequired) => {
     if (focused === fieldName) return 'var(--color-primary)'
     if (!hasSubmitted) return 'var(--color-border)'
-    
+
     if (isRequired) {
-      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+      return !value || !value.trim() ? 'var(--color-error)' : 'var(--color-primary)'
     }
     return 'var(--color-border)'
   }
@@ -117,13 +153,13 @@ export default function TribeSettingsPage() {
 
   const handleSave = (e) => {
     e.preventDefault()
-    
+
     if (!canSubmit) {
       setHasSubmitted(true)
       return
     }
 
-    editMutation.mutate(formData)
+    editMutation.mutate({ ...formData, assignedCardIds: selectedCardIds })
   }
 
   const handleDeleteTribe = () => {
@@ -143,7 +179,7 @@ export default function TribeSettingsPage() {
     fontFamily: 'inherit',
     outline: 'none',
     transition: 'border-color 0.2s',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
   }
 
   const labelStyle = {
@@ -153,75 +189,67 @@ export default function TribeSettingsPage() {
     color: 'var(--color-text-secondary)',
     marginBottom: 8,
     letterSpacing: '0.02em',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
   }
-
-
 
   return (
     <div className="flex-col gap-4">
-
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
-        <BackButton onClick={() => navigate('/tribe?tribeId=' + tribeId)} style={{ marginBottom: 0 }} />
+        <BackButton
+          onClick={() => navigate('/tribe?tribeId=' + tribeId)}
+          style={{ marginBottom: 0 }}
+        />
       </div>
 
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        marginBottom: 32,
-        paddingBottom: 24,
-        borderBottom: '1px solid var(--color-border)'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 32,
+          paddingBottom: 24,
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
         <div className="page-header-icon">
           <Settings size={22} color="#fff" />
         </div>
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+          <h1
+            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
+          >
             {t('tribe_settings.title')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            {t('tribe_settings.title_desc', 'Kabilenizin genel ayarlarını ve üyelerini buradan yönetebilirsiniz.')}
+            {t(
+              'tribe_settings.title_desc',
+              'Kabilenizin genel ayarlarını ve üyelerini buradan yönetebilirsiniz.'
+            )}
           </p>
         </div>
       </div>
 
       {/* Form */}
-      <form noValidate onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-
+      <form
+        noValidate
+        onSubmit={handleSave}
+        style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+      >
         <div>
           <label style={labelStyle}>
-            {t('tribe_settings.tribe_name')} <span style={{ color: 'var(--color-primary)' }}>*</span>
+            {t('tribe_settings.tribe_name')}{' '}
+            <span style={{ color: 'var(--color-primary)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <input
               type="text"
               name="tribeName"
-              required
-              value={formData.tribeName}
-              onChange={handleChange}
               disabled={editMutation.isPending}
-              style={{ ...inputStyle, borderColor: getBorderColor('tribeName', formData.tribeName, true) }}
-              onFocus={() => setFocused('tribeName')}
-              onBlur={() => setFocused(null)}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label style={labelStyle}>
-            {t('tribe_settings.cover_image')}
-          </label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type="text"
-              name="imageUrl"
-              placeholder="https://..."
-              value={formData.imageUrl}
-              onChange={handleChange}
-              disabled={editMutation.isPending}
-              style={{ ...inputStyle, borderColor: getBorderColor('imageUrl', formData.imageUrl, false) }}
+              style={{
+                ...inputStyle,
+                borderColor: getBorderColor('imageUrl', formData.imageUrl, false),
+              }}
               onFocus={() => setFocused('imageUrl')}
               onBlur={() => setFocused(null)}
             />
@@ -229,9 +257,7 @@ export default function TribeSettingsPage() {
         </div>
 
         <div>
-          <label style={labelStyle}>
-            {t('tribe_settings.mission')}
-          </label>
+          <label style={labelStyle}>{t('tribe_settings.mission')}</label>
           <div style={{ position: 'relative' }}>
             <textarea
               name="mission"
@@ -239,7 +265,13 @@ export default function TribeSettingsPage() {
               value={formData.mission}
               onChange={handleChange}
               disabled={editMutation.isPending}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 100, lineHeight: 1.65, borderColor: getBorderColor('mission', formData.mission, false) }}
+              style={{
+                ...inputStyle,
+                resize: 'vertical',
+                minHeight: 100,
+                lineHeight: 1.65,
+                borderColor: getBorderColor('mission', formData.mission, false),
+              }}
               onFocus={() => setFocused('mission')}
               onBlur={() => setFocused(null)}
             />
@@ -247,27 +279,15 @@ export default function TribeSettingsPage() {
         </div>
 
         <div>
-          <label style={labelStyle}>
-            {t('tribe_settings.personality')}
-          </label>
-          <div style={{ position: 'relative' }}>
-            <textarea
-              name="personalityModifier"
-              rows={2}
-              placeholder={t('tribe_settings.personality_placeholder')}
-              value={formData.personalityModifier}
-              onChange={handleChange}
-              disabled={editMutation.isPending}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 80, lineHeight: 1.65 }}
-              onFocus={e => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={e => e.target.style.borderColor = 'var(--color-border)'}
-            />
-          </div>
+          <label style={labelStyle}>{t('card.personality_cards', 'Kişilik Kartları')}</label>
+          <CardSelectionSlots
+            cards={myCards}
+            selectedCardIds={selectedCardIds}
+            onToggle={toggleCard}
+            maxSelections={4}
+            disabled={editMutation.isPending}
+          />
         </div>
-
-
-
-
 
         {/* Submit button */}
         <div style={{ marginTop: 16 }}>
@@ -302,32 +322,50 @@ export default function TribeSettingsPage() {
 
       {/* Member Management */}
       <div style={{ marginTop: 48 }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          marginBottom: 24,
-        }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10, background: 'var(--color-surface-raised)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 24,
+          }}
+        >
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: 'var(--color-surface-raised)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <Users size={18} color="var(--color-primary)" />
           </div>
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
+            <h2
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                margin: 0,
+                color: 'var(--color-text-primary)',
+              }}
+            >
               {t('tribe_settings.member_management')}
             </h2>
           </div>
         </div>
 
-        <div style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 16,
-          overflow: 'hidden'
-        }}>
-          {tribe.tribeMemberships?.map((member, index) => (
+        <div
+          style={{
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 16,
+            overflow: 'hidden',
+          }}
+        >
+          {tribe.tribeMemberships?.map((member, index) =>
             member.actor ? (
               <div
                 key={member.actor.actorId}
@@ -339,8 +377,13 @@ export default function TribeSettingsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="badge" style={{ background: 'var(--color-surface-raised)', marginRight: 8 }}>
-                    {member.roleName === 'TribeLeader' ? t('tribe_settings.leader') : member.roleName || t('tribe_settings.member')}
+                  <span
+                    className="badge"
+                    style={{ background: 'var(--color-surface-raised)', marginRight: 8 }}
+                  >
+                    {member.roleName === 'TribeLeader'
+                      ? t('tribe_settings.leader')
+                      : member.roleName || t('tribe_settings.member')}
                   </span>
 
                   {member.actor.actorId !== currentUserId && (
@@ -349,7 +392,12 @@ export default function TribeSettingsPage() {
                         <button
                           className="btn btn-ghost btn-sm"
                           title={t('tribe_settings.make_moderator')}
-                          onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 1 })}
+                          onClick={() =>
+                            rankMutation.mutate({
+                              memberActorId: member.actor.actorId,
+                              promotionType: 1,
+                            })
+                          }
                           disabled={rankMutation.isPending}
                         >
                           <Shield size={14} /> {t('tribe_settings.promote')}
@@ -358,7 +406,12 @@ export default function TribeSettingsPage() {
                         <button
                           className="btn btn-ghost btn-sm"
                           title={t('tribe_settings.demote_desc')}
-                          onClick={() => rankMutation.mutate({ memberActorId: member.actor.actorId, promotionType: 2 })}
+                          onClick={() =>
+                            rankMutation.mutate({
+                              memberActorId: member.actor.actorId,
+                              promotionType: 2,
+                            })
+                          }
                           disabled={rankMutation.isPending}
                         >
                           <Shield size={14} /> {t('tribe_settings.demote')}
@@ -383,32 +436,51 @@ export default function TribeSettingsPage() {
                 </div>
               </div>
             ) : null
-          ))}
+          )}
         </div>
       </div>
 
       {/* Danger Zone */}
-      <div style={{
-        marginTop: 48,
-        padding: '24px',
-        borderRadius: 16,
-        border: '1px solid rgba(239, 68, 68, 0.3)',
-        background: 'rgba(239, 68, 68, 0.04)'
-      }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: '0 0 8px 0' }}>{t('tribe_settings.danger_zone')}</h2>
-        <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 20px 0', lineHeight: 1.5 }}>
+      <div
+        style={{
+          marginTop: 48,
+          padding: '24px',
+          borderRadius: 16,
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          background: 'rgba(239, 68, 68, 0.04)',
+        }}
+      >
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: '0 0 8px 0' }}>
+          {t('tribe_settings.danger_zone')}
+        </h2>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--color-text-secondary)',
+            margin: '0 0 20px 0',
+            lineHeight: 1.5,
+          }}
+        >
           {t('tribe_settings.danger_zone_desc')}
         </p>
         <button
           className="btn btn-primary"
-          style={{ background: '#ef4444', borderColor: '#ef4444', width: '100%', gap: 8, padding: '13px 24px', fontSize: 14, fontWeight: 600, borderRadius: 12 }}
+          style={{
+            background: '#ef4444',
+            borderColor: '#ef4444',
+            width: '100%',
+            gap: 8,
+            padding: '13px 24px',
+            fontSize: 14,
+            fontWeight: 600,
+            borderRadius: 12,
+          }}
           onClick={handleDeleteTribe}
           disabled={deleteMutation.isPending}
         >
           <Trash2 size={16} /> {t('tribe_settings.delete_tribe')}
         </button>
       </div>
-
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { Bot, PersonStanding } from 'lucide-react'
+import { BotGradeColors } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
 
 /**
@@ -18,6 +19,7 @@ export default function ActorAvatar({
   imageUrl,
   discriminator,
   actorId,
+  botGrade,
   size = 'md',
   onClick,
 }) {
@@ -25,7 +27,14 @@ export default function ActorAvatar({
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
 
-  const sizeMap = { sm: 'avatar-sm', md: 'avatar-md', lg: 'avatar-lg', xl: 'avatar-xl', xxl: 'avatar-xxl', xxxl: 'avatar-xxxl' }
+  const sizeMap = {
+    sm: 'avatar-sm',
+    md: 'avatar-md',
+    lg: 'avatar-lg',
+    xl: 'avatar-xl',
+    xxl: 'avatar-xxl',
+    xxxl: 'avatar-xxxl',
+  }
   const sizeClass = sizeMap[size] || 'avatar-md'
 
   const badgeSizeMap = {
@@ -37,6 +46,11 @@ export default function ActorAvatar({
     xxxl: { size: 44, icon: 26, bottom: 4, right: 4 },
   }
   const badgeOpts = badgeSizeMap[size] || badgeSizeMap.md
+  const gradeLabel =
+    isBot && botGrade !== null && botGrade !== undefined
+      ? ['A', 'B', 'C', 'D', 'F'][botGrade] || '?'
+      : null
+  const gradeBadgeSize = Math.max(12, Math.round(badgeOpts.size * 0.52))
 
   const handleClick = (e) => {
     if (onClick) {
@@ -46,7 +60,16 @@ export default function ActorAvatar({
   }
 
   return (
-    <div className="actor-avatar-wrap" style={{ cursor: 'pointer', alignSelf: 'flex-start', height: 'max-content', display: 'inline-flex' }} onClick={handleClick}>
+    <div
+      className="actor-avatar-wrap"
+      style={{
+        cursor: 'pointer',
+        alignSelf: 'flex-start',
+        height: 'max-content',
+        display: 'inline-flex',
+      }}
+      onClick={handleClick}
+    >
       {imageUrl ? (
         <img src={imageUrl} alt={profileName || 'Aktör'} className={`avatar ${sizeClass}`} />
       ) : (
@@ -63,16 +86,30 @@ export default function ActorAvatar({
 
       {isBot && (
         <div
-          className="actor-avatar-user-badge"
-          title="Bot"
-          style={{
-            width: badgeOpts.size,
-            height: badgeOpts.size,
-            bottom: badgeOpts.bottom,
-            right: badgeOpts.right,
-          }}
+          className="actor-avatar-badge-group"
+          style={{ bottom: badgeOpts.bottom, right: badgeOpts.right }}
         >
-          <Bot size={badgeOpts.icon} color="white" strokeWidth={2.5} />
+          <div
+            className="actor-avatar-user-badge"
+            title="Bot"
+            style={{ width: badgeOpts.size, height: badgeOpts.size }}
+          >
+            <Bot size={badgeOpts.icon} color="white" strokeWidth={2.5} />
+          </div>
+          {gradeLabel && (
+            <div
+              className="actor-avatar-grade-badge"
+              title={`Bot derecesi: ${gradeLabel}`}
+              style={{
+                width: gradeBadgeSize,
+                height: gradeBadgeSize,
+                background: BotGradeColors[botGrade] ?? 'var(--color-primary)',
+                fontSize: Math.max(9, Math.round(gradeBadgeSize * 0.42)),
+              }}
+            >
+              {gradeLabel}
+            </div>
+          )}
         </div>
       )}
       {discriminator === 'User' && (

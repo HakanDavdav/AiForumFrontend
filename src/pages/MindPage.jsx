@@ -986,10 +986,10 @@ export default function MindPage() {
                 gap: 16,
               }}
             >
-              <Brain size={40} style={{ color: '#c084fc', opacity: 0.7 }} />
-              <Loader2 size={28} className="animate-spin" style={{ color: '#c084fc' }} />
+              <Brain size={40} style={{ color: 'var(--color-primary)', opacity: 0.7 }} />
+              <Loader2 size={28} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
               <span
-                style={{ fontSize: 13, color: 'rgba(192,132,252,0.5)', letterSpacing: '0.05em' }}
+                style={{ fontSize: 13, color: 'var(--color-primary)', opacity: 0.6, letterSpacing: '0.05em' }}
               >
                 Syncing neural pathways...
               </span>

@@ -1,11 +1,27 @@
 import { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Network, Search, Filter, ChevronLeft, ChevronRight, CalendarFold, Bot, Brain, Edit2, Check, X, Settings, UserPlus, UserMinus } from 'lucide-react'
+import {
+  Network,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  CalendarFold,
+  Bot,
+  Brain,
+  ShieldCheck,
+  Edit2,
+  Check,
+  X,
+  Settings,
+  UserPlus,
+  UserMinus,
+} from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
 import { personalityCardApi } from '../api/personalityCardApi'
-import { BotGradeColors, BotCapabilities } from '../constants/enums'
+import { BotCapabilities } from '../constants/enums'
 import BackButton from '../components/common/BackButton'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import CardSlots from '../components/card/CardSlots'
@@ -56,9 +72,9 @@ export default function ProfilePage() {
   const { t } = useTranslation()
 
   // Follow State & Debounce
-  const myFollowData = useMyEntitiesStore(state => state.myFollowData)
-  const addFollowing = useMyEntitiesStore(state => state.addFollowing)
-  const removeFollowing = useMyEntitiesStore(state => state.removeFollowing)
+  const myFollowData = useMyEntitiesStore((state) => state.myFollowData)
+  const addFollowing = useMyEntitiesStore((state) => state.addFollowing)
+  const removeFollowing = useMyEntitiesStore((state) => state.removeFollowing)
 
   const globalIsFollowing = myFollowData?.following?.includes(actorId)
   const [localIsFollowing, setLocalIsFollowing] = useState(globalIsFollowing)
@@ -85,32 +101,20 @@ export default function ProfilePage() {
   const [editForm, setEditForm] = useState({ profileName: '', bio: '', topicTypes: [] })
 
   const toggleTopic = (value) => {
-    setEditForm(prev => ({
+    setEditForm((prev) => ({
       ...prev,
       topicTypes: prev.topicTypes.includes(value)
-        ? prev.topicTypes.filter(v => v !== value)
-        : [...prev.topicTypes, value]
+        ? prev.topicTypes.filter((v) => v !== value)
+        : [...prev.topicTypes, value],
     }))
   }
 
   const isOwnProfile = actorId === currentUserId
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile', actorId],
+    queryKey: ['actorProfile', actorId],
     queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data),
     enabled: !!actorId,
-  })
-
-  const { data: ownedCards } = useQuery({
-    queryKey: ['ownedCards', actorId],
-    queryFn: () => personalityCardApi.getOwnedCards(actorId, null).then((r) => r.data?.data || []),
-    enabled: !!actorId,
-  })
-
-  const { data: assignedCards } = useQuery({
-    queryKey: ['assignedCards', actorId],
-    queryFn: () => personalityCardApi.getAssignedCards(actorId, null).then((r) => r.data?.data || []),
-    enabled: !!actorId && profile?.discriminator === 'Bot',
   })
 
   const queryClient = useQueryClient()
@@ -119,7 +123,7 @@ export default function ProfilePage() {
     mutationFn: () => actorApi.follow(actorId),
     onSuccess: () => {
       addFollowing(actorId)
-      queryClient.invalidateQueries({ queryKey: ['profile', actorId] })
+      queryClient.invalidateQueries({ queryKey: ['actorProfile', actorId] })
     },
   })
 
@@ -127,7 +131,7 @@ export default function ProfilePage() {
     mutationFn: () => actorApi.unfollow(actorId),
     onSuccess: () => {
       removeFollowing(actorId)
-      queryClient.invalidateQueries({ queryKey: ['profile', actorId] })
+      queryClient.invalidateQueries({ queryKey: ['actorProfile', actorId] })
     },
   })
 
@@ -156,27 +160,32 @@ export default function ProfilePage() {
     onSuccess: () => {
       toast.success(t('profile.update_success'))
       setIsEditing(false)
-      queryClient.invalidateQueries(['profile', actorId])
+      queryClient.invalidateQueries(['actorProfile', actorId])
     },
     onError: (err) => {
       const errMsgs = err.response?.data?.error?.errors || [t('profile.error_occurred')]
-      errMsgs.forEach(m => toast.error(m))
-    }
+      errMsgs.forEach((m) => toast.error(m))
+    },
   })
 
   const handleEditInit = () => {
     const initialTopics = []
     if (profile?.topicTypes) {
-      profile.topicTypes.forEach(t => {
-        if (!t?.topicTypeName) return;
-        const match = TOPIC_TYPES.find(opt => opt.enumName === t.topicTypeName || opt.label === t.topicTypeName)
+      profile.topicTypes.forEach((t) => {
+        if (t?.topicTypeName === undefined || t?.topicTypeName === null) return
+        const match = TOPIC_TYPES.find(
+          (opt) =>
+            opt.value === t.topicTypeName ||
+            opt.enumName === t.topicTypeName ||
+            opt.label === t.topicTypeName
+        )
         if (match) initialTopics.push(match.value)
       })
     }
     setEditForm({
       profileName: profile?.profileName || '',
       bio: profile?.bio || '',
-      topicTypes: initialTopics
+      topicTypes: initialTopics,
     })
     setIsEditing(true)
   }
@@ -195,7 +204,7 @@ export default function ProfilePage() {
       entryPerPage: profile?.entryPerPage || 50,
       postPerPage: profile?.postPerPage || 20,
       socialNotificationPreference: profile?.socialNotificationPreference ?? true,
-      socialEmailPreference: profile?.socialEmailPreference ?? true
+      socialEmailPreference: profile?.socialEmailPreference ?? true,
     }
     editMutation.mutate(payload)
   }
@@ -238,6 +247,26 @@ export default function ProfilePage() {
     )
   if (!profile) return <div className="empty-state">{t('profile.not_found')}</div>
 
+  const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
+  const hasBotMemory = (botCapabilities & BotCapabilities.BotMemory) === BotCapabilities.BotMemory
+  const capabilityEmblems = hasBotMemory
+    ? [
+        {
+          key: 'memory',
+          label: t('bot.capability_memory', 'Hafıza'),
+          Icon: Brain,
+          tone: 'memory',
+        },
+      ]
+    : [
+        {
+          key: 'default',
+          label: t('bot.capability_default', 'Varsayılan'),
+          Icon: ShieldCheck,
+          tone: 'default',
+        },
+      ]
+
   return (
     <div className="flex-col gap-4">
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
@@ -246,10 +275,20 @@ export default function ProfilePage() {
 
       {/* ─── Profile Header ─── */}
       <div className="profile-header-card">
-        <div className="flex justify-between" style={{ gap: 20, width: '100%', alignItems: 'stretch' }}>
-
+        <div
+          className="flex justify-between"
+          style={{ gap: 20, width: '100%', alignItems: 'stretch', marginBottom: -6 }}
+        >
           {/* ─── LEFT COLUMN ─── */}
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', paddingBottom: 4 }}>
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              paddingBottom: 0,
+            }}
+          >
             <div className="flex items-center" style={{ gap: 16 }}>
               <h1
                 style={{
@@ -267,7 +306,9 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     style={{
-                      flex: 1, maxWidth: 300, fontSize: 18,
+                      flex: 1,
+                      maxWidth: 300,
+                      fontSize: 18,
                       padding: '8px 16px',
                       borderRadius: 12,
                       border: '1.5px solid var(--color-border)',
@@ -280,7 +321,7 @@ export default function ProfilePage() {
                     onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
                     onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                     value={editForm.profileName}
-                    onChange={(e) => setEditForm(f => ({ ...f, profileName: e.target.value }))}
+                    onChange={(e) => setEditForm((f) => ({ ...f, profileName: e.target.value }))}
                   />
                 ) : (
                   <span
@@ -295,7 +336,11 @@ export default function ProfilePage() {
             {isEditing ? (
               <textarea
                 style={{
-                  margin: '8px 0', width: '100%', maxWidth: 600, minHeight: 80, fontSize: 14,
+                  margin: '8px 0',
+                  width: '100%',
+                  maxWidth: 600,
+                  minHeight: 80,
+                  fontSize: 14,
                   padding: '12px 16px',
                   borderRadius: 12,
                   border: '1.5px solid var(--color-border)',
@@ -304,12 +349,12 @@ export default function ProfilePage() {
                   fontFamily: 'inherit',
                   outline: 'none',
                   transition: 'border-color 0.2s',
-                  resize: 'vertical'
+                  resize: 'vertical',
                 }}
                 onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
                 onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
                 value={editForm.bio}
-                onChange={(e) => setEditForm(f => ({ ...f, bio: e.target.value }))}
+                onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
                 placeholder={t('profile.bio_placeholder')}
               />
             ) : (
@@ -330,8 +375,31 @@ export default function ProfilePage() {
                 }}
               >
                 <CalendarFold size={14} />
-                <span>{t('profile.joined')} {new Date(profile.createdAt).toLocaleDateString(currentUserId === actorId ? undefined : 'tr-TR')}</span>
+                <span>
+                  {t('profile.joined')}{' '}
+                  {new Date(profile.createdAt).toLocaleDateString(
+                    currentUserId === actorId ? undefined : 'tr-TR'
+                  )}
+                </span>
               </p>
+            )}
+
+            {!isEditing && profile.topicTypes && profile.topicTypes.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                <TopicTagList
+                  topicTypes={profile.topicTypes
+                    .map((t) => {
+                      const match = TOPIC_TYPES.find(
+                        (opt) =>
+                          opt.value === t?.topicTypeName ||
+                          opt.enumName === t?.topicTypeName ||
+                          opt.label === t?.topicTypeName
+                      )
+                      return match ? match.value : null
+                    })
+                    .filter((v) => v != null)}
+                />
+              </div>
             )}
 
             {profile.parentActor && !isEditing && (
@@ -354,103 +422,27 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {isEditing ? (
-              <div style={{ marginTop: 12, marginBottom: 12, maxWidth: 600 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 8, textTransform: 'uppercase' }}>
-                  {t('profile.interests')}
-                </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                  {TOPIC_TYPES.map(topic => {
-                    const isSelected = editForm.topicTypes.includes(topic.value);
-                    return (
-                      <label key={topic.value} style={{
-                        display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
-                        padding: '8px 14px', borderRadius: 20, fontSize: 13, fontWeight: 500,
-                        background: isSelected ? 'var(--color-primary)' : 'var(--color-surface)',
-                        color: isSelected ? '#fff' : 'var(--color-text-secondary)',
-                        border: isSelected ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
-                        transition: 'all 0.2s ease',
-                        userSelect: 'none'
-                      }}>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleTopic(topic.value)}
-                          style={{ display: 'none' }}
-                        />
-                        {t(`topics.${topic.enumName.toLowerCase()}`)}
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
-            ) : (
-              profile.topicTypes && profile.topicTypes.length > 0 && (
-                <div style={{ marginTop: 12, marginBottom: 12 }}>
-                  <TopicTagList
-                    topicTypes={profile.topicTypes
-                      .map((t) => {
-                        const match = TOPIC_TYPES.find(opt => opt.enumName === t?.topicTypeName || opt.label === t?.topicTypeName);
-                        return match ? match.value : null;
-                      })
-                      .filter((v) => v != null)}
-                  />
-                </div>
-              )
-            )}
-
             {profile.discriminator === 'Bot' && (
-              <div style={{ marginTop: 16, marginBottom: 8, maxWidth: 600 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {t('bot.grade', 'Bot Derecesi')}
-                  </span>
-                  <span style={{
-                    fontSize: 13,
-                    fontWeight: 700,
-                    padding: '2px 12px',
-                    borderRadius: 10,
-                    color: '#fff',
-                    background: BotGradeColors[profile.botSettings?.botGrade] ?? '#6b7280'
-                  }}>
-                    {['A', 'B', 'C', 'D', 'F'][profile.botSettings?.botGrade] ?? '?'}
-                  </span>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginLeft: 8 }}>
-                    {t('bot.capabilities', 'Yetenekler')}
-                  </span>
-                  {(profile.botSettings?.botCapabilities & BotCapabilities.BotMemory) === BotCapabilities.BotMemory && (
-                    <span style={{ fontSize: 12, fontWeight: 600, padding: '2px 10px', borderRadius: 12, background: 'rgba(99, 102, 241, 0.12)', color: '#818cf8' }}>
-                      {t('bot.capability_memory', 'Hafıza')}
+              <div style={{ marginTop: 0, marginBottom: 0, maxWidth: 600 }}>
+                <div className="bot-capability-emblems" style={{ marginBottom: 0 }}>
+                  {capabilityEmblems.map(({ key, label, Icon, tone }) => (
+                    <span
+                      key={key}
+                      className={`bot-capability-emblem bot-capability-emblem--${tone}`}
+                      title={label}
+                      aria-label={label}
+                      role="img"
+                    >
+                      <Icon size={20} strokeWidth={2.2} aria-hidden="true" />
                     </span>
-                  )}
-                  {!profile.botSettings?.botCapabilities && (
-                    <span style={{ fontSize: 12, fontWeight: 600, padding: '2px 10px', borderRadius: 12, background: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-faint)' }}>
-                      {t('bot.capability_default', 'Varsayılan')}
-                    </span>
-                  )}
+                  ))}
                 </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {t('card.personality_slots', 'Kişilik Kartları')}
-                  </span>
-                </div>
-
-                <CardSlots cards={assignedCards} slotCount={profile.botSettings?.maxCardSlots || 4} />
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, marginTop: 16, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {t('card.owned_cards', 'Sahip Olunan Kartlar')}
-                  </span>
-                </div>
-
-                <CardSlots cards={ownedCards} slotCount={10} />
               </div>
             )}
 
             <div style={{ flexGrow: 1 }} />
 
-            <div className="flex flex-wrap gap-2" style={{ paddingTop: 16 }}>
+            <div className="flex flex-wrap gap-2" style={{ paddingTop: 12, paddingBottom: 0 }}>
               {profile.discriminator === 'Bot' && (
                 <button
                   className="btn btn-outline btn-sm"
@@ -469,20 +461,37 @@ export default function ProfilePage() {
           </div>
 
           {/* ─── VERTICAL DIVIDER ─── */}
-          <div style={{ width: 2, background: 'var(--color-border)', marginTop: 8, marginBottom: 8, borderRadius: 2 }} />
+          <div
+            style={{
+              width: 0,
+              borderLeft: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+              marginTop: 0,
+              marginBottom: 0,
+            }}
+          />
 
           {/* ─── RIGHT COLUMN ─── */}
-          <div style={{ width: 144, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: 4 }}>
+          <div
+            style={{
+              width: 144,
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              paddingBottom: 0,
+            }}
+          >
             <ActorAvatar
               profileName={profile.profileName}
               imageUrl={profile.imageUrl}
               discriminator={profile.discriminator}
               actorId={profile.actorId}
+              botGrade={profile.botSettings?.botGrade}
               size="xxxl"
               clickable={false}
             />
 
-            <div className="flex flex-col gap-2" style={{ width: '100%', marginTop: 12 }}>
+            <div className="flex flex-col gap-2" style={{ width: '100%', marginTop: 8 }}>
               {isLoggedIn && !isOwnProfile && (
                 <button
                   className={`btn btn-sm ${localIsFollowing ? 'btn-outline' : 'btn-primary'}`}
@@ -490,22 +499,36 @@ export default function ProfilePage() {
                   style={{
                     transform: isBouncing ? 'scale(1.15)' : 'scale(1)',
                     transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    display: 'flex', alignItems: 'center', gap: 6
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
                   }}
                 >
                   {localIsFollowing ? (
-                    <><UserMinus size={14} /> {t('profile.unfollow')}</>
+                    <>
+                      <UserMinus size={14} /> {t('profile.unfollow')}
+                    </>
                   ) : (
-                    <><UserPlus size={14} /> {t('profile.follow')}</>
+                    <>
+                      <UserPlus size={14} /> {t('profile.follow')}
+                    </>
                   )}
                 </button>
               )}
               {isOwnProfile && !isEditing && (
                 <>
-                  <button className="btn btn-primary btn-sm" onClick={handleEditInit} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={handleEditInit}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
                     <Edit2 size={14} /> {t('profile.edit')}
                   </button>
-                  <button className="btn btn-primary btn-sm" onClick={() => navigate('/account-settings')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => navigate('/account-settings')}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
                     <Settings size={14} /> {t('profile.security_settings')}
                   </button>
                 </>
@@ -514,11 +537,26 @@ export default function ProfilePage() {
                 <>
                   <button
                     className="btn btn-success btn-sm"
-                    style={{ background: 'var(--color-success)', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
+                    style={{
+                      background: 'var(--color-success)',
+                      color: '#fff',
+                      border: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
                     onClick={handleEditSave}
                     disabled={editMutation.isPending}
                   >
-                    {editMutation.isPending ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Check size={14} />} {t('profile.save')}
+                    {editMutation.isPending ? (
+                      <div
+                        className="spinner spinner-sm"
+                        style={{ width: 14, height: 14, borderWidth: 2 }}
+                      />
+                    ) : (
+                      <Check size={14} />
+                    )}{' '}
+                    {t('profile.save')}
                   </button>
                   <button
                     className="btn btn-outline btn-sm"
@@ -534,10 +572,27 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div style={{ width: '100%' }}>
-          <div style={{ height: 1, background: 'var(--color-border)', width: '100%' }} />
+        {/* ─── HORIZONTAL DIVIDER ─── */}
+        <div
+          style={{
+            width: '100%',
+            height: 0,
+            borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+            margin: '2px 0 0px 0',
+          }}
+        />
 
-          <div className="profile-stats-grid" style={{ width: '100%', marginTop: 8 }}>
+        {/* ─── BOTTOM MODULE ─── */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            paddingBottom: 0,
+            marginTop: -16,
+          }}
+        >
+          <div className="profile-stats-grid" style={{ width: '100%' }}>
             <div className="profile-stat-box" onClick={() => setLikesModalOpen(true)}>
               <span className="profile-stat-value">{profile.likeCount ?? 0}</span>
               <span className="profile-stat-label">{t('profile.reaction')}</span>
@@ -563,6 +618,126 @@ export default function ProfilePage() {
               <span className="profile-stat-label">{t('profile.following')}</span>
             </div>
           </div>
+
+          {/* ─── STATS BOTTOM DIVIDER ─── */}
+          <div
+            style={{
+              width: '100%',
+              height: 0,
+              borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+              margin: '16px 0 12px 0',
+            }}
+          />
+
+          {isEditing && (
+            <div style={{ marginBottom: 12, maxWidth: 600 }}>
+              <label
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: 'var(--color-text-secondary)',
+                  display: 'block',
+                  marginBottom: 8,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('profile.interests')}
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                {TOPIC_TYPES.map((topic) => {
+                  const isSelected = editForm.topicTypes.includes(topic.value)
+                  return (
+                    <label
+                      key={topic.value}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        cursor: 'pointer',
+                        padding: '8px 14px',
+                        borderRadius: 20,
+                        fontSize: 13,
+                        fontWeight: 500,
+                        background: isSelected ? 'var(--color-primary)' : 'var(--color-surface)',
+                        color: isSelected ? '#fff' : 'var(--color-text-secondary)',
+                        border: isSelected
+                          ? '1px solid var(--color-primary)'
+                          : '1px solid var(--color-border)',
+                        transition: 'all 0.2s ease',
+                        userSelect: 'none',
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleTopic(topic.value)}
+                        style={{ display: 'none' }}
+                      />
+                      {t(`topics.${topic.enumName.toLowerCase()}`)}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {profile.discriminator === 'Bot' && (
+            <div style={{ marginBottom: 8, width: '100%' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 10,
+                  marginTop: 12,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: 'var(--color-text-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {t('card.personality_slots', 'Kişilik Kartları')}
+                </span>
+              </div>
+
+              <CardSlots
+                cards={profile.assignedCards}
+                slotCount={profile.botSettings?.maxCardSlots || 4}
+                showMark={false}
+              />
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 10,
+                  marginTop: 26,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: 'var(--color-text-secondary)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {t('card.owned_cards', 'Sahip Olunan Kartlar')}
+                </span>
+              </div>
+
+              <CardSlots cards={profile.ownedCards} slotCount={10} showMark={false} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -610,7 +785,7 @@ export default function ProfilePage() {
                 1,
                 Math.ceil(
                   (activeTab === 'posts' ? profile.postCount || 0 : profile.entryCount || 0) /
-                  inferredPerPage
+                    inferredPerPage
                 )
               )}
             </span>
@@ -618,10 +793,10 @@ export default function ProfilePage() {
               className="btn btn-outline btn-sm"
               disabled={
                 (activeTab === 'posts' ? postsPage : entriesPage) >=
-                Math.ceil(
-                  (activeTab === 'posts' ? profile.postCount || 0 : profile.entryCount || 0) /
-                  inferredPerPage
-                ) ||
+                  Math.ceil(
+                    (activeTab === 'posts' ? profile.postCount || 0 : profile.entryCount || 0) /
+                      inferredPerPage
+                  ) ||
                 isPostsFetching ||
                 isEntriesFetching
               }

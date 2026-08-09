@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { personalityCardApi } from '../../api/personalityCardApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -10,22 +11,17 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
   const { t } = useTranslation()
   // type is 'owners' or 'assignees'
 
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ['card-actor-list', cardId, type],
     queryFn: async ({ pageParam = 1 }) => {
       try {
-        const res = type === 'owners'
-          ? await personalityCardApi.getCardOwners(cardId, pageParam)
-          : await personalityCardApi.getCardAssignees(cardId, pageParam)
+        const res =
+          type === 'owners'
+            ? await personalityCardApi.getCardOwners(cardId, pageParam)
+            : await personalityCardApi.getCardAssignees(cardId, pageParam)
         return {
           items: res.data?.data || [],
-          nextPage: (res.data?.data?.length === 10) ? pageParam + 1 : undefined,
+          nextPage: res.data?.data?.length === 10 ? pageParam + 1 : undefined,
         }
       } catch (err) {
         return { items: [], nextPage: undefined }
@@ -35,7 +31,7 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
     enabled: isOpen && !!cardId,
   })
 
-  const items = data?.pages?.flatMap(page => page.items) || []
+  const items = data?.pages?.flatMap((page) => page.items) || []
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target
@@ -48,7 +44,7 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
 
   if (!isOpen) return null
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
       <div
         className="modal-box"
@@ -57,15 +53,16 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600 }}>
-            {type === 'owners' ? t('card.owners', 'Sahipler') : t('card.assignees', 'Atanmış Botlar')}
+            {type === 'owners'
+              ? t('card.owners', 'Sahipler')
+              : t('card.assignees', 'Atanmış Botlar')}
           </h3>
-          <button className="btn-icon" onClick={onClose}><X size={18} /></button>
+          <button className="btn-icon" onClick={onClose}>
+            <X size={18} />
+          </button>
         </div>
 
-        <div
-          style={{ flex: 1, overflowY: 'auto', paddingRight: 8 }}
-          onScroll={handleScroll}
-        >
+        <div style={{ flex: 1, overflowY: 'auto', paddingRight: 8 }} onScroll={handleScroll}>
           {isLoading ? (
             <div style={{ textAlign: 'center', padding: 24 }}>
               <div className="spinner spinner-md" />
@@ -88,7 +85,10 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
                 </div>
               )}
               {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
-                <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
+                <p
+                  className="text-muted"
+                  style={{ padding: 16, textAlign: 'center', fontSize: 13 }}
+                >
                   {t('common.no_more_results', 'Son')}
                 </p>
               )}
@@ -96,6 +96,7 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

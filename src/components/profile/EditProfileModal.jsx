@@ -54,7 +54,16 @@ export default function EditProfileModal({ isOpen, onClose }) {
         bio: profile.bio || ''
       })
       if (profile.topicTypes) {
-        setSelectedTopics(profile.topicTypes.map(t => t.topicTypeName).filter(v => v != null))
+        setSelectedTopics(
+          profile.topicTypes
+            .map((t) => {
+              const match = TOPIC_TYPES.find(
+                (opt) => opt.value === t.topicTypeName || opt.enumName === t.topicTypeName || opt.label === t.topicTypeName
+              )
+              return match ? match.value : null
+            })
+            .filter((v) => v != null)
+        )
       }
     }
   }, [profileResponse])

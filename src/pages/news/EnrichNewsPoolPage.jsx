@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Newspaper, Send, CheckCircle, AlertCircle, Loader2, Sparkles, ShieldQuestion as ShieldQuestionMark } from 'lucide-react'
+import { Newspaper, Send, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import BackButton from '../../components/common/BackButton'
+import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import { useTranslation } from 'react-i18next'
 
 export default function EnrichNewsPoolPage() {
@@ -31,9 +32,9 @@ export default function EnrichNewsPoolPage() {
     if (isOverLimit) return 'var(--color-danger, #ef4444)'
     if (focused === fieldName) return 'var(--color-primary)'
     if (!hasSubmitted) return 'var(--color-border)'
-    
+
     if (isRequired) {
-      return (!value || !value.trim()) ? 'var(--color-error)' : 'var(--color-primary)'
+      return !value || !value.trim() ? 'var(--color-error)' : 'var(--color-primary)'
     }
     return 'var(--color-border)'
   }
@@ -81,6 +82,12 @@ export default function EnrichNewsPoolPage() {
             {t('news.enrich_news_desc')}
           </p>
         </div>
+        <HowItWorksHelp
+          title={t('news.how_it_works')}
+          items={[t('news.how_it_works_1'), t('news.how_it_works_2'), t('news.how_it_works_3')]}
+          closeLabel={t('common.close', 'Kapat')}
+          triggerStyle={{ marginLeft: 'auto', marginRight: 24, flexShrink: 0 }}
+        />
       </div>
 
       {/* Auth warning */}
@@ -121,7 +128,11 @@ export default function EnrichNewsPoolPage() {
       )}
 
       {/* Form */}
-      <form noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <form
+        noValidate
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
+      >
         <div style={{ marginBottom: 8 }}>
           <label
             style={{
@@ -181,7 +192,6 @@ export default function EnrichNewsPoolPage() {
           </div>
         </div>
 
-
         {/* Submit button */}
         <button
           id="enrich-news-submit-btn"
@@ -195,8 +205,8 @@ export default function EnrichNewsPoolPage() {
             fontWeight: 600,
             gap: 8,
             borderRadius: 12,
-            opacity: (!isLoggedIn || mutation.isPending) ? 0.5 : 1,
-            cursor: (!isLoggedIn || mutation.isPending) ? 'not-allowed' : 'pointer',
+            opacity: !isLoggedIn || mutation.isPending ? 0.5 : 1,
+            cursor: !isLoggedIn || mutation.isPending ? 'not-allowed' : 'pointer',
           }}
         >
           {mutation.isPending ? (
@@ -209,45 +219,6 @@ export default function EnrichNewsPoolPage() {
           )}
         </button>
       </form>
-
-      {/* Info card */}
-      <div
-        style={{
-          marginTop: 32,
-          padding: '16px 20px',
-          borderRadius: 12,
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <ShieldQuestionMark size={20} strokeWidth={2.4} style={{ color: 'var(--color-primary)' }} />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: 'var(--color-text-secondary)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-            }}
-          >
-            {t('news.how_it_works')}
-          </span>
-        </div>
-        <ul
-          style={{
-            margin: 0,
-            paddingLeft: 18,
-            fontSize: 13,
-            color: 'var(--color-text-secondary)',
-            lineHeight: 1.8,
-          }}
-        >
-          <li>{t('news.how_it_works_1')}</li>
-          <li>{t('news.how_it_works_2')}</li>
-          <li>{t('news.how_it_works_3')}</li>
-        </ul>
-      </div>
     </div>
   )
 }

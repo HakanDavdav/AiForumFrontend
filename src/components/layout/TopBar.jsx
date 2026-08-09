@@ -38,6 +38,9 @@ import useUIStore from '../../store/uiStore'
 import useThemeStore from '../../store/themeStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
+import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
+import IconActionButton from '../common/IconActionButton'
+import HowItWorksHelp from '../common/HowItWorksHelp'
 
 export default function TopBar() {
   useDevLog('TopBar', arguments[0] || {})
@@ -63,7 +66,7 @@ export default function TopBar() {
     { code: 'ku', label: 'Kurdî', flagUrl: null, fallbackEmoji: '☀️' },
     { code: 'de', label: 'Deutsch', flagUrl: 'https://flagcdn.com/w20/de.png' },
     { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },
-    { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w20/sa.png' }
+    { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w20/sa.png' },
   ]
 
   const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
@@ -105,7 +108,15 @@ export default function TopBar() {
   const debounceTimerRef = useRef(null)
 
   // My Tribes & Bots from Global State
-  const { myTribes, myBots, fetchMyTribes, fetchMyBots, fetchMyFollowData, hasFetchedOnce, clear: clearEntities } = useMyEntitiesStore()
+  const {
+    myTribes,
+    myBots,
+    fetchMyTribes,
+    fetchMyBots,
+    fetchMyFollowData,
+    hasFetchedOnce,
+    clear: clearEntities,
+  } = useMyEntitiesStore()
 
   useEffect(() => {
     if (isLoggedIn && !hasFetchedOnce) {
@@ -248,12 +259,12 @@ export default function TopBar() {
       searchMode === 'general'
         ? { query: searchQuery, mode: searchMode }
         : {
-          query: searchQuery,
-          mode: searchMode,
-          orderType: filterOrderType || 'None',
-          startDate: filterStartDate || null,
-          endDate: filterEndDate || null,
-        }
+            query: searchQuery,
+            mode: searchMode,
+            orderType: filterOrderType || 'None',
+            startDate: filterStartDate || null,
+            endDate: filterEndDate || null,
+          }
 
     console.log('handleSearch - params:', params)
 
@@ -604,17 +615,17 @@ export default function TopBar() {
                               (!suggestions.actors || suggestions.actors.length === 0)) ||
                             (searchMode === 'tribes' &&
                               (!suggestions.tribes || suggestions.tribes.length === 0))) && (
-                              <div
-                                style={{
-                                  padding: 16,
-                                  textAlign: 'center',
-                                  color: 'var(--color-text-faint)',
-                                  fontSize: 13,
-                                }}
-                              >
-                                {t('search.no_results', 'Sonuç bulunamadı')}
-                              </div>
-                            )}
+                            <div
+                              style={{
+                                padding: 16,
+                                textAlign: 'center',
+                                color: 'var(--color-text-faint)',
+                                fontSize: 13,
+                              }}
+                            >
+                              {t('search.no_results', 'Sonuç bulunamadı')}
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
@@ -632,7 +643,9 @@ export default function TopBar() {
               disabled={searchMode === 'general'}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               title={
-                searchMode === 'general' ? t('topbar.general_search_no_filter') : t('topbar.search_filters')
+                searchMode === 'general'
+                  ? t('topbar.general_search_no_filter')
+                  : t('topbar.search_filters')
               }
             >
               <Filter size={14} />
@@ -685,13 +698,14 @@ export default function TopBar() {
                     >
                       <option value="">{t('topbar.default', 'Varsayılan')}</option>
                       {searchMode === 'posts' && (
-                        <option value="MostLiked">{t('topbar.most_liked', 'En Çok Beğenilen')}</option>
+                        <option value="MostLiked">
+                          {t('topbar.most_liked', 'En Çok Beğenilen')}
+                        </option>
                       )}
                       <option value="Newest">{t('sort.newest')}</option>
                       <option value="Oldest">{t('topbar.oldest', 'En Eski')}</option>
                     </select>
                   </div>
-
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
@@ -729,7 +743,15 @@ export default function TopBar() {
         </form>
 
         {/* Right: user info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 'auto' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            flexShrink: 0,
+            marginLeft: 'auto',
+          }}
+        >
           {/* Hakan Davdav Linkleri */}
           <div
             style={{
@@ -745,7 +767,12 @@ export default function TopBar() {
               href="https://www.linkedin.com/in/hakan-davdav-0ba19629a/"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center', transform: 'translateY(-1px)' }}
+              style={{
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                transform: 'translateY(-1px)',
+              }}
               title="LinkedIn"
             >
               <svg
@@ -768,7 +795,12 @@ export default function TopBar() {
               href="https://github.com/HakanDavdav"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: 'var(--color-primary)', display: 'flex', alignItems: 'center', transform: 'translateY(-1px)' }}
+              style={{
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                transform: 'translateY(-1px)',
+              }}
               title="GitHub"
             >
               <svg
@@ -786,10 +818,14 @@ export default function TopBar() {
                 <path d="M9 18c-4.5 1.5-5-2.5-7-3" />
               </svg>
             </a>
-            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 4px' }} />
+            <div
+              style={{ width: 1, height: 28, background: 'var(--color-border)', margin: '0 4px' }}
+            />
 
             <button
-              className={`btn-icon ${isBotShaking ? 'animate-shake' : ''}`}
+              className={`btn-icon ${
+                isBotShaking ? (isGreenMode ? 'theme-toggle-to-green' : 'theme-toggle-to-blue') : ''
+              }`}
               onClick={handleBotClick}
               title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
               style={{ color: 'var(--color-primary)', width: 30, height: 30, padding: 0 }}
@@ -800,7 +836,12 @@ export default function TopBar() {
               className="btn-icon"
               onClick={toggleTheme}
               title={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
-              style={{ color: isGreenMode ? '#10b981' : '#3b82f6', width: 30, height: 30, padding: 0 }}
+              style={{
+                color: isGreenMode ? '#10b981' : '#3b82f6',
+                width: 30,
+                height: 30,
+                padding: 0,
+              }}
             >
               {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
             </button>
@@ -810,12 +851,25 @@ export default function TopBar() {
               <button
                 className="btn btn-ghost btn-xs"
                 onClick={() => setIsLangOpen((v) => !v)}
-                style={{ fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px 5px', height: 30 }}
+                style={{
+                  fontSize: 13,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '2px 5px',
+                  height: 30,
+                }}
               >
-                {langs.find(l => l.code === currentLang)?.flagUrl ? (
-                  <img src={langs.find(l => l.code === currentLang).flagUrl} alt={currentLang} style={{ width: 19, height: 14, borderRadius: 2 }} />
+                {langs.find((l) => l.code === currentLang)?.flagUrl ? (
+                  <img
+                    src={langs.find((l) => l.code === currentLang).flagUrl}
+                    alt={currentLang}
+                    style={{ width: 19, height: 14, borderRadius: 2 }}
+                  />
                 ) : (
-                  <span style={{ fontSize: 14 }}>{langs.find(l => l.code === currentLang)?.fallbackEmoji || '🇹🇷'}</span>
+                  <span style={{ fontSize: 14 }}>
+                    {langs.find((l) => l.code === currentLang)?.fallbackEmoji || '🇹🇷'}
+                  </span>
                 )}
               </button>
               <AnimatePresence>
@@ -838,23 +892,41 @@ export default function TopBar() {
                       padding: 6,
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: 4
+                      gap: 4,
                     }}
                   >
                     {langs.map((l) => (
                       <button
                         key={l.code}
                         className={`btn ${currentLang === l.code ? 'btn-primary' : 'btn-ghost'}`}
-                        style={{ width: '100%', justifyContent: 'flex-start', padding: '5px 10px', gap: 7 }}
+                        style={{
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          padding: '5px 10px',
+                          gap: 7,
+                        }}
                         onClick={() => {
                           i18n.changeLanguage(l.code)
                           setIsLangOpen(false)
                         }}
                       >
                         {l.flagUrl ? (
-                          <img src={l.flagUrl} alt={l.code} style={{ width: 19, height: 14, borderRadius: 2 }} />
+                          <img
+                            src={l.flagUrl}
+                            alt={l.code}
+                            style={{ width: 19, height: 14, borderRadius: 2 }}
+                          />
                         ) : (
-                          <span style={{ fontSize: 14, display: 'inline-block', width: 19, textAlign: 'center' }}>{l.fallbackEmoji}</span>
+                          <span
+                            style={{
+                              fontSize: 14,
+                              display: 'inline-block',
+                              width: 19,
+                              textAlign: 'center',
+                            }}
+                          >
+                            {l.fallbackEmoji}
+                          </span>
                         )}
                         <span style={{ fontSize: 12.5 }}>{l.label}</span>
                       </button>
@@ -864,7 +936,9 @@ export default function TopBar() {
               </AnimatePresence>
             </div>
 
-            <div style={{ width: 1, height: 22, background: 'var(--color-border)', margin: '0 4px' }} />
+            <div
+              style={{ width: 1, height: 28, background: 'var(--color-border)', margin: '0 4px' }}
+            />
           </div>
 
           {isLoggedIn ? (
@@ -874,7 +948,7 @@ export default function TopBar() {
                   actor={myProfile}
                   showHierarchyBtn={false}
                   clickable={true}
-                  chipStyle={{ maxWidth: 205, fontSize: 12.5 }}
+                  chipStyle={{ minWidth: 110, maxWidth: 205, fontSize: 12.5 }}
                 />
               </div>
               <button
@@ -914,28 +988,28 @@ export default function TopBar() {
           display: 'flex',
           alignItems: 'center',
           padding: '0 20px',
-          gap: 8,
+          gap: 6,
           overflowX: 'auto',
         }}
       >
         {/* Cache buttons */}
         <button
           className={`btn ${activeLeftCacheType === 'trending' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
+          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
           onClick={() => setActiveLeftCacheType('trending')}
         >
           <Flame size={14} /> {t('sort.popular', 'Popüler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
+          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
           onClick={() => setActiveLeftCacheType('recent')}
         >
           <Clock8 size={14} /> {t('sort.new')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
+          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
           title={t('sort.best_desc', 'dünün en beğenilenleri')}
         >
@@ -943,204 +1017,286 @@ export default function TopBar() {
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '5px 12px', minWidth: '90px', fontSize: 13 }}
+          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
           onClick={() => setActiveLeftCacheType('mostDisliked')}
           title={t('sort.worst_desc', 'dünün en nefret edilenleri')}
         >
           <Skull size={14} /> {t('sort.worst', 'En Kötüler')}
         </button>
 
-        <div style={{ width: 1, height: 24, background: 'var(--color-border)', margin: '0 1px' }} />
-
-        {/* Leaderboard */}
-        <button
-          className="btn btn-ghost"
-          style={{ padding: '5px 12px', fontSize: 13 }}
-          onClick={() => navigate('/leaderboard?type=actor')}
-        >
-          {t('topbar.leaderboard')}
-        </button>
+        <div style={{ width: 1, height: 32, background: 'var(--color-border)', margin: '0 8px' }} />
 
         {/* My Tribes & My Bots dropdowns */}
         {isLoggedIn && (
           <>
-            <div style={{ width: 1, height: 24, background: 'var(--color-border)', margin: '0 1px' }} />
-            <div style={{ display: 'flex', gap: 8, marginLeft: 8 }}>
-            {/* My Tribes */}
-            <div style={{ position: 'relative' }} ref={myTribesRef}>
-              <button
-                className="btn btn-outline"
-                style={{ padding: '5px 12px', fontSize: 13 }}
-                onClick={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  setTribesDropdownPos({ top: rect.bottom + 4, left: rect.left })
-                  setIsMyTribesOpen((v) => !v)
-                  setIsMyBotsOpen(false)
-                  setBotsDropdownPos(null)
-                }}
-              >
-                {t('topbar.my_tribes')} <ChevronDown size={12} />
-              </button>
-              <AnimatePresence>
-                {isMyTribesOpen && tribesDropdownPos && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    style={{
-                      position: 'fixed',
-                      top: tribesDropdownPos.top,
-                      left: tribesDropdownPos.left,
-                      background: 'var(--color-bg)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 12,
-                      boxShadow: 'var(--shadow-lg)',
-                      zIndex: 200,
-                      minWidth: 400,
-                      maxWidth: 400,
-                      maxHeight: 320,
-                      overflowY: 'auto',
-                      overflowX: 'hidden',
-                      padding: 8,
-                    }}
-                  >
-                    {myTribes?.map((tData) => (
-                      <div
-                        key={tData.tribeId}
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0', cursor: 'pointer', minWidth: 0 }}
-                        onClick={() => {
-                          setIsMyTribesOpen(false)
-                          setTribesDropdownPos(null)
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <TribeMinimalCard {...tData} />
-                        </div>
-                      </div>
-                    ))}
-                    {(!myTribes || myTribes.length === 0) && (
-                      <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>
-                        {t('topbar.no_tribe')}
-                      </p>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8, marginBottom: 4 }}>
-                      <button
-                        onClick={() => {
-                          navigate('/create-tribe')
-                          setIsMyTribesOpen(false)
-                          setTribesDropdownPos(null)
-                        }}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: 'var(--color-text-muted)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                        title={t('topbar.new_tribe')}
-                      >
-                        <CirclePlus size={19} strokeWidth={2.4} />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* My Bots */}
-            <div style={{ position: 'relative' }} ref={myBotsRef}>
-              <button
-                className="btn btn-outline"
-                style={{ padding: '5px 12px', fontSize: 13 }}
-                onClick={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  setBotsDropdownPos({ top: rect.bottom + 4, left: rect.left })
-                  setIsMyBotsOpen((v) => !v)
-                  setIsMyTribesOpen(false)
-                  setTribesDropdownPos(null)
-                }}
-              >
-                {t('topbar.my_bots')} <ChevronDown size={12} />
-              </button>
-              <AnimatePresence>
-                {isMyBotsOpen && botsDropdownPos && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    style={{
-                      position: 'fixed',
-                      top: botsDropdownPos.top,
-                      left: botsDropdownPos.left,
-                      background: 'var(--color-bg)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 12,
-                      boxShadow: 'var(--shadow-lg)',
-                      zIndex: 200,
-                      minWidth: 300,
-                      maxWidth: 300,
-                      maxHeight: 320,
-                      overflowY: 'auto',
-                      overflowX: 'hidden',
-                      padding: 8,
-                    }}
-                  >
-                    {myBots?.map((b) => (
-                      <div
-                        key={b.actorId}
-                        style={{ display: 'flex', alignItems: 'center', gap: 4, margin: '4px 0', cursor: 'pointer', minWidth: 0 }}
-                        onClick={() => {
-                          setIsMyBotsOpen(false)
-                          setBotsDropdownPos(null)
-                        }}
-                      >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                marginLeft: 6,
+                flexShrink: 0,
+                height: 36,
+              }}
+            >
+              {/* My Tribes */}
+              <div style={{ position: 'relative' }} ref={myTribesRef}>
+                <button
+                  className="btn btn-outline"
+                  style={{ width: 90, padding: '4px 7px', fontSize: 11.5 }}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    setTribesDropdownPos({ top: rect.bottom + 4, left: rect.left })
+                    setIsMyTribesOpen((v) => !v)
+                    setIsMyBotsOpen(false)
+                    setBotsDropdownPos(null)
+                  }}
+                >
+                  {t('common.tribes', 'Tribes')} <ChevronDown size={12} />
+                </button>
+                <AnimatePresence>
+                  {isMyTribesOpen && tribesDropdownPos && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      style={{
+                        position: 'fixed',
+                        top: tribesDropdownPos.top,
+                        left: tribesDropdownPos.left,
+                        background: 'var(--color-bg)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 12,
+                        boxShadow: 'var(--shadow-lg)',
+                        zIndex: 200,
+                        minWidth: 400,
+                        maxWidth: 400,
+                        maxHeight: 320,
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        padding: 8,
+                      }}
+                    >
+                      {myTribes?.map((tData) => (
                         <div
-                          className="lb-card"
-                          style={{ flex: 1, padding: '8px 16px', minWidth: 0 }}
+                          key={tData.tribeId}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            margin: '4px 0',
+                            cursor: 'pointer',
+                            minWidth: 0,
+                          }}
+                          onClick={() => {
+                            setIsMyTribesOpen(false)
+                            setTribesDropdownPos(null)
+                          }}
                         >
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <ActorMinimalCard actor={b} clickable={true} />
+                            <TribeMinimalCard {...tData} />
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    {(!myBots || myBots.length === 0) && (
-                      <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>
-                        {t('topbar.no_bot')}
-                      </p>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8, marginBottom: 4 }}>
-                      <button
-                        onClick={() => {
-                          navigate('/create-bot')
-                          setIsMyBotsOpen(false)
-                          setBotsDropdownPos(null)
-                        }}
+                      ))}
+                      {(!myTribes || myTribes.length === 0) && (
+                        <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>
+                          {t('topbar.no_tribe')}
+                        </p>
+                      )}
+                      <div
                         style={{
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: 'var(--color-text-muted)',
                           display: 'flex',
-                          alignItems: 'center',
                           justifyContent: 'center',
+                          marginTop: 8,
+                          marginBottom: 4,
                         }}
-                        title={t('topbar.new_bot')}
                       >
-                        <CirclePlus size={19} strokeWidth={2.4} />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                        <button
+                          onClick={() => {
+                            navigate('/create-tribe')
+                            setIsMyTribesOpen(false)
+                            setTribesDropdownPos(null)
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title={t('topbar.new_tribe')}
+                        >
+                          <CirclePlus size={19} strokeWidth={2.4} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* My Bots */}
+              <div style={{ position: 'relative' }} ref={myBotsRef}>
+                <button
+                  className="btn btn-outline"
+                  style={{ width: 90, padding: '4px 7px', fontSize: 11.5 }}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    setBotsDropdownPos({ top: rect.bottom + 4, left: rect.left })
+                    setIsMyBotsOpen((v) => !v)
+                    setIsMyTribesOpen(false)
+                    setTribesDropdownPos(null)
+                  }}
+                >
+                  {t('common.bots', 'Bots')} <ChevronDown size={12} />
+                </button>
+                <AnimatePresence>
+                  {isMyBotsOpen && botsDropdownPos && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      style={{
+                        position: 'fixed',
+                        top: botsDropdownPos.top,
+                        left: botsDropdownPos.left,
+                        background: 'var(--color-bg)',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 12,
+                        boxShadow: 'var(--shadow-lg)',
+                        zIndex: 200,
+                        minWidth: 300,
+                        maxWidth: 300,
+                        maxHeight: 320,
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        padding: 8,
+                      }}
+                    >
+                      {myBots?.map((b) => (
+                        <div
+                          key={b.actorId}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            margin: '4px 0',
+                            cursor: 'pointer',
+                            minWidth: 0,
+                          }}
+                          onClick={() => {
+                            setIsMyBotsOpen(false)
+                            setBotsDropdownPos(null)
+                          }}
+                        >
+                          <div
+                            className="lb-card"
+                            style={{ flex: 1, padding: '8px 16px', minWidth: 0 }}
+                          >
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <ActorMinimalCard actor={b} clickable={true} />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {(!myBots || myBots.length === 0) && (
+                        <p className="text-muted" style={{ padding: 8, textAlign: 'center' }}>
+                          {t('topbar.no_bot')}
+                        </p>
+                      )}
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          marginTop: 8,
+                          marginBottom: 4,
+                        }}
+                      >
+                        <button
+                          onClick={() => {
+                            navigate('/create-bot')
+                            setIsMyBotsOpen(false)
+                            setBotsDropdownPos(null)
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: 'var(--color-text-muted)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title={t('topbar.new_bot')}
+                        >
+                          <CirclePlus size={19} strokeWidth={2.4} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <button
+                className="btn btn-outline"
+                style={{ width: 90, padding: '4px 7px', fontSize: 11.5 }}
+                onClick={() => navigate('/cards')}
+              >
+                {t('card.cards', 'Cards')}
+              </button>
             </div>
-          </div>
           </>
         )}
+
+        {isLoggedIn && (
+          <div
+            style={{ width: 1, height: 30, background: 'var(--color-border)', margin: '0 8px' }}
+          />
+        )}
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 7,
+            flexShrink: 0,
+            height: 38,
+          }}
+        >
+          <IconActionButton
+            onClick={() => navigate('/leaderboard?type=actor')}
+            title={t('topbar.leaderboard', 'Liderlik Tablosu')}
+            aria-label={t('topbar.leaderboard', 'Liderlik Tablosu')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <Podium size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/marketplace')}
+            title={t('card.marketplace', 'Kart Marketi')}
+            aria-label={t('card.marketplace', 'Kart Marketi')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <BotFlashCardsIcon size={24} />
+          </IconActionButton>
+
+          <HowItWorksHelp
+            title={t('bot.how_it_works', 'Nasıl çalışır?')}
+            items={[
+              t('bot.how_it_works_1'),
+              t('bot.how_it_works_2'),
+              t('bot.how_it_works_3'),
+              t('bot.how_it_works_4'),
+            ]}
+            closeLabel={t('common.close', 'Kapat')}
+            triggerLabel={t('bot.how_it_works', 'Nasıl çalışır?')}
+            triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          />
+        </div>
       </div>
     </header>
   )

@@ -11,7 +11,16 @@ import { useTranslation } from 'react-i18next'
  * TribeMinimalCard — plan.md Component #4
  * MinimalTribeDto'dan tribe kartı. Tıklanınca Center Panel'de TribeProfileView açar.
  */
-export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, imageUrl, clickable = true, showPoint = true, showMindBtn = true, showEditBtn = true }) {
+export default function TribeMinimalCard({
+  tribeId,
+  tribeName,
+  tribePoint,
+  imageUrl,
+  clickable = true,
+  showPoint = true,
+  showMindBtn = true,
+  showEditBtn = true,
+}) {
   useDevLog('TribeMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
@@ -19,7 +28,7 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
 
   const myTribes = useMyEntitiesStore((s) => s.myTribes)
 
-  const isMyTribe = myTribes?.some(t => t.tribeId === tribeId)
+  const isMyTribe = myTribes?.some((t) => t.tribeId === tribeId)
 
   const handleClick = () => {
     if (clickable) navigate('/tribe?tribeId=' + tribeId)
@@ -38,16 +47,24 @@ export default function TribeMinimalCard({ tribeId, tribeName, tribePoint, image
   }
 
   return (
-    <div className="tribe-card" onClick={handleClick} style={{ width: '100%', cursor: clickable ? 'pointer' : 'default', margin: 0 }}>
+    <div
+      className="tribe-card"
+      onClick={handleClick}
+      style={{ width: '100%', cursor: clickable ? 'pointer' : 'default', margin: 0 }}
+    >
       {imageUrl ? (
         <img src={imageUrl} alt={tribeName} className="tribe-card-img" />
       ) : (
         <div
           className="tribe-card-img"
           style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             background: 'var(--color-primary-light)',
-            color: 'var(--color-primary)', fontWeight: 700, fontSize: 16,
+            color: 'var(--color-primary)',
+            fontWeight: 700,
+            fontSize: 16,
           }}
         >
           {tribeName?.[0] || 'T'}
