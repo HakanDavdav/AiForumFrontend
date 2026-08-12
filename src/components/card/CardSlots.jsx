@@ -1,6 +1,6 @@
 import PersonalityCard from './PersonalityCard'
 
-export default function CardSlots({ cards, slotCount, showMark = true }) {
+export default function CardSlots({ cards, slotCount, showMark = true, tribeBadgeLabel = null }) {
   const count = Math.max(1, slotCount || 4)
 
   return (
@@ -16,7 +16,7 @@ export default function CardSlots({ cards, slotCount, showMark = true }) {
             '--slot-z': count - Math.abs(i - (count - 1) / 2),
           }}
         >
-          <PersonalityCard slotNumber={i + 1} card={cards?.[i] || null} showMark={showMark} />
+          <PersonalityCard slotNumber={i + 1} card={cards?.[i] || null} showMark={showMark} tribeBadgeLabel={tribeBadgeLabel} />
         </div>
       ))}
     </div>

@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next'
 import { signInWithPopup } from 'firebase/auth'
 import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 
+import Logo from '../../components/common/Logo'
+
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
   const { setAuth } = useAuthStore()
@@ -175,22 +177,28 @@ export default function LoginPage() {
   return (
     <>
       <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
-          <div
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0,
+            marginBottom: 24,
+            cursor: 'pointer',
+          }}
+          onClick={() => navigate('/')}
+        >
+          <Logo width={36} height={48} fill="var(--color-primary)" />
+          <span
             style={{
-              width: 36,
-              height: 36,
-              background: 'var(--color-primary)',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: 28,
+              color: 'var(--color-primary)',
+              marginTop: 4,
+              marginLeft: -2,
             }}
           >
-            <span style={{ color: 'white', fontWeight: 800, fontSize: 20 }}>B</span>
-          </div>
-          <span style={{ fontWeight: 800, fontSize: 28, color: 'var(--color-primary)' }}>
-            Bletchly
+            letchly
           </span>
         </div>
 

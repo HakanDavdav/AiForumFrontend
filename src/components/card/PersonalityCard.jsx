@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Bot, Check, Pencil, Users } from 'lucide-react'
+import { Bot, Check, Info, Pencil, Users } from 'lucide-react'
 import CardActorListModal from './CardActorListModal'
 import CardDetailModal from './CardDetailModal'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -17,6 +17,8 @@ export default function PersonalityCard({
   onSelect,
   showMark = true,
   locked = false,
+  tribeAssigned = false,
+  tribeBadgeLabel = null,
   maxSelections,
   selectedCount = 0,
   variant = 'default',
@@ -181,6 +183,11 @@ export default function PersonalityCard({
 
   const assignedBots = card?.assignedBots || []
   const assignedTribes = card?.assignedTribes || []
+  const isTribeAssigned = Boolean(card?.tribeId || card?.assignedTribeId || tribeAssigned)
+  const isAssignedCard = Boolean(
+    card?.assignmentId || card?.botId || card?.tribeId || card?.assignedTribeId || tribeAssigned
+  )
+  const isOwnerAssigned = isAssignedCard && !isTribeAssigned
   const isSelectionDisabled =
     disabled ||
     locked ||
@@ -212,16 +219,14 @@ export default function PersonalityCard({
 
   return (
     <div
-      className={`personality-card ${filled ? 'personality-card--filled' : 'personality-card--empty'}${selectable ? ' personality-card--selectable' : ''}${selected ? ' personality-card--selected' : ''}${isSelectionDisabled ? ' personality-card--selection-disabled' : ''}`}
+      className={`personality-card ${filled ? 'personality-card--filled' : 'personality-card--empty'}${selectable ? ' personality-card--selectable' : ''}${selected ? ' personality-card--selected' : ''}${isSelectionDisabled ? ' personality-card--selection-disabled' : ''}${isTribeAssigned ? ' personality-card--tribe-assigned' : ''}${isOwnerAssigned ? ' personality-card--owner-assigned' : ''}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={filled ? 'button' : undefined}
       tabIndex={filled ? 0 : undefined}
     >
       <div className="personality-card__topline">
-        <span className="personality-card__eyebrow">
-          {slotNumber ? String(slotNumber) : t('card.persona', 'Persona')}
-        </span>
+        <span className="personality-card__eyebrow">{slotNumber ? String(slotNumber) : ''}</span>
         <span className="personality-card__title">
           {cardName.length > 40 ? cardName.substring(0, 40) + '...' : cardName}
         </span>
@@ -249,6 +254,14 @@ export default function PersonalityCard({
           />
         )}
       </div>
+
+      {filled && isAssignedCard && (
+        <span className="personality-card__type-badge">
+          {isTribeAssigned
+            ? tribeBadgeLabel || t('card.from_tribe', 'From Tribe')
+            : t('card.from_owner', 'From Owner')}
+        </span>
+      )}
 
       {hint && <p className="personality-card__hint">{hint}</p>}
 
@@ -326,6 +339,17 @@ export default function PersonalityCard({
                 : '1px solid var(--color-primary-light)',
           }}
         >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsDetailOpen(true)
+            }}
+            className="personality-card__stat"
+            title={t('card.details', 'Kart Detayları')}
+          >
+            <Info size={12} />
+          </button>
           <button
             type="button"
             onClick={(e) => {

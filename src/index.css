@@ -241,6 +241,131 @@
   opacity: 0.58;
 }
 
+/* General Filled card color adjustments - Richer */
+.personality-card--filled {
+  background: linear-gradient(135deg, #93c5fd 0%, #e0f2fe 100%) !important;
+  border-color: #2563eb !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.16) !important;
+}
+.personality-card--filled .personality-card__eyebrow {
+  color: #1d4ed8 !important;
+}
+.personality-card--filled .personality-card__type-badge {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #1d4ed8 !important;
+  border-color: rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Tribe-assigned card color adjustments - Darker for Light Mode */
+.personality-card--tribe-assigned {
+  background: linear-gradient(135deg, #3b82f6 0%, #8cbffc 100%) !important;
+  border-color: #1d4ed8 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.16) !important;
+}
+.personality-card--tribe-assigned .personality-card__eyebrow {
+  color: #1e3a8a !important;
+}
+.personality-card--tribe-assigned .personality-card__type-badge {
+  background: rgba(30, 58, 138, 0.12) !important;
+  color: #1e3a8a !important;
+  border-color: rgba(30, 58, 138, 0.25) !important;
+}
+
+/* Dark Mode Overrides */
+:root.dark .personality-card--filled {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%) !important;
+  border-color: #3b82f6 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.22) !important;
+}
+:root.dark .personality-card--filled .personality-card__eyebrow {
+  color: #93c5fd !important;
+}
+:root.dark .personality-card--filled .personality-card__type-badge {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #93c5fd !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+:root.dark .personality-card--tribe-assigned {
+  background: linear-gradient(135deg, #2f6aef 0%, #213d96 100%) !important;
+  border-color: #60a5fa !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.16) !important;
+}
+:root.dark .personality-card--tribe-assigned .personality-card__eyebrow {
+  color: #bfdbfe !important;
+}
+:root.dark .personality-card--tribe-assigned .personality-card__type-badge {
+  background: rgba(96, 165, 250, 0.15) !important;
+  color: #bfdbfe !important;
+  border-color: rgba(96, 165, 250, 0.25) !important;
+}
+
+/* Green Theme Overrides */
+:root.theme-green .personality-card--filled {
+  background: linear-gradient(135deg, #6ee7b7 0%, #dcfce7 100%) !important;
+  border-color: #059669 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.16) !important;
+}
+:root.theme-green .personality-card--filled .personality-card__eyebrow {
+  color: #047857 !important;
+}
+:root.theme-green .personality-card--filled .personality-card__type-badge {
+  background: rgba(5, 150, 105, 0.08) !important;
+  color: #047857 !important;
+  border-color: rgba(5, 150, 105, 0.15) !important;
+}
+
+:root.theme-green .personality-card--tribe-assigned {
+  background: linear-gradient(135deg, #10b981 0%, #6fe8ba 100%) !important;
+  border-color: #047857 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(4, 120, 87, 0.16) !important;
+}
+:root.theme-green .personality-card--tribe-assigned .personality-card__eyebrow {
+  color: #022c22 !important;
+}
+:root.theme-green .personality-card--tribe-assigned .personality-card__type-badge {
+  background: rgba(2, 44, 34, 0.12) !important;
+  color: #022c22 !important;
+  border-color: rgba(2, 44, 34, 0.25) !important;
+}
+
+/* Dark Green Theme Overrides */
+:root.dark.theme-green .personality-card--filled {
+  background: linear-gradient(135deg, #047857 0%, #02120e 100%) !important;
+  border-color: #10b981 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.22) !important;
+}
+:root.dark.theme-green .personality-card--filled .personality-card__eyebrow {
+  color: #a7f3d0 !important;
+}
+:root.dark.theme-green .personality-card--filled .personality-card__type-badge {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+:root.dark.theme-green .personality-card--tribe-assigned {
+  background: linear-gradient(135deg, #09a473 0%, #044233 100%) !important;
+  border-color: #34d399 !important;
+  border-width: 2px !important;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.16) !important;
+}
+:root.dark.theme-green .personality-card--tribe-assigned .personality-card__eyebrow {
+  color: #a7f3d0 !important;
+}
+:root.dark.theme-green .personality-card--tribe-assigned .personality-card__type-badge {
+  background: rgba(52, 211, 153, 0.15) !important;
+  color: #a7f3d0 !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+
 .card-selection-slots__header {
   display: flex;
   align-items: center;
@@ -472,9 +597,9 @@
 }
 
 .selection-marker--sm {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
 }
 
 .selection-marker.is-checked {
@@ -556,6 +681,28 @@
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.personality-card__type-badge {
+  display: inline-flex;
+  align-self: center;
+  padding: 1.5px 7px;
+  border-radius: var(--radius-full);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--color-surface-3);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  margin-top: 1px;
+  margin-bottom: 3px;
+}
+
+.personality-card--tribe-assigned .personality-card__type-badge {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
 .personality-card--empty .personality-card__title {

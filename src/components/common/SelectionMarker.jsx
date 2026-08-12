@@ -14,7 +14,7 @@ export default function SelectionMarker({
       className={`selection-marker selection-marker--${size}${checked ? ' is-checked' : ''}${disabled ? ' is-disabled' : ''}${locked ? ' is-locked' : ''}`}
       aria-hidden="true"
     >
-      {checked && <Check size={size === 'sm' ? 10 : 13} strokeWidth={3} />}
+      {checked && <Check size={size === 'sm' ? 12 : 13} strokeWidth={3} />}
       {locked && <span className="selection-marker__slash" aria-hidden="true" />}
     </span>
   )

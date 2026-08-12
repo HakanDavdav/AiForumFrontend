@@ -19,6 +19,7 @@ import {
   Bot,
   Star,
   CirclePlus,
+  PaintbrushVertical,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -41,6 +42,7 @@ import useDevLog from '../../utils/useDevLog'
 import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
 import HowItWorksHelp from '../common/HowItWorksHelp'
+import Logo from '../common/Logo'
 
 export default function TopBar() {
   useDevLog('TopBar', arguments[0] || {})
@@ -311,27 +313,23 @@ export default function TopBar() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 0, // Sıfır boşluk
             cursor: 'pointer',
             flexShrink: 0,
           }}
           onClick={() => navigate('/')}
         >
-          <div
+          <Logo width={36} height={48} fill="var(--color-primary)" />
+          <span
             style={{
-              width: 32,
-              height: 32,
-              background: 'var(--color-primary)',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: 26,
+              color: 'var(--color-primary)',
+              marginTop: 4,
+              marginLeft: -2,
             }}
           >
-            <span style={{ color: 'white', fontWeight: 800, fontSize: 16 }}>B</span>
-          </div>
-          <span style={{ fontWeight: 800, fontSize: 18, color: 'var(--color-primary)' }}>
-            Bletchly
+            letchly
           </span>
         </div>
 
@@ -828,9 +826,12 @@ export default function TopBar() {
               }`}
               onClick={handleBotClick}
               title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
-              style={{ color: 'var(--color-primary)', width: 30, height: 30, padding: 0 }}
+              style={{ color: 'var(--color-primary)', height: 30, padding: '0 2px' }}
             >
-              <Bot size={16} strokeWidth={2.4} />
+              <span style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                <Bot size={18} strokeWidth={2.4} />
+                <PaintbrushVertical size={15} strokeWidth={2.2} style={{ marginLeft: -5 }} />
+              </span>
             </button>
             <button
               className="btn-icon"
@@ -1061,6 +1062,10 @@ export default function TopBar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       onMouseDown={(e) => e.stopPropagation()}
+                      onClickCapture={() => {
+                        setIsMyTribesOpen(false)
+                        setTribesDropdownPos(null)
+                      }}
                       style={{
                         position: 'fixed',
                         top: tribesDropdownPos.top,
@@ -1159,6 +1164,10 @@ export default function TopBar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       onMouseDown={(e) => e.stopPropagation()}
+                      onClickCapture={() => {
+                        setIsMyBotsOpen(false)
+                        setBotsDropdownPos(null)
+                      }}
                       style={{
                         position: 'fixed',
                         top: botsDropdownPos.top,
@@ -1267,7 +1276,7 @@ export default function TopBar() {
           }}
         >
           <IconActionButton
-            onClick={() => navigate('/leaderboard?type=actor')}
+            onClick={() => navigate('/leaderboard?type=user')}
             title={t('topbar.leaderboard', 'Liderlik Tablosu')}
             aria-label={t('topbar.leaderboard', 'Liderlik Tablosu')}
             style={{ width: 38, height: 38, boxSizing: 'border-box' }}

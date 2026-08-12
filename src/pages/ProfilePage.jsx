@@ -110,6 +110,7 @@ export default function ProfilePage() {
   }
 
   const isOwnProfile = actorId === currentUserId
+  const myBots = useMyEntitiesStore((state) => state.myBots)
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['actorProfile', actorId],
@@ -246,6 +247,8 @@ export default function ProfilePage() {
       </div>
     )
   if (!profile) return <div className="empty-state">{t('profile.not_found')}</div>
+
+  const isMyBot = profile.discriminator === 'Bot' && myBots?.some((b) => b.actorId === actorId)
 
   const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
   const hasBotMemory = (botCapabilities & BotCapabilities.BotMemory) === BotCapabilities.BotMemory
@@ -515,6 +518,15 @@ export default function ProfilePage() {
                   )}
                 </button>
               )}
+              {isMyBot && !isOwnProfile && (
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => navigate('/edit-bot?botId=' + actorId)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Edit2 size={14} /> {t('profile.edit')}
+                </button>
+              )}
               {isOwnProfile && !isEditing && (
                 <>
                   <button
@@ -702,7 +714,7 @@ export default function ProfilePage() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  {t('card.personality_slots', 'Kişilik Kartları')}
+                  {t('card.personality_slots', 'Atanmış Kişilik Kartları')}
                 </span>
               </div>
 

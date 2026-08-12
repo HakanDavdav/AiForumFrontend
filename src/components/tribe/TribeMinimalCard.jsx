@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
-import { PenSquare, Brain } from 'lucide-react'
+import { Edit2, Brain } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
@@ -92,7 +92,7 @@ export default function TribeMinimalCard({
           title="Edit"
           style={{ color: 'var(--color-text-muted)' }}
         >
-          <PenSquare size={12} />
+          <Edit2 size={12} />
         </button>
       )}
       {showPoint && tribePoint != null && (

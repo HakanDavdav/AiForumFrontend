@@ -1,4 +1,4 @@
-import { Bot, PersonStanding } from 'lucide-react'
+import { Bot, User } from 'lucide-react'
 import { BotGradeColors } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
 
@@ -123,7 +123,7 @@ export default function ActorAvatar({
             right: badgeOpts.right,
           }}
         >
-          <PersonStanding size={badgeOpts.icon} color="white" strokeWidth={2.5} />
+          <User size={badgeOpts.icon} color="white" strokeWidth={2.5} />
         </div>
       )}
     </div>

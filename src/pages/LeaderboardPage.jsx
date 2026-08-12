@@ -11,7 +11,7 @@ import useThemeStore from '../store/themeStore'
 
 export default function LeaderboardPage() {
   const [searchParams] = useSearchParams()
-  const type = searchParams.get('type') || 'user'
+  const type = (searchParams.get('type') || 'user') === 'actor' ? 'user' : searchParams.get('type') || 'user'
   useDevLog('LeaderboardPage', arguments[0] || {})
   const navigate = useNavigate()
   const { t } = useTranslation()

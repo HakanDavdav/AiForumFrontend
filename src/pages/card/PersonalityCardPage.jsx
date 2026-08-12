@@ -179,7 +179,7 @@ export default function PersonalityCardPage() {
           >
             {t('card.ownership_slots', 'Kart Sahiplik Yuvaları (10 Slot)')}
           </h3>
-          <CardSlots cards={myCards} slotCount={10} />
+          <CardSlots cards={myCards} slotCount={10} showMark={false} />
         </div>
       </div>
     </div>

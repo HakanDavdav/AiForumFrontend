@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Save, Trash2, Shield, UserMinus, Settings, Users, Loader2 } from 'lucide-react'
+import { Trash2, Shield, UserMinus, Users, Loader2 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import { personalityCardApi } from '../api/personalityCardApi'
 import BackButton from '../components/common/BackButton'
+import BotFlashCardsIcon from '../components/common/BotFlashCardsIcon'
 import CardSelectionSlots from '../components/card/CardSelectionSlots'
+import PersonalityCard from '../components/card/PersonalityCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
@@ -27,6 +29,9 @@ export default function TribeSettingsPage() {
     tribeName: '',
     imageUrl: '',
     mission: '',
+    personalityCardName: '',
+    personalityCardPrompt: '',
+    personalityCardConfirmed: false,
   })
   const [selectedCardIds, setSelectedCardIds] = useState([])
   const [hasSubmitted, setHasSubmitted] = useState(false)
@@ -56,7 +61,7 @@ export default function TribeSettingsPage() {
         mission: tribe.mission || '',
       })
       setSelectedCardIds(
-        (tribe.personalityCards || []).map((card) => card.personalityCardId).filter(Boolean)
+        (tribe.personalityCards || []).map((card) => card.cardId || card.card?.personalityCardId || card.personalityCardId).filter(Boolean)
       )
     }
   }, [tribe])
@@ -69,6 +74,9 @@ export default function TribeSettingsPage() {
       toast.success(t('tribe_settings.success_update', 'Değişiklikler kaydedildi'))
       queryClient.invalidateQueries({ queryKey: ['tribe', tribeId] })
       queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
+      setTimeout(() => {
+        navigate('/tribe?tribeId=' + tribeId)
+      }, 1000)
     },
   })
 
@@ -131,11 +139,21 @@ export default function TribeSettingsPage() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  const handlePersonalityCardChange = (field, value) => {
+    setFormData((current) => ({
+      ...current,
+      personalityCardName: field === 'cardName' ? value : current.personalityCardName,
+      personalityCardPrompt: field === 'prompt' ? value : current.personalityCardPrompt,
+      personalityCardConfirmed: false,
+    }))
+  }
+
   const toggleCard = (cardId) => {
+    const lowerId = cardId?.toLowerCase()
     setSelectedCardIds((current) =>
-      current.includes(cardId)
-        ? current.filter((selectedId) => selectedId !== cardId)
-        : [...current, cardId]
+      current.map((id) => id.toLowerCase()).includes(lowerId)
+        ? current.filter((selectedId) => selectedId.toLowerCase() !== lowerId)
+        : [...current, lowerId]
     )
   }
 
@@ -159,7 +177,15 @@ export default function TribeSettingsPage() {
       return
     }
 
-    editMutation.mutate({ ...formData, assignedCardIds: selectedCardIds })
+    const { personalityCardName, personalityCardPrompt, personalityCardConfirmed, ...base } =
+      formData
+
+    editMutation.mutate({
+      ...base,
+      assignedCardIds: selectedCardIds,
+      personalityCardName: personalityCardConfirmed ? personalityCardName : null,
+      personalityCardPrompt: personalityCardConfirmed ? personalityCardPrompt : null,
+    })
   }
 
   const handleDeleteTribe = () => {
@@ -213,7 +239,7 @@ export default function TribeSettingsPage() {
         }}
       >
         <div className="page-header-icon">
-          <Settings size={22} color="#fff" />
+          <Users size={22} color="#fff" />
         </div>
         <div>
           <h1
@@ -245,12 +271,14 @@ export default function TribeSettingsPage() {
             <input
               type="text"
               name="tribeName"
+              value={formData.tribeName}
+              onChange={handleChange}
               disabled={editMutation.isPending}
               style={{
                 ...inputStyle,
-                borderColor: getBorderColor('imageUrl', formData.imageUrl, false),
+                borderColor: getBorderColor('tribeName', formData.tribeName, true),
               }}
-              onFocus={() => setFocused('imageUrl')}
+              onFocus={() => setFocused('tribeName')}
               onBlur={() => setFocused(null)}
             />
           </div>
@@ -279,14 +307,92 @@ export default function TribeSettingsPage() {
         </div>
 
         <div>
-          <label style={labelStyle}>{t('card.personality_cards', 'Kişilik Kartları')}</label>
+          <label style={labelStyle}>
+            {t('card.create_personality_optional', 'Kişilik kartı oluştur (Opsiyonel)')}
+          </label>
+          <PersonalityCard
+            variant="editor"
+            editorCardName={formData.personalityCardName}
+            editorPrompt={formData.personalityCardPrompt}
+            editorConfirmed={formData.personalityCardConfirmed}
+            disabled={editMutation.isPending}
+            onEditorChange={handlePersonalityCardChange}
+            onEditorConfirm={() =>
+              setFormData((current) => ({ ...current, personalityCardConfirmed: true }))
+            }
+            onEditorEdit={() =>
+              setFormData((current) => ({ ...current, personalityCardConfirmed: false }))
+            }
+          />
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+            {t('tribe_settings.primary_personality_desc')}
+          </p>
+        </div>
+
+        <div>
+          <label style={labelStyle}>
+            {t('card.personality_cards', 'TRIBEYE ATANMIŞ KOLLEKTİF KİŞİLİK KARTLARI')}
+          </label>
+          {tribe.personalityCards?.length > 0 ? (
+            <CardSelectionSlots
+              cards={tribe.personalityCards}
+              selectedCardIds={selectedCardIds}
+              onToggle={toggleCard}
+              maxSelections={4}
+              disabled={editMutation.isPending}
+              showHeader={false}
+              slotCount={tribe.personalityCards.length}
+              tribeAssigned
+              tribeBadgeLabel="TRIBE"
+            />
+          ) : (
+            <p className="text-muted" style={{ fontSize: 13 }}>
+              {t('card.no_assigned_cards', 'Henüz tribe\'a kart atanmamış.')}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label style={labelStyle}>
+            {t(
+              'bot.select_unassigned_cards',
+              'Sahip olduğun kartlarından ekle (Opsiyonel)'
+            )}
+          </label>
           <CardSelectionSlots
             cards={myCards}
             selectedCardIds={selectedCardIds}
             onToggle={toggleCard}
-            maxSelections={4}
             disabled={editMutation.isPending}
+            showHeader={false}
+            slotCount={10}
           />
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+            {t(
+              'bot.additional_personality_cards_desc',
+              'Sahip olduğun kartlardan tribe\'a ekleyebilirsin.'
+            )}
+          </p>
+        </div>
+
+        <div
+          aria-label={t(
+            'card.selected_count',
+            `${selectedCardIds.length + (formData.personalityCardConfirmed ? 1 : 0)} kart seçildi`
+          )}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: 7,
+            marginBottom: 0,
+            color: 'var(--color-text-secondary)',
+            fontSize: 16,
+            fontWeight: 600,
+          }}
+        >
+          <BotFlashCardsIcon size={36} color="var(--color-primary)" />
+          <span>{selectedCardIds.length + (formData.personalityCardConfirmed ? 1 : 0)}</span>
         </div>
 
         {/* Submit button */}
@@ -312,9 +418,7 @@ export default function TribeSettingsPage() {
                 {t('auth.processing')}
               </>
             ) : (
-              <>
-                <Save size={16} /> {t('action.save_changes')}
-              </>
+              <>{t('action.update', 'Güncelle')}</>
             )}
           </button>
         </div>
@@ -357,20 +461,13 @@ export default function TribeSettingsPage() {
           </div>
         </div>
 
-        <div
-          style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 16,
-            overflow: 'hidden',
-          }}
-        >
+        <div className="flex-col gap-2">
           {tribe.tribeMemberships?.map((member, index) =>
             member.actor ? (
               <div
                 key={member.actor.actorId}
                 className="lb-card flex items-center justify-between"
-                style={{ padding: '8px 16px', marginBottom: 8 }}
+                style={{ padding: '8px 16px' }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <ActorMinimalCard actor={member.actor} />

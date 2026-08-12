@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { BookOpen, Bot, Calendar, Hash, Tag, Users, X } from 'lucide-react'
+import { BookOpen, Bot, CalendarFold, Hash, Tag, Users, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
@@ -18,7 +18,10 @@ function normalizeTags(rawTags) {
 function formatDate(value) {
   if (!value) return null
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('tr-TR')
+  if (Number.isNaN(date.getTime())) return String(value)
+  const datePart = date.toLocaleDateString('tr-TR')
+  const timePart = date.toLocaleTimeString('tr-TR', { hour12: false })
+  return `${datePart} / ${timePart}`
 }
 
 function DetailRow({ icon: Icon, label, value, multiline = false, iconSize = 14 }) {
@@ -99,14 +102,22 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
 
   const detailRows = [
     {
-      icon: BookOpen,
+      icon: BotFlashCardsIcon,
+      iconSize: 20,
       label: t('card.prompt', 'Kişilik Promptu'),
       value: personalityPrompt,
       multiline: true,
     },
-    { icon: BookOpen, label: t('card.hint', 'Kart Hint'), value: cardHint, multiline: true },
     {
-      icon: Tag,
+      icon: BotFlashCardsIcon,
+      iconSize: 20,
+      label: t('card.hint', 'Kart Hint'),
+      value: cardHint,
+      multiline: true,
+    },
+    {
+      icon: BotFlashCardsIcon,
+      iconSize: 20,
       label: t('card.tags', 'Etiketler'),
       value: tags.length > 0 ? tags.join(', ') : null,
     },
@@ -132,20 +143,20 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
     { icon: Hash, label: 'Card ID', value: cardId },
     { icon: Hash, label: 'Ownership ID', value: ownershipId },
     { icon: Hash, label: 'Actor ID', value: actorId },
-    { icon: BookOpen, label: t('card.acquisition_type', 'Edinim Türü'), value: acquisitionType },
+    { icon: Hash, label: t('card.acquisition_type', 'Edinim Türü'), value: acquisitionType },
     {
-      icon: Calendar,
-      label: t('card.acquired_at', 'Edinilme Tarihi'),
+      icon: CalendarFold,
+      label: t('card.acquired_at', 'Edinilme'),
       value: formatDate(card.acquiredAt),
     },
     {
-      icon: Calendar,
-      label: t('card.created_at', 'Oluşturulma Tarihi'),
+      icon: CalendarFold,
+      label: t('card.created_at', 'Oluşturulma'),
       value: formatDate(cardData.createdAt),
     },
     {
-      icon: Calendar,
-      label: t('card.updated_at', 'Güncellenme Tarihi'),
+      icon: CalendarFold,
+      label: t('card.updated_at', 'Güncellenme'),
       value: formatDate(cardData.updatedAt),
     },
   ]
@@ -177,15 +188,15 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                marginBottom: 6,
+                marginBottom: 12,
                 color: 'var(--color-primary)',
-                fontSize: 11,
-                fontWeight: 800,
+                fontSize: 13,
+                fontWeight: 900,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
               }}
             >
-              <BookOpen size={14} />
+              <BotFlashCardsIcon size={32} />
               {t('card.details', 'Kart Detayları')}
             </div>
             <h2
@@ -232,7 +243,7 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
                   fontSize: 14,
                 }}
               >
-                <Users size={16} />
+                <Bot size={16} />
                 {t('card.assignments', 'Atamalar')}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

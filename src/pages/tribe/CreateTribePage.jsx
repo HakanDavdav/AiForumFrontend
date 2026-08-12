@@ -67,6 +67,10 @@ export default function CreateTribePage() {
     e.preventDefault()
     if (!canSubmit) {
       setHasSubmitted(true)
+      const firstInvalid = Array.from(e.currentTarget.querySelectorAll('[data-field]')).find(
+        (el) => !(el.value || '').trim()
+      )
+      firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
     const { personalityCardConfirmed, ...payload } = formData
@@ -174,6 +178,7 @@ export default function CreateTribePage() {
             <input
               type="text"
               required
+              data-field="tribeName"
               placeholder={t('tribe_settings.tribe_name_placeholder')}
               value={formData.tribeName}
               onChange={(e) => setFormData({ ...formData, tribeName: e.target.value })}
@@ -214,6 +219,7 @@ export default function CreateTribePage() {
           <div style={{ position: 'relative' }}>
             <textarea
               rows={3}
+              data-field="mission"
               placeholder={t('tribe_settings.mission_placeholder')}
               value={formData.mission}
               onChange={(e) => setFormData({ ...formData, mission: e.target.value })}
@@ -340,7 +346,6 @@ export default function CreateTribePage() {
             cards={myCards}
             selectedCardIds={selectedCardIds}
             onToggle={toggleCard}
-            maxSelections={3}
             disabled={mutation.isPending || mutation.isSuccess}
             showHeader={false}
             slotCount={10}

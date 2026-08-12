@@ -3,11 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   LogOut,
   UserPlus,
-  Settings,
+  Edit2,
   ChevronLeft,
   ChevronRight,
   Brain,
   CalendarFold,
+  Users,
 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
@@ -132,7 +133,7 @@ export default function TribePage() {
                 className="btn btn-outline btn-sm"
                 onClick={() => navigate('/mind?tribeId=' + tribeId)}
               >
-                <Brain size={14} /> {t('profile.memories')}
+                <Brain size={14} /> {t('tribe.collective_memories', 'Kollektif Anılar')}
               </button>
             </div>
           </div>
@@ -237,7 +238,7 @@ export default function TribePage() {
                   onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)}
                   style={{ display: 'flex', alignItems: 'center', gap: 6 }}
                 >
-                  <Settings size={14} /> {t('tribe.management')}
+                  <Edit2 size={14} /> {t('action.edit', 'Düzenle')}
                 </button>
               )}
             </div>
@@ -314,6 +315,7 @@ export default function TribePage() {
                   cards={tribe.personalityCards}
                   slotCount={tribe.personalityCards.length}
                   showMark={false}
+                  tribeBadgeLabel="TRIBE"
                 />
               </div>
             </>
@@ -322,17 +324,42 @@ export default function TribePage() {
       </div>
 
       {/* ─── Members List ─── */}
-      <h3
-        style={{
-          fontSize: 18,
-          fontWeight: 700,
-          paddingBottom: 8,
-          borderBottom: '1px solid var(--color-border)',
-          marginTop: 16,
-        }}
-      >
-        {t('tribe.members')} ({tribe.tribeMemberships?.length ?? 0})
-      </h3>
+      <div style={{ marginTop: 16 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 24,
+          }}
+        >
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: 'var(--color-surface-raised)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Users size={18} color="var(--color-primary)" />
+          </div>
+          <div>
+            <h2
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                margin: 0,
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              {t('tribe.members')} ({tribe.tribeMemberships?.length ?? 0})
+            </h2>
+          </div>
+        </div>
+      </div>
 
       <div className="flex-col gap-2">
         {tribe.tribeMemberships?.length === 0 ? (
@@ -351,16 +378,7 @@ export default function TribePage() {
                 <div className="flex items-center gap-4">
                   <span
                     className="badge"
-                    style={{
-                      background:
-                        member.roleName === 'TribeLeader'
-                          ? 'var(--color-primary-light)'
-                          : 'var(--color-surface-3)',
-                      color:
-                        member.roleName === 'TribeLeader'
-                          ? 'var(--color-primary)'
-                          : 'var(--color-text-secondary)',
-                    }}
+                    style={{ background: 'var(--color-surface-raised)', marginRight: 8 }}
                   >
                     {member.roleName === 'TribeLeader'
                       ? t('tribe.leader')

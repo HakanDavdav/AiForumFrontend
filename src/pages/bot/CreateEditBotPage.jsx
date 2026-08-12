@@ -83,15 +83,30 @@ export default function CreateEditBotPage() {
 
     if (isEditMode && existingBot) {
       const assignedCards = existingBot.assignedCards || []
-      const personalAssignedCards = assignedCards.filter((card) => !card.assignedTribeId)
+      const personalAssignedCards = assignedCards.filter(
+        (card) => !card.tribeId && !card.assignedTribeId
+      )
       const existingPersonalityCard = personalAssignedCards[0]
       setExistingCard(existingPersonalityCard || null)
 
       const enums = {
-        Politics: 1, Economy: 2, WorldNews: 4, LocalNews: 8, Trending: 16,
-        Technology: 32, Science: 64, AI: 128, Space: 256, Health: 512,
-        Sports: 1024, Entertainment: 2048, Gaming: 4096, Celebrity: 8192,
-        Lifestyle: 16384, Education: 32768, Relationships: 65536
+        Politics: 1,
+        Economy: 2,
+        WorldNews: 4,
+        LocalNews: 8,
+        Trending: 16,
+        Technology: 32,
+        Science: 64,
+        AI: 128,
+        Space: 256,
+        Health: 512,
+        Sports: 1024,
+        Entertainment: 2048,
+        Gaming: 4096,
+        Celebrity: 8192,
+        Lifestyle: 16384,
+        Education: 32768,
+        Relationships: 65536,
       }
 
       const mappedTopicTypes = (existingBot.topicTypes || [])
@@ -114,16 +129,11 @@ export default function CreateEditBotPage() {
         autoBio: existingBot.botSettings?.autoBio || false,
         topicTypes: mappedTopicTypes,
         selectedCardIds: personalAssignedCards
-          .map((card) => card.personalityCardId)
+          .map((card) => card.cardId || card.card?.personalityCardId || card.personalityCardId)
           .filter(Boolean),
       })
     }
   }, [isEditMode, existingBot, botId])
-
-  const tribeLockedCardIds = myCards
-    .filter((card) => (card?.assignedTribes?.length || 0) > 0)
-    .map((card) => (card.cardId || card.card?.personalityCardId)?.toLowerCase())
-    .filter(Boolean)
 
   const mutation = useMutation({
     mutationFn: (data) => (isEditMode ? actorApi.editBot(botId, data) : actorApi.createBot(data)),
@@ -175,10 +185,20 @@ export default function CreateEditBotPage() {
 
     if (!canSubmit) {
       setHasSubmitted(true)
+      const firstInvalid = Array.from(e.currentTarget.querySelectorAll('[data-field]')).find(
+        (el) => !(el.value || '').trim()
+      )
+      firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
 
-    const { selectedCardIds, personalityCardName, personalityCardPrompt, personalityCardConfirmed, ...payload } = formData
+    const {
+      selectedCardIds,
+      personalityCardName,
+      personalityCardPrompt,
+      personalityCardConfirmed,
+      ...payload
+    } = formData
     payload.assignedCardIds = selectedCardIds
     if (payload.autoBio) {
       payload.bio = ''
@@ -245,12 +265,11 @@ export default function CreateEditBotPage() {
   }
 
   const hasNewCard = Boolean(
-    formData.personalityCardName.trim() !== '' ||
-    formData.personalityCardPrompt.trim() !== ''
+    formData.personalityCardName.trim() !== '' || formData.personalityCardPrompt.trim() !== ''
   )
 
   const isPersonalityCardValid = hasNewCard
-    ? (formData.personalityCardName.trim() !== '' && formData.personalityCardPrompt.trim() !== '')
+    ? formData.personalityCardName.trim() !== '' && formData.personalityCardPrompt.trim() !== ''
     : true
 
   const isExistingCardSelected =
@@ -260,13 +279,28 @@ export default function CreateEditBotPage() {
     )
 
   const primaryCardCount = hasNewCard
-    ? (formData.personalityCardConfirmed ? 1 : 0)
-    : (isExistingCardSelected ? 1 : 0)
+    ? formData.personalityCardConfirmed
+      ? 1
+      : 0
+    : isExistingCardSelected
+      ? 1
+      : 0
   const selectedPrimaryCardId = (hasNewCard ? null : existingCard?.personalityCardId)?.toLowerCase()
   const secondarySelectedCount = formData.selectedCardIds.filter(
     (id) => id.toLowerCase() !== selectedPrimaryCardId
   ).length
   const totalSelectedCount = primaryCardCount + secondarySelectedCount
+
+  const assignedCards = existingBot?.assignedCards || []
+  const sortedAssignedCards = [...assignedCards].sort((a, b) => {
+    const aIsTribe = Boolean(a.tribeId || a.assignedTribeId)
+    const bIsTribe = Boolean(b.tribeId || b.assignedTribeId)
+    return aIsTribe - bIsTribe
+  })
+  const totalSlotCount = Math.max(
+    assignedCards.length,
+    existingBot?.botSettings?.maxCardSlots || 4
+  )
 
   const canSubmit =
     formData.profileName.trim() !== '' &&
@@ -353,6 +387,7 @@ export default function CreateEditBotPage() {
             <input
               type="text"
               required
+              data-field="profileName"
               placeholder={t('bot.bot_name_placeholder')}
               value={formData.profileName}
               onChange={(e) => setFormData({ ...formData, profileName: e.target.value })}
@@ -395,6 +430,7 @@ export default function CreateEditBotPage() {
               <div style={{ position: 'relative' }}>
                 <textarea
                   rows={2}
+                  data-field="bio"
                   placeholder={t('bot.bio_placeholder')}
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -523,31 +559,39 @@ export default function CreateEditBotPage() {
             </label>
             <div
               className="personality-card-slots"
-              style={{ '--card-count': existingBot.assignedCards.length }}
+              style={{ '--card-count': totalSlotCount }}
             >
-              {existingBot.assignedCards.map((card, index) => {
-                const isTribeCard = Boolean(card.assignedTribeId)
-                const cardId = card.personalityCardId?.toLowerCase()
+              {Array.from({ length: totalSlotCount }, (_, i) => {
+                const card = sortedAssignedCards[i]
+                const slotStyle = {
+                  '--slot-count': totalSlotCount,
+                  '--slot-index': i,
+                  '--slot-rotation': `${totalSlotCount === 1 ? 0 : ((i / (totalSlotCount - 1)) * 2 - 1) * 8}deg`,
+                  '--slot-z': totalSlotCount - Math.abs(i - (totalSlotCount - 1) / 2),
+                }
+                if (!card) {
+                  return (
+                    <div key={`empty-${i}`} className="personality-card-slot" style={slotStyle}>
+                      <PersonalityCard slotNumber={i + 1} />
+                    </div>
+                  )
+                }
+                const isTribeCard = Boolean(card.tribeId || card.assignedTribeId)
+                const cardId = (
+                  card.cardId ||
+                  card.card?.personalityCardId ||
+                  card.personalityCardId
+                )?.toLowerCase()
                 const isSelected = formData.selectedCardIds.includes(cardId)
                 return (
-                  <div
-                    key={card.personalityCardId}
-                    className="personality-card-slot"
-                    style={{
-                      '--slot-count': existingBot.assignedCards.length,
-                      '--slot-index': index,
-                      '--slot-rotation': `${existingBot.assignedCards.length === 1 ? 0 : ((index / (existingBot.assignedCards.length - 1)) * 2 - 1) * 8}deg`,
-                      '--slot-z':
-                        existingBot.assignedCards.length -
-                        Math.abs(index - (existingBot.assignedCards.length - 1) / 2),
-                    }}
-                  >
+                  <div key={cardId} className="personality-card-slot" style={slotStyle}>
                     <PersonalityCard
+                      slotNumber={i + 1}
                       card={card}
                       selectable={!isTribeCard}
                       selected={!isTribeCard && isSelected}
                       locked={isTribeCard}
-                      onSelect={isTribeCard ? undefined : () => toggleCardId(card.personalityCardId)}
+                      onSelect={isTribeCard ? undefined : () => toggleCardId(cardId)}
                       showOwnersBtn={false}
                       showAssigneesBtn={false}
                     />
@@ -578,21 +622,16 @@ export default function CreateEditBotPage() {
                 textTransform: 'uppercase',
               }}
             >
-              {t(
-                'bot.select_unassigned_cards',
-                'Sahip olduğun kartlarından ekle (Opsiyonel)'
-              )}
+              {t('bot.select_unassigned_cards', 'Sahip olduğun kartlarından ekle (Opsiyonel)')}
             </label>
           </div>
           <CardSelectionSlots
             cards={myCards}
             selectedCardIds={formData.selectedCardIds}
             onToggle={toggleCardId}
-            maxSelections={3}
             disabled={mutation.isPending || mutation.isSuccess}
             showHeader={false}
             slotCount={10}
-            lockedCardIds={tribeLockedCardIds}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('bot.additional_personality_cards_desc')}
@@ -668,10 +707,7 @@ export default function CreateEditBotPage() {
         </div>
 
         <div
-          aria-label={t(
-            'card.selected_count',
-            `${totalSelectedCount} kart seçildi`
-          )}
+          aria-label={t('card.selected_count', `${totalSelectedCount} kart seçildi`)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -684,9 +720,7 @@ export default function CreateEditBotPage() {
           }}
         >
           <BotFlashCardsIcon size={36} color="var(--color-primary)" />
-          <span>
-            {totalSelectedCount}
-          </span>
+          <span>{totalSelectedCount}</span>
         </div>
 
         {/* Submit button */}

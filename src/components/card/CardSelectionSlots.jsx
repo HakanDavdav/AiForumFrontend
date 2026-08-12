@@ -6,7 +6,12 @@ function getCardId(item) {
 }
 
 function getCard(item) {
-  return item?.card || item
+  if (!item?.card) return item
+  return {
+    ...item.card,
+    assignedBots: item.assignedBots || [],
+    assignedTribes: item.assignedTribes || [],
+  }
 }
 
 export default function CardSelectionSlots({
@@ -18,6 +23,8 @@ export default function CardSelectionSlots({
   showHeader = true,
   slotCount = 0,
   lockedCardIds = [],
+  tribeAssigned = false,
+  tribeBadgeLabel = null,
 }) {
   const { t } = useTranslation()
   const selectableCards = cards
@@ -86,6 +93,8 @@ export default function CardSelectionSlots({
                 selectable={!locked}
                 selected={selectedCardIds.includes(id)}
                 locked={locked}
+                tribeAssigned={tribeAssigned}
+                tribeBadgeLabel={tribeBadgeLabel}
                 disabled={disabled}
                 onSelect={() => onToggle(id)}
                 maxSelections={maxSelections}
