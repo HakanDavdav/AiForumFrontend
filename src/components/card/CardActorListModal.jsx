@@ -45,7 +45,14 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
   if (!isOpen) return null
 
   return createPortal(
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        e.stopPropagation()
+        onClose()
+      }}
+      style={{ zIndex: 100 }}
+    >
       <div
         className="modal-box"
         onClick={(e) => e.stopPropagation()}
@@ -57,7 +64,13 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
               ? t('card.owners', 'Sahipler')
               : t('card.assignees', 'Atanmış Botlar')}
           </h3>
-          <button className="btn-icon" onClick={onClose}>
+          <button
+            className="btn-icon"
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+          >
             <X size={18} />
           </button>
         </div>

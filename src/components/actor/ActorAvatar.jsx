@@ -1,6 +1,8 @@
-import { Bot, User } from 'lucide-react'
+import { Bot, User, Crown } from 'lucide-react'
 import { BotGradeColors } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
+import { useTranslation } from 'react-i18next'
 
 /**
  * ActorAvatar — profil resmi veya isim harfi fallback.
@@ -24,8 +26,12 @@ export default function ActorAvatar({
   onClick,
 }) {
   useDevLog('ActorAvatar', arguments[0] || {})
+  const { t } = useTranslation()
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
+  
+  const myBots = useMyEntitiesStore((s) => s.myBots)
+  const isMyBot = isBot && myBots?.some((b) => b.actorId === actorId)
 
   const sizeMap = {
     sm: 'avatar-sm',
@@ -82,6 +88,25 @@ export default function ActorAvatar({
         >
           {initial}
         </div>
+      )}
+
+      {isMyBot && (
+        <span
+          title={t('common.your_bot', 'Senin Botun')}
+          style={{
+            position: 'absolute',
+            top: -(badgeOpts.size * 0.25),
+            left: -(badgeOpts.size * 0.12),
+            color: 'var(--color-warning)',
+            zIndex: 2,
+            filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+            transform: 'rotate(-15deg)',
+            display: 'flex',
+            pointerEvents: 'auto'
+          }}
+        >
+          <Crown size={Math.max(16, badgeOpts.size * 0.9)} strokeWidth={2.5} />
+        </span>
       )}
 
       {isBot && (

@@ -53,7 +53,7 @@ export default function ReactionButton({
   useEffect(() => {
     serverReactionRef.current = currentUserReaction
     serverLikeIdRef.current = currentLikeId
-    
+
     if (!debounceTimerRef.current) {
       setOptimisticReaction(currentUserReaction)
       setLikeId(currentLikeId)
@@ -166,7 +166,7 @@ export default function ReactionButton({
           try {
             await removeMutation.mutateAsync({ likeId: serverLikeId, contentItemId })
           } catch (e) {
-            console.error("Failed to remove reaction", e)
+            console.error('Failed to remove reaction', e)
           }
         }
       } else {
@@ -175,10 +175,10 @@ export default function ReactionButton({
           try {
             await removeMutation.mutateAsync({ likeId: serverLikeId, contentItemId })
           } catch (e) {
-            console.error("Failed to remove old reaction", e)
+            console.error('Failed to remove old reaction', e)
           }
         }
-        
+
         likeMutation.mutate({ contentItemId, reactionType: nextReaction })
       }
     }, 1000)
@@ -226,10 +226,14 @@ export default function ReactionButton({
               >
                 <span>{ReactionIcons[type]}</span>
                 {type === ReactionType.Like && (
-                  <span style={{ fontSize: '12px', position: 'relative', top: '-1px' }}>{optimisticLikeCount}</span>
+                  <span style={{ fontSize: '12px', position: 'relative', top: '-1px' }}>
+                    {optimisticLikeCount}
+                  </span>
                 )}
                 {type === ReactionType.Dislike && (
-                  <span style={{ fontSize: '12px', position: 'relative', top: '-1px' }}>{optimisticDislikeCount}</span>
+                  <span style={{ fontSize: '12px', position: 'relative', top: '-1px' }}>
+                    {optimisticDislikeCount}
+                  </span>
                 )}
               </button>
 

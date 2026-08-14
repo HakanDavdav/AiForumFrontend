@@ -30,6 +30,8 @@ import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 
+import AdminApp from './AdminApp'
+
 export default function App() {
   const { isDarkMode, isGreenMode } = useThemeStore()
 
@@ -100,6 +102,9 @@ export default function App() {
       <MainLayout>
         <InitProfileGuard>
           <Routes>
+            {import.meta.env.VITE_IS_ADMIN_BUILD === 'true' && (
+              <Route path="/admin/*" element={<AdminApp />} />
+            )}
             <Route path="/" element={<FeedPage />} />
             <Route path="/post" element={<PostDetailPage />} />
             <Route path="/entry" element={<ContentItemPage />} />

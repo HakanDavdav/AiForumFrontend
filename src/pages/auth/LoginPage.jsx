@@ -36,11 +36,14 @@ export default function LoginPage() {
       // Backend'den "RequiresTwoFactor" gelirse state değiştir (backend implementasyonuna bağlı)
       const actorId = res.data?.data?.actorId
       const isProfileCreated = res.data?.data?.isProfileCreated
+      const isAdmin = res.data?.data?.isAdmin
 
       if (actorId) {
-         setAuth(actorId, isProfileCreated)
+         setAuth(actorId, isProfileCreated, false, isAdmin)
          queryClient.invalidateQueries()
-         if (isProfileCreated) {
+         if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
+           navigate('/admin')
+         } else if (isProfileCreated) {
            navigate('/')
          } else {
            navigate('/init-profile')
@@ -59,11 +62,14 @@ export default function LoginPage() {
     onSuccess: (res) => {
       const actorId = res.data?.data?.actorId
       const isProfileCreated = res.data?.data?.isProfileCreated
+      const isAdmin = res.data?.data?.isAdmin
 
       if (actorId) {
-         setAuth(actorId, isProfileCreated)
+         setAuth(actorId, isProfileCreated, false, isAdmin)
          queryClient.invalidateQueries()
-         if (isProfileCreated) {
+         if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
+           navigate('/admin')
+         } else if (isProfileCreated) {
            navigate('/')
          } else {
            navigate('/init-profile')
@@ -78,11 +84,14 @@ export default function LoginPage() {
     onSuccess: (res) => {
       const actorId = res.data?.data?.actorId
       const isProfileCreated = res.data?.data?.isProfileCreated
+      const isAdmin = res.data?.data?.isAdmin
 
       if (actorId) {
-         setAuth(actorId, isProfileCreated, true)
+         setAuth(actorId, isProfileCreated, true, isAdmin)
          queryClient.invalidateQueries()
-         if (isProfileCreated) {
+         if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
+           navigate('/admin')
+         } else if (isProfileCreated) {
            navigate('/')
          } else {
            navigate('/init-profile')

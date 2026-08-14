@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { BookOpen, Bot, CalendarFold, Hash, Tag, Users, X } from 'lucide-react'
+import { BookOpen, Bot, CalendarFold, Hash, Tag, Users, X, Crown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
@@ -105,7 +105,12 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
       icon: BotFlashCardsIcon,
       iconSize: 20,
       label: t('card.prompt', 'Kişilik Promptu'),
-      value: personalityPrompt,
+      value: personalityPrompt || (
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-danger)' }} title={t('card.not_creator', 'Orijinal prompta erişmek için yaratıcısı olmalısınız.')}>
+          <Crown size={16} /> 
+          {t('card.hidden_prompt', 'Gizli (Yalnızca Yaratıcı)')}
+        </span>
+      ),
       multiline: true,
     },
     {

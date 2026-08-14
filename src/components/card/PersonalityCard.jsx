@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Bot, Check, Info, Pencil, Users } from 'lucide-react'
+import { Bot, Check, Info, Pencil, Users, Crown, Award } from 'lucide-react'
 import CardActorListModal from './CardActorListModal'
 import CardDetailModal from './CardDetailModal'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -181,13 +181,18 @@ export default function PersonalityCard({
     card?.cardId ??
     null
 
+  const innerCard = card?.card ?? card?.ownership?.originalCard ?? card
+  const currentAcqType = innerCard?.acquisitionType ?? null
+
   const assignedBots = card?.assignedBots || []
   const assignedTribes = card?.assignedTribes || []
   const isTribeAssigned = Boolean(card?.tribeId || card?.assignedTribeId || tribeAssigned)
   const isAssignedCard = Boolean(
     card?.assignmentId || card?.botId || card?.tribeId || card?.assignedTribeId || tribeAssigned
   )
-  const isOwnerAssigned = isAssignedCard && !isTribeAssigned
+  const ownerActor = card?.ownership?.actor ?? card?.actor ?? null
+  const originTribe = isTribeAssigned && card?.tribe ? card.tribe : null
+  const hasAssigned = Boolean(assignedBots.length > 0 || assignedTribes.length > 0)
   const isSelectionDisabled =
     disabled ||
     locked ||
@@ -219,12 +224,46 @@ export default function PersonalityCard({
 
   return (
     <div
-      className={`personality-card ${filled ? 'personality-card--filled' : 'personality-card--empty'}${selectable ? ' personality-card--selectable' : ''}${selected ? ' personality-card--selected' : ''}${isSelectionDisabled ? ' personality-card--selection-disabled' : ''}${isTribeAssigned ? ' personality-card--tribe-assigned' : ''}${isOwnerAssigned ? ' personality-card--owner-assigned' : ''}`}
+      className={`personality-card ${filled ? 'personality-card--filled' : 'personality-card--empty'}${selectable ? ' personality-card--selectable' : ''}${selected ? ' personality-card--selected' : ''}${isSelectionDisabled ? ' personality-card--selection-disabled' : ''}${isAssignedCard ? ' personality-card--owner-assigned' : ''}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={filled ? 'button' : undefined}
       tabIndex={filled ? 0 : undefined}
     >
+      {currentAcqType === 0 && (
+        <span
+          title={t('card.creator_badge', 'Bu kartın yaratıcısısınız (Tüm haklar sizde)')}
+          style={{
+            position: 'absolute',
+            top: -14,
+            left: -8,
+            color: 'var(--color-warning)',
+            zIndex: 3,
+            filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+            transform: 'rotate(-25deg)',
+            pointerEvents: 'auto',
+          }}
+        >
+          <Crown size={28} strokeWidth={2.5} />
+        </span>
+      )}
+      {currentAcqType === 1 && (
+        <span
+          title={t('card.purchaser_badge', 'Bu kartı satın aldınız')}
+          style={{
+            position: 'absolute',
+            top: -14,
+            left: -8,
+            color: 'var(--color-primary)',
+            zIndex: 3,
+            filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+            transform: 'rotate(-25deg)',
+            pointerEvents: 'auto',
+          }}
+        >
+          <Award size={28} strokeWidth={2.5} />
+        </span>
+      )}
       <div className="personality-card__topline">
         <span className="personality-card__eyebrow">{slotNumber ? String(slotNumber) : ''}</span>
         <span className="personality-card__title">
@@ -255,14 +294,6 @@ export default function PersonalityCard({
         )}
       </div>
 
-      {filled && isAssignedCard && (
-        <span className="personality-card__type-badge">
-          {isTribeAssigned
-            ? tribeBadgeLabel || t('card.from_tribe', 'From Tribe')
-            : t('card.from_owner', 'From Owner')}
-        </span>
-      )}
-
       {hint && <p className="personality-card__hint">{hint}</p>}
 
       {tags.length > 0 && (
@@ -282,98 +313,128 @@ export default function PersonalityCard({
         <span className="personality-card__empty-copy">—/{t('card.card', 'Kart')}</span>
       )}
 
-      {(assignedBots.length > 0 || assignedTribes.length > 0) && (
+      {filled && (
         <div
+          className="personality-card__footer"
           style={{
             marginTop: 12,
             paddingTop: 12,
             borderTop: '1px solid var(--color-primary-light)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
           }}
         >
-          <span
-            style={{
-              fontSize: 9.5,
-              fontWeight: 700,
-              color: 'var(--color-text-secondary)',
-              textTransform: 'uppercase',
-              display: 'block',
-              marginBottom: 8,
-            }}
-          >
-            {t('card.yours', 'Assigned:')}
-          </span>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, zoom: 0.75 }}>
-            {assignedBots.map((b) => (
-              <ActorMinimalCard
-                key={b.actorId}
-                actor={b}
-                showHierarchyBtn={false}
-                showMindBtn={false}
-                showPoint={false}
-                showEditBtn={false}
-              />
-            ))}
-            {assignedTribes.map((tr) => (
-              <TribeMinimalCard
-                key={tr.tribeId}
-                {...tr}
-                variant="compact"
-                showMindBtn={false}
-                showEditBtn={false}
-                showPoint={false}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+          {(ownerActor || originTribe || hasAssigned) && (
+            <div className="personality-card__assignment-sources" style={{ margin: 0 }}>
+              {ownerActor && (
+                <div className="personality-card__assignment-row personality-card__assignment-row--owner">
+                  <span className="personality-card__assignment-label personality-card__assignment-label--owner">
+                    {t('card.owner_label', 'Sahip')}:
+                  </span>
+                  <ActorMinimalCard 
+                    actor={ownerActor} 
+                    showHierarchyBtn={false} 
+                    showMindBtn={false} 
+                    showEditBtn={false} 
+                    showPoint={false}
+                    clickable={false}
+                    variant="compact"
+                  />
+                </div>
+              )}
+              {originTribe && (
+                <div className={`personality-card__assignment-row personality-card__assignment-row--branch personality-card__assignment-row--tribe${hasAssigned ? ' has-next-sibling' : ''}`}>
+                  <span className="personality-card__assignment-label personality-card__assignment-label--tribe">
+                    {tribeBadgeLabel || t('card.from_tribe_label', 'Kabileden')}:
+                  </span>
+                  <TribeMinimalCard 
+                    tribeId={originTribe.tribeId}
+                    tribeName={originTribe.tribeName}
+                    tribePoint={originTribe.tribePoint}
+                    imageUrl={originTribe.imageUrl}
+                    clickable={false}
+                    variant="compact"
+                  />
+                </div>
+              )}
+              {hasAssigned && (
+                <div className="personality-card__assignment-row personality-card__assignment-row--branch personality-card__assignment-row--assigned" style={{ alignItems: 'flex-start' }}>
+                  <span className="personality-card__assignment-label personality-card__assignment-label--assigned" style={{ marginTop: '5px' }}>
+                    {t('card.assigned_to_label', 'Atadı')}:
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2, flex: 1, minWidth: 0 }}>
+                    {assignedBots.map((b) => (
+                      <ActorMinimalCard
+                        key={b.actorId}
+                        actor={b}
+                        showHierarchyBtn={false}
+                        showMindBtn={false}
+                        showPoint={false}
+                        showEditBtn={false}
+                        variant="compact"
+                      />
+                    ))}
+                    {assignedTribes.map((tr) => (
+                      <TribeMinimalCard
+                        key={tr.tribeId}
+                        {...tr}
+                        variant="compact"
+                        showMindBtn={false}
+                        showEditBtn={false}
+                        showPoint={false}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
-      {filled && (
-        <div
-          className="personality-card__stats"
-          style={{
-            marginTop: assignedBots.length > 0 || assignedTribes.length > 0 ? -2 : 12,
-            paddingTop: assignedBots.length > 0 || assignedTribes.length > 0 ? 0 : 12,
-            borderTop:
-              assignedBots.length > 0 || assignedTribes.length > 0
-                ? 'none'
-                : '1px solid var(--color-primary-light)',
-          }}
-        >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsDetailOpen(true)
+          <div
+            className="personality-card__stats"
+            style={{
+              marginTop: 0,
+              paddingTop: 0,
+              borderTop: 'none',
             }}
-            className="personality-card__stat"
-            title={t('card.details', 'Kart Detayları')}
           >
-            <Info size={12} />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              if (personalityCardId) setModalType('owners')
-            }}
-            className="personality-card__stat"
-            title={t('card.owners', 'Sahipler')}
-          >
-            <Users size={12} />
-            {ownershipCount}
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              if (personalityCardId) setModalType('assignees')
-            }}
-            className="personality-card__stat"
-            title={t('card.assignees', 'Atanmış Botlar')}
-          >
-            <Bot size={12} />
-            {assignmentCount}
-          </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsDetailOpen(true)
+              }}
+              className="personality-card__stat"
+              title={t('card.details', 'Kart Detayları')}
+            >
+              <Info size={12} />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (personalityCardId) setModalType('owners')
+              }}
+              className="personality-card__stat"
+              title={t('card.owners', 'Sahipler')}
+            >
+              <Users size={12} />
+              {ownershipCount}
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                if (personalityCardId) setModalType('assignees')
+              }}
+              className="personality-card__stat"
+              title={t('card.assignees', 'Atanmış Botlar')}
+            >
+              <Bot size={12} />
+              {assignmentCount}
+            </button>
+          </div>
         </div>
       )}
 

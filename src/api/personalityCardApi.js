@@ -18,6 +18,10 @@ export const personalityCardApi = {
     axiosInstance.get(`/PersonalityCard/owners/${cardId}`, { params: { page } }),
   getCardAssignees: (cardId, page) =>
     axiosInstance.get(`/PersonalityCard/assignees/${cardId}`, { params: { page } }),
-  getMarketplaceCards: (page = 1, query = '', orderType = '') =>
-    axiosInstance.get(`/PersonalityCard/marketplace`, { params: { page, query, orderType } }),
+  getMarketplaceCards: (page = 1, query = '', orderType = '') => {
+    const params = { page }
+    if (query) params.query = query
+    if (orderType) params.orderType = orderType
+    return axiosInstance.get(`/PersonalityCard/marketplace`, { params })
+  },
 }

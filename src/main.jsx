@@ -12,27 +12,27 @@ import './i18n'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: Infinity,         // Veriyi süresiz olarak taze kabul et (arka planda istek atma)
+      staleTime: Infinity, // Veriyi süresiz olarak taze kabul et (arka planda istek atma)
       refetchOnWindowFocus: false, // Sekme değişiminde gereksiz istekleri önler
-      retry: 1,                    // Hata durumunda sadece 1 kez tekrar dener
+      retry: 1, // Hata durumunda sadece 1 kez tekrar dener
     },
   },
   mutationCache: new MutationCache({
     onError: (error, variables, context, mutation) => {
       // Varsayılan olarak kapalı. Sadece spesifik mutasyonlarda açmak için:
       // useMutation({ ..., meta: { showErrorToast: true } })
-      if (!mutation.meta?.showErrorToast) return;
+      if (!mutation.meta?.showErrorToast) return
 
-      let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.'];
+      let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.']
       if (error.response?.data?.errors) {
         if (Array.isArray(error.response.data.errors)) {
-          errorMessages = error.response.data.errors.map(e => e.description || e.message || e);
+          errorMessages = error.response.data.errors.map((e) => e.description || e.message || e)
         } else if (typeof error.response.data.errors === 'object') {
-          errorMessages = Object.values(error.response.data.errors).flat();
+          errorMessages = Object.values(error.response.data.errors).flat()
         }
       }
-      
-      errorMessages.forEach(msg => {
+
+      errorMessages.forEach((msg) => {
         toast.error(msg, {
           style: {
             borderRadius: '10px',
@@ -42,24 +42,24 @@ const queryClient = new QueryClient({
           },
         })
       })
-    }
+    },
   }),
   queryCache: new QueryCache({
     onError: (error, query) => {
       // Varsayılan olarak kapalı. Sadece spesifik sorgularda açmak için:
       // useQuery({ ..., meta: { showErrorToast: true } })
-      if (!query.meta?.showErrorToast) return;
-      
-      let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.'];
+      if (!query.meta?.showErrorToast) return
+
+      let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.']
       if (error.response?.data?.errors) {
         if (Array.isArray(error.response.data.errors)) {
-          errorMessages = error.response.data.errors.map(e => e.description || e.message || e);
+          errorMessages = error.response.data.errors.map((e) => e.description || e.message || e)
         } else if (typeof error.response.data.errors === 'object') {
-          errorMessages = Object.values(error.response.data.errors).flat();
+          errorMessages = Object.values(error.response.data.errors).flat()
         }
       }
-      
-      errorMessages.forEach(msg => {
+
+      errorMessages.forEach((msg) => {
         toast.error(msg, {
           style: {
             borderRadius: '10px',
@@ -69,8 +69,8 @@ const queryClient = new QueryClient({
           },
         })
       })
-    }
-  })
+    },
+  }),
 })
 
 import { BrowserRouter } from 'react-router-dom'

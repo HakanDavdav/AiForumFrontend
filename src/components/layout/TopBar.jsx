@@ -308,7 +308,7 @@ export default function TopBar() {
           <Menu size={20} />
         </button>
 
-        {/* Logo */}
+        {/* Bletchly Logo Resized */}
         <div
           style={{
             display: 'flex',
@@ -316,6 +316,8 @@ export default function TopBar() {
             gap: 0, // Sıfır boşluk
             cursor: 'pointer',
             flexShrink: 0,
+            transform: 'scale(0.85)',
+            transformOrigin: 'left center'
           }}
           onClick={() => navigate('/')}
         >
@@ -752,6 +754,7 @@ export default function TopBar() {
         >
           {/* Hakan Davdav Linkleri */}
           <div
+            className="hide-under-900"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -996,21 +999,21 @@ export default function TopBar() {
         {/* Cache buttons */}
         <button
           className={`btn ${activeLeftCacheType === 'trending' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
+          style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('trending')}
         >
           <Flame size={14} /> {t('sort.popular', 'Popüler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
+          style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('recent')}
         >
           <Clock8 size={14} /> {t('sort.new')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
+          style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
           title={t('sort.best_desc', 'dünün en beğenilenleri')}
         >
@@ -1018,7 +1021,7 @@ export default function TopBar() {
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
-          style={{ padding: '4px 7px', minWidth: '75px', fontSize: 11.5 }}
+          style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('mostDisliked')}
           title={t('sort.worst_desc', 'dünün en nefret edilenleri')}
         >
@@ -1031,6 +1034,7 @@ export default function TopBar() {
         {isLoggedIn && (
           <>
             <div
+              className="hide-under-900"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -1044,7 +1048,7 @@ export default function TopBar() {
               <div style={{ position: 'relative' }} ref={myTribesRef}>
                 <button
                   className="btn btn-outline"
-                  style={{ width: 90, padding: '4px 7px', fontSize: 11.5 }}
+                  style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     setTribesDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -1146,7 +1150,7 @@ export default function TopBar() {
               <div style={{ position: 'relative' }} ref={myBotsRef}>
                 <button
                   className="btn btn-outline"
-                  style={{ width: 90, padding: '4px 7px', fontSize: 11.5 }}
+                  style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     setBotsDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -1251,7 +1255,7 @@ export default function TopBar() {
 
               <button
                 className="btn btn-outline"
-                style={{ width: 90, padding: '4px 7px', fontSize: 11.5 }}
+                style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
                 onClick={() => navigate('/cards')}
               >
                 {t('card.cards', 'Cards')}
@@ -1262,11 +1266,13 @@ export default function TopBar() {
 
         {isLoggedIn && (
           <div
+            className="hide-under-900"
             style={{ width: 1, height: 30, background: 'var(--color-border)', margin: '0 8px' }}
           />
         )}
 
         <div
+          className="hide-under-900"
           style={{
             display: 'flex',
             alignItems: 'center',

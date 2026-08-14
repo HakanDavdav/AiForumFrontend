@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
+import ActorMinimalCard from '../../components/actor/ActorMinimalCard'
 
 export default function MarketplacePage() {
   const navigate = useNavigate()
@@ -289,11 +290,7 @@ export default function MarketplacePage() {
           gap: 16,
         }}
       >
-        {isLoading && visibleCards.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center' }}>
-            {t('common.loading', 'Yükleniyor...')}
-          </div>
-        ) : visibleCards.length === 0 ? (
+        {isLoading && visibleCards.length === 0 ? null : visibleCards.length === 0 ? (
           <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
             {t(
               'card.no_marketplace_cards',
@@ -314,33 +311,66 @@ export default function MarketplacePage() {
                 gap: 12,
               }}
             >
-              <PersonalityCard card={card} />
+              <PersonalityCard card={card} showMark={false} />
+
+              {card.actor && (
+                <div
+                  style={{
+                    marginTop: 8,
+                    paddingTop: 12,
+                    borderTop: '1px solid var(--color-border)',
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'block',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: 'var(--color-text-secondary)',
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {t('card.seller', 'Satıcı:')}
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, zoom: 0.75 }}>
+                    <ActorMinimalCard
+                      actor={card.actor}
+                      showHierarchyBtn={false}
+                      showMindBtn={false}
+                      showPoint={false}
+                      showEditBtn={false}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginTop: 4,
+                  marginTop: 12,
                 }}
               >
                 {/* Only show price if isListedOnMarketplace is true */}
-                {card.isListedOnMarketplace ? (
+                {card.card?.isListedOnMarketplace ? (
                   <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-primary)' }}>
-                    {card.price} AP
+                    {card.card?.price} AP
                   </span>
                 ) : (
                   <span></span> /* Placeholder for space-between */
                 )}
                 <span style={{ fontSize: 12, color: 'var(--color-text-faint)' }}>
-                  {t('card.sales', 'Satış')}: {card.ownershipCount || 0}
+                  {t('card.sales', 'Satış')}: {card.card?.ownershipCount || 0}
                 </span>
               </div>
 
               <button
                 className="btn btn-sm btn-primary w-full"
-                onClick={() => handleBuy(card.cardId, card.price)}
-                disabled={buyMutation.isPending || !card.isListedOnMarketplace}
+                onClick={() => handleBuy(card.cardId, card.card?.price)}
+                disabled={buyMutation.isPending || !card.card?.isListedOnMarketplace}
               >
                 <ShoppingCart size={14} style={{ marginRight: 4 }} /> {t('card.buy', 'Satın Al')}
               </button>

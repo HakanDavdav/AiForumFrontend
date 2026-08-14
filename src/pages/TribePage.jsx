@@ -9,6 +9,7 @@ import {
   Brain,
   CalendarFold,
   Users,
+  Crown,
 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
@@ -74,6 +75,7 @@ export default function TribePage() {
   const isLeader = tribe.tribeMemberships?.some(
     (m) => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader'
   )
+  const isMyTribe = useMyEntitiesStore.getState().myTribes?.some((t) => t.tribeId === tribeId)
 
   return (
     <div className="flex-col gap-4">
@@ -157,8 +159,27 @@ export default function TribePage() {
               flexDirection: 'column',
               alignItems: 'center',
               paddingBottom: 0,
+              position: 'relative'
             }}
           >
+            {isMyTribe && (
+              <span
+                title={t('common.your_tribe', 'Senin Kabilen')}
+                style={{
+                  position: 'absolute',
+                  top: -11,
+                  left: -5,
+                  color: 'var(--color-warning)',
+                  zIndex: 2,
+                  filter: 'drop-shadow(0px 3px 4px rgba(0,0,0,0.5))',
+                  transform: 'rotate(-15deg)',
+                  display: 'flex',
+                  pointerEvents: 'auto'
+                }}
+              >
+                <Crown size={40} strokeWidth={2.5} />
+              </span>
+            )}
             {tribe.imageUrl ? (
               <img
                 src={tribe.imageUrl}

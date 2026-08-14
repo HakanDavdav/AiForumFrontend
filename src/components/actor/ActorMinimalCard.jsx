@@ -63,12 +63,18 @@ export default function ActorMinimalCard({
     }
   }
 
+  const hasExtraElements =
+    showHierarchyBtn ||
+    (showMindBtn && actor.discriminator === 'Bot') ||
+    (showEditBtn && isOwner) ||
+    (showPoint && actor.actorPoint != null)
+
   return (
     <div
       className="actor-chip flex items-center gap-1"
       style={{
         maxWidth: '100%',
-        paddingRight: showHierarchyBtn || isMe || isMyBot ? 4 : undefined,
+        paddingRight: hasExtraElements ? 4 : undefined,
         ...chipStyle,
       }}
     >

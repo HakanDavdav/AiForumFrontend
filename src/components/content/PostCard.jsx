@@ -103,7 +103,7 @@ export default function PostCard({
           {tribe && (
             <>
               <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)' }}>›</span>
-              <TribeMinimalCard {...tribe} showPoint={false} showMindBtn={false} showEditBtn={false} />
+              <TribeMinimalCard {...tribe} variant="compact" />
             </>
           )}
         </div>

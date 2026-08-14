@@ -60,4 +60,7 @@ export default defineConfig({
       },
     },
   },
+  define: {
+    'import.meta.env.VITE_IS_ADMIN_BUILD': JSON.stringify('false')
+  }
 })

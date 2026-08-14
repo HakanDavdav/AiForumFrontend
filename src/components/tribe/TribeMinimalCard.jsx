@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
 import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
-import { Edit2, Brain } from 'lucide-react'
+import { Edit2, Brain, Crown } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
@@ -20,6 +20,8 @@ export default function TribeMinimalCard({
   showPoint = true,
   showMindBtn = true,
   showEditBtn = true,
+  variant = 'expanded',
+  style = {},
 }) {
   useDevLog('TribeMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
@@ -27,8 +29,8 @@ export default function TribeMinimalCard({
   const { t } = useTranslation()
 
   const myTribes = useMyEntitiesStore((s) => s.myTribes)
-
   const isMyTribe = myTribes?.some((t) => t.tribeId === tribeId)
+  const isCompact = variant === 'compact'
 
   const handleClick = () => {
     if (clickable) navigate('/tribe?tribeId=' + tribeId)
@@ -48,32 +50,58 @@ export default function TribeMinimalCard({
 
   return (
     <div
-      className="tribe-card"
+      className={`tribe-card ${isCompact ? 'tribe-card--compact' : 'tribe-card--expanded'}`}
       onClick={handleClick}
-      style={{ width: '100%', cursor: clickable ? 'pointer' : 'default', margin: 0 }}
+      style={{
+        width: isCompact ? 'auto' : '100%',
+        maxWidth: '100%',
+        cursor: clickable ? 'pointer' : 'default',
+        margin: 0,
+        ...style,
+      }}
     >
-      {imageUrl ? (
-        <img src={imageUrl} alt={tribeName} className="tribe-card-img" />
-      ) : (
-        <div
-          className="tribe-card-img"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--color-primary-light)',
-            color: 'var(--color-primary)',
-            fontWeight: 700,
-            fontSize: 16,
-          }}
-        >
-          {tribeName?.[0] || 'T'}
-        </div>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
+        {imageUrl ? (
+          <img src={imageUrl} alt={tribeName} className="tribe-card-img" />
+        ) : (
+          <div
+            className="tribe-card-img"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--color-primary-light)',
+              color: 'var(--color-primary)',
+              fontWeight: 700,
+              fontSize: isCompact ? 11 : 16,
+            }}
+          >
+            {tribeName?.[0] || 'T'}
+          </div>
+        )}
+        {isMyTribe && (
+          <span
+            title={t('common.your_tribe', 'Senin Kabilen')}
+            style={{
+              position: 'absolute',
+              top: isCompact ? -3 : -4,
+              left: isCompact ? -3 : -4,
+              color: 'var(--color-warning)',
+              zIndex: 2,
+              filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+              transform: 'rotate(-15deg)',
+              display: 'flex',
+              pointerEvents: 'auto',
+            }}
+          >
+            <Crown size={isCompact ? 12 : 16} strokeWidth={2.5} />
+          </span>
+        )}
+      </div>
+      <div style={{ flex: isCompact ? '0 1 auto' : 1, minWidth: 0 }}>
         <div className="tribe-card-name truncate">{tribeName || 'İsimsiz Tribe'}</div>
       </div>
-      {showMindBtn && (
+      {!isCompact && showMindBtn && (
         <button
           type="button"
           className="actor-chip-hier-btn"
@@ -84,7 +112,7 @@ export default function TribeMinimalCard({
           <Brain size={12} />
         </button>
       )}
-      {isMyTribe && showEditBtn && (
+      {!isCompact && isMyTribe && showEditBtn && (
         <button
           type="button"
           className="actor-chip-hier-btn"
@@ -95,7 +123,7 @@ export default function TribeMinimalCard({
           <Edit2 size={12} />
         </button>
       )}
-      {showPoint && tribePoint != null && (
+      {!isCompact && showPoint && tribePoint != null && (
         <span
           style={{
             fontSize: 10,
