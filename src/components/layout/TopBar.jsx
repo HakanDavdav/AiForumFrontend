@@ -3,21 +3,16 @@ import {
   Search,
   Settings,
   User,
-  ChevronDown,
   Menu,
   Bell,
   LogOut,
   PenLine,
   Filter,
-  Flame,
-  Clock8,
   ThumbsUp,
-  Skull,
   Podium,
   Sun,
   Moon,
   Bot,
-  Star,
   CirclePlus,
   PaintbrushVertical,
 } from 'lucide-react'
@@ -46,7 +41,7 @@ import Logo from '../common/Logo'
 
 export default function TopBar() {
   useDevLog('TopBar', arguments[0] || {})
-  const { actorId, isLoggedIn, logout: storeLogout } = useAuthStore()
+  const { actorId, isLoggedIn, isAdmin, logout: storeLogout } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
   const {
@@ -56,9 +51,6 @@ export default function TopBar() {
     activeLeftCacheType,
     setActiveLeftCacheType,
   } = useUIStore()
-  const { t, i18n } = useTranslation()
-  const currentLang = i18n.language || 'tr'
-
   const langs = [
     { code: 'tr', label: 'Türkçe', flagUrl: 'https://flagcdn.com/w20/tr.png' },
     { code: 'en', label: 'English', flagUrl: 'https://flagcdn.com/w20/us.png' },
@@ -70,6 +62,12 @@ export default function TopBar() {
     { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },
     { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w20/sa.png' },
   ]
+
+  const { t, i18n } = useTranslation()
+  const rawLang = (i18n.language || 'tr').toLowerCase()
+  const activeLangObj =
+    langs.find((l) => l.code === rawLang || l.code === rawLang.split('-')[0]) || langs[0]
+  const currentLang = activeLangObj.code
 
   const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
   const [isBotShaking, setIsBotShaking] = useState(false)
@@ -317,7 +315,7 @@ export default function TopBar() {
             cursor: 'pointer',
             flexShrink: 0,
             transform: 'scale(0.85)',
-            transformOrigin: 'left center'
+            transformOrigin: 'left center',
           }}
           onClick={() => navigate('/')}
         >
@@ -350,7 +348,16 @@ export default function TopBar() {
               style={{ gap: 4, whiteSpace: 'nowrap' }}
             >
               {searchModeOptions.find((o) => o.key === searchMode)?.label}
-              <ChevronDown size={12} />
+              <span
+                style={{
+                  fontSize: 9,
+                  display: 'inline-block',
+                  transform: searchModeDropdown ? 'rotate(180deg)' : 'none',
+                  transition: 'transform var(--transition-fast)',
+                }}
+              >
+                ▼
+              </span>
             </button>
             <AnimatePresence>
               {searchModeDropdown && (
@@ -864,16 +871,14 @@ export default function TopBar() {
                   height: 30,
                 }}
               >
-                {langs.find((l) => l.code === currentLang)?.flagUrl ? (
+                {activeLangObj.flagUrl ? (
                   <img
-                    src={langs.find((l) => l.code === currentLang).flagUrl}
-                    alt={currentLang}
+                    src={activeLangObj.flagUrl}
+                    alt={activeLangObj.code}
                     style={{ width: 19, height: 14, borderRadius: 2 }}
                   />
                 ) : (
-                  <span style={{ fontSize: 14 }}>
-                    {langs.find((l) => l.code === currentLang)?.fallbackEmoji || '🇹🇷'}
-                  </span>
+                  <span style={{ fontSize: 14 }}>{activeLangObj.fallbackEmoji || '🇹🇷'}</span>
                 )}
               </button>
               <AnimatePresence>
@@ -955,6 +960,7 @@ export default function TopBar() {
                   chipStyle={{ minWidth: 110, maxWidth: 205, fontSize: 12.5 }}
                 />
               </div>
+
               <button
                 className="btn-icon"
                 onClick={() => logoutMutation.mutate()}
@@ -1002,14 +1008,14 @@ export default function TopBar() {
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('trending')}
         >
-          <Flame size={14} /> {t('sort.popular', 'Popüler')}
+          {t('sort.popular', 'Popüler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('recent')}
         >
-          <Clock8 size={14} /> {t('sort.new')}
+          {t('sort.new')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
@@ -1017,7 +1023,7 @@ export default function TopBar() {
           onClick={() => setActiveLeftCacheType('mostLiked')}
           title={t('sort.best_desc', 'dünün en beğenilenleri')}
         >
-          <Star size={14} /> {t('sort.best', 'En İyiler')}
+          {t('sort.best', 'En İyiler')}
         </button>
         <button
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
@@ -1025,7 +1031,7 @@ export default function TopBar() {
           onClick={() => setActiveLeftCacheType('mostDisliked')}
           title={t('sort.worst_desc', 'dünün en nefret edilenleri')}
         >
-          <Skull size={14} /> {t('sort.worst', 'En Kötüler')}
+          {t('sort.worst', 'En Kötüler')}
         </button>
 
         <div style={{ width: 1, height: 32, background: 'var(--color-border)', margin: '0 8px' }} />
@@ -1057,7 +1063,17 @@ export default function TopBar() {
                     setBotsDropdownPos(null)
                   }}
                 >
-                  {t('common.tribes', 'Tribes')} <ChevronDown size={12} />
+                  {t('common.tribes', 'Tribes')}{' '}
+                  <span
+                    style={{
+                      fontSize: 9,
+                      display: 'inline-block',
+                      transform: isMyTribesOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform var(--transition-fast)',
+                    }}
+                  >
+                    ▼
+                  </span>
                 </button>
                 <AnimatePresence>
                   {isMyTribesOpen && tribesDropdownPos && (
@@ -1159,7 +1175,17 @@ export default function TopBar() {
                     setTribesDropdownPos(null)
                   }}
                 >
-                  {t('common.bots', 'Bots')} <ChevronDown size={12} />
+                  {t('common.bots', 'Bots')}{' '}
+                  <span
+                    style={{
+                      fontSize: 9,
+                      display: 'inline-block',
+                      transform: isMyBotsOpen ? 'rotate(180deg)' : 'none',
+                      transition: 'transform var(--transition-fast)',
+                    }}
+                  >
+                    ▼
+                  </span>
                 </button>
                 <AnimatePresence>
                   {isMyBotsOpen && botsDropdownPos && (
@@ -1260,6 +1286,17 @@ export default function TopBar() {
               >
                 {t('card.cards', 'Cards')}
               </button>
+
+              {import.meta.env.VITE_IS_ADMIN_BUILD === 'true' && isAdmin && (
+                <button
+                  className="btn btn-outline"
+                  style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
+                  onClick={() => navigate('/admin/panel')}
+                  title="Admin Panel"
+                >
+                  Admin
+                </button>
+              )}
             </div>
           </>
         )}

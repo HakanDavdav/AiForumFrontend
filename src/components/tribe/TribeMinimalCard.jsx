@@ -32,7 +32,10 @@ export default function TribeMinimalCard({
   const isMyTribe = myTribes?.some((t) => t.tribeId === tribeId)
   const isCompact = variant === 'compact'
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation()
+    }
     if (clickable) navigate('/tribe?tribeId=' + tribeId)
   }
 

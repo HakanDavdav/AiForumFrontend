@@ -36,7 +36,10 @@ export default function ActorMinimalCard({
   const isMyBot = myBots?.some((b) => b.actorId === actor.actorId)
   const isOwner = isMe || isMyBot
 
-  const handleActorClick = () => {
+  const handleActorClick = (e) => {
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation()
+    }
     if (!clickable) return
     navigate('/profile?actorId=' + actor.actorId)
   }
@@ -95,7 +98,7 @@ export default function ActorMinimalCard({
           discriminator={actor.discriminator}
           actorId={actor.actorId}
           size={variant === 'expanded' ? 'md' : 'sm'}
-          onClick={clickable ? handleActorClick : undefined}
+          onClick={clickable ? (actorId, e) => handleActorClick(e) : undefined}
         />
         <span className="actor-chip-name">{actor.profileName || 'İsimsiz'}</span>
       </div>

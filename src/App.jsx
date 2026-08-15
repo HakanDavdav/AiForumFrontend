@@ -1,7 +1,7 @@
 import MainLayout from './components/layout/MainLayout'
 import useUIStore from './store/uiStore'
 import useThemeStore from './store/themeStore'
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
 import InitProfileGuard from './components/auth/InitProfileGuard'
 
@@ -30,7 +30,9 @@ import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 
-import AdminApp from './AdminApp'
+const AdminApp = import.meta.env.VITE_IS_ADMIN_BUILD === 'true'
+  ? lazy(() => import('./AdminApp'))
+  : () => null
 
 export default function App() {
   const { isDarkMode, isGreenMode } = useThemeStore()
@@ -103,7 +105,14 @@ export default function App() {
         <InitProfileGuard>
           <Routes>
             {import.meta.env.VITE_IS_ADMIN_BUILD === 'true' && (
-              <Route path="/admin/*" element={<AdminApp />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading Admin...</div>}>
+                    <AdminApp />
+                  </Suspense>
+                }
+              />
             )}
             <Route path="/" element={<FeedPage />} />
             <Route path="/post" element={<PostDetailPage />} />

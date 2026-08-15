@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Bot, Check, Info, Pencil, Users, Crown, Award } from 'lucide-react'
+import { Bot, Check, Info, Pencil, Users, Crown } from 'lucide-react'
 import CardActorListModal from './CardActorListModal'
 import CardDetailModal from './CardDetailModal'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -254,14 +254,31 @@ export default function PersonalityCard({
             position: 'absolute',
             top: -14,
             left: -8,
-            color: 'var(--color-primary)',
+            color: '#b87333',
             zIndex: 3,
             filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
-            transform: 'rotate(-25deg)',
+            transform: 'rotate(-18deg)',
             pointerEvents: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
           }}
         >
-          <Award size={28} strokeWidth={2.5} />
+          <Crown size={24} strokeWidth={2.5} />
+          <span
+            style={{
+              marginLeft: '-4px',
+              marginTop: '4px',
+              fontSize: '25px',
+              fontWeight: '900',
+              fontFamily: '"Arial Black", Impact, system-ui, sans-serif',
+              lineHeight: 1,
+              color: '#22c55e',
+              textShadow: '0 0 3px rgba(34, 197, 94, 0.35), 0 1px 2px rgba(0,0,0,0.8)',
+              WebkitTextStroke: '0.6px #052e16',
+            }}
+          >
+            $
+          </span>
         </span>
       )}
       <div className="personality-card__topline">
@@ -338,7 +355,7 @@ export default function PersonalityCard({
                     showMindBtn={false} 
                     showEditBtn={false} 
                     showPoint={false}
-                    clickable={false}
+                    clickable={true}
                     variant="compact"
                   />
                 </div>
@@ -353,7 +370,7 @@ export default function PersonalityCard({
                     tribeName={originTribe.tribeName}
                     tribePoint={originTribe.tribePoint}
                     imageUrl={originTribe.imageUrl}
-                    clickable={false}
+                    clickable={true}
                     variant="compact"
                   />
                 </div>
@@ -372,6 +389,7 @@ export default function PersonalityCard({
                         showMindBtn={false}
                         showPoint={false}
                         showEditBtn={false}
+                        clickable={true}
                         variant="compact"
                       />
                     ))}
@@ -380,6 +398,7 @@ export default function PersonalityCard({
                         key={tr.tribeId}
                         {...tr}
                         variant="compact"
+                        clickable={true}
                         showMindBtn={false}
                         showEditBtn={false}
                         showPoint={false}

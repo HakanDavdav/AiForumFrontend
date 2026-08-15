@@ -1,73 +1,75 @@
 import { useState } from 'react'
-import { LogOut } from 'lucide-react'
-import useAuthStore from '../../store/authStore'
-import BotAdminPanel from '../../components/admin/BotAdminPanel'
-import TribeAdminPanel from '../../components/admin/TribeAdminPanel'
+import SystemEventsPanel from '../../components/admin/SystemEventsPanel'
+import MemoryManagementPanel from '../../components/admin/MemoryManagementPanel'
 import ActorManagementPanel from '../../components/admin/ActorManagementPanel'
 import ConfigManagementPanel from '../../components/admin/ConfigManagementPanel'
 import Logo from '../../components/common/Logo'
 
 export default function AdminPage() {
-  const { logout } = useAuthStore()
   const [activeTab, setActiveTab] = useState('config')
-
-  const handleLogout = () => {
-    logout()
-    window.location.href = 'http://localhost:5173/login'
-  }
 
   const tabs = [
     { id: 'config', label: 'Background Services & Config' },
-    { id: 'bot', label: 'Bot Management' },
-    { id: 'tribe', label: 'Tribe Management' },
+    { id: 'events', label: 'System Events' },
+    { id: 'memory', label: 'Memory Management' },
     { id: 'actor', label: 'Actor Management' },
   ]
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex-col">
-      <header className="flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-6 shrink-0">
-        <div className="flex items-center gap-3">
-          <Logo width={30} height={40} fill="var(--color-primary)" />
-          <h1 className="text-xl font-bold text-primary">Admin Control Panel</h1>
+    <div className="flex flex-col w-full min-h-screen" style={{ color: 'var(--color-text)' }}>
+      {/* Header / Tabs */}
+      <div
+        className="flex flex-col shrink-0 border-b"
+        style={{
+          background: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+        }}
+      >
+        <div className="flex justify-center items-center gap-3 px-4 py-4 border-b" style={{ borderColor: 'var(--color-border)', marginTop: '4px' }}>
+          <Logo width={24} height={24} fill="var(--color-primary)" />
+          <span style={{ fontWeight: 800, fontSize: 18 }}>Admin</span>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-medium hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
-        >
-          <LogOut size={16} />
-          Logout
-        </button>
-      </header>
-      
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shrink-0">
-          <nav className="flex flex-col gap-1 p-4">
-            {tabs.map((tab) => (
+        
+        {/* Horizontal Navigation */}
+        <nav className="flex justify-center overflow-x-auto px-4 gap-2 hide-scrollbar" style={{ paddingTop: '16px', paddingBottom: '12px' }}>
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-primary text-white'
-                    : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-                }`}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: 11.5,
+                  fontWeight: isActive ? 600 : 500,
+                  transition: 'all var(--transition-fast)',
+                  background: isActive ? 'var(--color-primary)' : 'var(--color-surface-2)',
+                  color: isActive ? '#ffffff' : 'var(--color-text)',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.background = 'var(--color-surface-hover)'
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.background = 'var(--color-surface-2)'
+                }}
               >
                 {tab.label}
               </button>
-            ))}
-          </nav>
-        </aside>
+            )
+          })}
+        </nav>
+      </div>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-50 dark:bg-gray-900">
-          <div className="mx-auto max-w-5xl">
-            {activeTab === 'config' && <ConfigManagementPanel />}
-            {activeTab === 'bot' && <BotAdminPanel />}
-            {activeTab === 'tribe' && <TribeAdminPanel />}
-            {activeTab === 'actor' && <ActorManagementPanel />}
-          </div>
-        </main>
+      {/* Content Area */}
+      <div className="flex-1 flex flex-col p-4 md:p-6 w-full">
+        {activeTab === 'config' && <ConfigManagementPanel />}
+        {activeTab === 'events' && <SystemEventsPanel />}
+        {activeTab === 'memory' && <MemoryManagementPanel />}
+        {activeTab === 'actor' && <ActorManagementPanel />}
       </div>
     </div>
   )

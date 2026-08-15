@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, Podium } from 'lucide-react'
+import { Podium } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
@@ -224,7 +224,17 @@ function CacheWidget({ title, items, type, onViewAll }) {
         }}
       >
         {title}
-        {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        <span
+          style={{
+            fontSize: 11,
+            color: 'var(--color-text-muted)',
+            transform: expanded ? 'rotate(180deg)' : 'none',
+            transition: 'transform var(--transition-fast)',
+            display: 'inline-block',
+          }}
+        >
+          ▼
+        </span>
       </button>
 
       <AnimatePresence>

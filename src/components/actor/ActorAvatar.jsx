@@ -61,7 +61,8 @@ export default function ActorAvatar({
   const handleClick = (e) => {
     if (onClick) {
       e.preventDefault()
-      onClick(actorId)
+      e.stopPropagation()
+      onClick(actorId, e)
     }
   }
 

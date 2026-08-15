@@ -8,8 +8,8 @@ export default function InitProfileGuard({ children }) {
   const location = useLocation()
 
   useEffect(() => {
-    // Sadece kullanıcı giriş yapmışsa ve profili tamamlanmamışsa
-    if (actorId && !isProfileCreated && location.pathname !== '/init-profile') {
+    // Sadece kullanıcı giriş yapmışsa ve profili tamamlanmamışsa (admin sayfaları hariç)
+    if (actorId && !isProfileCreated && location.pathname !== '/init-profile' && !location.pathname.startsWith('/admin')) {
       navigate('/init-profile', { replace: true })
     }
   }, [actorId, isProfileCreated, location.pathname, navigate])

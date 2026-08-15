@@ -1,10 +1,19 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { createPortal } from 'react-dom'
-import { X } from 'lucide-react'
+import { X, Crown } from 'lucide-react'
 import { personalityCardApi } from '../../api/personalityCardApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+
+function formatDate(value) {
+  if (!value) return null
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return String(value)
+  const datePart = date.toLocaleDateString('tr-TR')
+  const timePart = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+  return `${datePart} ${timePart}`
+}
 
 export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
   useDevLog('CardActorListModal', arguments[0] || {})
@@ -56,7 +65,7 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
       <div
         className="modal-box"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: 400, height: '60vh', display: 'flex', flexDirection: 'column' }}
+        style={{ maxWidth: 560, height: '75vh', display: 'flex', flexDirection: 'column' }}
       >
         <div className="flex items-center justify-between" style={{ marginBottom: 16 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600 }}>
@@ -84,13 +93,94 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
             <p className="empty-state">{t('card.no_actors', 'Henüz kimse yok.')}</p>
           ) : (
             <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
-              {items.map((actor) => (
-                <div key={actor.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <ActorMinimalCard actor={actor} showHierarchyBtn={false} clickable={true} />
+              {items.map((item, idx) => {
+                const isOwnerType = type === 'owners'
+                const actor = isOwnerType ? (item.actor || item) : item
+                const acqType = isOwnerType ? item.acquisitionType : null
+                const acquiredAt = isOwnerType ? item.acquiredAt : null
+                const key = item.ownershipId || item.actorId || actor?.actorId || idx
+
+                return (
+                  <div
+                    key={key}
+                    className="lb-card"
+                    style={{
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <ActorMinimalCard actor={actor} showHierarchyBtn={false} clickable={true} />
+                    </div>
+
+                    {isOwnerType && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {acqType === 0 && (
+                          <span
+                            title={t('card.creator_badge', 'Bu kartın yaratıcısı')}
+                            style={{
+                              color: 'var(--color-warning)',
+                              filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.5))',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <Crown size={20} strokeWidth={2.5} />
+                          </span>
+                        )}
+                        {acqType === 1 && (
+                          <span
+                            title={t('card.purchaser_badge', 'Bu kartı satın aldı')}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.5))',
+                            }}
+                          >
+                            <Crown size={18} strokeWidth={2.5} color="#b87333" />
+                            <span
+                              style={{
+                                marginLeft: '-3px',
+                                marginTop: '3px',
+                                fontSize: '18px',
+                                fontWeight: '900',
+                                fontFamily: '"Arial Black", Impact, system-ui, sans-serif',
+                                lineHeight: 1,
+                                color: '#22c55e',
+                                textShadow: '0 0 3px rgba(34, 197, 94, 0.35), 0 1px 2px rgba(0,0,0,0.8)',
+                                WebkitTextStroke: '0.5px #052e16',
+                              }}
+                            >
+                              $
+                            </span>
+                          </span>
+                        )}
+                        {acquiredAt && (
+                          <span
+                            style={{
+                              fontSize: 11,
+                              color: 'var(--color-text-muted)',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {formatDate(acquiredAt)}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
 
               {isFetchingNextPage && (
                 <div style={{ textAlign: 'center', padding: 16 }}>

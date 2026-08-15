@@ -1,60 +1,140 @@
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { adminApi } from '../../api/adminApi'
 import toast from 'react-hot-toast'
 
 export default function ActorManagementPanel() {
   const [actorId, setActorId] = useState('')
   const [points, setPoints] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSetPoints = async () => {
-    if (!actorId || !points) return toast.error('ActorId and Points are required')
-    setIsLoading(true)
-    try {
-      await adminApi.setActorPoint(actorId, parseInt(points, 10))
+  const setPointsMutation = useMutation({
+    mutationFn: ({ actorId, points }) => adminApi.setActorPoint(actorId, points),
+    meta: { showErrorToast: true },
+    onSuccess: () => {
       toast.success('Actor points updated successfully!')
-    } catch (err) {
-      toast.error('Failed to update actor points')
-      console.error(err)
-    } finally {
-      setIsLoading(false)
-    }
+    },
+  })
+
+  const handleSetPoints = () => {
+    if (!actorId || !points) return toast.error('ActorId and Points are required')
+    setPointsMutation.mutate({ actorId, points: parseInt(points, 10) })
   }
 
+  const isLoading = setPointsMutation.isPending
+
   return (
-    <div className="card-surface p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-      <h2 className="text-2xl font-bold mb-6">Actor Management</h2>
-      
-      <div className="flex flex-col gap-4 max-w-md">
-        <div className="form-group">
-          <label className="form-label text-sm font-medium mb-1 block">Actor ID (Guid)</label>
-          <input 
-            className="input w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700" 
-            placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
-            value={actorId}
-            onChange={e => setActorId(e.target.value)}
-          />
-        </div>
+    <div
+      className="card-surface"
+      style={{
+        padding: 24,
+        borderRadius: 'var(--radius-xl)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+      }}
+    >
+      {/* Header */}
+      <div
+        className="border-b"
+        style={{ borderColor: 'var(--color-border)', marginBottom: '12px', paddingBottom: '8px' }}
+      >
+        <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>
+          Actor Management
+        </h2>
+        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
+          Aktör puanı ve skor düzenleme
+        </p>
+      </div>
 
-        <div className="form-group mt-4">
-          <label className="form-label text-sm font-medium mb-1 block">New Score</label>
-          <input 
-            type="number"
-            className="input w-full p-2 border rounded-md dark:bg-gray-800 dark:border-gray-700" 
-            placeholder="e.g. 1000"
-            value={points}
-            onChange={e => setPoints(e.target.value)}
-          />
-        </div>
-
-        <div className="flex mt-4">
-          <button 
-            className="btn btn-primary px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors w-full"
-            onClick={handleSetPoints}
-            disabled={isLoading}
+      <div className="flex flex-col gap-6 w-full">
+        <div
+          style={{
+            padding: 16,
+            borderRadius: 'var(--radius-lg)',
+            background: 'var(--color-surface-2)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <div
+            style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--color-text)' }}
           >
-            Set Actor Points
-          </button>
+            Actor Score Settings
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '8px' }}>
+            <label
+              className="form-label"
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                marginBottom: 3,
+                display: 'block',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              Actor ID
+            </label>
+            <input
+              className="input w-full"
+              placeholder="e.g. 1847c130-aef0-4d9a-858f-0a02baf45dfd"
+              value={actorId}
+              onChange={(e) => setActorId(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                fontSize: 13,
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--color-surface)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text)',
+                fontFamily: 'monospace',
+              }}
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '10px' }}>
+            <label
+              className="form-label"
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                marginBottom: 3,
+                display: 'block',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              Yeni Puan
+            </label>
+            <input
+              type="number"
+              className="input w-full"
+              placeholder="e.g. 1500"
+              value={points}
+              onChange={(e) => setPoints(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                fontSize: 13,
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--color-surface)',
+                borderColor: 'var(--color-border)',
+                color: 'var(--color-text)',
+              }}
+            />
+          </div>
+
+          <div className="flex">
+            <button
+              className="btn btn-primary"
+              onClick={handleSetPoints}
+              disabled={isLoading}
+              style={{
+                fontSize: 11.5,
+                fontWeight: 500,
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              {isLoading ? 'Güncelleniyor...' : 'Puanı Güncelle'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

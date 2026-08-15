@@ -28,6 +28,7 @@ i18n
       ar: { translation: ar },
     },
     fallbackLng: 'tr',
+    load: 'languageOnly',
     debug: false,
     interpolation: {
       escapeValue: false,

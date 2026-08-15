@@ -42,7 +42,7 @@ export default function LoginPage() {
          setAuth(actorId, isProfileCreated, false, isAdmin)
          queryClient.invalidateQueries()
          if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
-           navigate('/admin')
+           navigate('/admin/panel')
          } else if (isProfileCreated) {
            navigate('/')
          } else {
@@ -68,7 +68,7 @@ export default function LoginPage() {
          setAuth(actorId, isProfileCreated, false, isAdmin)
          queryClient.invalidateQueries()
          if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
-           navigate('/admin')
+           navigate('/admin/panel')
          } else if (isProfileCreated) {
            navigate('/')
          } else {
@@ -90,7 +90,7 @@ export default function LoginPage() {
          setAuth(actorId, isProfileCreated, true, isAdmin)
          queryClient.invalidateQueries()
          if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
-           navigate('/admin')
+           navigate('/admin/panel')
          } else if (isProfileCreated) {
            navigate('/')
          } else {

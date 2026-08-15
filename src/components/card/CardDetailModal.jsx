@@ -259,7 +259,7 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
                     showHierarchyBtn={false}
                     showMindBtn={false}
                     showEditBtn={false}
-                    clickable={false}
+                    clickable={true}
                   />
                 ))}
                 {assignedTribes.map((assignedTribe) => (
@@ -269,7 +269,7 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
                     showPoint={false}
                     showMindBtn={false}
                     showEditBtn={false}
-                    clickable={false}
+                    clickable={true}
                   />
                 ))}
               </div>

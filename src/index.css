@@ -1834,12 +1834,44 @@ select {
   }
 }
 
+@keyframes pulse-ring {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn var(--transition-slow) ease forwards;
 }
 
 .animate-scale-in {
   animation: scaleIn var(--transition-base) ease forwards;
+}
+
+/* Config Management Card Header Hover Glow */
+.config-card-header {
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.config-card-title {
+  transition: color var(--transition-fast);
+}
+
+.config-card-arrow {
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.config-card-header:hover .config-card-title {
+  color: var(--color-primary) !important;
+}
+
+.config-card-header:hover .config-card-arrow {
+  color: var(--color-primary) !important;
 }
 
 /* â”€â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */

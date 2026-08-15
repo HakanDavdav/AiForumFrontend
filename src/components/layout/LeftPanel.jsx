@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { ChevronDown, ChevronUp, PenSquare, Flame, Clock8, ThumbsUp, Skull, Sparkles } from 'lucide-react'
+import { PenSquare, Flame, Clock8, ThumbsUp, Skull, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
@@ -233,7 +233,17 @@ export default function LeftPanel() {
                 </span>
               )}
             </span>
-            {isActivitiesExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            <span
+              style={{
+                fontSize: 11,
+                color: 'var(--color-text-muted)',
+                transform: isActivitiesExpanded ? 'rotate(180deg)' : 'none',
+                transition: 'transform var(--transition-fast)',
+                display: 'inline-block',
+              }}
+            >
+              ▼
+            </span>
           </button>
 
           <AnimatePresence>
@@ -430,12 +440,16 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const options = [
-    { value: 25, label: '25' },
-    ...(maxItems > 25 ? [{ value: 50, label: '50' }] : []),
-    ...(maxItems > 50 ? [{ value: 75, label: '75' }] : []),
-    { value: maxItems, label: `${t('left_panel.show_all')} (${maxItems})` },
+  const rawValues = [
+    25,
+    ...(maxItems > 25 ? [50] : []),
+    ...(maxItems > 50 ? [75] : []),
+    maxItems,
   ]
+  const options = Array.from(new Set(rawValues)).map((val) => ({
+    value: val,
+    label: String(val),
+  }))
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -445,21 +459,31 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
+          gap: 5.5,
           background: 'none',
           border: 'none',
           color: 'var(--color-text-secondary)',
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: 600,
           cursor: 'pointer',
-          padding: '2px 0',
+          padding: '1px 2px',
           fontFamily: 'inherit',
           lineHeight: 1,
           outline: 'none',
         }}
       >
         {limit}
-        <ChevronDown size={10} style={{ opacity: 0.6 }} />
+        <span
+          style={{
+            fontSize: 7.5,
+            color: 'var(--color-text-muted)',
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform var(--transition-fast)',
+            display: 'inline-block',
+          }}
+        >
+          ▼
+        </span>
       </button>
       {open && (
         <div
@@ -469,10 +493,10 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
             right: 0,
             background: 'var(--color-surface-2)',
             border: '1px solid var(--color-border)',
-            borderRadius: 8,
-            padding: 4,
+            borderRadius: 6,
+            padding: 3,
             zIndex: 100,
-            minWidth: 80,
+            minWidth: 55,
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           }}
         >
@@ -487,12 +511,12 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
                 background: opt.value === limit ? 'var(--color-primary-light)' : 'none',
                 border: 'none',
                 color: opt.value === limit ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: opt.value === limit ? 700 : 500,
-                padding: '5px 10px',
-                borderRadius: 5,
+                padding: '4px 6px',
+                borderRadius: 4,
                 cursor: 'pointer',
-                textAlign: 'left',
+                textAlign: 'center',
                 fontFamily: 'inherit',
                 lineHeight: 1,
                 outline: 'none',
