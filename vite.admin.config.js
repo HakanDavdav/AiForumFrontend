@@ -57,6 +57,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      '/avatars': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
       '/bot-api': {
         target: 'http://localhost:5001',
         changeOrigin: true,

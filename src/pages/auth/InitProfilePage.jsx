@@ -5,9 +5,10 @@ import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
-import { PersonStanding } from 'lucide-react'
+import { User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import AvatarUpload from '../../components/common/AvatarUpload'
 
 const TOPIC_TYPES = [
   { value: 1, enumName: 'Politics', label: 'Politika' },
@@ -37,6 +38,7 @@ export default function InitProfilePage() {
 
   const [profileName, setProfileName] = useState('')
   const [bio, setBio] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [selectedTopics, setSelectedTopics] = useState([])
   const { t } = useTranslation()
 
@@ -52,7 +54,7 @@ export default function InitProfilePage() {
       }
       setProfileCreated(true)
       queryClient.invalidateQueries()
-      navigate('/')
+      navigate('/', { state: { showGuide: true } })
     }
   })
 
@@ -89,9 +91,9 @@ export default function InitProfilePage() {
       userId: actorId,
       profileName: profileName,
       bio: bio,
-      imageUrl: '',
+      imageUrl: imageUrl,
       topicTypes: selectedTopics,
-      entryPerPage: 50,
+
       postPerPage: 20,
       socialNotificationPreference: true,
       socialEmailPreference: true
@@ -114,7 +116,7 @@ export default function InitProfilePage() {
         }}
       >
         <div className="page-header-icon">
-          <PersonStanding size={22} color="#fff" />
+          <User size={22} color="#fff" />
         </div>
         <div>
           <h1
@@ -169,6 +171,29 @@ export default function InitProfilePage() {
               onBlur={() => setFocused(null)}
             />
           </div>
+        </div>
+
+        {/* Avatar */}
+        <div>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 8,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('auth.profile_image', 'Profil Resmi')}
+          </label>
+          <AvatarUpload
+            imageUrl={imageUrl}
+            onImageUploaded={setImageUrl}
+            size={150}
+            disabled={initProfileMutation.isPending || initProfileMutation.isSuccess}
+          />
         </div>
 
         {/* Bio */}

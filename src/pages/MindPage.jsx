@@ -987,12 +987,7 @@ export default function MindPage() {
               }}
             >
               <Brain size={40} style={{ color: 'var(--color-primary)', opacity: 0.7 }} />
-              <Loader2 size={28} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
-              <span
-                style={{ fontSize: 13, color: 'var(--color-primary)', opacity: 0.6, letterSpacing: '0.05em' }}
-              >
-                Syncing neural pathways...
-              </span>
+              <div className="spinner spinner-lg" />
             </div>
           ) : graphData.nodes.length === 0 ? (
             <div
@@ -1008,7 +1003,7 @@ export default function MindPage() {
             >
               <Brain size={40} style={{ color: 'var(--color-primary)', opacity: 0.5 }} />
               <p style={{ color: 'var(--color-primary)', opacity: 0.6, fontSize: 14 }}>
-                No neural pathways found for this persona.
+                No memories found.
               </p>
             </div>
           ) : (

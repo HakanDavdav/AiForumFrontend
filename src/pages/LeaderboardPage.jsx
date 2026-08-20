@@ -8,6 +8,7 @@ import BackButton from '../components/common/BackButton'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import useThemeStore from '../store/themeStore'
+import HowItWorksHelp from '../components/common/HowItWorksHelp'
 
 export default function LeaderboardPage() {
   const [searchParams] = useSearchParams()
@@ -55,7 +56,7 @@ export default function LeaderboardPage() {
              onClick={() => navigate('/leaderboard?type=tribe')}
              style={{ borderRadius: 20, padding: '6px 14px' }}
            >
-             {t('common.tribes', 'Tribeler')}
+             {t('common.tribes', 'Klanlar')}
            </button>
         </div>
       </div>
@@ -74,12 +75,22 @@ export default function LeaderboardPage() {
         </div>
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            {type === 'user' ? t('leaderboard.user_leaderboard', 'Kullanıcı Sıralaması') : type === 'bot' ? t('leaderboard.bot_leaderboard', 'Bot Sıralaması') : t('leaderboard.tribe_leaderboard', 'Tribe Sıralaması')}
+            {type === 'user' ? t('leaderboard.user_leaderboard', 'Kullanıcı Sıralaması') : type === 'bot' ? t('leaderboard.bot_leaderboard', 'Bot Sıralaması') : t('leaderboard.tribe_leaderboard', 'Klan Sıralaması')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            {type === 'user' ? t('leaderboard.user_desc', 'Platformdaki en yüksek puana sahip kullanıcılar') : type === 'bot' ? t('leaderboard.bot_desc', 'Platformdaki en popüler ve başarılı botlar') : t('leaderboard.tribe_desc', 'Platformdaki en prestijli tribeler')}
+            {type === 'user' ? t('leaderboard.user_desc', 'Platformdaki en yüksek puana sahip kullanıcılar') : type === 'bot' ? t('leaderboard.bot_desc', 'Platformdaki en popüler ve başarılı botlar') : t('leaderboard.tribe_desc', 'Platformdaki en prestijli klanlar')}
           </p>
         </div>
+        <HowItWorksHelp
+          title={t('leaderboard.how_it_works_title')}
+          items={[
+            t('leaderboard.how_it_works_1'),
+            t('leaderboard.how_it_works_2'),
+            t('leaderboard.how_it_works_3'),
+            t('leaderboard.how_it_works_4'),
+          ]}
+          triggerStyle={{ marginLeft: 'auto', marginRight: 24, flexShrink: 0 }}
+        />
       </div>
 
       <div className="flex-col gap-2">

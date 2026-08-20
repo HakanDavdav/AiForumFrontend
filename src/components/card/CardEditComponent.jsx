@@ -1,0 +1,611 @@
+import { useState, useEffect } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { personalityCardApi } from '../../api/personalityCardApi'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
+import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
+import { Edit2, X, Check, Crown, Bot, Loader2, Users, Trash2 } from 'lucide-react'
+import ActorMinimalCard from '../actor/ActorMinimalCard'
+import SelectionMarker from '../common/SelectionMarker'
+
+export default function CardEditComponent({ card, myBots = [], onClose, onSaved }) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+
+  const cardData = card?.card || card?.originalCard || card
+  const isCreator = card?.acquisitionType === 0 || cardData?.acquisitionType === 0
+  const cardId = cardData?.personalityCardId ?? card?.cardId
+
+  const [editFormData, setEditFormData] = useState({
+    cardName: '',
+    personalityPrompt: '',
+    isListedOnMarketplace: false,
+    assignedBotIds: [],
+  })
+
+  const [isConfirmed, setIsConfirmed] = useState(false)
+
+  useEffect(() => {
+    if (!card) return
+    const innerCardData = card.card || card.originalCard || card
+    const innerIsCreator = card.acquisitionType === 0 || innerCardData.acquisitionType === 0
+    const assignedBots = card.assignedBots || innerCardData.assignedBots || []
+    const assignedBotIds = assignedBots.map((b) => b.actorId || b.id).filter(Boolean)
+
+    setEditFormData({
+      cardName: innerCardData.cardName || card.cardName || '',
+      personalityPrompt: innerIsCreator
+        ? innerCardData.personalityPrompt || card.personalityPrompt || ''
+        : '',
+      isListedOnMarketplace: Boolean(innerCardData.isListedOnMarketplace),
+      assignedBotIds,
+    })
+    setIsConfirmed(false)
+  }, [card])
+
+  const editMutation = useMutation({
+    mutationFn: (data) => personalityCardApi.editCard(cardId, data),
+    meta: { showErrorToast: true },
+    onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
+      queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
+      queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
+      useMyEntitiesStore.getState().fetchMyBots()
+      onSaved?.()
+      onClose?.()
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => personalityCardApi.deleteCard(cardId),
+    meta: { showErrorToast: true },
+    onSuccess: () => {
+      toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
+      queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
+      queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
+      useMyEntitiesStore.getState().fetchMyBots()
+      onSaved?.()
+      onClose?.()
+    },
+  })
+
+  const handleSave = () => {
+    if (!cardId) return
+
+    const payload = {
+      assignedBotIds: editFormData.assignedBotIds,
+    }
+
+    if (isCreator) {
+      if (editFormData.cardName.trim()) {
+        payload.cardName = editFormData.cardName.trim()
+      }
+      if (editFormData.personalityPrompt.trim()) {
+        payload.personalityPrompt = editFormData.personalityPrompt.trim()
+      }
+      payload.isListedOnMarketplace = editFormData.isListedOnMarketplace
+    }
+
+    editMutation.mutate(payload)
+  }
+
+  const handleDelete = () => {
+    if (!cardId) return
+    const confirmMessage = isCreator
+      ? t(
+          'card.confirm_delete_creator',
+          'Bu kişilik kartını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.'
+        )
+      : t(
+          'card.confirm_delete_purchaser',
+          'Bu kartın sahipliğini bırakıp envanterinizden silmek istediğinize emin misiniz?'
+        )
+
+    if (window.confirm(confirmMessage)) {
+      deleteMutation.mutate()
+    }
+  }
+
+  if (!card) return null
+
+  const ownershipCount = cardData?.ownershipCount ?? card?.ownershipCount ?? 0
+  const assignmentCount = editFormData.assignedBotIds.length
+
+  return (
+    <div
+      className="card-edit-component"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        marginBottom: 32,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 4,
+        }}
+      >
+        <label
+          style={{
+            display: 'block',
+            fontSize: 13,
+            fontWeight: 600,
+            color: 'var(--color-text-secondary)',
+            letterSpacing: '0.02em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('card.edit_personality_card', 'Kişilik Kartını Düzenle')}
+        </label>
+        <button
+          type="button"
+          className="btn btn-sm btn-ghost"
+          onClick={onClose}
+          style={{ borderRadius: 20, padding: '4px 10px', height: 'auto', fontSize: 12 }}
+        >
+          <X size={14} /> {t('common.cancel', 'İptal')}
+        </button>
+      </div>
+
+      {/* The Unified Personality Card Box (.personality-card .personality-card--filled .personality-card--editor) */}
+      <div
+        className={`personality-card personality-card--filled personality-card--editor${isConfirmed ? ' personality-card--editor-confirmed' : ''}`}
+        style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 12 }}
+      >
+        {/* Creator / Purchaser Crown Badge on Top-Left */}
+        {isCreator ? (
+          <span
+            title={t('card.creator_badge', 'Bu kartın yaratıcısısınız (Tüm haklar sizde)')}
+            style={{
+              position: 'absolute',
+              top: -14,
+              left: -8,
+              color: 'var(--color-warning)',
+              zIndex: 3,
+              filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+              transform: 'rotate(-25deg)',
+              pointerEvents: 'auto',
+            }}
+          >
+            <Crown size={28} strokeWidth={2.5} />
+          </span>
+        ) : (
+          <span
+            title={t('card.purchaser_badge', 'Bu kartı satın aldınız')}
+            style={{
+              position: 'absolute',
+              top: -14,
+              left: -8,
+              color: '#b87333',
+              zIndex: 3,
+              filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+              transform: 'rotate(-18deg)',
+              pointerEvents: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+            }}
+          >
+            <Crown size={24} strokeWidth={2.5} />
+            <span
+              style={{
+                marginLeft: '-4px',
+                marginTop: '4px',
+                fontSize: '25px',
+                fontWeight: '900',
+                fontFamily: '"Arial Black", Impact, system-ui, sans-serif',
+                lineHeight: 1,
+                color: '#22c55e',
+                textShadow: '0 0 3px rgba(34, 197, 94, 0.35), 0 1px 2px rgba(0,0,0,0.8)',
+                WebkitTextStroke: '0.6px #052e16',
+              }}
+            >
+              $
+            </span>
+          </span>
+        )}
+
+        <div className="personality-card__topline">
+          {isConfirmed && (
+            <span className="personality-card__title personality-card-editor__confirmed-title">
+              {editFormData.cardName}
+            </span>
+          )}
+          <SelectionMarker
+            checked={isConfirmed}
+            onChange={isConfirmed ? () => setIsConfirmed(false) : undefined}
+            disabled={editMutation.isPending || deleteMutation.isPending}
+            size="sm"
+            label={
+              isConfirmed
+                ? t('card.personality_confirmed', 'Kişilik kartı onaylandı')
+                : t('card.personality_pending', 'Kişilik kartı bekliyor')
+            }
+          />
+        </div>
+
+        {/* Card Body: Name and Prompt/Hint */}
+        <div className="personality-card-editor__body">
+          {!isConfirmed && (
+            <input
+              className="input personality-card__title personality-card-editor__name"
+              type="text"
+              value={editFormData.cardName}
+              onChange={(event) =>
+                isCreator &&
+                setEditFormData((prev) => ({ ...prev, cardName: event.target.value }))
+              }
+              placeholder={t('card.card_name_placeholder', 'Kişilik kart adı')}
+              disabled={!isCreator || editMutation.isPending || deleteMutation.isPending}
+              maxLength={100}
+              aria-label={t('card.card_name', 'Kart adı')}
+              style={!isCreator ? { opacity: 0.8, cursor: 'not-allowed' } : undefined}
+            />
+          )}
+
+          {isConfirmed ? (
+            <p className="personality-card-editor__preview">
+              {isCreator
+                ? editFormData.personalityPrompt
+                : `"${cardData?.cardHint || card?.cardHint || t('card.hint_placeholder', 'Bu kart için özel oluşturulmuş kişilik kuralları.')}"`}
+            </p>
+          ) : isCreator ? (
+            <textarea
+              className="input textarea personality-card-editor__prompt"
+              value={editFormData.personalityPrompt}
+              onChange={(event) =>
+                setEditFormData((prev) => ({ ...prev, personalityPrompt: event.target.value }))
+              }
+              placeholder={t('card.personality_prompt_placeholder', 'Bu kişiliği tanımlayın...')}
+              disabled={editMutation.isPending || deleteMutation.isPending}
+              maxLength={2000}
+              aria-label={t('card.personality_prompt', 'Kişilik tanımı')}
+            />
+          ) : (
+            <div
+              className="personality-card-editor__preview"
+              style={{
+                padding: '12px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+                justifyContent: 'center',
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  color: 'var(--color-warning)',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              >
+                <Crown size={14} />{' '}
+                {t('card.prompt_creator_only', 'Orijinal prompt gizlidir (Yalnızca Yaratıcı)')}
+              </div>
+              <p
+                style={{
+                  margin: 0,
+                  fontStyle: 'italic',
+                  color: 'var(--color-text-secondary)',
+                  fontSize: 13,
+                }}
+              >
+                "
+                {cardData?.cardHint ||
+                  card?.cardHint ||
+                  t('card.hint_placeholder', 'Bu kart için özel oluşturulmuş kişilik kuralları.')}
+                "
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Integrated Marketplace Listing Row (Creator Only) */}
+        {isCreator && (
+          <div
+            onClick={() => {
+              if (editMutation.isPending || deleteMutation.isPending) return
+              setEditFormData((prev) => ({
+                ...prev,
+                isListedOnMarketplace: !prev.isListedOnMarketplace,
+              }))
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: editFormData.isListedOnMarketplace
+                ? 'color-mix(in srgb, var(--color-primary) 14%, var(--color-surface-2) 86%)'
+                : 'color-mix(in srgb, var(--color-surface-2) 72%, var(--color-surface-3) 28%)',
+              border: editFormData.isListedOnMarketplace
+                ? '1.5px solid var(--color-primary)'
+                : '1px solid color-mix(in srgb, var(--color-border) 72%, var(--color-text) 18%)',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              userSelect: 'none',
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                {t('card.list_on_marketplace', 'Pazarda Satışa Çıkar')}
+              </span>
+              <span style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
+                {t(
+                  'card.list_on_marketplace_desc',
+                  'Diğer kullanıcılar bu kartı pazar yerinden satın alabilir'
+                )}
+              </span>
+            </div>
+            <SelectionMarker
+              checked={editFormData.isListedOnMarketplace}
+              size="sm"
+              disabled={editMutation.isPending || deleteMutation.isPending}
+              label={t('card.list_on_marketplace', 'Pazarda Satışa Çıkar')}
+            />
+          </div>
+        )}
+
+        {/* Integrated Bot Assignment Section (Tiklenebilir ActorMinimalCard Listesi) */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            padding: '12px 14px',
+            borderRadius: 8,
+            background:
+              'color-mix(in srgb, var(--color-surface-2) 72%, var(--color-surface-3) 28%)',
+            border:
+              '1px solid color-mix(in srgb, var(--color-border) 72%, var(--color-text) 18%)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <label
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: 'var(--color-text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                textTransform: 'uppercase',
+                letterSpacing: '0.03em',
+              }}
+            >
+              <Bot size={15} color="var(--color-primary)" />
+              {t('card.assign_to_bots', 'Bu Kartı Kuşanacak Botlar')}
+            </label>
+            <span
+              style={{
+                fontSize: 11,
+                color: 'var(--color-text-secondary)',
+                fontWeight: 600,
+              }}
+            >
+              {editFormData.assignedBotIds.length} {t('card.selected_bots_count', 'bot seçili')}
+            </span>
+          </div>
+
+          {myBots.length === 0 ? (
+            <div
+              style={{
+                padding: '10px 0',
+                textAlign: 'center',
+                color: 'var(--color-text-secondary)',
+                fontSize: 12,
+              }}
+            >
+              {t('card.no_bots_to_assign', 'Henüz atanabilecek bir botunuz bulunmuyor.')}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+                maxHeight: 190,
+                overflowY: 'auto',
+                padding: '4px 6px 6px 4px',
+                margin: '-2px -2px -2px -2px',
+              }}
+            >
+              {myBots.map((bot) => {
+                const isAssigned = editFormData.assignedBotIds.includes(bot.actorId)
+                return (
+                  <ActorMinimalCard
+                    key={bot.actorId}
+                    actor={bot}
+                    selectable
+                    selected={isAssigned}
+                    onSelect={() => {
+                      if (editMutation.isPending || deleteMutation.isPending) return
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        assignedBotIds: isAssigned
+                          ? prev.assignedBotIds.filter((id) => id !== bot.actorId)
+                          : [...prev.assignedBotIds, bot.actorId],
+                      }))
+                    }}
+                    disabled={editMutation.isPending || deleteMutation.isPending}
+                    variant="compact"
+                  />
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Danger Zone Section (Inside the Card) */}
+        <div
+          style={{
+            marginTop: 4,
+            padding: '14px 16px',
+            borderRadius: 10,
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            background: 'rgba(239, 68, 68, 0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h4
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#ef4444',
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <Trash2 size={15} />
+              {t('tribe_settings.danger_zone', 'Tehlikeli Bölge')}
+            </h4>
+          </div>
+          <p
+            style={{
+              fontSize: 12,
+              color: 'var(--color-text-secondary)',
+              margin: 0,
+              lineHeight: 1.5,
+            }}
+          >
+            {isCreator
+              ? t(
+                  'card.danger_zone_creator_desc',
+                  'Kişilik kartını silmek kartın tüm sahipliğini ve tanımlarını kalıcı olarak sonlandırır. Kartı silmeden önce atanmış botların ataması kaldırılmalıdır.'
+                )
+              : t(
+                  'card.danger_zone_purchaser_desc',
+                  'Bu kartı envanterinizden sildiğinizde kart sahipliğiniz sona erer. Kartı silmeden önce atanmış botların ataması kaldırılmalıdır.'
+                )}
+          </p>
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{
+              background: '#ef4444',
+              borderColor: '#ef4444',
+              width: '100%',
+              gap: 8,
+              padding: '10px 16px',
+              fontSize: 13,
+              fontWeight: 600,
+              borderRadius: 8,
+              marginTop: 2,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending || editMutation.isPending}
+          >
+            {deleteMutation.isPending ? (
+              <>
+                <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                {t('common.deleting', 'Siliniyor...')}
+              </>
+            ) : (
+              <>
+                <Trash2 size={14} />
+                {isCreator
+                  ? t('card.delete_card', 'Kişilik Kartını Sil')
+                  : t('card.delete_ownership', 'Kartı Envanterden Sil')}
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Card Footer & Actions (Inside the Card) */}
+        <div
+          className="personality-card-editor__footer personality-card__stats"
+          style={{
+            marginTop: 'auto',
+            paddingTop: 10,
+            borderTop:
+              '1px solid color-mix(in srgb, var(--color-border) 72%, var(--color-text) 18%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="personality-card__stat" title={t('card.owners', 'Sahipler')}>
+              <Users size={12} /> {ownershipCount}
+            </span>
+            <span className="personality-card__stat" title={t('card.assignees', 'Atanmış Botlar')}>
+              <Bot size={12} /> {assignmentCount}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={onClose}
+              disabled={editMutation.isPending || deleteMutation.isPending}
+              style={{ borderRadius: 16, fontSize: 12 }}
+            >
+              {t('common.cancel', 'İptal')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={handleSave}
+              disabled={
+                editMutation.isPending ||
+                deleteMutation.isPending ||
+                (isCreator &&
+                  (!editFormData.cardName.trim() || !editFormData.personalityPrompt.trim()))
+              }
+              style={{
+                borderRadius: 16,
+                fontSize: 12,
+                padding: '6px 14px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              {editMutation.isPending ? (
+                <>
+                  <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                  {t('common.saving', 'Kaydediliyor...')}
+                </>
+              ) : (
+                <>
+                  <Check size={13} />
+                  {t('common.save_changes', 'Değişiklikleri Kaydet')}
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

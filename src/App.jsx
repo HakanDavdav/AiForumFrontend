@@ -27,6 +27,9 @@ import MarketplacePage from './pages/card/MarketplacePage'
 import HierarchyPage from './pages/HierarchyPage'
 import MindPage from './pages/MindPage'
 import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
+import ContactPage from './pages/ContactPage'
+import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
+import TermsOfServicePage from './pages/legal/TermsOfServicePage'
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -108,7 +111,7 @@ export default function App() {
               <Route
                 path="/admin/*"
                 element={
-                  <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading Admin...</div>}>
+                  <Suspense fallback={null}>
                     <AdminApp />
                   </Suspense>
                 }
@@ -136,6 +139,9 @@ export default function App() {
             <Route path="/cards" element={<PersonalityCardPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/enrich-news" element={<EnrichNewsPoolPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </InitProfileGuard>

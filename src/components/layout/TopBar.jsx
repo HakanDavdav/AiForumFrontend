@@ -15,6 +15,7 @@ import {
   Bot,
   CirclePlus,
   PaintbrushVertical,
+  X,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -36,7 +37,7 @@ import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
-import HowItWorksHelp from '../common/HowItWorksHelp'
+import BletchlyGuideModal from '../common/BletchlyGuideModal'
 import Logo from '../common/Logo'
 
 export default function TopBar() {
@@ -106,6 +107,7 @@ export default function TopBar() {
   const searchRef = useRef(null)
   const langRef = useRef(null)
   const debounceTimerRef = useRef(null)
+  const suppressSuggestionsRef = useRef(false)
 
   // My Tribes & Bots from Global State
   const {
@@ -129,7 +131,7 @@ export default function TopBar() {
   // Current user profile
   const { data: myProfile } = useQuery({
     queryKey: ['actorProfile', actorId],
-    queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data),
+    queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data ?? null),
     enabled: !!actorId && isLoggedIn,
   })
 
@@ -205,6 +207,8 @@ export default function TopBar() {
             result = await searchApi.filterPosts({
               query: searchQuery,
               orderType: filterOrderType || 'None',
+              startDate: filterStartDate || null,
+              endDate: filterEndDate || null,
             })
             setSuggestions({ posts: result.data?.data || [] })
             break
@@ -212,6 +216,8 @@ export default function TopBar() {
             result = await searchApi.filterActors({
               query: searchQuery,
               orderType: filterOrderType || 'None',
+              startDate: filterStartDate || null,
+              endDate: filterEndDate || null,
             })
             setSuggestions({ actors: result.data?.data || [] })
             break
@@ -219,6 +225,8 @@ export default function TopBar() {
             result = await searchApi.filterTribes({
               query: searchQuery,
               orderType: filterOrderType || 'None',
+              startDate: filterStartDate || null,
+              endDate: filterEndDate || null,
             })
             setSuggestions({ tribes: result.data?.data || [] })
             break
@@ -233,7 +241,7 @@ export default function TopBar() {
             })
             break
         }
-        setShowSuggestions(true)
+        if (!suppressSuggestionsRef.current) setShowSuggestions(true)
       } catch (error) {
         console.error('Suggestion error:', error)
         setSuggestions(null)
@@ -247,7 +255,7 @@ export default function TopBar() {
         clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [searchQuery, searchMode, filterOrderType])
+  }, [searchQuery, searchMode, filterOrderType, filterStartDate, filterEndDate])
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -276,7 +284,7 @@ export default function TopBar() {
     if (params.startDate) searchParams.append('startDate', params.startDate)
     if (params.endDate) searchParams.append('endDate', params.endDate)
     navigate('/search?' + searchParams.toString())
-    setSearchQuery('')
+    // setSearchQuery('') // keep query after search
     setShowSuggestions(false)
     setIsFilterOpen(false)
   }
@@ -285,7 +293,7 @@ export default function TopBar() {
     { key: 'general', label: t('search.mode.general', 'Genel') },
     { key: 'posts', label: t('search.mode.posts', 'Başlıklar') },
     { key: 'actors', label: t('search.mode.actors', 'Aktörler') },
-    { key: 'tribes', label: t('search.mode.tribes', 'Tribeler') },
+    { key: 'tribes', label: t('search.mode.tribes', 'Klanlar') },
   ]
 
   return (
@@ -420,14 +428,14 @@ export default function TopBar() {
               placeholder={t('topbar.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => {
-                if (suggestions) setShowSuggestions(true)
+              onClick={() => {
+                if (suggestions && !suppressSuggestionsRef.current) setShowSuggestions(true)
               }}
             />
 
             {/* Search Suggestions Dropdown */}
             <AnimatePresence>
-              {showSuggestions && (suggestions || isLoadingSuggestions) && (
+              {showSuggestions && !isFilterOpen && (suggestions || isLoadingSuggestions) && (
                 <motion.div
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -499,7 +507,7 @@ export default function TopBar() {
                                   textTransform: 'uppercase',
                                 }}
                               >
-                                {t('common.tribes', 'Tribeler')}
+                                {t('common.tribes', 'Klanlar')}
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                                 {suggestions.tribes.slice(0, 3).map((tribe) => (
@@ -649,14 +657,61 @@ export default function TopBar() {
               className="btn btn-outline btn-sm btn-icon"
               disabled={searchMode === 'general'}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
+              style={{
+                borderColor: (filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : undefined,
+              }}
               title={
                 searchMode === 'general'
                   ? t('topbar.general_search_no_filter')
                   : t('topbar.search_filters')
               }
             >
-              <Filter size={14} />
+              <Filter
+                size={14}
+                color={(filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : 'currentColor'}
+                fill={(filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : 'none'}
+              />
             </button>
+            {(filterOrderType || filterStartDate || filterEndDate) && (
+              <button
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  suppressSuggestionsRef.current = true
+                  setTimeout(() => { suppressSuggestionsRef.current = false }, 300)
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  setFilterOrderType('')
+                  setFilterStartDate('')
+                  setFilterEndDate('')
+                  setShowSuggestions(false)
+                }}
+                title={t('common.clear_all', 'Tümünü Temizle')}
+                style={{
+                  position: 'absolute',
+                  top: -4,
+                  right: -4,
+                  transform: 'none',
+                  marginTop: 0,
+                  background: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 14,
+                  height: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  padding: 0,
+                  zIndex: 10,
+                }}
+              >
+                <X size={10} strokeWidth={3} />
+              </button>
+            )}
             <AnimatePresence>
               {isFilterOpen && (
                 <motion.div
@@ -683,6 +738,9 @@ export default function TopBar() {
                 >
                   <div
                     style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                       fontSize: 13,
                       fontWeight: 600,
                       color: 'var(--color-text)',
@@ -690,62 +748,121 @@ export default function TopBar() {
                       paddingBottom: 6,
                     }}
                   >
-                    {t('search.filters_title', 'Arama Filtreleri')}
+                    <span>{t('search.filters_title', 'Arama Filtreleri')}</span>
+                    <X
+                      size={14}
+                      color="var(--color-text-secondary)"
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => setIsFilterOpen(false)}
+                    />
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                       {t('search.sort_by', 'Sıralama')}
                     </label>
-                    <select
-                      className="input"
-                      style={{ padding: '4px 8px', height: 32, fontSize: 13 }}
-                      value={filterOrderType}
-                      onChange={handleOrderTypeChange}
-                    >
-                      <option value="">{t('topbar.default', 'Varsayılan')}</option>
-                      {searchMode === 'posts' && (
-                        <option value="MostLiked">
-                          {t('topbar.most_liked', 'En Çok Beğenilen')}
-                        </option>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <select
+                        className="input"
+                        style={{ padding: '4px 8px', height: 32, fontSize: 13, flex: 1 }}
+                        value={filterOrderType}
+                        onChange={handleOrderTypeChange}
+                      >
+                        <option value="">{t('search.none', 'Yok')}</option>
+                        {searchMode === 'posts' && (
+                          <option value="MostLiked">
+                            {t('topbar.most_liked', 'En Çok Beğenilen')}
+                          </option>
+                        )}
+                        <option value="Newest">{t('sort.newest')}</option>
+                        <option value="Oldest">{t('topbar.oldest', 'En Eski')}</option>
+                      </select>
+                      {filterOrderType && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
+                          onClick={() => {
+                            // Using the same manual change event pattern if needed, but direct state update might be enough.
+                            // The select uses handleOrderTypeChange, let's just create a synthetic event or call it if it takes an event,
+                            // or just do handleOrderTypeChange({ target: { value: '' } })
+                            handleOrderTypeChange({ target: { value: '' } })
+                          }}
+                          title={t('common.clear', 'Temizle')}
+                        >
+                          <X size={16} />
+                        </button>
                       )}
-                      <option value="Newest">{t('sort.newest')}</option>
-                      <option value="Oldest">{t('topbar.oldest', 'En Eski')}</option>
-                    </select>
+                    </div>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                       {t('search.start_date', 'Başlangıç Tarihi')}
                     </label>
-                    <input
-                      type="date"
-                      className="input"
-                      style={{ padding: '4px 8px', height: 32, fontSize: 13 }}
-                      value={filterStartDate}
-                      onChange={(e) => setFilterStartDate(e.target.value)}
-                    />
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <input
+                        type="date"
+                        className="input"
+                        style={{ padding: '4px 8px', height: 32, fontSize: 13, flex: 1 }}
+                        value={filterStartDate}
+                        onChange={(e) => setFilterStartDate(e.target.value)}
+                      />
+                      {filterStartDate && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
+                          onClick={() => setFilterStartDate('')}
+                          title={t('common.clear', 'Temizle')}
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                       {t('search.end_date', 'Bitiş Tarihi')}
                     </label>
-                    <input
-                      type="date"
-                      className="input"
-                      style={{ padding: '4px 8px', height: 32, fontSize: 13 }}
-                      value={filterEndDate}
-                      onChange={(e) => setFilterEndDate(e.target.value)}
-                    />
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <input
+                        type="date"
+                        className="input"
+                        style={{ padding: '4px 8px', height: 32, fontSize: 13, flex: 1 }}
+                        value={filterEndDate}
+                        onChange={(e) => setFilterEndDate(e.target.value)}
+                      />
+                      {filterEndDate && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
+                          onClick={() => setFilterEndDate('')}
+                          title={t('common.clear', 'Temizle')}
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Ara butonu */}
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm"
+                    style={{ width: '100%', marginTop: 4, paddingTop: 7, paddingBottom: 7 }}
+                  >
+                    {t('topbar.search_button', 'Ara')}
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
           <button type="submit" className="btn btn-primary btn-sm">
-            {t('topbar.search')}
+            {t('topbar.search_button', 'Ara')}
           </button>
         </form>
 
@@ -956,7 +1073,8 @@ export default function TopBar() {
                 <ActorMinimalCard
                   actor={myProfile}
                   showHierarchyBtn={false}
-                  clickable={true}
+                  clickable={location.pathname !== '/init-profile'}
+                  showEditBtn={location.pathname !== '/init-profile'}
                   chipStyle={{ minWidth: 110, maxWidth: 205, fontSize: 12.5 }}
                 />
               </div>
@@ -1336,18 +1454,7 @@ export default function TopBar() {
             <BotFlashCardsIcon size={24} />
           </IconActionButton>
 
-          <HowItWorksHelp
-            title={t('bot.how_it_works', 'Nasıl çalışır?')}
-            items={[
-              t('bot.how_it_works_1'),
-              t('bot.how_it_works_2'),
-              t('bot.how_it_works_3'),
-              t('bot.how_it_works_4'),
-            ]}
-            closeLabel={t('common.close', 'Kapat')}
-            triggerLabel={t('bot.how_it_works', 'Nasıl çalışır?')}
-            triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          />
+          <BletchlyGuideModal triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }} />
         </div>
       </div>
     </header>

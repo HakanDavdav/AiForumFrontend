@@ -7,9 +7,10 @@ import useAuthStore from '../../store/authStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import SelectionMarker from '../common/SelectionMarker'
 
 /**
- * ActorMinimalCard — avatar + isim, hierarchy button.
+ * ActorMinimalCard — avatar + isim, hierarchy button, selection support.
  * Plan.md'ye göre her listede kullanılan temel aktör komponenti.
  */
 export default function ActorMinimalCard({
@@ -21,6 +22,11 @@ export default function ActorMinimalCard({
   clickable = true,
   variant = 'compact',
   chipStyle = {},
+  selectable = false,
+  selected = false,
+  onSelect,
+  disabled = false,
+  children,
 }) {
   useDevLog('ActorMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
@@ -39,6 +45,12 @@ export default function ActorMinimalCard({
   const handleActorClick = (e) => {
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation()
+    }
+    if (selectable) {
+      if (!disabled && onSelect) {
+        onSelect(!selected, actor)
+      }
+      return
     }
     if (!clickable) return
     navigate('/profile?actorId=' + actor.actorId)
@@ -67,27 +79,41 @@ export default function ActorMinimalCard({
   }
 
   const hasExtraElements =
-    showHierarchyBtn ||
-    (showMindBtn && actor.discriminator === 'Bot') ||
-    (showEditBtn && isOwner) ||
-    (showPoint && actor.actorPoint != null)
+    (showHierarchyBtn && !selectable) ||
+    (showMindBtn && !selectable && actor.discriminator === 'Bot') ||
+    (showEditBtn && !selectable && isOwner) ||
+    (showPoint && actor.actorPoint != null) ||
+    selectable ||
+    Boolean(children)
 
   return (
     <div
-      className="actor-chip flex items-center gap-1"
+      className={`actor-chip flex items-center gap-1${selectable ? ' actor-chip--selectable' : ''}${selected ? ' actor-chip--selected' : ''}`}
+      onClick={selectable ? handleActorClick : undefined}
       style={{
+        width: selectable ? '100%' : undefined,
         maxWidth: '100%',
-        paddingRight: hasExtraElements ? 4 : undefined,
+        justifyContent: selectable ? 'space-between' : undefined,
+        paddingRight: hasExtraElements ? (selectable ? 8 : 4) : undefined,
+        paddingLeft: selectable ? 6 : undefined,
+        cursor: selectable ? (disabled ? 'not-allowed' : 'pointer') : undefined,
+        border: selectable && selected ? '1.5px solid var(--color-primary)' : undefined,
+        background:
+          selectable && selected
+            ? 'color-mix(in srgb, var(--color-primary) 14%, var(--color-surface) 86%)'
+            : undefined,
+        userSelect: selectable ? 'none' : undefined,
+        transition: 'all 0.15s ease',
         ...chipStyle,
       }}
     >
       <div
-        onClick={handleActorClick}
+        onClick={selectable ? undefined : handleActorClick}
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 8,
-          cursor: clickable ? 'pointer' : 'default',
+          cursor: clickable || selectable ? 'pointer' : 'default',
           flex: 1,
           minWidth: 0,
         }}
@@ -98,12 +124,21 @@ export default function ActorMinimalCard({
           discriminator={actor.discriminator}
           actorId={actor.actorId}
           size={variant === 'expanded' ? 'md' : 'sm'}
-          onClick={clickable ? (actorId, e) => handleActorClick(e) : undefined}
+          onClick={clickable && !selectable ? (actorId, e) => handleActorClick(e) : undefined}
         />
-        <span className="actor-chip-name">{actor.profileName || 'İsimsiz'}</span>
+        <span
+          className="actor-chip-name"
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {actor.profileName || 'İsimsiz'}
+        </span>
       </div>
 
-      {showHierarchyBtn && (
+      {showHierarchyBtn && !selectable && (
         <button
           type="button"
           className="actor-chip-hier-btn"
@@ -113,7 +148,7 @@ export default function ActorMinimalCard({
           <Network size={12} />
         </button>
       )}
-      {showMindBtn && actor.discriminator === 'Bot' && (
+      {showMindBtn && !selectable && actor.discriminator === 'Bot' && (
         <button
           type="button"
           className="actor-chip-hier-btn"
@@ -123,7 +158,7 @@ export default function ActorMinimalCard({
           <Brain size={12} />
         </button>
       )}
-      {showEditBtn && isOwner && (
+      {showEditBtn && !selectable && isOwner && (
         <button
           type="button"
           className="actor-chip-hier-btn"
@@ -147,6 +182,17 @@ export default function ActorMinimalCard({
           {actor.actorPoint} P
         </span>
       )}
+      {selectable && (
+        <div style={{ marginLeft: 'auto', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+          <SelectionMarker
+            checked={selected}
+            size="sm"
+            disabled={disabled}
+            label={actor.profileName}
+          />
+        </div>
+      )}
+      {children}
     </div>
   )
 }

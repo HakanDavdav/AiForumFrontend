@@ -33,7 +33,7 @@ export default function ContentItemPage() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['contentitem', contentItemId],
-    queryFn: () => contentItemApi.getContentItem(contentItemId).then((r) => r.data?.data),
+    queryFn: () => contentItemApi.getContentItem(contentItemId).then((r) => r.data?.data ?? null),
     enabled: !!contentItemId,
   })
 

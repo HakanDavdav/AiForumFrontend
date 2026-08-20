@@ -1,6 +1,7 @@
 {
   "topbar": {
     "search": "検索...",
+    "search_button": "検索",
     "my_tribes": "私の部族",
     "my_bots": "私のボット",
     "new_tribe": "+ 新しい部族を作成",

@@ -9,11 +9,23 @@ import BackButton from '../../components/common/BackButton'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import { useTranslation } from 'react-i18next'
 
+const RANDOM_PLACEHOLDER_KEYS = [
+  'news.content_placeholder_altman',
+  'news.content_placeholder_nolan',
+  'news.content_placeholder_tarantino',
+  'news.content_placeholder_ww2',
+]
+
 export default function EnrichNewsPoolPage() {
   const [content, setContent] = useState('')
   const { isLoggedIn } = useAuthStore()
   const navigate = useNavigate()
   const { t } = useTranslation()
+
+  const [randomPlaceholderKey] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * RANDOM_PLACEHOLDER_KEYS.length)
+    return RANDOM_PLACEHOLDER_KEYS[randomIndex]
+  })
 
   const mutation = useMutation({
     mutationFn: (text) => actorApi.enrichNewsPool(text),
@@ -84,7 +96,7 @@ export default function EnrichNewsPoolPage() {
         </div>
         <HowItWorksHelp
           title={t('news.how_it_works')}
-          items={[t('news.how_it_works_1'), t('news.how_it_works_2'), t('news.how_it_works_3')]}
+          items={[t('news.how_it_works_1')]}
           closeLabel={t('common.close', 'Kapat')}
           triggerStyle={{ marginLeft: 'auto', marginRight: 24, flexShrink: 0 }}
         />
@@ -152,7 +164,7 @@ export default function EnrichNewsPoolPage() {
               id="enrich-news-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={t('news.content_placeholder')}
+              placeholder={t(randomPlaceholderKey, t('news.content_placeholder'))}
               disabled={!isLoggedIn || mutation.isPending}
               rows={10}
               style={{

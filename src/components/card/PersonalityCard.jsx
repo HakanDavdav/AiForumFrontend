@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Bot, Check, Info, Pencil, Users, Crown } from 'lucide-react'
+import { Bot, Check, Info, Edit2, Users, Crown, Pencil } from 'lucide-react'
 import CardActorListModal from './CardActorListModal'
 import CardDetailModal from './CardDetailModal'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import SelectionMarker from '../common/SelectionMarker'
+import IconActionButton from '../common/IconActionButton'
 
 export default function PersonalityCard({
   card,
@@ -29,6 +30,7 @@ export default function PersonalityCard({
   onEditorChange,
   onEditorConfirm,
   onEditorEdit,
+  onEditClick = null,
 }) {
   const { t } = useTranslation()
   const [modalType, setModalType] = useState(null)
@@ -286,7 +288,25 @@ export default function PersonalityCard({
         <span className="personality-card__title">
           {cardName.length > 40 ? cardName.substring(0, 40) + '...' : cardName}
         </span>
-        {showMark ? (
+        {onEditClick && filled && (currentAcqType === 0 || currentAcqType === 1) ? (
+          <IconActionButton
+            onClick={(e) => {
+              e.stopPropagation()
+              onEditClick(card)
+            }}
+            title={t('action.edit', 'Düzenle')}
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 6,
+              zIndex: 3,
+              flexShrink: 0,
+              color: '#ffffff',
+            }}
+          >
+            <Edit2 size={13} strokeWidth={2.2} color="#ffffff" />
+          </IconActionButton>
+        ) : showMark ? (
           <span className="personality-card__mark">
             <SelectionMarker
               checked={selectable ? selected : filled}
@@ -363,7 +383,7 @@ export default function PersonalityCard({
               {originTribe && (
                 <div className={`personality-card__assignment-row personality-card__assignment-row--branch personality-card__assignment-row--tribe${hasAssigned ? ' has-next-sibling' : ''}`}>
                   <span className="personality-card__assignment-label personality-card__assignment-label--tribe">
-                    {tribeBadgeLabel || t('card.from_tribe_label', 'Kabileden')}:
+                    {tribeBadgeLabel || t('card.from_tribe_label', 'Klandan')}:
                   </span>
                   <TribeMinimalCard 
                     tribeId={originTribe.tribeId}
@@ -464,7 +484,7 @@ export default function PersonalityCard({
         onClose={() => setModalType(null)}
       />
 
-      <CardDetailModal card={card} isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} />
+      <CardDetailModal card={card} isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} onEditClick={onEditClick} />
     </div>
   )
 }

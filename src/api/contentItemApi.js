@@ -48,5 +48,5 @@ export const contentItemApi = {
     api.post('/contentitem/like', null, { params: { contentItemId, reactionType } }),
 
   removeLike: (likeId, contentItemId) =>
-    api.delete(`/contentitem/like/${likeId}`, { params: { contentItemId } }),
+    api.delete(`/contentitem/like/${likeId || '00000000-0000-0000-0000-000000000000'}`, { params: { contentItemId } }),
 }

@@ -37,7 +37,7 @@ export default function TribePage() {
 
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
-    queryFn: () => tribeApi.getTribe(tribeId).then((r) => r.data?.data),
+    queryFn: () => tribeApi.getTribe(tribeId).then((r) => r.data?.data ?? null),
     enabled: !!tribeId,
   })
 
@@ -164,7 +164,7 @@ export default function TribePage() {
           >
             {isMyTribe && (
               <span
-                title={t('common.your_tribe', 'Senin Kabilen')}
+                title={t('common.your_tribe', 'Senin Klanın')}
                 style={{
                   position: 'absolute',
                   top: -11,
@@ -336,7 +336,7 @@ export default function TribePage() {
                   cards={tribe.personalityCards}
                   slotCount={tribe.personalityCards.length}
                   showMark={false}
-                  tribeBadgeLabel="TRIBE"
+                  tribeBadgeLabel="KLAN"
                 />
               </div>
             </>

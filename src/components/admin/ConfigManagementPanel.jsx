@@ -11,7 +11,12 @@ export default function ConfigManagementPanel() {
   const [isDirty, setIsDirty] = useState(false)
   const queryClient = useQueryClient()
 
-  const { data: configData, isLoading, refetch, isFetching } = useQuery({
+  const {
+    data: configData,
+    isLoading,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ['adminAppSettings'],
     queryFn: async () => {
       const res = await adminApi.getAppSettings()
@@ -54,6 +59,20 @@ export default function ConfigManagementPanel() {
     } else {
       if (!config) return
       updateConfigMutation.mutate(config)
+    }
+  }
+
+  const handleRefresh = async () => {
+    try {
+      const res = await refetch()
+      const freshData = res.data ?? configData
+      if (freshData) {
+        setConfig(JSON.parse(JSON.stringify(freshData)))
+        setConfigText(JSON.stringify(freshData, null, 2))
+        setIsDirty(false)
+      }
+    } catch {
+      toast.error('Ayarlar yenilenirken bir hata oluştu.')
     }
   }
 
@@ -138,7 +157,9 @@ export default function ConfigManagementPanel() {
     if (!config || activeSection === '__raw__' || !config[activeSection]) return []
     let keys = getAllCardKeys(config[activeSection], [activeSection])
     if (config[activeSection]?.PromptSettings && Object.keys(config[activeSection]).length === 1) {
-      keys = keys.concat(getAllCardKeys(config[activeSection].PromptSettings, [activeSection, 'PromptSettings']))
+      keys = keys.concat(
+        getAllCardKeys(config[activeSection].PromptSettings, [activeSection, 'PromptSettings'])
+      )
     }
     return Array.from(new Set(keys))
   }
@@ -190,7 +211,14 @@ export default function ConfigManagementPanel() {
     if (type === 'boolean') {
       return (
         <div key={key} className="flex flex-col justify-end" style={{ minWidth: 120 }}>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+          <label
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 4,
+            }}
+          >
             {formatLabel(key)}
           </label>
           <div>
@@ -219,7 +247,15 @@ export default function ConfigManagementPanel() {
     if (type === 'number') {
       return (
         <div key={key} style={{ minWidth: 140, flex: '1 1 140px' }}>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 3, display: 'block' }}>
+          <label
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 3,
+              display: 'block',
+            }}
+          >
             {formatLabel(key)}
           </label>
           <input
@@ -247,7 +283,15 @@ export default function ConfigManagementPanel() {
       const isTime = /^\d{2}:\d{2}:\d{2}$/.test(value)
       return (
         <div key={key} style={{ minWidth: 140, flex: '1 1 140px' }}>
-          <label style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 3, display: 'block' }}>
+          <label
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 3,
+              display: 'block',
+            }}
+          >
             {formatLabel(key)}
           </label>
           <input
@@ -293,7 +337,10 @@ export default function ConfigManagementPanel() {
           className="config-card-header flex items-center gap-2 mb-2"
           onClick={() => toggleExpand(cardPathKey)}
         >
-          <span className="config-card-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)' }}>
+          <span
+            className="config-card-title"
+            style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)' }}
+          >
             {formatLabel(key)}
           </span>
           {!isExpanded && (
@@ -329,7 +376,9 @@ export default function ConfigManagementPanel() {
               const calculatedRows = Math.max(
                 2,
                 Math.min(
-                  text.split('\n').reduce((acc, line) => acc + Math.max(1, Math.ceil(line.length / 80)), 0),
+                  text
+                    .split('\n')
+                    .reduce((acc, line) => acc + Math.max(1, Math.ceil(line.length / 80)), 0),
                   20
                 )
               )
@@ -441,7 +490,9 @@ export default function ConfigManagementPanel() {
 
     const entries = Object.entries(obj)
     const primitives = entries.filter(([, v]) => v !== null && typeof v !== 'object')
-    const objects = entries.filter(([, v]) => v !== null && typeof v === 'object' && !Array.isArray(v))
+    const objects = entries.filter(
+      ([, v]) => v !== null && typeof v === 'object' && !Array.isArray(v)
+    )
     const arrays = entries.filter(([, v]) => Array.isArray(v))
 
     return (
@@ -497,12 +548,17 @@ export default function ConfigManagementPanel() {
                         background: v.Enabled ? '#22c55e' : '#ef4444',
                         display: 'inline-block',
                         flexShrink: 0,
-                        boxShadow: v.Enabled ? '0 0 6px rgba(34, 197, 94, 0.5)' : '0 0 6px rgba(239, 68, 68, 0.4)',
+                        boxShadow: v.Enabled
+                          ? '0 0 6px rgba(34, 197, 94, 0.5)'
+                          : '0 0 6px rgba(239, 68, 68, 0.4)',
                         transition: 'all var(--transition-fast)',
                       }}
                     />
                   )}
-                  <span className="config-card-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)' }}>
+                  <span
+                    className="config-card-title"
+                    style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)' }}
+                  >
                     {formatLabel(k)}
                   </span>
                   {/* Field count badge when collapsed */}
@@ -555,9 +611,7 @@ export default function ConfigManagementPanel() {
               </div>
 
               {isExpanded && (
-                <div style={{ marginTop: 8 }}>
-                  {renderObjectNode([...path, k], v, level + 1)}
-                </div>
+                <div style={{ marginTop: 8 }}>{renderObjectNode([...path, k], v, level + 1)}</div>
               )}
             </div>
           )
@@ -597,8 +651,8 @@ export default function ConfigManagementPanel() {
 
         <div className="flex items-center gap-2">
           <button
-            className="btn btn-secondary"
-            onClick={() => refetch()}
+            className="btn btn-primary"
+            onClick={handleRefresh}
             disabled={isBusy}
             style={{
               fontSize: 11.5,
@@ -619,10 +673,12 @@ export default function ConfigManagementPanel() {
               padding: '4px 10px',
               borderRadius: 'var(--radius-md)',
               position: 'relative',
-              ...(isDirty && !isSaving ? {
-                boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.4)',
-                animation: 'pulse-ring 2s ease-in-out infinite',
-              } : {}),
+              ...(isDirty && !isSaving
+                ? {
+                    boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.4)',
+                    animation: 'pulse-ring 2s ease-in-out infinite',
+                  }
+                : {}),
             }}
           >
             {isSaving ? 'Kaydediliyor...' : isDirty ? '● Kaydet' : 'Kaydet'}
@@ -631,7 +687,10 @@ export default function ConfigManagementPanel() {
       </div>
 
       {/* Top Section Tabs & Expand/Collapse All (Auto-discovered from JSON keys + Raw JSON) */}
-      <div className="flex justify-between items-center border-b shrink-0 mb-3 gap-2 flex-wrap" style={{ borderColor: 'var(--color-border)', paddingBottom: 8 }}>
+      <div
+        className="flex justify-between items-center border-b shrink-0 mb-3 gap-2 flex-wrap"
+        style={{ borderColor: 'var(--color-border)', paddingBottom: 8 }}
+      >
         <div className="flex items-center gap-2 overflow-x-auto">
           {topSections.map((secKey) => {
             const isActive = activeSection === secKey
@@ -675,7 +734,8 @@ export default function ConfigManagementPanel() {
               fontWeight: activeSection === '__raw__' ? 600 : 500,
               border: 'none',
               cursor: 'pointer',
-              background: activeSection === '__raw__' ? 'var(--color-primary)' : 'var(--color-surface-2)',
+              background:
+                activeSection === '__raw__' ? 'var(--color-primary)' : 'var(--color-surface-2)',
               color: activeSection === '__raw__' ? '#ffffff' : 'var(--color-text-secondary)',
               transition: 'all var(--transition-fast)',
             }}
@@ -729,7 +789,9 @@ export default function ConfigManagementPanel() {
               border: '1px solid var(--color-border-light)',
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--color-text)' }}>
+            <div
+              style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--color-text)' }}
+            >
               Raw JSON Configuration
             </div>
             <textarea
@@ -755,13 +817,29 @@ export default function ConfigManagementPanel() {
             />
           </div>
         ) : config && config[activeSection] ? (
-          config[activeSection]?.PromptSettings && Object.keys(config[activeSection]).length === 1 ? (
-            renderObjectNode([activeSection, 'PromptSettings'], config[activeSection].PromptSettings, 0)
+          config[activeSection]?.PromptSettings &&
+          Object.keys(config[activeSection]).length === 1 ? (
+            renderObjectNode(
+              [activeSection, 'PromptSettings'],
+              config[activeSection].PromptSettings,
+              0
+            )
           ) : (
             renderObjectNode([activeSection], config[activeSection], 0)
           )
+        ) : isLoading ? (
+          <div className="flex justify-center" style={{ padding: 40 }}>
+            <div className="spinner spinner-lg" />
+          </div>
         ) : (
-          <div style={{ color: 'var(--color-text-muted)', fontSize: 13, padding: 20, textAlign: 'center' }}>
+          <div
+            style={{
+              color: 'var(--color-text-muted)',
+              fontSize: 13,
+              padding: 20,
+              textAlign: 'center',
+            }}
+          >
             No configuration found for this section.
           </div>
         )}

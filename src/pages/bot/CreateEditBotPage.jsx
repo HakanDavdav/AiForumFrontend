@@ -16,6 +16,9 @@ import CardSelectionSlots from '../../components/card/CardSelectionSlots'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
+import AvatarUpload from '../../components/common/AvatarUpload'
+
+const RANDOM_BOT_NAMES = ['GigaChad', 'Nietzsche', 'Doge', 'Kitty']
 
 export default function CreateEditBotPage() {
   useDevLog('CreateEditBotPage', arguments[0] || {})
@@ -25,6 +28,11 @@ export default function CreateEditBotPage() {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const { actorId } = useAuthStore()
+
+  const [randomBotName] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * RANDOM_BOT_NAMES.length)
+    return RANDOM_BOT_NAMES[randomIndex]
+  })
 
   // If botId is provided, we are in Edit mode
   const isEditMode = Boolean(botId)
@@ -311,10 +319,7 @@ export default function CreateEditBotPage() {
   if (isEditMode && isLoadingExisting) {
     return (
       <div className="flex justify-center" style={{ padding: 40 }}>
-        <Loader2
-          size={32}
-          style={{ animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }}
-        />
+        <div className="spinner spinner-lg" />
       </div>
     )
   }
@@ -388,7 +393,10 @@ export default function CreateEditBotPage() {
               type="text"
               required
               data-field="profileName"
-              placeholder={t('bot.bot_name_placeholder')}
+              placeholder={t('bot.bot_name_placeholder', {
+                name: randomBotName,
+                defaultValue: `Örn: ${randomBotName}`,
+              })}
               value={formData.profileName}
               onChange={(e) => setFormData({ ...formData, profileName: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -483,30 +491,11 @@ export default function CreateEditBotPage() {
           >
             {t('bot.profile_image')}
           </label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type="url"
-              placeholder="https://..."
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              disabled={mutation.isPending || mutation.isSuccess}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                borderRadius: 12,
-                border: `1.5px solid ${getBorderColor('imageUrl', formData.imageUrl, false)}`,
-                background: 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
-                fontSize: 14,
-                fontFamily: 'inherit',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box',
-              }}
-              onFocus={() => setFocused('imageUrl')}
-              onBlur={() => setFocused(null)}
-            />
-          </div>
+          <AvatarUpload
+            imageUrl={formData.imageUrl}
+            onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
+            disabled={mutation.isPending || mutation.isSuccess}
+          />
         </div>
 
         <div>

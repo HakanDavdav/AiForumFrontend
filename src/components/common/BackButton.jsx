@@ -19,7 +19,7 @@ export default function BackButton({ onClick, style = { marginBottom: 16 } }) {
     <button
       className="btn-icon"
       onClick={handleGoBack}
-      style={{ background: 'var(--color-surface-2)', ...style }}
+      style={style}
       title="Geri Dön"
     >
       <ArrowLeft size={18} />

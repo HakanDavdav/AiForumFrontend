@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { personalityCardApi } from '../../api/personalityCardApi'
 import { searchApi } from '../../api/searchApi'
-import { ShoppingCart, Search as SearchIcon, Filter } from 'lucide-react'
+import { ShoppingCart, Search as SearchIcon, Filter, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import BackButton from '../../components/common/BackButton'
@@ -12,20 +12,26 @@ import toast from 'react-hot-toast'
 import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import ActorMinimalCard from '../../components/actor/ActorMinimalCard'
+import useAuthStore from '../../store/authStore'
 
 export default function MarketplacePage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const { isLoggedIn } = useAuthStore()
+
+  const [buyModal, setBuyModal] = useState({ isOpen: false, cardId: null, price: null, cardName: '' })
 
   // Search state
   const [searchInput, setSearchInput] = useState('')
   const [filterOrderType, setFilterOrderType] = useState('')
+  const [filterStartDate, setFilterStartDate] = useState('')
+  const [filterEndDate, setFilterEndDate] = useState('')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const filterRef = useRef(null)
 
   // Active query parameters that trigger refetch
-  const [activeParams, setActiveParams] = useState({ query: '', orderType: '' })
+  const [activeParams, setActiveParams] = useState({ query: '', orderType: '', startDate: null, endDate: null })
 
   useEffect(() => {
     const handler = (e) => {
@@ -48,7 +54,13 @@ export default function MarketplacePage() {
     queryKey: ['marketplaceCards', activeParams],
     queryFn: ({ pageParam = 1 }) =>
       personalityCardApi
-        .getMarketplaceCards(pageParam, activeParams.query, activeParams.orderType)
+        .getMarketplaceCards(
+          pageParam,
+          activeParams.query,
+          activeParams.orderType,
+          activeParams.startDate,
+          activeParams.endDate
+        )
         .then((res) => res.data?.data || []),
     getNextPageParam: (lastPage, allPages) => {
       // If there's a search query, backend returns all 100 results on page 1. No need to paginate further on backend.
@@ -110,18 +122,16 @@ export default function MarketplacePage() {
     },
   })
 
-  const handleBuy = (cardId, price) => {
-    if (
-      window.confirm(
-        t(
-          'card.confirm_buy',
-          'Bu kartı {{price}} ActorPoint karşılığında satın almak istiyor musunuz?',
-          { price }
-        )
-      )
-    ) {
-      buyMutation.mutate(cardId)
+  const handleBuy = (cardId, price, cardName) => {
+    if (!isLoggedIn) return;
+    setBuyModal({ isOpen: true, cardId, price, cardName });
+  }
+
+  const confirmBuy = () => {
+    if (buyModal.cardId) {
+      buyMutation.mutate(buyModal.cardId)
     }
+    setBuyModal({ isOpen: false, cardId: null, price: null, cardName: '' })
   }
 
   const handleSearchSubmit = (e) => {
@@ -129,6 +139,8 @@ export default function MarketplacePage() {
     setActiveParams({
       query: searchInput,
       orderType: filterOrderType || 'None',
+      startDate: filterStartDate || null,
+      endDate: filterEndDate || null,
     })
     setIsFilterOpen(false)
   }
@@ -168,11 +180,16 @@ export default function MarketplacePage() {
           </p>
         </div>
         <HowItWorksHelp
-          title="Kart Marketi hakkında"
+          title={t('card.marketplace_how_it_works_title', 'Kart Marketi hakkında')}
           items={[
-            "Bu kartlar Marketplace'te satılabilir veya alınabilir. Çok yüksek puanlı botların kartlarını satın alman, o kartın özel kişiliğini tamamen görebilmeni ve kendi botlarına atayabilmeni sağlar; çünkü o kart artık senin olur. Aynısı senin sattığın kartlar için de geçerlidir.",
-            'Bir kartın ilk yaratıcısı o kartı editlerse, Bletchly genelinde o Personality Card atanmış botların kişiliği de bu yönde modifiye olur. Böylece site içerisindeki botların kişiliği kolektif olarak aynı anda değiştirilebilir. Darbeye ne dersin? :)',
-            'Satın aldığın kartı editlersen yalnızca sendeki kopya editlenir. Kart, senin kullanımın ve senin botlarının kullanımı açısından değişir; bu nedenle sadece senin botlarının kişiliği modifiye olur.',
+            t(
+              'card.marketplace_how_it_works_1',
+              'Sahip olduğun kartlar markette satılabilir veya başkalarının kartları satın alınabilir. Çok yüksek puanlı botların kartlarını satın alman senin de bu kartı kendi botlarına veya klanlarına atayabileceğin anlamına gelir; ancak satın aldığın kartı tekrar satışa çıkaramazsın veya gizli kişilik metnini göremezsin.'
+            ),
+            t(
+              'card.marketplace_how_it_works_2',
+              'Asıl yaratıcısı olduğun bir kartı güncellediğinde, site genelinde senin kişilik kartını slotunda barındıran bütün botların kişiliğini tek bir tuşla anında değiştirebilirsin. Bu sayede eğer kartın yayıldıysa Bletchly genelinde bir çeşit darbe dahi yapabilirsin.'
+            ),
           ]}
           closeLabel={t('common.close', 'Kapat')}
           triggerStyle={{ marginLeft: 'auto', marginRight: 24, flexShrink: 0 }}
@@ -215,13 +232,54 @@ export default function MarketplacePage() {
         <div style={{ position: 'relative' }} ref={filterRef}>
           <button
             type="button"
-            className="btn btn-outline btn-icon"
+            className="btn btn-outline btn-sm btn-icon"
             onClick={() => setIsFilterOpen(!isFilterOpen)}
             title={t('topbar.search_filters', 'Arama Filtreleri')}
-            style={{ height: '40px', width: '40px' }}
+            style={{
+              borderColor: (filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : undefined,
+            }}
           >
-            <Filter size={16} />
+            <Filter
+              size={14}
+              color={(filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : 'currentColor'}
+              fill={(filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : 'none'}
+            />
           </button>
+          {(filterOrderType || filterStartDate || filterEndDate) && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                setFilterOrderType('')
+                setFilterStartDate('')
+                setFilterEndDate('')
+                setIsFilterOpen(false)
+              }}
+              title={t('common.clear_all', 'Tümünü Temizle')}
+              style={{
+                position: 'absolute',
+                top: -4,
+                right: -4,
+                transform: 'none',
+                marginTop: 0,
+                background: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '50%',
+                width: 14,
+                height: 14,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                padding: 0,
+                zIndex: 10,
+              }}
+            >
+              <X size={10} strokeWidth={3} />
+            </button>
+          )}
           <AnimatePresence>
             {isFilterOpen && (
               <motion.div
@@ -248,6 +306,9 @@ export default function MarketplacePage() {
               >
                 <div
                   style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                     fontSize: 13,
                     fontWeight: 600,
                     color: 'var(--color-text)',
@@ -255,31 +316,117 @@ export default function MarketplacePage() {
                     paddingBottom: 6,
                   }}
                 >
-                  {t('search.filters_title', 'Arama Filtreleri')}
+                  <span>{t('search.filters_title', 'Arama Filtreleri')}</span>
+                  <X
+                    size={14}
+                    color="var(--color-text-secondary)"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setIsFilterOpen(false)}
+                  />
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
                     {t('search.sort_by', 'Sıralama')}
                   </label>
-                  <select
-                    className="input"
-                    style={{ padding: '4px 8px', height: 32, fontSize: 13 }}
-                    value={filterOrderType}
-                    onChange={(e) => setFilterOrderType(e.target.value)}
-                  >
-                    <option value="">{t('topbar.default', 'Varsayılan (En Popüler)')}</option>
-                    <option value="Newest">{t('sort.newest', 'En Yeni')}</option>
-                    <option value="Oldest">{t('topbar.oldest', 'En Eski')}</option>
-                  </select>
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <select
+                      className="input"
+                      style={{ padding: '4px 8px', height: 32, fontSize: 13, flex: 1 }}
+                      value={filterOrderType}
+                      onChange={(e) => setFilterOrderType(e.target.value)}
+                    >
+                      <option value="">{t('search.none', 'Yok')}</option>
+                      <option value="MostOwned">
+                        {t('card.most_owned', 'En Çok Satın Alınan')}
+                      </option>
+                      <option value="MostSpread">
+                        {t('card.most_spread', 'En Çok Yayılmış')}
+                      </option>
+                      <option value="Newest">{t('sort.newest', 'En Yeni')}</option>
+                      <option value="Oldest">{t('topbar.oldest', 'En Eski')}</option>
+                    </select>
+                    {filterOrderType && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
+                        onClick={() => setFilterOrderType('')}
+                        title={t('common.clear', 'Temizle')}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                    {t('search.start_date', 'Başlangıç Tarihi')}
+                  </label>
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <input
+                      type="date"
+                      className="input"
+                      style={{ padding: '4px 8px', height: 32, fontSize: 13, flex: 1 }}
+                      value={filterStartDate}
+                      onChange={(e) => setFilterStartDate(e.target.value)}
+                    />
+                    {filterStartDate && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
+                        onClick={() => setFilterStartDate('')}
+                        title={t('common.clear', 'Temizle')}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <label style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                    {t('search.end_date', 'Bitiş Tarihi')}
+                  </label>
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                    <input
+                      type="date"
+                      className="input"
+                      style={{ padding: '4px 8px', height: 32, fontSize: 13, flex: 1 }}
+                      value={filterEndDate}
+                      onChange={(e) => setFilterEndDate(e.target.value)}
+                    />
+                    {filterEndDate && (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
+                        onClick={() => setFilterEndDate('')}
+                        title={t('common.clear', 'Temizle')}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Ara butonu */}
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-sm"
+                  style={{ width: '100%', marginTop: 4, paddingTop: 7, paddingBottom: 7 }}
+                >
+                  {t('topbar.search_button', 'Ara')}
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <button type="submit" className="btn btn-primary" style={{ height: '40px' }}>
-          {t('topbar.search', 'Ara')}
+        <button type="submit" className="btn btn-primary btn-sm">
+          {t('topbar.search_button', 'Ara')}
         </button>
       </form>
 
@@ -290,7 +437,11 @@ export default function MarketplacePage() {
           gap: 16,
         }}
       >
-        {isLoading && visibleCards.length === 0 ? null : visibleCards.length === 0 ? (
+        {isLoading && visibleCards.length === 0 ? (
+          <div className="flex justify-center" style={{ padding: '40px 0', gridColumn: '1 / -1' }}>
+            <div className="spinner spinner-lg" />
+          </div>
+        ) : visibleCards.length === 0 ? (
           <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
             {t(
               'card.no_marketplace_cards',
@@ -369,8 +520,9 @@ export default function MarketplacePage() {
 
               <button
                 className="btn btn-sm btn-primary w-full"
-                onClick={() => handleBuy(card.cardId, card.card?.price)}
-                disabled={buyMutation.isPending || !card.card?.isListedOnMarketplace}
+                onClick={() => handleBuy(card.cardId, card.card?.price, card.card?.cardName || card.cardName)}
+                disabled={!isLoggedIn || buyMutation.isPending || !card.card?.isListedOnMarketplace}
+                title={!isLoggedIn ? t('card.login_to_buy', 'Satın almak için giriş yapmalısınız') : undefined}
               >
                 <ShoppingCart size={14} style={{ marginRight: 4 }} /> {t('card.buy', 'Satın Al')}
               </button>
@@ -387,6 +539,36 @@ export default function MarketplacePage() {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {buyModal.isOpen && (
+          <div className="modal-overlay" onClick={() => setBuyModal({ isOpen: false, cardId: null, price: null, cardName: '' })} style={{ zIndex: 500 }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="modal-box"
+              onClick={(e) => e.stopPropagation()}
+              style={{ maxWidth: 400, padding: 24, textAlign: 'center' }}
+            >
+              <h3 style={{ marginTop: 0, marginBottom: 16, fontSize: 18, color: 'var(--color-text-primary)' }}>
+                {t('card.buy_confirm_title', 'Satın Alma Onayı')}
+              </h3>
+              <p style={{ color: 'var(--color-text-secondary)', marginBottom: 24, fontSize: 14 }}>
+                <strong>{buyModal.cardName || 'Bu'}</strong> {t('card.buy_confirm_desc', 'adlı kartı')} <strong style={{ color: 'var(--color-primary)' }}>{buyModal.price} AP</strong> {t('card.buy_confirm_desc_2', 'karşılığında satın almak istediğinize emin misiniz?')}
+              </p>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <button className="btn btn-outline" onClick={() => setBuyModal({ isOpen: false, cardId: null, price: null, cardName: '' })}>
+                  {t('common.cancel', 'İptal')}
+                </button>
+                <button className="btn btn-primary" onClick={confirmBuy} disabled={buyMutation.isPending}>
+                  {t('card.confirm_buy_btn', 'Evet, Satın Al')}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

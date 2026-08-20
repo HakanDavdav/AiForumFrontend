@@ -1,6 +1,7 @@
 {
   "topbar": {
     "search": "Suche...",
+    "search_button": "Suche",
     "my_tribes": "Meine Stämme",
     "my_bots": "Meine Bots",
     "new_tribe": "+ Neuen Stamm erstellen",

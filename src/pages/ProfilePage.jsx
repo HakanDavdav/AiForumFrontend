@@ -38,6 +38,7 @@ import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import AvatarUpload from '../components/common/AvatarUpload'
 
 const TOPIC_TYPES = [
   { value: 1, enumName: 'Politics', label: 'Politika' },
@@ -98,7 +99,7 @@ export default function ProfilePage() {
   const [likesModalOpen, setLikesModalOpen] = useState(false)
 
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState({ profileName: '', bio: '', topicTypes: [] })
+  const [editForm, setEditForm] = useState({ profileName: '', bio: '', imageUrl: '', topicTypes: [] })
 
   const toggleTopic = (value) => {
     setEditForm((prev) => ({
@@ -114,7 +115,7 @@ export default function ProfilePage() {
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['actorProfile', actorId],
-    queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data),
+    queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data ?? null),
     enabled: !!actorId,
   })
 
@@ -186,6 +187,7 @@ export default function ProfilePage() {
     setEditForm({
       profileName: profile?.profileName || '',
       bio: profile?.bio || '',
+      imageUrl: profile?.imageUrl || '',
       topicTypes: initialTopics,
     })
     setIsEditing(true)
@@ -199,10 +201,10 @@ export default function ProfilePage() {
     const payload = {
       userId: actorId,
       profileName: editForm.profileName,
-      imageUrl: profile?.imageUrl || '',
+      imageUrl: editForm.imageUrl || '',
       bio: editForm.bio,
       topicTypes: editForm.topicTypes,
-      entryPerPage: profile?.entryPerPage || 50,
+
       postPerPage: profile?.postPerPage || 20,
       socialNotificationPreference: profile?.socialNotificationPreference ?? true,
       socialEmailPreference: profile?.socialEmailPreference ?? true,
@@ -484,15 +486,23 @@ export default function ProfilePage() {
               paddingBottom: 0,
             }}
           >
-            <ActorAvatar
-              profileName={profile.profileName}
-              imageUrl={profile.imageUrl}
-              discriminator={profile.discriminator}
-              actorId={profile.actorId}
-              botGrade={profile.botSettings?.botGrade}
-              size="xxxl"
-              clickable={false}
-            />
+            {isEditing ? (
+              <AvatarUpload
+                imageUrl={editForm.imageUrl}
+                onImageUploaded={(url) => setEditForm(prev => ({ ...prev, imageUrl: url }))}
+                disabled={editMutation.isPending}
+              />
+            ) : (
+              <ActorAvatar
+                profileName={profile.profileName}
+                imageUrl={profile.imageUrl}
+                discriminator={profile.discriminator}
+                actorId={profile.actorId}
+                botGrade={profile.botSettings?.botGrade}
+                size="xxxl"
+                clickable={false}
+              />
+            )}
 
             <div className="flex flex-col gap-2" style={{ width: '100%', marginTop: 8 }}>
               {isLoggedIn && !isOwnProfile && (

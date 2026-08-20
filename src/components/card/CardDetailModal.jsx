@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { BookOpen, Bot, CalendarFold, Hash, Tag, Users, X, Crown } from 'lucide-react'
+import { BookOpen, Bot, CalendarFold, Hash, Tag, Users, X, Crown, Edit2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
+import IconActionButton from '../common/IconActionButton'
 
 function normalizeTags(rawTags) {
   if (Array.isArray(rawTags)) return rawTags
@@ -69,7 +70,7 @@ function DetailRow({ icon: Icon, label, value, multiline = false, iconSize = 14 
   )
 }
 
-export default function CardDetailModal({ card, isOpen, onClose }) {
+export default function CardDetailModal({ card, isOpen, onClose, onEditClick = null }) {
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -166,6 +167,12 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
     },
   ]
 
+  const isOwnerCard =
+    card.acquisitionType === 0 ||
+    card.acquisitionType === 1 ||
+    cardData.acquisitionType === 0 ||
+    cardData.acquisitionType === 1
+
   return createPortal(
     <div className="modal-overlay" onClick={onClose} style={{ zIndex: 150 }} role="presentation">
       <div
@@ -217,14 +224,29 @@ export default function CardDetailModal({ card, isOpen, onClose }) {
               {cardName}
             </h2>
           </div>
-          <button
-            type="button"
-            className="btn-icon"
-            onClick={onClose}
-            aria-label={t('common.close', 'Kapat')}
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {onEditClick && isOwnerCard && (
+              <IconActionButton
+                onClick={() => {
+                  onClose()
+                  onEditClick(card)
+                }}
+                title={t('action.edit', 'Düzenle')}
+                aria-label={t('action.edit', 'Düzenle')}
+                style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)' }}
+              >
+                <Edit2 size={17} strokeWidth={2.2} />
+              </IconActionButton>
+            )}
+            <IconActionButton
+              onClick={onClose}
+              title={t('common.close', 'Kapat')}
+              aria-label={t('common.close', 'Kapat')}
+              style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)' }}
+            >
+              <X size={20} />
+            </IconActionButton>
+          </div>
         </div>
 
         <div

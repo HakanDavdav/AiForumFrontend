@@ -4,6 +4,7 @@ import MemoryManagementPanel from '../../components/admin/MemoryManagementPanel'
 import ActorManagementPanel from '../../components/admin/ActorManagementPanel'
 import ConfigManagementPanel from '../../components/admin/ConfigManagementPanel'
 import Logo from '../../components/common/Logo'
+import BackButton from '../../components/common/BackButton'
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('config')
@@ -16,56 +17,76 @@ export default function AdminPage() {
   ]
 
   return (
-    <div className="flex flex-col w-full min-h-screen" style={{ color: 'var(--color-text)' }}>
-      {/* Header / Tabs */}
-      <div
-        className="flex flex-col shrink-0 border-b"
-        style={{
-          background: 'var(--color-surface)',
-          borderColor: 'var(--color-border)',
-        }}
-      >
-        <div className="flex justify-center items-center gap-3 px-4 py-4 border-b" style={{ borderColor: 'var(--color-border)', marginTop: '4px' }}>
-          <Logo width={24} height={24} fill="var(--color-primary)" />
-          <span style={{ fontWeight: 800, fontSize: 18 }}>Admin</span>
-        </div>
-        
-        {/* Horizontal Navigation */}
-        <nav className="flex justify-center overflow-x-auto px-4 gap-2 hide-scrollbar" style={{ paddingTop: '16px', paddingBottom: '12px' }}>
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: '9999px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: 11.5,
-                  fontWeight: isActive ? 600 : 500,
-                  transition: 'all var(--transition-fast)',
-                  background: isActive ? 'var(--color-primary)' : 'var(--color-surface-2)',
-                  color: isActive ? '#ffffff' : 'var(--color-text)',
-                  whiteSpace: 'nowrap'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) e.currentTarget.style.background = 'var(--color-surface-hover)'
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) e.currentTarget.style.background = 'var(--color-surface-2)'
-                }}
-              >
-                {tab.label}
-              </button>
-            )
-          })}
-        </nav>
+    <div className="flex-col gap-4">
+      {/* Standalone Back Button row */}
+      <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
+        <BackButton style={{ marginBottom: 0 }} />
       </div>
 
+      {/* Standard Page Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 24,
+          paddingBottom: 20,
+          borderBottom: '1px solid var(--color-border)',
+        }}
+      >
+        <div className="page-header-icon">
+          <Logo width={22} height={22} fill="#fff" />
+        </div>
+        <div>
+          <h1
+            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
+          >
+            Admin Panel
+          </h1>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
+            Sistem yapılandırması, olaylar ve bellek yönetimi
+          </p>
+        </div>
+      </div>
+
+      {/* Horizontal Navigation Tabs */}
+      <nav
+        className="flex overflow-x-auto gap-2 hide-scrollbar"
+        style={{ marginBottom: 20 }}
+      >
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '9999px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 12.5,
+                fontWeight: isActive ? 600 : 500,
+                transition: 'all var(--transition-fast)',
+                background: isActive ? 'var(--color-primary)' : 'var(--color-surface-2)',
+                color: isActive ? '#ffffff' : 'var(--color-text)',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) e.currentTarget.style.background = 'var(--color-surface-hover)'
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) e.currentTarget.style.background = 'var(--color-surface-2)'
+              }}
+            >
+              {tab.label}
+            </button>
+          )
+        })}
+      </nav>
+
       {/* Content Area */}
-      <div className="flex-1 flex flex-col p-4 md:p-6 w-full">
+      <div className="flex-1 flex flex-col w-full">
         {activeTab === 'config' && <ConfigManagementPanel />}
         {activeTab === 'events' && <SystemEventsPanel />}
         {activeTab === 'memory' && <MemoryManagementPanel />}

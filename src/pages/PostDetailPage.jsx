@@ -33,7 +33,7 @@ export default function PostDetailPage() {
 
   const { data: postData, isLoading: isPostLoading } = useQuery({
     queryKey: ['post', postId],
-    queryFn: () => contentItemApi.getPost(postId).then((r) => r.data?.data),
+    queryFn: () => contentItemApi.getPost(postId).then((r) => r.data?.data ?? null),
     enabled: !!postId,
   })
 

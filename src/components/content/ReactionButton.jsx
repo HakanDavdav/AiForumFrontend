@@ -74,6 +74,9 @@ export default function ReactionButton({
       const newLikeId = res.data?.data
       if (newLikeId) {
         setLikeId(newLikeId)
+        serverLikeIdRef.current = newLikeId
+        serverReactionRef.current = variables.reactionType
+        if (onReactionChange) onReactionChange(variables.reactionType)
         if (loggedInActorId) {
           queryClient.setQueryData(['actorLike', contentItemId, loggedInActorId], {
             likeId: newLikeId,
@@ -84,7 +87,7 @@ export default function ReactionButton({
     },
     onError: () => {
       // Geri al
-      setOptimisticReaction(currentUserReaction)
+      setOptimisticReaction(serverReactionRef.current)
       setOptimisticLikeCount(likeCount ?? 0)
       setOptimisticDislikeCount(dislikeCount ?? 0)
     },
@@ -94,12 +97,15 @@ export default function ReactionButton({
     mutationFn: ({ likeId, contentItemId }) => contentItemApi.removeLike(likeId, contentItemId),
     onSuccess: () => {
       setLikeId(null)
+      serverLikeIdRef.current = null
+      serverReactionRef.current = null
+      if (onReactionChange) onReactionChange(null)
       if (loggedInActorId) {
         queryClient.setQueryData(['actorLike', contentItemId, loggedInActorId], null)
       }
     },
     onError: () => {
-      setOptimisticReaction(currentUserReaction)
+      setOptimisticReaction(serverReactionRef.current)
       setOptimisticLikeCount(likeCount ?? 0)
       setOptimisticDislikeCount(dislikeCount ?? 0)
     },
@@ -154,26 +160,24 @@ export default function ReactionButton({
       debounceTimerRef.current = null // Timer çalışmaya başladı
 
       const serverReaction = serverReactionRef.current
-      const serverLikeId = serverLikeIdRef.current
+      const currentKnownLikeId = serverLikeIdRef.current || likeId || '00000000-0000-0000-0000-000000000000'
 
       if (nextReaction === serverReaction) {
         return // Sunucu durumu ile istenen durum aynı, işlem yapmaya gerek yok
       }
 
       if (nextReaction === null) {
-        // Kaldırma işlemi
-        if (serverLikeId) {
-          try {
-            await removeMutation.mutateAsync({ likeId: serverLikeId, contentItemId })
-          } catch (e) {
-            console.error('Failed to remove reaction', e)
-          }
+        // Kaldırma işlemi (unlike / undislike)
+        try {
+          await removeMutation.mutateAsync({ likeId: currentKnownLikeId, contentItemId })
+        } catch (e) {
+          console.error('Failed to remove reaction', e)
         }
       } else {
         // Değiştirme veya yeni ekleme işlemi
-        if (serverReaction !== null && serverLikeId) {
+        if (serverReaction !== null) {
           try {
-            await removeMutation.mutateAsync({ likeId: serverLikeId, contentItemId })
+            await removeMutation.mutateAsync({ likeId: currentKnownLikeId, contentItemId })
           } catch (e) {
             console.error('Failed to remove old reaction', e)
           }
@@ -181,7 +185,7 @@ export default function ReactionButton({
 
         likeMutation.mutate({ contentItemId, reactionType: nextReaction })
       }
-    }, 1000)
+    }, 400)
   }
 
   const activeClass = (type) => {

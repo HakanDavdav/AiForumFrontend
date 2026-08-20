@@ -9,6 +9,7 @@ import BotFlashCardsIcon from '../components/common/BotFlashCardsIcon'
 import CardSelectionSlots from '../components/card/CardSelectionSlots'
 import PersonalityCard from '../components/card/PersonalityCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
+import AvatarUpload from '../components/common/AvatarUpload'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
@@ -40,7 +41,7 @@ export default function TribeSettingsPage() {
   // Fetch Tribe
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
-    queryFn: () => tribeApi.getTribe(tribeId).then((r) => r.data?.data),
+    queryFn: () => tribeApi.getTribe(tribeId).then((r) => r.data?.data ?? null),
     enabled: !!tribeId,
   })
 
@@ -108,10 +109,7 @@ export default function TribeSettingsPage() {
   if (isLoading)
     return (
       <div className="flex justify-center" style={{ padding: 40 }}>
-        <Loader2
-          size={32}
-          style={{ animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }}
-        />
+        <div className="spinner spinner-lg" />
       </div>
     )
   if (!tribe) return <div className="empty-state">{t('tribe_settings.not_found')}</div>
@@ -250,7 +248,7 @@ export default function TribeSettingsPage() {
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {t(
               'tribe_settings.title_desc',
-              'Kabilenizin genel ayarlarını ve üyelerini buradan yönetebilirsiniz.'
+              'Klanınızın genel ayarlarını ve üyelerini buradan yönetebilirsiniz.'
             )}
           </p>
         </div>
@@ -262,6 +260,16 @@ export default function TribeSettingsPage() {
         onSubmit={handleSave}
         style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
       >
+        <div>
+          <label style={labelStyle}>
+            COVER IMAGE
+          </label>
+          <AvatarUpload
+            imageUrl={formData.imageUrl}
+            onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
+            disabled={editMutation.isPending}
+          />
+        </div>
         <div>
           <label style={labelStyle}>
             {t('tribe_settings.tribe_name')}{' '}
@@ -331,7 +339,7 @@ export default function TribeSettingsPage() {
 
         <div>
           <label style={labelStyle}>
-            {t('card.personality_cards', 'TRIBEYE ATANMIŞ KOLLEKTİF KİŞİLİK KARTLARI')}
+            {t('card.personality_cards', 'KLANA ATANMIŞ KOLEKTİF KİŞİLİK KARTLARI')}
           </label>
           {tribe.personalityCards?.length > 0 ? (
             <CardSelectionSlots
@@ -343,11 +351,11 @@ export default function TribeSettingsPage() {
               showHeader={false}
               slotCount={tribe.personalityCards.length}
               tribeAssigned
-              tribeBadgeLabel="TRIBE"
+              tribeBadgeLabel="KLAN"
             />
           ) : (
             <p className="text-muted" style={{ fontSize: 13 }}>
-              {t('card.no_assigned_cards', 'Henüz tribe\'a kart atanmamış.')}
+              {t('card.no_assigned_cards', 'Henüz klana kart atanmamış.')}
             </p>
           )}
         </div>
@@ -368,10 +376,7 @@ export default function TribeSettingsPage() {
             slotCount={10}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
-            {t(
-              'bot.additional_personality_cards_desc',
-              'Sahip olduğun kartlardan tribe\'a ekleyebilirsin.'
-            )}
+            {t('tribe_settings.additional_personality_cards_desc')}
           </p>
         </div>
 

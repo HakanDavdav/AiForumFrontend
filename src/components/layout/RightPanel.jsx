@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Podium } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -48,8 +48,8 @@ export default function RightPanel() {
         <div style={{ padding: '0 12px', marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
             {myBots.slice(0, 3).map((bot) => (
-              <div 
-                key={bot.actorId} 
+              <div
+                key={bot.actorId}
                 onClick={() => navigate('/profile?actorId=' + bot.actorId)}
                 style={{ cursor: 'pointer' }}
                 title={bot.profileName}
@@ -95,7 +95,7 @@ export default function RightPanel() {
       {/* ─── Tribe Leaderboard Cache Widget ────── */}
       <div style={{ padding: '0 12px' }}>
         <CacheWidget
-          title={t('leaderboard.tribe_leaderboard', 'Tribe Sıralaması')}
+          title={t('leaderboard.tribe_leaderboard', 'Klan Sıralaması')}
           items={tribeLeaderboard}
           type="tribe"
           onViewAll={() => navigate('/leaderboard?type=tribe')}
@@ -178,18 +178,21 @@ export default function RightPanel() {
             color: 'var(--color-text-faint)',
           }}
         >
-          <a href="#" style={{ color: 'inherit' }}>
+          <Link to="/about" style={{ color: 'inherit', textDecoration: 'none' }}>
             {t('footer.about', 'Hakkımızda')}
-          </a>{' '}
+          </Link>{' '}
           •
-          <a href="#" style={{ color: 'inherit' }}>
+          <Link to="/contact" style={{ color: 'inherit', textDecoration: 'none' }}>
+            {t('footer.contact', 'İletişim')}
+          </Link>{' '}
+          •
+          <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>
             {t('footer.privacy', 'Gizlilik')}
-          </a>{' '}
+          </Link>{' '}
           •
-          <a href="#" style={{ color: 'inherit' }}>
+          <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>
             {t('footer.terms', 'Şartlar')}
-          </a>{' '}
-          •<span>© 2026 Bletchly</span>
+          </Link>
         </div>
       </div>
     </aside>
@@ -264,18 +267,30 @@ function CacheWidget({ title, items, type, onViewAll }) {
                       style={{ padding: '6px 8px', margin: '2px 0' }}
                       onClick={() =>
                         navigate(
-                          type !== 'tribe' ? '/profile?actorId=' + item.actorId : '/tribe?tribeId=' + item.tribeId
+                          type !== 'tribe'
+                            ? '/profile?actorId=' + item.actorId
+                            : '/tribe?tribeId=' + item.tribeId
                         )
                       }
                     >
-                      <div className="lb-rank" style={{ minWidth: 24, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <div
+                        className="lb-rank"
+                        style={{
+                          minWidth: 24,
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
                         {isTop3 ? (
-                          <span style={{
-                            color: 'var(--color-primary)',
-                            opacity: rank === 1 ? 1 : rank === 2 ? 0.8 : 0.6,
-                            fontWeight: rank === 1 ? 800 : rank === 2 ? 700 : 600,
-                            fontSize: rank === 1 ? 18 : rank === 2 ? 16 : 14
-                          }}>
+                          <span
+                            style={{
+                              color: 'var(--color-primary)',
+                              opacity: rank === 1 ? 1 : rank === 2 ? 0.8 : 0.6,
+                              fontWeight: rank === 1 ? 800 : rank === 2 ? 700 : 600,
+                              fontSize: rank === 1 ? 18 : rank === 2 ? 16 : 14,
+                            }}
+                          >
                             #{rank}
                           </span>
                         ) : (

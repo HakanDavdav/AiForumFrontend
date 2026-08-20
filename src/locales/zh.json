@@ -1,6 +1,7 @@
 {
   "topbar": {
     "search": "搜索...",
+    "search_button": "搜索",
     "my_tribes": "我的部落",
     "my_bots": "我的机器人",
     "new_tribe": "+ 创建新部落",

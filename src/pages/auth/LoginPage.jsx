@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import ForgotPasswordModal from '../../components/auth/ForgotPasswordModal'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
@@ -10,6 +10,7 @@ import { signInWithPopup } from 'firebase/auth'
 import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 
 import Logo from '../../components/common/Logo'
+import SelectionMarker from '../../components/common/SelectionMarker'
 
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
@@ -240,6 +241,13 @@ export default function LoginPage() {
               onBlur={() => setFocused(null)}
             />
           </div>
+
+          <div style={{ marginTop: 8, padding: '12px 16px', backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: '1.4', display: 'block', textAlign: 'center' }}>
+              By logging in, you agree to our <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Terms of Service</Link> and <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Privacy Policy</Link>.
+            </span>
+          </div>
+
           <button 
             type="submit" 
             className="btn btn-primary w-full"

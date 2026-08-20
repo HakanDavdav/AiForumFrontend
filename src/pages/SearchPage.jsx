@@ -177,12 +177,22 @@ export default function SearchPage() {
     <div className="flex-col gap-4">
       <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
         <BackButton />
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>
-          {query ? t('search.results_for', { query }) : t('search.results')}
-        </h1>
-        {mode !== 'general' && (
-          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-            {orderType && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+                      <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                padding: '4px 8px',
+                borderRadius: 16,
+                background: 'var(--color-bg-alt)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              {t('search.search_label', 'Arama: ')}{query || t('search.none', 'Yok')}
+            </span>
+          
+          {mode !== 'general' && (
+            <>
               <span
                 style={{
                   fontSize: 12,
@@ -194,16 +204,16 @@ export default function SearchPage() {
                 }}
               >
                 {t('search.order')}
-                {orderType === 'Oldest'
-                  ? t('search.oldest')
-                  : orderType === 'Newest'
-                    ? t('search.newest')
-                    : orderType === 'MostLiked'
-                      ? t('search.most_liked')
-                      : orderType}
+                {orderType && orderType !== 'None'
+                  ? orderType === 'Oldest'
+                    ? t('search.oldest')
+                    : orderType === 'Newest'
+                      ? t('search.newest')
+                      : orderType === 'MostLiked'
+                        ? t('search.most_liked')
+                        : orderType
+                  : t('search.none', 'Yok')}
               </span>
-            )}
-            {startDate && (
               <span
                 style={{
                   fontSize: 12,
@@ -214,10 +224,9 @@ export default function SearchPage() {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                {t('search.start_date')}{new Date(startDate).toLocaleDateString(undefined)}
+                {t('search.start_date')}
+                {startDate ? new Date(startDate).toLocaleDateString(undefined) : t('search.none', 'Yok')}
               </span>
-            )}
-            {endDate && (
               <span
                 style={{
                   fontSize: 12,
@@ -228,11 +237,12 @@ export default function SearchPage() {
                   border: '1px solid var(--color-border)',
                 }}
               >
-                {t('search.end_date')}{new Date(endDate).toLocaleDateString(undefined)}
+                {t('search.end_date')}
+                {endDate ? new Date(endDate).toLocaleDateString(undefined) : t('search.none', 'Yok')}
               </span>
-            )}
-          </div>
-        )}
+            </>
+          )}
+        </div>
       </div>
       {renderResults()}
     </div>

@@ -145,12 +145,33 @@ export default function SystemEventsPanel() {
   const [selectedEventName, setSelectedEventName] = useState(initialEvent.name)
   const [eventType, setEventType] = useState(initialEvent.name)
   const [payload, setPayload] = useState(JSON.stringify(initialEvent.defaultPayload, null, 2))
+  const [lastTraceId, setLastTraceId] = useState(null)
 
-  const triggerEventMutation = useMutation({
+  const isActorEvent = EVENT_CATEGORIES.some(
+    (cat) => cat.category === 'Actor Events' && cat.events.some((e) => e.name === selectedEventName)
+  )
+
+  const triggerSystemEventMutation = useMutation({
     mutationFn: (data) => adminApi.triggerSystemCustomEvent(data),
     meta: { showErrorToast: true },
-    onSuccess: () => {
+    onSuccess: (res) => {
+      const traceId = res?.data?.data
+      setLastTraceId(traceId || null)
       toast.success('System event triggered successfully!')
+    },
+  })
+
+  const triggerBotEventMutation = useMutation({
+    mutationFn: (data) =>
+      adminApi.triggerBotEvent(data.actorId, {
+        eventType: data.eventType,
+        payload: data.payload,
+      }),
+    meta: { showErrorToast: true },
+    onSuccess: (res) => {
+      const traceId = res?.data?.data
+      setLastTraceId(traceId || null)
+      toast.success('Bot event triggered successfully!')
     },
   })
 
@@ -171,13 +192,21 @@ export default function SystemEventsPanel() {
     if (!eventType) return toast.error('EventType is required')
     try {
       const parsed = JSON.parse(payload)
-      triggerEventMutation.mutate({ eventType, payload: parsed })
+      if (isActorEvent) {
+        triggerBotEventMutation.mutate({
+          actorId: parsed.ParentActorId,
+          eventType,
+          payload: parsed,
+        })
+      } else {
+        triggerSystemEventMutation.mutate({ eventType, payload: parsed })
+      }
     } catch {
       toast.error('Invalid JSON format in Payload')
     }
   }
 
-  const isLoading = triggerEventMutation.isPending
+  const isLoading = triggerSystemEventMutation.isPending || triggerBotEventMutation.isPending
 
   return (
     <div
@@ -279,7 +308,9 @@ export default function SystemEventsPanel() {
             <textarea
               className="input w-full"
               value={payload}
-              onChange={(e) => setPayload(e.target.value)}
+              onChange={(e) => {
+                setPayload(e.target.value)
+              }}
               spellCheck={false}
               style={{
                 fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
@@ -310,6 +341,39 @@ export default function SystemEventsPanel() {
           >
             {isLoading ? 'İşleniyor...' : 'Event Tetikle'}
           </button>
+
+          {lastTraceId && (
+            <div
+              style={{
+                marginTop: 10,
+                padding: '8px 12px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(34, 197, 94, 0.08)',
+                border: '1px solid rgba(34, 197, 94, 0.25)',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--color-text-secondary)',
+                  marginBottom: 2,
+                }}
+              >
+                Trace ID
+              </div>
+              <code
+                style={{
+                  fontSize: 12,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                  color: '#22c55e',
+                  wordBreak: 'break-all',
+                }}
+              >
+                {lastTraceId}
+              </code>
+            </div>
+          )}
         </div>
       </div>
     </div>

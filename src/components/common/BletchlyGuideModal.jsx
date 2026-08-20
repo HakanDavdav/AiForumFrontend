@@ -1,17 +1,16 @@
 import { useEffect, useId, useState } from 'react'
-import { ShieldQuestion, X, Info } from 'lucide-react'
+import { ShieldQuestion, X, Bot, Users, Sparkles, Newspaper, ArrowRight, Podium } from 'lucide-react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import IconActionButton from './IconActionButton'
+import BotFlashCardsIcon from './BotFlashCardsIcon'
+import Logo from './Logo'
 
-export default function HowItWorksHelp({
-  title,
-  items,
-  triggerLabel = title,
-  closeLabel = 'Close',
-  triggerStyle,
-  modalWidth = 'min(700px, calc(100vw - 32px))',
-}) {
+export default function BletchlyGuideModal({ triggerStyle }) {
   const [isOpen, setIsOpen] = useState(false)
   const titleId = useId()
+  const navigate = useNavigate()
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -24,14 +23,67 @@ export default function HowItWorksHelp({
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [isOpen])
 
+  const location = useLocation()
+  useEffect(() => {
+    if (location.state?.showGuide) {
+      setIsOpen(true)
+      const state = { ...location.state }
+      delete state.showGuide
+      navigate(location.pathname, { replace: true, state })
+    }
+  }, [location, navigate])
+
+  const handleNavigate = (path) => {
+    setIsOpen(false)
+    navigate(path)
+  }
+
+  const sections = [
+    {
+      icon: <Bot size={22} color="var(--color-primary)" />,
+      title: t('bletchly_guide.bots_title'),
+      desc: t('bletchly_guide.bots_desc'),
+      linkText: t('bletchly_guide.bots_link'),
+      path: '/create-bot'
+    },
+    {
+      icon: <Users size={22} color="var(--color-primary)" />,
+      title: t('bletchly_guide.tribes_title'),
+      desc: t('bletchly_guide.tribes_desc'),
+      linkText: t('bletchly_guide.tribes_link'),
+      path: '/create-tribe'
+    },
+    {
+      icon: <BotFlashCardsIcon size={22} style={{ color: 'var(--color-primary)' }} />,
+      title: t('bletchly_guide.cards_title'),
+      desc: t('bletchly_guide.cards_desc'),
+      linkText: t('bletchly_guide.cards_link'),
+      path: '/marketplace'
+    },
+    {
+      icon: <Sparkles size={22} color="var(--color-primary)" />,
+      title: t('bletchly_guide.news_title'),
+      desc: t('bletchly_guide.news_desc'),
+      linkText: t('bletchly_guide.news_link'),
+      path: '/enrich-news'
+    },
+    {
+      icon: <Podium size={22} color="var(--color-primary)" />,
+      title: t('bletchly_guide.leaderboard_title'),
+      desc: t('bletchly_guide.leaderboard_desc'),
+      linkText: t('bletchly_guide.leaderboard_link'),
+      path: '/leaderboard'
+    }
+  ]
+
   return (
     <>
       <IconActionButton
         onClick={() => setIsOpen(true)}
-        aria-label={triggerLabel}
+        aria-label={t('bletchly_guide.title')}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        title={triggerLabel}
+        title={t('bletchly_guide.title')}
         style={triggerStyle}
       >
         <ShieldQuestion size={20} strokeWidth={2.2} />
@@ -51,7 +103,7 @@ export default function HowItWorksHelp({
             aria-labelledby={titleId}
             onClick={(event) => event.stopPropagation()}
             style={{
-              width: modalWidth,
+              width: 'min(700px, calc(100vw - 32px))',
               maxWidth: 'none',
               maxHeight: '90vh',
               padding: 0,
@@ -79,7 +131,7 @@ export default function HowItWorksHelp({
                   width: 44, height: 44, borderRadius: '50%', background: 'var(--color-primary-alpha)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
-                  <ShieldQuestion size={24} color="var(--color-primary)" />
+                  <Logo width={32} height={32} fill="var(--color-primary)" />
                 </div>
                 <div>
                   <h2
@@ -92,7 +144,7 @@ export default function HowItWorksHelp({
                       letterSpacing: '-0.02em',
                     }}
                   >
-                    {title}
+                    {t('bletchly_guide.title')}
                   </h2>
                 </div>
               </div>
@@ -100,7 +152,7 @@ export default function HowItWorksHelp({
                 type="button"
                 className="btn-icon"
                 onClick={() => setIsOpen(false)}
-                aria-label={closeLabel}
+                aria-label={t('common.close', 'Kapat')}
               >
                 <X size={20} />
               </button>
@@ -108,18 +160,25 @@ export default function HowItWorksHelp({
 
             {/* Body */}
             <div style={{ padding: '24px', overflowY: 'auto' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {items.map((item, index) => (
+              <p style={{ margin: '0 0 24px 0', fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+                {t('bletchly_guide.intro')}
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                {sections.map((sec, idx) => (
                   <div
-                    key={`${titleId}-${index}`}
+                    key={idx}
+                    onClick={() => handleNavigate(sec.path)}
                     style={{
                       display: 'flex',
-                      gap: 16,
+                      flexDirection: 'column',
                       padding: 20,
                       borderRadius: 12,
                       border: '1px solid var(--color-border)',
                       background: 'var(--color-bg)',
+                      cursor: 'pointer',
                       transition: 'all 0.2s ease',
+                      gap: 12
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = 'var(--color-primary)'
@@ -132,16 +191,23 @@ export default function HowItWorksHelp({
                       e.currentTarget.style.boxShadow = 'none'
                     }}
                   >
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 8, background: 'var(--color-surface)',
-                      border: '1px solid var(--color-border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                      marginTop: 2
-                    }}>
-                      <Info size={16} color="var(--color-primary)" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 10, background: 'var(--color-surface)',
+                        border: '1px solid var(--color-border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        {sec.icon}
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                        {sec.title}
+                      </h3>
                     </div>
-                    <div style={{ flex: 1, margin: 0, fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                      {item}
+                    <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.5, flex: 1 }}>
+                      {sec.desc}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-primary)', fontSize: 13, fontWeight: 600, marginTop: 'auto' }}>
+                      {sec.linkText}
+                      <ArrowRight size={14} strokeWidth={2.5} />
                     </div>
                   </div>
                 ))}

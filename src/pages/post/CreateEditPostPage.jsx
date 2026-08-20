@@ -127,10 +127,7 @@ export default function CreateEditPostPage() {
   if (isEditMode && isLoadingExisting) {
     return (
       <div className="flex justify-center" style={{ padding: 40 }}>
-        <Loader2
-          size={32}
-          style={{ animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }}
-        />
+        <div className="spinner spinner-lg" />
       </div>
     )
   }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { personalityCardApi } from '../../api/personalityCardApi'
+import { actorApi } from '../../api/actorApi'
 import { Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
@@ -12,6 +13,7 @@ import CardSlots from '../../components/card/CardSlots'
 import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import PersonalityCard from '../../components/card/PersonalityCard'
+import CardEditComponent from '../../components/card/CardEditComponent'
 
 export default function PersonalityCardPage() {
   const navigate = useNavigate()
@@ -20,6 +22,7 @@ export default function PersonalityCardPage() {
   const { actorId } = useAuthStore()
 
   const [isCreating, setIsCreating] = useState(false)
+  const [editingCard, setEditingCard] = useState(null)
   const [formData, setFormData] = useState({
     cardName: '',
     personalityPrompt: '',
@@ -27,9 +30,16 @@ export default function PersonalityCardPage() {
     personalityCardConfirmed: false,
   })
 
-  const { data: myCards = [] } = useQuery({
+  const { data: myCards = [], isLoading: isCardsLoading } = useQuery({
     queryKey: ['myPersonalityCards', actorId],
     queryFn: () => personalityCardApi.getOwnedCards(actorId).then((res) => res.data?.data || []),
+    enabled: Boolean(actorId),
+    meta: { showErrorToast: true },
+  })
+
+  const { data: myBots = [], isLoading: isBotsLoading } = useQuery({
+    queryKey: ['myBots', actorId],
+    queryFn: () => actorApi.getMyBots().then((res) => res.data?.data || []),
     enabled: Boolean(actorId),
     meta: { showErrorToast: true },
   })
@@ -73,6 +83,21 @@ export default function PersonalityCardPage() {
     createMutation.mutate(payload)
   }
 
+  const handleStartEdit = (card) => {
+    if (!card) return
+    setIsCreating(false)
+    setEditingCard(card)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  if (isCardsLoading || isBotsLoading) {
+    return (
+      <div className="flex justify-center" style={{ padding: 40 }}>
+        <div className="spinner spinner-lg" />
+      </div>
+    )
+  }
+
   return (
     <div className="flex-col gap-4">
       <div
@@ -91,7 +116,14 @@ export default function PersonalityCardPage() {
         />
         <button
           className="btn btn-sm btn-primary"
-          onClick={() => setIsCreating(!isCreating)}
+          onClick={() => {
+            if (isCreating) {
+              setIsCreating(false)
+            } else {
+              setEditingCard(null)
+              setIsCreating(true)
+            }
+          }}
           style={{ borderRadius: 20, padding: '6px 14px' }}
         >
           {isCreating ? (
@@ -128,16 +160,31 @@ export default function PersonalityCardPage() {
           </p>
         </div>
         <HowItWorksHelp
-          title="Kişilik kartları hakkında"
+          title={t('card.how_it_works_title', 'Kişilik kartları hakkında')}
           items={[
-            'Yaratılan kişilik kartlarının sahipliği sende olur. Bu kartları istediğin botlarına atayabilirsin. Botlar Bletchly içerisinde bütün davranışlarını bu kişilik kartlarına göbekten bağlı şekilde gerçekleştirir ve yapacakları her işlemi kendi kişiliklerini göz önünde bulundurarak yaparlar.',
-            'Bu kartların taşıdığı kişilik metni diğer kullanıcılar tarafından görülemez. Diğer kullanıcılar senin kartlarının yalnızca çok kısa şekilde özetlenmiş hint bilgisini ve alakalı etiketlerini görebilir. Aynısı senin için de geçerlidir.',
+            t(
+              'card.how_it_works_1',
+              'Yaratılan kişilik kartlarının sahipliği sende olur. Bu kişilik kartlarını istediğin botlarına atayabilirsin. Botlar Bletchly içerisinde bütün davranışlarını kendi kişilik kartı setine göre sergiler.'
+            ),
+            t(
+              'card.how_it_works_2',
+              'Herkes sadece asıl yaratıcısı olduğu kartın kişilik metnini görebilir. Eğer kartın orijinal sahibi değilsen bu kartların sadece kısa ipucunu görebilirsin.'
+            ),
+            t(
+              'card.how_it_works_3',
+              'Kart marketinden kullanıcı puanın (AP) ile kart satın alabilirsin; bu satın aldığın kartı istediğin bir klanına veya botuna atayabilirsin ama tekrar satışa çıkaramazsın veya kişilik metnini göremezsin.'
+            ),
+            t(
+              'card.how_it_works_4',
+              'Asıl yaratıcısı olduğun bir kartı güncellediğinde, site genelinde senin kişilik kartını slotunda barındıran bütün botların kişiliğini tek bir tuşla anında değiştirebilirsin. Bu sayede eğer kartın yayıldıysa Bletchly genelinde bir çeşit darbe dahi yapabilirsin.'
+            ),
           ]}
           closeLabel={t('common.close', 'Kapat')}
           triggerStyle={{ marginLeft: 'auto', marginRight: 24, flexShrink: 0 }}
         />
       </div>
 
+      {/* Card Creation Block */}
       {isCreating && (
         <div
           style={{
@@ -160,8 +207,21 @@ export default function PersonalityCardPage() {
                 setFormData((current) => ({ ...current, personalityCardConfirmed: false }))
               }
             />
+            <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+              {t('card.how_it_works_1')}
+            </p>
           </div>
         </div>
+      )}
+
+      {/* Comprehensive Card Editing Block */}
+      {editingCard && (
+        <CardEditComponent
+          card={editingCard}
+          myBots={myBots}
+          onClose={() => setEditingCard(null)}
+          onSaved={() => setEditingCard(null)}
+        />
       )}
 
       {/* Slots Section */}
@@ -179,9 +239,15 @@ export default function PersonalityCardPage() {
           >
             {t('card.ownership_slots', 'Kart Sahiplik Yuvaları (10 Slot)')}
           </h3>
-          <CardSlots cards={myCards} slotCount={10} showMark={false} />
+          <CardSlots
+            cards={myCards}
+            slotCount={10}
+            showMark={false}
+            onEditClick={handleStartEdit}
+          />
         </div>
       </div>
     </div>
   )
 }
+

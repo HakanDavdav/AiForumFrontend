@@ -84,7 +84,7 @@ export default function TribeMinimalCard({
         )}
         {isMyTribe && (
           <span
-            title={t('common.your_tribe', 'Senin Kabilen')}
+            title={t('common.your_tribe', 'Senin Klanın')}
             style={{
               position: 'absolute',
               top: isCompact ? -3 : -4,
@@ -102,7 +102,7 @@ export default function TribeMinimalCard({
         )}
       </div>
       <div style={{ flex: isCompact ? '0 1 auto' : 1, minWidth: 0 }}>
-        <div className="tribe-card-name truncate">{tribeName || 'İsimsiz Tribe'}</div>
+        <div className="tribe-card-name truncate">{tribeName || 'İsimsiz Klan'}</div>
       </div>
       {!isCompact && showMindBtn && (
         <button

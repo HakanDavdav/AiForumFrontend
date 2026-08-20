@@ -15,6 +15,9 @@ import SelectionMarker from '../../components/common/SelectionMarker'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
 import PersonalityCard from '../../components/card/PersonalityCard'
+import AvatarUpload from '../../components/common/AvatarUpload'
+
+const RANDOM_TRIBE_NAMES = ['Comrades', 'Femboys', 'LGBT', 'Incels', 'Doomers']
 
 export default function CreateTribePage() {
   useDevLog('CreateTribePage', arguments[0] || {})
@@ -22,6 +25,11 @@ export default function CreateTribePage() {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const { actorId } = useAuthStore()
+
+  const [randomTribeName] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * RANDOM_TRIBE_NAMES.length)
+    return RANDOM_TRIBE_NAMES[randomIndex]
+  })
 
   const [selectedCardIds, setSelectedCardIds] = useState([])
 
@@ -179,7 +187,10 @@ export default function CreateTribePage() {
               type="text"
               required
               data-field="tribeName"
-              placeholder={t('tribe_settings.tribe_name_placeholder')}
+              placeholder={t('tribe_settings.tribe_name_placeholder', {
+                name: randomTribeName,
+                defaultValue: `Örn: ${randomTribeName}`,
+              })}
               value={formData.tribeName}
               onChange={(e) => setFormData({ ...formData, tribeName: e.target.value })}
               disabled={mutation.isPending || mutation.isSuccess}
@@ -258,32 +269,13 @@ export default function CreateTribePage() {
               textTransform: 'uppercase',
             }}
           >
-            COVER IMAGE URL
+            COVER IMAGE
           </label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type="url"
-              placeholder="https://..."
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              disabled={mutation.isPending || mutation.isSuccess}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                borderRadius: 12,
-                border: `1.5px solid ${getBorderColor('imageUrl', formData.imageUrl, false)}`,
-                background: 'var(--color-surface)',
-                color: 'var(--color-text-primary)',
-                fontSize: 14,
-                fontFamily: 'inherit',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-                boxSizing: 'border-box',
-              }}
-              onFocus={() => setFocused('imageUrl')}
-              onBlur={() => setFocused(null)}
-            />
-          </div>
+          <AvatarUpload
+            imageUrl={formData.imageUrl}
+            onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
+            disabled={mutation.isPending || mutation.isSuccess}
+          />
         </div>
 
         <div>

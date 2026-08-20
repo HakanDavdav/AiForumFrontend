@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import TokenModal from '../../components/auth/TokenModal'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import { signInWithPopup } from 'firebase/auth'
@@ -14,6 +14,7 @@ import { triggerConfetti } from '../../utils/confetti'
 
 
 import Logo from '../../components/common/Logo'
+import SelectionMarker from '../../components/common/SelectionMarker'
 
 export default function RegisterPage() {
   useDevLog('RegisterPage', arguments[0] || {})
@@ -26,6 +27,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   const [isConfirming, setIsConfirming] = useState(false)
   const { t } = useTranslation()
@@ -59,6 +61,12 @@ export default function RegisterPage() {
   })
 
   const handleProviderLogin = async (provider) => {
+    if (!agreedToTerms) {
+      toast.error(t('auth.must_agree_terms', 'Kayıt olmak için Hizmet Şartları\'nı kabul etmelisiniz.'))
+      setHasTermsError(true)
+      return
+    }
+
     try {
       const result = await signInWithPopup(auth, provider)
       const idToken = await result.user.getIdToken()
@@ -96,6 +104,7 @@ export default function RegisterPage() {
   }
 
   const [hasSubmitted, setHasSubmitted] = useState(false)
+  const [hasTermsError, setHasTermsError] = useState(false)
   const [focused, setFocused] = useState(null)
 
   const getBorderColor = (fieldName, value, isRequired) => {
@@ -108,11 +117,18 @@ export default function RegisterPage() {
     return 'var(--color-border)'
   }
 
-  const canSubmitRegister = username.trim() !== '' && email.trim() !== '' && password.trim() !== '' && passwordConfirm.trim() !== '' && !registerMutation.isPending && !requestEmailConfirmMutation.isPending
+  const canSubmitRegister = username.trim() !== '' && email.trim() !== '' && password.trim() !== '' && passwordConfirm.trim() !== '' && agreedToTerms && !registerMutation.isPending && !requestEmailConfirmMutation.isPending
 
   const handleRegisterSubmit = (e) => {
     e.preventDefault()
     
+    if (!agreedToTerms) {
+      toast.error(t('auth.must_agree_terms', 'Kayıt olmak için Hizmet Şartları\'nı kabul etmelisiniz.'))
+      setHasSubmitted(true)
+      setHasTermsError(true)
+      return
+    }
+
     if (!canSubmitRegister) {
       setHasSubmitted(true)
       return
@@ -211,6 +227,28 @@ export default function RegisterPage() {
             onBlur={() => setFocused(null)}
           />
         </div>
+
+        <div style={{ 
+          marginTop: 8, 
+          padding: '12px 16px', 
+          backgroundColor: 'rgba(59, 130, 246, 0.05)', 
+          borderRadius: 8, 
+          border: (hasTermsError && !agreedToTerms) ? '1px solid var(--color-error)' : '1px solid rgba(59, 130, 246, 0.2)',
+          transition: 'border-color 0.2s ease-in-out'
+        }}>
+          <SelectionMarker 
+            checked={agreedToTerms} 
+            onChange={(e) => {
+              setAgreedToTerms(e.target.checked)
+              if (e.target.checked) setHasTermsError(false)
+            }}
+          >
+            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: '1.4', userSelect: 'none', display: 'block', paddingLeft: 4 }}>
+              By registering, I agree to the <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Terms of Service</Link> and acknowledge the <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Privacy Policy</Link>.
+            </span>
+          </SelectionMarker>
+        </div>
+
         <button 
           type="submit" 
           className="btn btn-primary w-full"

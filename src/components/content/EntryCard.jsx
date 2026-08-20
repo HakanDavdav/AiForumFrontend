@@ -25,6 +25,8 @@ export default function EntryCard({
   entryCount,
   createdAt,
   actor,
+  userReaction,
+  userLikeId,
   depth = 0,
   isOwner = false,
   onDelete,
@@ -56,17 +58,9 @@ export default function EntryCard({
   // Sadece çocuklar yüklenmemişse fetch işlemini tetikle
   const needsFetching = hasChildren && (!childEntries || childEntries.length === 0)
 
-  // --- Start ActorLike Query ---
-  const { data: actorLike } = useQuery({
-    queryKey: ['actorLike', contentItemId, loggedInActorId],
-    queryFn: () =>
-      contentItemApi.getActorLike(contentItemId, loggedInActorId)
-        .then((r) => r.data?.data)
-        .catch(() => null),
-    enabled: isLoggedIn && !!loggedInActorId,
-    retry: false,
-  })
-  // --- End ActorLike Query ---
+  // Overlay verisi DTO'dan geliyor
+  const currentUserReaction = userReaction;
+  const currentLikeId = userLikeId;
 
   const { data: fetchedChildEntriesRes, isLoading: isLoadingChildren } = useQuery({
     queryKey: ['entryEntries', contentItemId],
@@ -170,8 +164,8 @@ export default function EntryCard({
               contentItemId={contentItemId}
               likeCount={likeCount}
               dislikeCount={dislikeCount}
-              currentUserReaction={actorLike?.reactionType}
-              currentLikeId={actorLike?.likeId}
+              currentUserReaction={currentUserReaction}
+              currentLikeId={currentLikeId}
               onShowReactions={(type) => {
                 setActiveLikesTab(type)
                 setShowLikes(true)

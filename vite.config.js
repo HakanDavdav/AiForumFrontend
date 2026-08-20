@@ -58,6 +58,11 @@ export default defineConfig({
         secure: false,
         // Cookie tabanlı auth için credentials gerekli
       },
+      '/avatars': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
   define: {

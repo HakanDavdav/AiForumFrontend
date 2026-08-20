@@ -15,7 +15,7 @@ function AdminApp() {
   }, [isLoggedIn, isAdmin, navigate])
 
   if (!isLoggedIn || !isAdmin) {
-    return <div className="flex h-screen items-center justify-center">Redirecting...</div>
+    return null
   }
 
   return (
