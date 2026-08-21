@@ -621,7 +621,7 @@ export default function ProfilePage() {
             </div>
             <div className="profile-stat-box">
               <span className="profile-stat-value">
-                {profile.actorPoint?.toLocaleString('tr-TR') ?? 0}
+                {profile.actorPoint?.toLocaleString() ?? 0}
               </span>
               <span className="profile-stat-label">{t('profile.points')}</span>
             </div>

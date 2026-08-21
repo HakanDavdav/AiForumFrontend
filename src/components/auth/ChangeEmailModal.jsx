@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
-import { X } from 'lucide-react'
+import { X, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { triggerConfetti } from '../../utils/confetti'
@@ -88,37 +88,101 @@ export default function ChangeEmailModal({ isOpen, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={handleOverlayClick} style={{ zIndex: 100 }}>
-      <div className="modal-box" style={{ maxWidth: 400, padding: 32, textAlign: 'left' }}>
+      <div className="modal-box" style={{ maxWidth: 440, padding: '36px 32px', textAlign: 'left', position: 'relative' }}>
+        <button
+          type="button"
+          className="btn-icon"
+          onClick={onClose}
+          style={{ position: 'absolute', top: 16, right: 16, color: 'var(--color-text-muted)' }}
+        >
+          <X size={20} />
+        </button>
+
         <AnimatePresence mode="wait">
           <motion.div key="step1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('auth.change_email_title')}</h2>
-              <button type="button" className="btn-icon" onClick={onClose}>
-                <X size={20} />
-              </button>
+            {/* Top Centered Circular Icon Badge */}
+            <div
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                background: 'var(--color-primary-lighter)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 20px',
+              }}
+            >
+              <Mail size={26} color="var(--color-primary)" strokeWidth={2} />
             </div>
-            <p className="text-muted" style={{ marginBottom: 24, fontSize: 14 }}>
+
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 10px', textAlign: 'center' }}>
+              {t('auth.change_email_title')}
+            </h2>
+
+            {/* Modal Description */}
+            <p
+              style={{
+                fontSize: 13,
+                lineHeight: 1.6,
+                color: 'var(--color-text-muted)',
+                margin: '0 0 24px 0',
+                textAlign: 'center',
+              }}
+            >
               {t('auth.change_email_desc')}
             </p>
-            <form noValidate onSubmit={handleRequestSubmit} className="flex-col gap-4">
-              <div className="form-group">
-                <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.new_email')}</label>
+
+            {/* Modal Form */}
+            <form noValidate onSubmit={handleRequestSubmit}>
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                  {t('auth.new_email')}
+                </label>
                 <input
                   className="input"
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="name@example.com"
                   required
-                  style={{ borderColor: getBorderColor('newEmail', newEmail, true), outline: 'none' }}
+                  style={{
+                    height: 42,
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    borderColor: getBorderColor('newEmail', newEmail, true),
+                    outline: 'none',
+                  }}
                   onFocus={() => setFocused('newEmail')}
                   onBlur={() => setFocused(null)}
                 />
               </div>
-              <div style={{ marginTop: 16 }}>
+
+              {/* Modal Footer with Top Lining */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 10,
+                  paddingTop: 20,
+                  marginTop: 24,
+                  borderTop: '1px solid var(--color-border)',
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={onClose}
+                  disabled={requestMutation.isPending}
+                  style={{ minWidth: 90 }}
+                >
+                  {t('common.close', 'Kapat')}
+                </button>
                 <button
                   type="submit"
-                  className="btn btn-primary w-full"
+                  className="btn btn-primary"
                   disabled={requestMutation.isPending}
+                  style={{ minWidth: 120 }}
                 >
                   {requestMutation.isPending ? t('action.sending') : t('action.send')}
                 </button>

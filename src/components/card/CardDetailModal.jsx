@@ -7,6 +7,8 @@ import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
 
+import i18n from '../../i18n'
+
 function normalizeTags(rawTags) {
   if (Array.isArray(rawTags)) return rawTags
   if (typeof rawTags !== 'string' || !rawTags.trim()) return []
@@ -20,8 +22,9 @@ function formatDate(value) {
   if (!value) return null
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return String(value)
-  const datePart = date.toLocaleDateString('tr-TR')
-  const timePart = date.toLocaleTimeString('tr-TR', { hour12: false })
+  const locale = (i18n.language && i18n.language.startsWith('en')) ? 'en-US' : 'tr-TR'
+  const datePart = date.toLocaleDateString(locale)
+  const timePart = date.toLocaleTimeString(locale, { hour12: false })
   return `${datePart} / ${timePart}`
 }
 
@@ -95,7 +98,7 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
   const ownershipId = card.ownershipId
   const actorId = card.actorId
   const acquisitionType =
-    card.acquisitionType === 0 ? 'Created' : card.acquisitionType === 1 ? 'Purchased' : null
+    card.acquisitionType === 0 ? t('card.created', 'Oluşturuldu') : card.acquisitionType === 1 ? t('card.purchased', 'Satın Alındı') : null
   const assignedBots = card.assignedBots || cardData.assignedBots || []
   const assignedTribes = card.assignedTribes || cardData.assignedTribes || []
   const ownershipCount = cardData.ownershipCount ?? card.ownershipCount

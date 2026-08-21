@@ -5,15 +5,17 @@ import ActorManagementPanel from '../../components/admin/ActorManagementPanel'
 import ConfigManagementPanel from '../../components/admin/ConfigManagementPanel'
 import Logo from '../../components/common/Logo'
 import BackButton from '../../components/common/BackButton'
+import { useTranslation } from 'react-i18next'
 
 export default function AdminPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('config')
 
   const tabs = [
-    { id: 'config', label: 'Background Services & Config' },
-    { id: 'events', label: 'System Events' },
-    { id: 'memory', label: 'Memory Management' },
-    { id: 'actor', label: 'Actor Management' },
+    { id: 'config', label: t('admin.bg_services_config', 'Background Services & Config') },
+    { id: 'events', label: t('admin.system_events_title', 'System Events') },
+    { id: 'memory', label: t('admin.memory_management_title', 'Memory Management') },
+    { id: 'actor', label: t('admin.actor_management_title', 'Actor Management') },
   ]
 
   return (
@@ -41,10 +43,10 @@ export default function AdminPage() {
           <h1
             style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
-            Admin Panel
+            {t('admin.title', 'Admin Paneli')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            Sistem yapılandırması, olaylar ve bellek yönetimi
+            {t('admin.desc', 'Sistem yapılandırması, olaylar ve bellek yönetimi')}
           </p>
         </div>
       </div>
@@ -95,3 +97,4 @@ export default function AdminPage() {
     </div>
   )
 }
+

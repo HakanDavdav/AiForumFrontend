@@ -80,7 +80,7 @@ export default function ProfileLikesModal({ actorId, isOpen, onClose }) {
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">{t('profile.no_reactions', 'Henüz bir reaksiyon vermemiş.')}</p>
+            <p className="empty-state">{t('common.nothing_here_yet', 'Henüz burada hiçbir şey yok')}</p>
           ) : (
             <div className="flex flex-col gap-4">
               {items.map((like) => {

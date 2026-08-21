@@ -59,14 +59,14 @@ export default function ContentItemPage() {
   if (isError || !data) {
     return (
       <div className="empty-state">
-        İçerik bulunamadı.
+        {t('common.content_not_found', 'İçerik bulunamadı.')}
         <br />
         <button
           className="btn btn-ghost"
           onClick={() => navigate(-1)}
           style={{ marginTop: 16 }}
         >
-          Geri Dön
+          {t('common.go_back', 'Geri Dön')}
         </button>
       </div>
     )

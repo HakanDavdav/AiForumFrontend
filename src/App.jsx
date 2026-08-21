@@ -4,6 +4,7 @@ import useThemeStore from './store/themeStore'
 import { useEffect, lazy, Suspense } from 'react'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
 import InitProfileGuard from './components/auth/InitProfileGuard'
+import { useTranslation } from 'react-i18next'
 
 // View (Page) Components placeholder importları
 // Birazdan bunları oluşturacağız
@@ -27,6 +28,7 @@ import MarketplacePage from './pages/card/MarketplacePage'
 import HierarchyPage from './pages/HierarchyPage'
 import MindPage from './pages/MindPage'
 import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
+import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
 import TermsOfServicePage from './pages/legal/TermsOfServicePage'
@@ -38,6 +40,7 @@ const AdminApp = import.meta.env.VITE_IS_ADMIN_BUILD === 'true'
   : () => null
 
 export default function App() {
+  const { t: translate } = useTranslation()
   const { isDarkMode, isGreenMode } = useThemeStore()
 
   useEffect(() => {
@@ -94,7 +97,7 @@ export default function App() {
                       padding: '0 4px',
                       lineHeight: 1,
                     }}
-                    title="Close"
+                    title={translate('common.close', 'Close')}
                   >
                     ×
                   </button>
@@ -139,6 +142,7 @@ export default function App() {
             <Route path="/cards" element={<PersonalityCardPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/enrich-news" element={<EnrichNewsPoolPage />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/contact" element={<ContactPage />} />

@@ -1,17 +1,19 @@
 import { useEffect, useId, useState } from 'react'
 import { ShieldQuestion, X, Info } from 'lucide-react'
 import IconActionButton from './IconActionButton'
+import { useTranslation } from 'react-i18next'
 
 export default function HowItWorksHelp({
   title,
   items,
   triggerLabel = title,
-  closeLabel = 'Close',
+  closeLabel = null,
   triggerStyle,
   modalWidth = 'min(700px, calc(100vw - 32px))',
 }) {
   const [isOpen, setIsOpen] = useState(false)
   const titleId = useId()
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -100,7 +102,7 @@ export default function HowItWorksHelp({
                 type="button"
                 className="btn-icon"
                 onClick={() => setIsOpen(false)}
-                aria-label={closeLabel}
+                aria-label={closeLabel || t('common.close', 'Kapat')}
               >
                 <X size={20} />
               </button>

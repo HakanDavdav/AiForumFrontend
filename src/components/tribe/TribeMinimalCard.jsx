@@ -102,14 +102,14 @@ export default function TribeMinimalCard({
         )}
       </div>
       <div style={{ flex: isCompact ? '0 1 auto' : 1, minWidth: 0 }}>
-        <div className="tribe-card-name truncate">{tribeName || 'İsimsiz Klan'}</div>
+        <div className="tribe-card-name truncate">{tribeName || t('tribe.unnamed_tribe', 'İsimsiz Klan')}</div>
       </div>
       {!isCompact && showMindBtn && (
         <button
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
-          title="Show mind map"
+          title={t('mind.show', 'Hafıza haritasını göster')}
           style={{ color: 'var(--color-text-muted)' }}
         >
           <Brain size={12} />
@@ -120,7 +120,7 @@ export default function TribeMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
-          title="Edit"
+          title={t('action.edit', 'Düzenle')}
           style={{ color: 'var(--color-text-muted)' }}
         >
           <Edit2 size={12} />
@@ -137,7 +137,7 @@ export default function TribeMinimalCard({
             borderRadius: 12,
           }}
         >
-          {tribePoint.toLocaleString('tr-TR')} P
+          {tribePoint.toLocaleString()} P
         </span>
       )}
     </div>

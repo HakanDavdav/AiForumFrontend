@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { adminApi } from '../../api/adminApi'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 export default function MemoryManagementPanel() {
+  const { t } = useTranslation()
   const [tribeId, setTribeId] = useState('')
   const [actorId, setActorId] = useState('')
 
@@ -12,7 +14,7 @@ export default function MemoryManagementPanel() {
     mutationFn: (id) => adminApi.triggerTribeMemory(id),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      toast.success('Tribe memory triggered successfully!')
+      toast.success(t('admin.tribe_memory_triggered', 'Tribe hafızası tetiklendi'))
     },
   })
 
@@ -20,7 +22,7 @@ export default function MemoryManagementPanel() {
     mutationFn: (id) => adminApi.forgetOldTribeMemories(id),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      toast.success('Old tribe memories forgotten successfully!')
+      toast.success(t('admin.tribe_memory_forgotten', 'Eski tribe hafızaları unutuldu'))
     },
   })
 
@@ -29,7 +31,7 @@ export default function MemoryManagementPanel() {
     mutationFn: (id) => adminApi.triggerMemory(id),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      toast.success('Bot memory triggered successfully!')
+      toast.success(t('admin.bot_memory_triggered', 'Bot hafızası tetiklendi'))
     },
   })
 
@@ -37,27 +39,27 @@ export default function MemoryManagementPanel() {
     mutationFn: (id) => adminApi.forgetOldMemories(id),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      toast.success('Old bot memories forgotten successfully!')
+      toast.success(t('admin.bot_memory_forgotten', 'Eski bot hafızaları unutuldu'))
     },
   })
 
   const handleTriggerTribeMemory = () => {
-    if (!tribeId) return toast.error('TribeId is required')
+    if (!tribeId) return toast.error(t('admin.tribe_id_placeholder', 'Tribe ID girin (GUID)'))
     triggerTribeMemoryMutation.mutate(tribeId)
   }
 
   const handleForgetTribeMemories = () => {
-    if (!tribeId) return toast.error('TribeId is required')
+    if (!tribeId) return toast.error(t('admin.tribe_id_placeholder', 'Tribe ID girin (GUID)'))
     forgetTribeMemoriesMutation.mutate(tribeId)
   }
 
   const handleTriggerActorMemory = () => {
-    if (!actorId) return toast.error('ActorId is required')
+    if (!actorId) return toast.error(t('admin.actor_id_placeholder', 'Actor ID girin (GUID)'))
     triggerActorMemoryMutation.mutate(actorId)
   }
 
   const handleForgetActorMemories = () => {
-    if (!actorId) return toast.error('ActorId is required')
+    if (!actorId) return toast.error(t('admin.actor_id_placeholder', 'Actor ID girin (GUID)'))
     forgetActorMemoriesMutation.mutate(actorId)
   }
 
@@ -78,10 +80,10 @@ export default function MemoryManagementPanel() {
       {/* Header */}
       <div className="border-b" style={{ borderColor: 'var(--color-border)', marginBottom: '12px', paddingBottom: '8px' }}>
         <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>
-          Memory Management
+          {t('admin.memory_management_title', 'Hafıza Yönetimi')}
         </h2>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
-          Tribe ve Bot Actor hafızalarını yönetin
+          {t('admin.memory_management_desc', 'Tribe ve Bot Actor hafızalarını yönetin')}
         </p>
       </div>
 
@@ -96,7 +98,7 @@ export default function MemoryManagementPanel() {
           }}
         >
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--color-text)' }}>
-            Tribe Memory
+            {t('admin.tribe_memory', 'Tribe Hafızası')}
           </div>
           <div className="form-group">
             <label
@@ -109,7 +111,7 @@ export default function MemoryManagementPanel() {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Tribe ID
+              {t('admin.tribe_id', 'Tribe ID')}
             </label>
             <input
               className="input w-full"
@@ -140,7 +142,7 @@ export default function MemoryManagementPanel() {
                 borderRadius: 'var(--radius-md)',
               }}
             >
-              Hafıza Çıkarımı Tetikle
+              {t('admin.trigger_memory_extraction', 'Hafıza Çıkarımı Tetikle')}
             </button>
 
             <button
@@ -154,7 +156,7 @@ export default function MemoryManagementPanel() {
                 borderRadius: 'var(--radius-md)',
               }}
             >
-              Eski Hafızaları Unut
+              {t('admin.forget_old_memories', 'Eski Hafızaları Unut')}
             </button>
           </div>
         </div>
@@ -169,7 +171,7 @@ export default function MemoryManagementPanel() {
           }}
         >
           <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--color-text)' }}>
-            Bot Actor Memory
+            {t('admin.bot_actor_memory', 'Bot Actor Hafızası')}
           </div>
           <div className="form-group">
             <label
@@ -182,7 +184,7 @@ export default function MemoryManagementPanel() {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Bot Actor ID
+              {t('admin.bot_actor_id', 'Bot Actor ID')}
             </label>
             <input
               className="input w-full"
@@ -213,7 +215,7 @@ export default function MemoryManagementPanel() {
                 borderRadius: 'var(--radius-md)',
               }}
             >
-              Hafıza Çıkarımı Tetikle
+              {t('admin.trigger_memory_extraction', 'Hafıza Çıkarımı Tetikle')}
             </button>
 
             <button
@@ -227,7 +229,7 @@ export default function MemoryManagementPanel() {
                 borderRadius: 'var(--radius-md)',
               }}
             >
-              Eski Hafızaları Unut
+              {t('admin.forget_old_memories', 'Eski Hafızaları Unut')}
             </button>
           </div>
         </div>
@@ -235,3 +237,4 @@ export default function MemoryManagementPanel() {
     </div>
   )
 }
+

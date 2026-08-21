@@ -22,6 +22,7 @@ import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import i18n from '../i18n'
 
 export default function TribePage() {
   const [searchParams] = useSearchParams()
@@ -122,7 +123,7 @@ export default function TribePage() {
                   <CalendarFold size={14} />
                   <span>
                     {t('tribe.founded')}
-                    {new Date(tribe.createdAt).toLocaleDateString('tr-TR')}
+                    {new Date(tribe.createdAt).toLocaleDateString(i18n.language && i18n.language.startsWith('en') ? 'en-US' : 'tr-TR')}
                   </span>
                 </p>
               )}
@@ -288,7 +289,7 @@ export default function TribePage() {
           <div className="profile-stats-grid" style={{ width: '100%' }}>
             <div className="profile-stat-box">
               <span className="profile-stat-value">
-                {tribe.tribePoint?.toLocaleString('tr-TR') ?? 0}
+                {tribe.tribePoint?.toLocaleString() ?? 0}
               </span>
               <span className="profile-stat-label">{t('profile.points')}</span>
             </div>
@@ -336,7 +337,7 @@ export default function TribePage() {
                   cards={tribe.personalityCards}
                   slotCount={tribe.personalityCards.length}
                   showMark={false}
-                  tribeBadgeLabel="KLAN"
+                  tribeBadgeLabel={t('tribe.badge_tribe', 'KLAN')}
                 />
               </div>
             </>

@@ -1,11 +1,13 @@
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 /**
  * BackButton — Standardized back button for pages
  */
 export default function BackButton({ onClick, style = { marginBottom: 16 } }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const handleGoBack = () => {
     if (onClick) {
@@ -20,7 +22,7 @@ export default function BackButton({ onClick, style = { marginBottom: 16 } }) {
       className="btn-icon"
       onClick={handleGoBack}
       style={style}
-      title="Geri Dön"
+      title={t('common.go_back', 'Geri Dön')}
     >
       <ArrowLeft size={18} />
     </button>

@@ -25,7 +25,7 @@ export default function AccountSettingsPage() {
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>
         <BackButton style={{ marginBottom: 0 }} />
       </div>
-      
+
       {/* Header */}
       <div
         style={{
@@ -52,31 +52,42 @@ export default function AccountSettingsPage() {
         </div>
       </div>
 
-
-
       {/* Hesap & Güvenlik Bölümü */}
       {!isExternalAuth && (
-        <div className="card-surface" style={{ padding: 24, marginBottom: 16 }}>
-          <div style={{ marginBottom: 20 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4, color: 'var(--color-text-primary)' }}>{t('settings.account_security')}</h2>
-            <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
-              {t('settings.account_security_desc')}
-            </p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-            <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changeEmail')}>
+        <div style={{ marginBottom: 32 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: 12,
+            }}
+          >
+            <button
+              className="btn btn-outline"
+              style={{ justifyContent: 'center' }}
+              onClick={() => setActiveModal('changeEmail')}
+            >
               {t('settings.change_email')}
             </button>
-            <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changePhone')}>
-              {t('settings.change_phone')}
-            </button>
-            <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changeUsername')}>
+            <button
+              className="btn btn-outline"
+              style={{ justifyContent: 'center' }}
+              onClick={() => setActiveModal('changeUsername')}
+            >
               {t('settings.change_username')}
             </button>
-            <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('changePassword')}>
+            <button
+              className="btn btn-outline"
+              style={{ justifyContent: 'center' }}
+              onClick={() => setActiveModal('changePassword')}
+            >
               {t('settings.change_password')}
             </button>
-            <button className="btn btn-outline" style={{ justifyContent: 'center' }} onClick={() => setActiveModal('twoFactor')}>
+            <button
+              className="btn btn-outline"
+              style={{ justifyContent: 'center' }}
+              onClick={() => setActiveModal('twoFactor')}
+            >
               {t('settings.two_factor')}
             </button>
           </div>
@@ -84,17 +95,27 @@ export default function AccountSettingsPage() {
       )}
 
       {/* Tehlikeli Alan Bölümü */}
-      <div className="card-surface" style={{ padding: 24, border: '1px solid var(--color-error)' }}>
+      <div
+        style={{
+          padding: 24,
+          borderRadius: 12,
+          border: '1px solid var(--color-error)',
+          marginBottom: 32,
+        }}
+      >
         <div style={{ marginBottom: 20 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 4 }}>{t('settings.danger_zone')}</h2>
+          <h2
+            style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-error)', marginBottom: 4 }}
+          >
+            {t('settings.danger_zone')}
+          </h2>
           <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: 0 }}>
             {t('settings.danger_zone_desc')}
           </p>
         </div>
         <div>
-          <button 
-            className="btn" 
-            style={{ backgroundColor: 'var(--color-error)', color: '#fff', border: 'none' }}
+          <button
+            className="btn btn-danger"
             onClick={() => setActiveModal('deleteAccount')}
           >
             {t('settings.delete_account')}
@@ -104,29 +125,26 @@ export default function AccountSettingsPage() {
 
       {/* Modals */}
 
-      <ChangeUsernameModal 
-        isOpen={activeModal === 'changeUsername'} 
-        onClose={() => setActiveModal(null)} 
+      <ChangeUsernameModal
+        isOpen={activeModal === 'changeUsername'}
+        onClose={() => setActiveModal(null)}
       />
-      <ChangePasswordModal 
-        isOpen={activeModal === 'changePassword'} 
-        onClose={() => setActiveModal(null)} 
+      <ChangePasswordModal
+        isOpen={activeModal === 'changePassword'}
+        onClose={() => setActiveModal(null)}
       />
-      <TwoFactorModal 
-        isOpen={activeModal === 'twoFactor'} 
-        onClose={() => setActiveModal(null)} 
+      <TwoFactorModal isOpen={activeModal === 'twoFactor'} onClose={() => setActiveModal(null)} />
+      <DeleteAccountModal
+        isOpen={activeModal === 'deleteAccount'}
+        onClose={() => setActiveModal(null)}
       />
-      <DeleteAccountModal 
-        isOpen={activeModal === 'deleteAccount'} 
-        onClose={() => setActiveModal(null)} 
+      <ChangeEmailModal
+        isOpen={activeModal === 'changeEmail'}
+        onClose={() => setActiveModal(null)}
       />
-      <ChangeEmailModal 
-        isOpen={activeModal === 'changeEmail'} 
-        onClose={() => setActiveModal(null)} 
-      />
-      <ChangePhoneModal 
-        isOpen={activeModal === 'changePhone'} 
-        onClose={() => setActiveModal(null)} 
+      <ChangePhoneModal
+        isOpen={activeModal === 'changePhone'}
+        onClose={() => setActiveModal(null)}
       />
     </div>
   )

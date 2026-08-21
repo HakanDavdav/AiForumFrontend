@@ -133,7 +133,7 @@ export default function ContactPage() {
               }}
               onFocus={() => setFocused('message')}
               onBlur={() => setFocused(null)}
-              placeholder="Mesajınızı buraya yazın..."
+              placeholder={t('contact.message_placeholder', 'Mesajınızı buraya yazın...')}
             />
           </div>
 

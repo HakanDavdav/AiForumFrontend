@@ -339,7 +339,7 @@ export default function CreateEditPostPage() {
                       : 'none',
                   }}
                 >
-                  {topic.label}
+                  {t(`topics.${topic.key || topic.enumName?.toLowerCase()}`, topic.label)}
                 </div>
               )
             })}

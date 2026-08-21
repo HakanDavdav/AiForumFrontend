@@ -11,6 +11,7 @@ import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 
 import Logo from '../../components/common/Logo'
 import SelectionMarker from '../../components/common/SelectionMarker'
+import PasswordInput from '../../components/common/PasswordInput'
 
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
@@ -231,9 +232,7 @@ export default function LoginPage() {
               <label className="form-label">{t('auth.password')}</label>
               <button type="button" className="btn btn-ghost" style={{ fontSize: 12, padding: 0 }} onClick={() => setIsForgotOpen(true)}>{t('auth.forgot_password')}</button>
             </div>
-            <input 
-              className="input" 
-              type="password" 
+            <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{ borderColor: getBorderColor('password', password, true), outline: 'none' }}

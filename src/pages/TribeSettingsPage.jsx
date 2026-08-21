@@ -262,7 +262,7 @@ export default function TribeSettingsPage() {
       >
         <div>
           <label style={labelStyle}>
-            COVER IMAGE
+            {t('tribe.cover_image', 'Kapak Resmi')}
           </label>
           <AvatarUpload
             imageUrl={formData.imageUrl}

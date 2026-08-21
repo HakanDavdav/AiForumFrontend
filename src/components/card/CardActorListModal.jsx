@@ -5,13 +5,15 @@ import { personalityCardApi } from '../../api/personalityCardApi'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import i18n from '../../i18n'
 
 function formatDate(value) {
   if (!value) return null
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return String(value)
-  const datePart = date.toLocaleDateString('tr-TR')
-  const timePart = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+  const locale = (i18n.language && i18n.language.startsWith('en')) ? 'en-US' : 'tr-TR'
+  const datePart = date.toLocaleDateString(locale)
+  const timePart = date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
   return `${datePart} ${timePart}`
 }
 
@@ -90,7 +92,7 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">{t('card.no_actors', 'Henüz kimse yok.')}</p>
+            <p className="empty-state">{t('common.nothing_here_yet', 'Henüz burada hiçbir şey yok')}</p>
           ) : (
             <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
               {items.map((item, idx) => {

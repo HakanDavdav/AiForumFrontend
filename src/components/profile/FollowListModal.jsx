@@ -74,7 +74,7 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">{t('profile.no_users_found', 'Henüz kimse yok.')}</p>
+            <p className="empty-state">{t('common.nothing_here_yet', 'Henüz burada hiçbir şey yok')}</p>
           ) : (
             <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
               {items.map((actor) => (

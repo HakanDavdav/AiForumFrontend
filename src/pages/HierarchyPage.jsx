@@ -5,8 +5,10 @@ import { actorApi } from '../api/actorApi'
 import BackButton from '../components/common/BackButton'
 import HierarchyTree from '../components/hierarchy/HierarchyTree'
 import useDevLog from '../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 export default function HierarchyPage() {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const actorId = searchParams.get('actorId')
   useDevLog('HierarchyPage', arguments[0] || {})
@@ -131,7 +133,7 @@ export default function HierarchyPage() {
         {/* Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>Derinlik:</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>{t('hierarchy.depth', 'Derinlik:')}</span>
             <input 
               type="number" 
               min="1" 
@@ -153,7 +155,7 @@ export default function HierarchyPage() {
             style={{ display: 'flex', alignItems: 'center', gap: 6 }}
           >
             {isExpandingAll ? <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} /> : <Maximize2 size={14} />}
-            Tümünü Genişlet
+            {t('hierarchy.expand_all', 'Tümünü Genişlet')}
           </button>
         </div>
       </div>
@@ -176,10 +178,10 @@ export default function HierarchyPage() {
           <h1
             style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
-            {actorName ? `${actorName} Hiyerarşisi` : 'Hiyerarşi Ağacı'}
+            {actorName ? t('hierarchy.actor_hierarchy', { name: actorName, defaultValue: `${actorName} Hiyerarşisi` }) : t('hierarchy.title', 'Hiyerarşi Ağacı')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            Aktörün platformdaki ilişkilerini ve ağacını inceleyin.
+            {t('hierarchy.desc', 'Platformdaki ilişkileri ve hiyerarşi ağacını inceleyin.')}
           </p>
         </div>
       </div>
@@ -191,10 +193,11 @@ export default function HierarchyPage() {
           {treeData ? (
              <HierarchyTree data={treeData} setTreeData={setTreeData} expandCounter={expandCounter} fetchDepth={fetchDepth} rootActorId={actorId} />
           ) : (
-             <div className="empty-state">Hiyerarşi verisi bulunamadı.</div>
+             <div className="empty-state">{t('hierarchy.no_data', 'Hiyerarşi verisi bulunamadı.')}</div>
           )}
         </div>
       )}
     </div>
   )
 }
+

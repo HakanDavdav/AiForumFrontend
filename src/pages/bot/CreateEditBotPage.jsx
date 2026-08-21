@@ -670,7 +670,7 @@ export default function CreateEditBotPage() {
                         : 'none',
                     }}
                   >
-                    {topic.label}
+                    {t(`topics.${topic.key || topic.enumName?.toLowerCase()}`, topic.label)}
                   </div>
                 )
               })}

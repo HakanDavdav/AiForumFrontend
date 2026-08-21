@@ -7,7 +7,7 @@ export function TopicTag({ topicType, size = 'sm', onClick }) {
   useDevLog('TopicTag', arguments[0] || {})
   const { t } = useTranslation()
   const enumName = TopicEnumNames[topicType]
-  const label = enumName ? t(`topics.${enumName}`) : (TopicLabels[topicType] || `Başlık ${topicType}`)
+  const label = enumName ? t(`topics.${enumName}`) : (TopicLabels[topicType] || `${t('card.topic_prefix', 'Başlık ')}${topicType}`)
   const color = TopicColors[topicType] || '#64748B'
 
   return (

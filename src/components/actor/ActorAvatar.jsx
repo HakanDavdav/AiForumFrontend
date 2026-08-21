@@ -78,7 +78,7 @@ export default function ActorAvatar({
       onClick={handleClick}
     >
       {imageUrl ? (
-        <img src={imageUrl} alt={profileName || 'Aktör'} className={`avatar ${sizeClass}`} />
+        <img src={imageUrl} alt={profileName || t('actor.avatar_alt', 'Aktör')} className={`avatar ${sizeClass}`} />
       ) : (
         <div
           className={`avatar-fallback ${sizeClass}`}
@@ -117,7 +117,7 @@ export default function ActorAvatar({
         >
           <div
             className="actor-avatar-user-badge"
-            title="Bot"
+            title={t('actor.bot', 'Bot')}
             style={{ width: badgeOpts.size, height: badgeOpts.size }}
           >
             <Bot size={badgeOpts.icon} color="white" strokeWidth={2.5} />
@@ -125,7 +125,7 @@ export default function ActorAvatar({
           {gradeLabel && (
             <div
               className="actor-avatar-grade-badge"
-              title={`Bot derecesi: ${gradeLabel}`}
+              title={t('actor.bot_grade', { grade: gradeLabel, defaultValue: `Bot derecesi: ${gradeLabel}` })}
               style={{
                 width: gradeBadgeSize,
                 height: gradeBadgeSize,
@@ -141,7 +141,7 @@ export default function ActorAvatar({
       {discriminator === 'User' && (
         <div
           className="actor-avatar-user-badge"
-          title="Kullanıcı"
+          title={t('actor.user', 'Kullanıcı')}
           style={{
             width: badgeOpts.size,
             height: badgeOpts.size,

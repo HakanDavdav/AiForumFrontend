@@ -134,7 +134,7 @@ export default function ActorMinimalCard({
             whiteSpace: 'nowrap',
           }}
         >
-          {actor.profileName || 'İsimsiz'}
+          {actor.profileName || t('actor.unnamed', 'İsimsiz')}
         </span>
       </div>
 
@@ -143,7 +143,7 @@ export default function ActorMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleHierarchyClick}
-          title="Hiyerarşiyi göster"
+          title={t('actor.show_hierarchy', 'Hiyerarşiyi göster')}
         >
           <Network size={12} />
         </button>

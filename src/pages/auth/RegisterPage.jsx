@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import TokenModal from '../../components/auth/TokenModal'
 import { useNavigate, Link } from 'react-router-dom'
@@ -9,12 +9,11 @@ import { useTranslation } from 'react-i18next'
 import { signInWithPopup } from 'firebase/auth'
 import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 import useAuthStore from '../../store/authStore'
-import { useQueryClient } from '@tanstack/react-query'
 import { triggerConfetti } from '../../utils/confetti'
-
 
 import Logo from '../../components/common/Logo'
 import SelectionMarker from '../../components/common/SelectionMarker'
+import PasswordInput from '../../components/common/PasswordInput'
 
 export default function RegisterPage() {
   useDevLog('RegisterPage', arguments[0] || {})
@@ -204,9 +203,7 @@ export default function RegisterPage() {
 
         <div className="form-group">
           <label className="form-label">{t('auth.password')}</label>
-          <input 
-            className="input" 
-            type="password" 
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ borderColor: getBorderColor('password', password, true), outline: 'none' }}
@@ -217,9 +214,7 @@ export default function RegisterPage() {
 
         <div className="form-group">
           <label className="form-label">{t('auth.password_confirm')}</label>
-          <input 
-            className="input" 
-            type="password" 
+          <PasswordInput
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
             style={{ borderColor: getBorderColor('passwordConfirm', passwordConfirm, true), outline: 'none' }}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { adminApi } from '../../api/adminApi'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 export const EVENT_CATEGORIES = [
   {
@@ -141,6 +142,7 @@ export const EVENT_CATEGORIES = [
 ]
 
 export default function SystemEventsPanel() {
+  const { t } = useTranslation()
   const initialEvent = EVENT_CATEGORIES[0].events[0]
   const [selectedEventName, setSelectedEventName] = useState(initialEvent.name)
   const [eventType, setEventType] = useState(initialEvent.name)
@@ -157,7 +159,7 @@ export default function SystemEventsPanel() {
     onSuccess: (res) => {
       const traceId = res?.data?.data
       setLastTraceId(traceId || null)
-      toast.success('System event triggered successfully!')
+      toast.success(t('admin.system_event_triggered', 'Sistem olayı başarıyla tetiklendi!'))
     },
   })
 
@@ -171,7 +173,7 @@ export default function SystemEventsPanel() {
     onSuccess: (res) => {
       const traceId = res?.data?.data
       setLastTraceId(traceId || null)
-      toast.success('Bot event triggered successfully!')
+      toast.success(t('admin.bot_event_triggered', 'Bot olayı başarıyla tetiklendi!'))
     },
   })
 
@@ -189,7 +191,7 @@ export default function SystemEventsPanel() {
   }
 
   const handleTriggerEvent = () => {
-    if (!eventType) return toast.error('EventType is required')
+    if (!eventType) return toast.error(t('admin.event_type_required', 'Olay türü zorunludur'))
     try {
       const parsed = JSON.parse(payload)
       if (isActorEvent) {
@@ -202,7 +204,7 @@ export default function SystemEventsPanel() {
         triggerSystemEventMutation.mutate({ eventType, payload: parsed })
       }
     } catch {
-      toast.error('Invalid JSON format in Payload')
+      toast.error(t('admin.invalid_json_payload', 'Payload geçerli bir JSON formatında değil'))
     }
   }
 
@@ -228,10 +230,10 @@ export default function SystemEventsPanel() {
         }}
       >
         <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>
-          System Events
+          {t('admin.system_events_title', 'Sistem Olayları')}
         </h2>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
-          Sistem olayları tetikleme ve yönetimi
+          {t('admin.system_events_desc', 'Sistem olayları tetikleme ve yönetimi')}
         </p>
       </div>
 
@@ -248,7 +250,7 @@ export default function SystemEventsPanel() {
           <div
             style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--color-text)' }}
           >
-            System Event
+            {t('admin.system_events_title', 'Sistem Olayları')}
           </div>
 
           {/* Event Category & Type Selector Dropdown */}
@@ -263,7 +265,7 @@ export default function SystemEventsPanel() {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Event Type
+              {t('admin.event_type', 'Olay Türü')}
             </label>
             <select
               className="input w-full"
@@ -303,7 +305,7 @@ export default function SystemEventsPanel() {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Payload
+              {t('admin.payload', 'Payload')}
             </label>
             <textarea
               className="input w-full"
@@ -339,7 +341,7 @@ export default function SystemEventsPanel() {
               borderRadius: 'var(--radius-md)',
             }}
           >
-            {isLoading ? 'İşleniyor...' : 'Event Tetikle'}
+            {isLoading ? t('admin.processing', 'İşleniyor...') : t('admin.trigger_event', 'Event Tetikle')}
           </button>
 
           {lastTraceId && (
@@ -360,7 +362,7 @@ export default function SystemEventsPanel() {
                   marginBottom: 2,
                 }}
               >
-                Trace ID
+                {t('admin.trace_id', 'Trace ID')}
               </div>
               <code
                 style={{
@@ -379,3 +381,4 @@ export default function SystemEventsPanel() {
     </div>
   )
 }
+

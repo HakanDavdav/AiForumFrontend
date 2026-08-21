@@ -7,6 +7,7 @@ import { actorApi } from '../api/actorApi'
 import { tribeApi } from '../api/tribeApi'
 import { ArrowLeft, Loader2, Brain, Focus } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 // Nöron renk paleti — koyu arka planda biyolüminesans tonlar
 const NEURON_COLORS = {
@@ -385,6 +386,7 @@ function updateCapillaryPosition(obj, { start, end }, link) {
 const TOPBAR_HEIGHT = 'var(--topbar-height)'
 
 function NodeDetailPanel({ node, onClose }) {
+  const { t } = useTranslation()
   const { isDarkMode } = useThemeStore()
   const { core, glow } = getNeuronColor(node.label)
   const icon = node.label === 'Persona' ? '🧠' : node.label === 'Topic' ? '📌' : '💠'
@@ -445,7 +447,7 @@ function NodeDetailPanel({ node, onClose }) {
               {node.label}
             </div>
             <div style={{ fontSize: 20, fontWeight: 700, marginTop: 4, lineHeight: 1.2 }}>
-              {node.name || 'Unknown Node'}
+              {node.name || t('mind.unknown_node', 'Unknown Node')}
             </div>
           </div>
         </div>
@@ -507,7 +509,7 @@ function NodeDetailPanel({ node, onClose }) {
                   fontWeight: 600,
                 }}
               >
-                {key === 'lastUpdated' ? 'Son Güncelleme' : key}
+                {key === 'lastUpdated' ? t('mind.last_updated', 'Son Güncelleme') : key}
               </div>
               <div
                 style={{
@@ -531,6 +533,7 @@ function NodeDetailPanel({ node, onClose }) {
 }
 
 export default function MindPage() {
+  const { t } = useTranslation()
   const [searchParams] = useSearchParams()
   const actorId = searchParams.get('actorId')
   const tribeId = searchParams.get('tribeId')
@@ -614,7 +617,7 @@ export default function MindPage() {
 
   useEffect(() => {
     if (!actorId && !tribeId) {
-      toast.error('Actor or Tribe ID is missing.')
+      toast.error(t('mind.id_missing', 'Actor or Tribe ID is missing.'))
       navigate('/')
       return
     }
@@ -633,25 +636,25 @@ export default function MindPage() {
               setRawData(parsedData)
             } catch (e) {
               console.error('Failed to parse neo4j output:', e)
-              toast.error('Failed to parse memory data.')
+              toast.error(t('mind.parse_error', 'Failed to parse memory data.'))
               setRawData([])
             }
           } else {
             setRawData([])
           }
         } else {
-          toast.error(response.data.errors?.[0]?.description || 'Failed to fetch memory.')
+          toast.error(response.data.errors?.[0]?.description || t('mind.fetch_error', 'Failed to fetch memory.'))
         }
       } catch (error) {
         console.error(error)
-        toast.error('An error occurred while fetching memory.')
+        toast.error(t('mind.generic_error', 'An error occurred while fetching memory.'))
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchMemory()
-  }, [actorId, navigate])
+  }, [actorId, navigate, t])
 
   const graphData = useMemo(() => {
     if (!rawData || !Array.isArray(rawData)) return { nodes: [], links: [] }
@@ -936,7 +939,7 @@ export default function MindPage() {
                     letterSpacing: '0.02em',
                   }}
                 >
-                  MIND GRAPH
+                  {t('mind.graph_title', 'MIND GRAPH')}
                 </h1>
 
               </div>
@@ -1003,7 +1006,7 @@ export default function MindPage() {
             >
               <Brain size={40} style={{ color: 'var(--color-primary)', opacity: 0.5 }} />
               <p style={{ color: 'var(--color-primary)', opacity: 0.6, fontSize: 14 }}>
-                No memories found.
+                {t('mind.no_memories', 'No memories found.')}
               </p>
             </div>
           ) : (
@@ -1117,7 +1120,7 @@ export default function MindPage() {
             }}
           >
             <Focus size={18} style={{ color: 'var(--color-primary)' }} />
-            Varsayılan Görünüm
+            {t('mind.default_view', 'Varsayılan Görünüm')}
           </button>
         </div>
       </div>

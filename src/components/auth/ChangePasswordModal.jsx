@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useDevLog from '../../utils/useDevLog'
-import { X } from 'lucide-react'
+import { X, Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import { triggerConfetti } from '../../utils/confetti'
+import PasswordInput from '../common/PasswordInput'
 
 export default function ChangePasswordModal({ isOpen, onClose }) {
   useDevLog('ChangePasswordModal', arguments[0] || {})
@@ -62,53 +63,112 @@ export default function ChangePasswordModal({ isOpen, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={handleOverlayClick} style={{ zIndex: 100 }}>
-      <div className="modal-box" style={{ maxWidth: 400, padding: 32 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 800 }}>{t('settings.change_password')}</h2>
-          <button type="button" className="btn-icon" onClick={onClose}>
-            <X size={20} />
-          </button>
+      <div className="modal-box" style={{ maxWidth: 440, padding: '36px 32px', textAlign: 'left', position: 'relative' }}>
+        <button
+          type="button"
+          className="btn-icon"
+          onClick={onClose}
+          style={{ position: 'absolute', top: 16, right: 16, color: 'var(--color-text-muted)' }}
+        >
+          <X size={20} />
+        </button>
+
+        {/* Top Centered Circular Icon Badge */}
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: 'var(--color-primary-lighter)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+          }}
+        >
+          <Lock size={26} color="var(--color-primary)" strokeWidth={2} />
         </div>
 
-        <form noValidate onSubmit={handleSubmit} className="flex-col gap-4">
-            <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.current_password')}</label>
-              <input
-                className="input"
-                type="password"
+        <h2 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 24px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
+          {t('settings.change_password')}
+        </h2>
+
+        {/* Modal Form */}
+        <form noValidate onSubmit={handleSubmit}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                {t('auth.current_password')}
+              </label>
+              <PasswordInput
                 value={formData.currentPassword}
                 onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                placeholder="••••••••"
                 required
-                style={{ borderColor: getBorderColor('currentPassword', formData.currentPassword, true), outline: 'none' }}
+                style={{
+                  height: 42,
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  borderColor: getBorderColor('currentPassword', formData.currentPassword, true),
+                  outline: 'none',
+                }}
                 onFocus={() => setFocused('currentPassword')}
                 onBlur={() => setFocused(null)}
               />
             </div>
 
-            <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>{t('auth.new_password')}</label>
-              <input
-                className="input"
-                type="password"
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-secondary)' }}>
+                {t('auth.new_password')}
+              </label>
+              <PasswordInput
                 value={formData.newPassword}
                 onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                placeholder="••••••••"
                 required
-                style={{ borderColor: getBorderColor('newPassword', formData.newPassword, true), outline: 'none' }}
+                style={{
+                  height: 42,
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  borderColor: getBorderColor('newPassword', formData.newPassword, true),
+                  outline: 'none',
+                }}
                 onFocus={() => setFocused('newPassword')}
                 onBlur={() => setFocused(null)}
               />
             </div>
+          </div>
 
-            <div style={{ marginTop: 16 }}>
-              <button
-                type="submit"
-                className="btn btn-primary w-full"
-                disabled={changePasswordMutation.isPending}
-              >
-                {changePasswordMutation.isPending ? t('action.saving') : t('action.change')}
-              </button>
-            </div>
-          </form>
+          {/* Modal Footer with Top Lining */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 10,
+              paddingTop: 20,
+              marginTop: 24,
+              borderTop: '1px solid var(--color-border)',
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onClose}
+              disabled={changePasswordMutation.isPending}
+              style={{ minWidth: 90 }}
+            >
+              {t('common.close', 'Kapat')}
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={changePasswordMutation.isPending}
+              style={{ minWidth: 120 }}
+            >
+              {changePasswordMutation.isPending ? t('action.saving') : t('action.change')}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )

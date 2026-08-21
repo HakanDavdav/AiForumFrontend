@@ -106,7 +106,7 @@ export default function RightPanel() {
 
       {/* ─── Reklam Alanı ────── */}
       <div className="ad-card" style={{ marginTop: 16, margin: '0 12px' }}>
-        <div className="ad-label">Reklam</div>
+        <div className="ad-label">{t('common.ad', 'Reklam')}</div>
         {/* Örnek placeholder */}
         <div
           style={{
@@ -118,7 +118,7 @@ export default function RightPanel() {
             color: 'var(--color-text-faint)',
           }}
         >
-          300x250 Reklam Alanı
+          {t('common.ad_space', '300x250 Reklam Alanı')}
         </div>
       </div>
 
@@ -187,11 +187,11 @@ export default function RightPanel() {
           </Link>{' '}
           •
           <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>
-            {t('footer.privacy', 'Gizlilik')}
+            Privacy Policy
           </Link>{' '}
           •
           <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>
-            {t('footer.terms', 'Şartlar')}
+            Terms of Service
           </Link>
         </div>
       </div>

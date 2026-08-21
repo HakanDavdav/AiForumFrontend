@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { adminApi } from '../../api/adminApi'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 export default function ActorManagementPanel() {
+  const { t } = useTranslation()
   const [actorId, setActorId] = useState('')
   const [points, setPoints] = useState('')
 
@@ -11,12 +13,12 @@ export default function ActorManagementPanel() {
     mutationFn: ({ actorId, points }) => adminApi.setActorPoint(actorId, points),
     meta: { showErrorToast: true },
     onSuccess: () => {
-      toast.success('Actor points updated successfully!')
+      toast.success(t('admin.actor_point_updated', 'Aktör puanı güncellendi'))
     },
   })
 
   const handleSetPoints = () => {
-    if (!actorId || !points) return toast.error('ActorId and Points are required')
+    if (!actorId || !points) return toast.error(t('admin.actor_id_placeholder', 'Actor ID girin (GUID)'))
     setPointsMutation.mutate({ actorId, points: parseInt(points, 10) })
   }
 
@@ -38,10 +40,10 @@ export default function ActorManagementPanel() {
         style={{ borderColor: 'var(--color-border)', marginBottom: '12px', paddingBottom: '8px' }}
       >
         <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>
-          Actor Management
+          {t('admin.actor_management_title', 'Aktör Yönetimi')}
         </h2>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
-          Aktör puanı ve skor düzenleme
+          {t('admin.actor_management_desc', 'Aktör puanlarını ve seviyelerini yönetin')}
         </p>
       </div>
 
@@ -57,7 +59,7 @@ export default function ActorManagementPanel() {
           <div
             style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--color-text)' }}
           >
-            Actor Score Settings
+            {t('admin.actor_management_title', 'Aktör Yönetimi')}
           </div>
 
           <div className="form-group" style={{ marginBottom: '8px' }}>
@@ -71,7 +73,7 @@ export default function ActorManagementPanel() {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Actor ID
+              {t('admin.actor_id', 'Actor ID')}
             </label>
             <input
               className="input w-full"
@@ -101,7 +103,7 @@ export default function ActorManagementPanel() {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Yeni Puan
+              {t('admin.new_point', 'Yeni Puan')}
             </label>
             <input
               type="number"
@@ -132,7 +134,7 @@ export default function ActorManagementPanel() {
                 borderRadius: 'var(--radius-md)',
               }}
             >
-              {isLoading ? 'Güncelleniyor...' : 'Puanı Güncelle'}
+              {isLoading ? t('admin.updating', 'Güncelleniyor...') : t('admin.update_point', 'Puanı Güncelle')}
             </button>
           </div>
         </div>
@@ -140,3 +142,4 @@ export default function ActorManagementPanel() {
     </div>
   )
 }
+

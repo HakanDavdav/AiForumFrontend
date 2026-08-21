@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import { triggerConfetti } from '../../utils/confetti'
 import { useNavigate } from 'react-router-dom'
 import TokenModal from './TokenModal'
+import PasswordInput from '../common/PasswordInput'
 
 const PASSWORD_SECONDS = 180
 
@@ -215,18 +216,16 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
               {t('settings.change_password')}
             </h2>
             <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
-              Lütfen yeni şifrenizi belirleyin.
+              {t('auth.set_new_password', 'Lütfen yeni şifrenizi belirleyin.')}
             </p>
             
             <form noValidate onSubmit={handleConfirmSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               
               {/* New Password */}
-              <input 
-                className="input" 
-                type="password" 
+              <PasswordInput
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                required 
+                required
                 minLength={6}
                 placeholder={t('auth.new_password')}
                 style={{ textAlign: 'center', padding: '14px', fontSize: 14, borderColor: getBorderColor('newPassword', newPassword, true), outline: 'none' }}

@@ -269,7 +269,7 @@ export default function CreateTribePage() {
               textTransform: 'uppercase',
             }}
           >
-            COVER IMAGE
+            {t('tribe.cover_image', 'Kapak Resmi')}
           </label>
           <AvatarUpload
             imageUrl={formData.imageUrl}
@@ -290,7 +290,7 @@ export default function CreateTribePage() {
               textTransform: 'uppercase',
             }}
           >
-            {t('card.create_personality', 'Kişilik kartı oluştur')} (Opsiyonel)
+            {t('card.create_personality', 'Kişilik kartı oluştur')} ({t('common.optional', 'Opsiyonel')})
           </label>
           <PersonalityCard
             variant="editor"

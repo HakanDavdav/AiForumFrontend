@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { mediaApi } from '../../api/mediaApi';
 import { Loader2, UploadCloud, Camera, Trash2, ImagePlus } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,16 +14,36 @@ export default function AvatarUpload({
 }) {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  const processFile = async (file) => {
+  const uploadMutation = useMutation({
+    mutationFn: (file) => mediaApi.uploadAvatar(file),
+    meta: { showErrorToast: true },
+    onSuccess: (res) => {
+      if (res.data?.succeeded && res.data?.data) {
+        onImageUploaded(res.data.data);
+        toast.success(t('upload.success', 'Resim başarıyla yüklendi.'));
+      }
+    },
+    onSettled: () => {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  });
+
+  const isUploading = uploadMutation.isPending;
+
+  const processFile = (file) => {
     if (!file) return;
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      toast.error(t('upload.invalid_type', 'Desteklenmeyen dosya türü. (JPEG, PNG, WEBP, GIF)'));
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/pjpeg', 'image/jfif'];
+    const extension = file.name ? file.name.slice(file.name.lastIndexOf('.')).toLowerCase() : '';
+    const isAllowedExt = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.jfif'].includes(extension);
+
+    if (!allowedTypes.includes(file.type) && !isAllowedExt) {
+      toast.error(t('upload.invalid_type', 'Desteklenmeyen dosya türü. (JPEG, PNG, WEBP, GIF, JFIF)'));
       return;
     }
 
@@ -31,24 +52,7 @@ export default function AvatarUpload({
       return;
     }
 
-    try {
-      setIsUploading(true);
-      const res = await mediaApi.uploadAvatar(file);
-      if (res.data?.succeeded && res.data?.data) {
-        onImageUploaded(res.data.data);
-        toast.success(t('upload.success', 'Resim başarıyla yüklendi.'));
-      } else {
-        toast.error(res.data?.errors?.[0]?.description || t('upload.error', 'Yükleme başarısız.'));
-      }
-    } catch (error) {
-      toast.error(t('upload.error', 'Yükleme sırasında bir hata oluştu.'));
-      console.error('Upload error:', error);
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
+    uploadMutation.mutate(file);
   };
 
   const handleFileChange = (e) => {
@@ -185,7 +189,7 @@ export default function AvatarUpload({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 200, flex: 1 }}>
         <input
           type="file"
-          accept="image/jpeg, image/png, image/gif, image/webp"
+          accept="image/jpeg, image/png, image/gif, image/webp, image/pjpeg, .jfif, .jpg, .jpeg, .png, .gif, .webp"
           ref={fileInputRef}
           style={{ display: 'none' }}
           onChange={handleFileChange}
@@ -214,7 +218,7 @@ export default function AvatarUpload({
             }}
           >
             {imageUrl ? <Camera size={16} /> : <ImagePlus size={16} />}
-            {imageUrl ? t('upload.change_image', 'Resmi Değiştir') : t('upload.select_image', 'Resim Seç')}
+            {imageUrl ? t('upload.change_image', 'Görseli Değiştir') : t('upload.select_image', 'Görsel Seç')}
           </button>
 
           {imageUrl && (
@@ -237,7 +241,7 @@ export default function AvatarUpload({
                 cursor: disabled || isUploading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s ease',
               }}
-              title={t('upload.remove_image', 'Resmi Kaldır')}
+              title={t('upload.remove_image', 'Görseli Kaldır')}
             >
               <Trash2 size={15} />
               {t('upload.remove', 'Kaldır')}
@@ -248,7 +252,7 @@ export default function AvatarUpload({
         <div style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
           {t('upload.drag_hint', 'Görseli sürükleyip bırakabilir veya tıklayarak yükleyebilirsiniz.')}
           <div style={{ fontSize: 11, color: 'var(--color-text-faint)', marginTop: 2 }}>
-            {t('upload.limits', 'Maksimum 5MB (PNG, JPEG, WEBP, GIF)')}
+            {t('upload.limits', 'Maksimum 5MB (PNG, JPEG, WEBP, GIF, JFIF)')}
           </div>
         </div>
       </div>

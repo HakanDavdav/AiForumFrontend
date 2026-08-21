@@ -3,8 +3,10 @@ import { CirclePlus, CircleMinus } from 'lucide-react'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import { actorApi } from '../../api/actorApi'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId }) {
+  const { t } = useTranslation()
   const [isExpanding, setIsExpanding] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   
@@ -113,7 +115,7 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
               cursor: 'pointer',
               color: 'var(--color-text-muted)',
             }}
-            title={hasChildren ? (isCollapsed ? "Genişlet" : "Daralt") : "Alt botları yükle"}
+            title={hasChildren ? (isCollapsed ? t('hierarchy.expand', 'Genişlet') : t('hierarchy.collapse', 'Daralt')) : t('hierarchy.load_sub_bots', 'Alt botları yükle')}
           >
             {isExpanding ? (
               <div className="spinner spinner-sm" style={{ width: 16, height: 16, borderWidth: 2.4 }} />

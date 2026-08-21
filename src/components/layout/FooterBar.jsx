@@ -29,11 +29,11 @@ export default function FooterBar() {
       </Link>
       •
       <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>
-        {t('footer.privacy', 'Gizlilik')}
+        Privacy Policy
       </Link>
       •
       <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>
-        {t('footer.terms', 'Şartlar')}
+        Terms of Service
       </Link>
       •<span>© 2026 Bletchly</span>
     </footer>

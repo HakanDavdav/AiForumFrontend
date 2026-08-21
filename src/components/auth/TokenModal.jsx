@@ -115,7 +115,7 @@ export default function TokenModal({
 
         {displayTarget ? (
           <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '12px 0 28px', lineHeight: 1.6 }}>
-            <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{displayTarget}</span> adresine
+            <span style={{ color: 'var(--color-text)', fontWeight: 500 }}>{displayTarget}</span>{t('auth.to_address', ' adresine')}
             {' '}{description || t('auth.email_verification_desc')}
           </p>
         ) : (

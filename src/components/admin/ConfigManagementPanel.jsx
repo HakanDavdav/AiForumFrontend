@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '../../api/adminApi'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 export default function ConfigManagementPanel() {
+  const { t } = useTranslation()
   const [config, setConfig] = useState(null)
   const [configText, setConfigText] = useState('')
   const [activeSection, setActiveSection] = useState('')
@@ -40,7 +42,7 @@ export default function ConfigManagementPanel() {
     mutationFn: (newSettings) => adminApi.updateAppSettings(newSettings),
     meta: { showErrorToast: true },
     onSuccess: (_, newSettings) => {
-      toast.success('Configuration saved successfully!')
+      toast.success(t('admin.config_saved', 'Configuration saved successfully!'))
       setConfig(newSettings)
       setConfigText(JSON.stringify(newSettings, null, 2))
       setIsDirty(false)
@@ -54,7 +56,7 @@ export default function ConfigManagementPanel() {
         const parsed = JSON.parse(configText)
         updateConfigMutation.mutate(parsed)
       } catch {
-        toast.error('Invalid JSON format')
+        toast.error(t('admin.invalid_json', 'Invalid JSON format'))
       }
     } else {
       if (!config) return
@@ -72,7 +74,7 @@ export default function ConfigManagementPanel() {
         setIsDirty(false)
       }
     } catch {
-      toast.error('Ayarlar yenilenirken bir hata oluştu.')
+      toast.error(t('admin.config_refresh_error', 'Ayarlar yenilenirken bir hata oluştu.'))
     }
   }
 
@@ -237,7 +239,7 @@ export default function ConfigManagementPanel() {
                 transition: 'all var(--transition-fast)',
               }}
             >
-              {value ? 'Active' : 'Disabled'}
+              {value ? t('admin.active', 'Active') : t('admin.disabled', 'Disabled')}
             </button>
           </div>
         </div>
@@ -354,7 +356,7 @@ export default function ConfigManagementPanel() {
                 color: 'var(--color-text-muted)',
               }}
             >
-              {arr.length} prompts
+              {arr.length} {t('admin.prompts', 'prompts')}
             </span>
           )}
           <span
@@ -410,7 +412,7 @@ export default function ConfigManagementPanel() {
                       </span>
                       {text.length > 0 && (
                         <span style={{ fontSize: 10.5, color: 'var(--color-text-muted)' }}>
-                          {text.length} chars
+                          {text.length} {t('admin.chars', 'chars')}
                         </span>
                       )}
                     </div>
@@ -428,9 +430,9 @@ export default function ConfigManagementPanel() {
                         fontWeight: 600,
                         transition: 'all var(--transition-fast)',
                       }}
-                      title="Remove Item"
+                      title={t('admin.remove_item', 'Remove Item')}
                     >
-                      ✕ Sil
+                      {t('admin.delete_item', '✕ Sil')}
                     </button>
                   </div>
                   <textarea
@@ -476,7 +478,7 @@ export default function ConfigManagementPanel() {
                   transition: 'all var(--transition-fast)',
                 }}
               >
-                + Yeni Prompt Ekle
+                {t('admin.add_new_prompt', '+ Yeni Prompt Ekle')}
               </button>
             </div>
           </div>
@@ -573,7 +575,7 @@ export default function ConfigManagementPanel() {
                         color: 'var(--color-text-muted)',
                       }}
                     >
-                      {fieldCount} fields
+                      {fieldCount} {t('admin.fields', 'fields')}
                     </span>
                   )}
                   <span
@@ -604,7 +606,7 @@ export default function ConfigManagementPanel() {
                         transition: 'all var(--transition-fast)',
                       }}
                     >
-                      {v.Enabled ? 'Active' : 'Disabled'}
+                      {v.Enabled ? t('admin.active', 'Active') : t('admin.disabled', 'Disabled')}
                     </button>
                   </div>
                 )}
@@ -642,10 +644,10 @@ export default function ConfigManagementPanel() {
       >
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: 'var(--color-text)' }}>
-            Background Services & Config
+            {t('admin.bg_services_config', 'Background Services & Config')}
           </h2>
           <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
-            Dinamik konfigürasyon ve background worker ayarları
+            {t('admin.bg_services_config_desc', 'Dinamik konfigürasyon ve background worker ayarları')}
           </p>
         </div>
 
@@ -661,7 +663,7 @@ export default function ConfigManagementPanel() {
               borderRadius: 'var(--radius-md)',
             }}
           >
-            {isFetching ? 'Yükleniyor...' : 'Yenile'}
+            {isFetching ? t('admin.loading', 'Yükleniyor...') : t('admin.refresh', 'Yenile')}
           </button>
           <button
             className="btn btn-primary"
@@ -681,7 +683,7 @@ export default function ConfigManagementPanel() {
                 : {}),
             }}
           >
-            {isSaving ? 'Kaydediliyor...' : isDirty ? '● Kaydet' : 'Kaydet'}
+            {isSaving ? t('admin.saving', 'Kaydediliyor...') : isDirty ? `● ${t('admin.save', 'Kaydet')}` : t('admin.save', 'Kaydet')}
           </button>
         </div>
       </div>
@@ -762,7 +764,7 @@ export default function ConfigManagementPanel() {
               cursor: 'pointer',
               transition: 'all var(--transition-fast)',
             }}
-            title={isAllExpanded ? 'Tümünü Kapat' : 'Tümünü Aç'}
+            title={isAllExpanded ? t('admin.collapse_all', 'Tümünü Kapat') : t('admin.expand_all', 'Tümünü Aç')}
           >
             <span
               style={{
@@ -792,7 +794,7 @@ export default function ConfigManagementPanel() {
             <div
               style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--color-text)' }}
             >
-              Raw JSON Configuration
+              {t('admin.raw_json_config', 'Raw JSON Configuration')}
             </div>
             <textarea
               className="input w-full"
@@ -840,7 +842,7 @@ export default function ConfigManagementPanel() {
               textAlign: 'center',
             }}
           >
-            No configuration found for this section.
+            {t('admin.no_config_found', 'Bu bölüm için konfigürasyon bulunamadı.')}
           </div>
         )}
       </div>

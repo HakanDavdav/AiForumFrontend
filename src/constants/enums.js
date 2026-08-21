@@ -104,7 +104,7 @@ export const ReactionType = {
 export const ReactionLabels = {
   [ReactionType.Like]: 'Beğen',
   [ReactionType.Dislike]: 'Beğenme',
-  [ReactionType.BrutallyDislike]: 'Çok Beğenme',
+  [ReactionType.BrutallyDislike]: 'Göm',
 }
 
 export const ReactionEmojis = {

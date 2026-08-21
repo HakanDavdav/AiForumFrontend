@@ -133,13 +133,13 @@ export default function EditProfileModal({ isOpen, onClose }) {
         ) : (
           <form noValidate onSubmit={handleSubmit} className="flex-col gap-4">
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>Profil Adı</label>
+              <label className="text-muted" style={{ fontSize: 14 }}>{t('profile_modal.profile_name', 'Profil Adı')}</label>
               <input
                 className="input"
                 type="text"
                 value={formData.profileName}
                 onChange={(e) => setFormData({ ...formData, profileName: e.target.value })}
-                placeholder="Profil Adınız"
+                placeholder={t('profile_modal.profile_name_placeholder', 'Profil Adınız')}
                 maxLength={50}
                 style={{ borderColor: getBorderColor('profileName', formData.profileName, true), outline: 'none' }}
                 onFocus={() => setFocused('profileName')}
@@ -148,13 +148,13 @@ export default function EditProfileModal({ isOpen, onClose }) {
             </div>
 
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>Profil Resmi URL'si</label>
+              <label className="text-muted" style={{ fontSize: 14 }}>{t('profile_modal.image_url', "Profil Resmi URL'si")}</label>
               <input
                 className="input"
                 type="text"
                 value={formData.imageUrl}
                 onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                placeholder="https://..."
+                placeholder={t('profile_modal.image_url_placeholder', 'https://...')}
                 style={{ borderColor: getBorderColor('imageUrl', formData.imageUrl, false), outline: 'none' }}
                 onFocus={() => setFocused('imageUrl')}
                 onBlur={() => setFocused(null)}
@@ -162,12 +162,12 @@ export default function EditProfileModal({ isOpen, onClose }) {
             </div>
 
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>Hakkında <span style={{ color: 'var(--color-primary)' }}>*</span></label>
+              <label className="text-muted" style={{ fontSize: 14 }}>{t('profile_modal.bio', 'Hakkında')} <span style={{ color: 'var(--color-primary)' }}>*</span></label>
               <textarea
                 className="input"
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                placeholder="Kısa bir biyografi..."
+                placeholder={t('profile_modal.bio_placeholder', 'Kısa bir biyografi...')}
                 rows={4}
                 maxLength={300}
                 style={{ borderColor: getBorderColor('bio', formData.bio, true), outline: 'none' }}
@@ -177,7 +177,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
             </div>
 
             <div className="form-group">
-              <label className="text-muted" style={{ fontSize: 14 }}>İlgi Alanları</label>
+              <label className="text-muted" style={{ fontSize: 14 }}>{t('profile_modal.interests', 'İlgi Alanları')}</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
                 {TOPIC_TYPES.map(topic => (
                   <label key={topic.value} style={{
@@ -207,7 +207,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
                 disabled={editUserMutation.isPending}
                 style={{ marginTop: 24 }}
               >
-                {editUserMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+                {editUserMutation.isPending ? t('common.saving', 'Kaydediliyor...') : t('common.save', 'Kaydet')}
               </button>
             </div>
           </form>

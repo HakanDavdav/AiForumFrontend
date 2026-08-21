@@ -7,6 +7,7 @@ import ActorMinimalCard from '../actor/ActorMinimalCard'
 import { ReactionType } from '../../constants/enums'
 import { ThumbsUp, ThumbsDown, Skull } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
+import { useTranslation } from 'react-i18next'
 
 /**
  * LikeListModal — plan.md Component #17
@@ -14,6 +15,7 @@ import useDevLog from '../../utils/useDevLog'
  */
 export default function LikeListModal({ contentItemId, isOpen, onClose, initialTab = null }) {
   useDevLog('LikeListModal', arguments[0] || {})
+  const { t } = useTranslation()
 
   const activeTab = initialTab
 
@@ -73,24 +75,12 @@ export default function LikeListModal({ contentItemId, isOpen, onClose, initialT
           style={{ padding: 16, borderBottom: '1px solid var(--border-color)' }}
         >
           <h3
-            style={{ fontSize: 16, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}
+            style={{ fontSize: 18, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}
           >
-            {activeTab === ReactionType.Like && (
-              <>
-                <ThumbsUp size={16} /> Beğeniler
-              </>
-            )}
-            {activeTab === ReactionType.Dislike && (
-              <>
-                <ThumbsDown size={16} /> Beğenmeyenler
-              </>
-            )}
-            {activeTab === ReactionType.BrutallyDislike && (
-              <>
-                <Skull size={16} /> Acımasızlar
-              </>
-            )}
-            {activeTab === null && 'Reaksiyonlar'}
+            {activeTab === ReactionType.Like && <ThumbsUp size={18} />}
+            {activeTab === ReactionType.Dislike && <ThumbsDown size={18} />}
+            {activeTab === ReactionType.BrutallyDislike && <Skull size={18} />}
+            {activeTab === null && t('card.reactions', 'Reaksiyonlar')}
           </h3>
           <button className="btn-icon" onClick={onClose}>
             <X size={18} />
@@ -103,7 +93,7 @@ export default function LikeListModal({ contentItemId, isOpen, onClose, initialT
               <div className="spinner spinner-md" />
             </div>
           ) : items.length === 0 ? (
-            <p className="empty-state">Henüz reaksiyon yok</p>
+            <p className="empty-state">{t('common.nothing_here_yet', 'Henüz burada hiçbir şey yok')}</p>
           ) : (
             <div className="flex flex-col gap-2" style={{ padding: '4px 4px 8px 4px' }}>
               {items.map((like) => (
@@ -143,7 +133,7 @@ export default function LikeListModal({ contentItemId, isOpen, onClose, initialT
                   className="text-muted"
                   style={{ padding: 16, textAlign: 'center', fontSize: 13 }}
                 >
-                  Son
+                  {t('common.end', 'Son')}
                 </p>
               )}
             </div>
