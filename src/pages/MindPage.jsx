@@ -12,8 +12,11 @@ import { useTranslation } from 'react-i18next'
 // Nöron renk paleti — koyu arka planda biyolüminesans tonlar
 const NEURON_COLORS = {
   Persona: { core: '#ff6b35', glow: '#ff4500' },
+  Tribe: { core: '#c084fc', glow: '#a855f7' },
+  Actor: { core: '#38bdf8', glow: '#0284c7' },
+  GeneralThought: { core: '#10b981', glow: '#059669' },
   Topic: { core: '#00e5ff', glow: '#00bcd4' },
-  default: { core: '#c084fc', glow: '#a855f7' },
+  default: { core: '#818cf8', glow: '#6366f1' },
 }
 
 function getNeuronColor(label) {
@@ -22,13 +25,12 @@ function getNeuronColor(label) {
 
 // Three.js ile parlayan küre nesnesi oluştur (3 katman: çekirdek + orta hale + dış hale)
 function buildNeuronObject(node) {
-  const isPersona = node.label === 'Persona'
+  const isRoot = node.label === 'Persona' || (node.label === 'Tribe' && node.isRoot)
   const { core, glow } = getNeuronColor(node.label)
   const group = new THREE.Group()
 
   // Yarıçap: ForceGraph3D link offset'iyle eşleşecek boyutta
-  // nodeRelSize=6, val=30 → ~18.7, val=10 → ~12.9
-  const r = isPersona ? 30 : (node.label === 'Topic' ? 14 : 8)
+  const r = isRoot ? 30 : (node.label === 'GeneralThought' || node.label === 'Topic' ? 16 : 12)
 
   // İç parlak çekirdek
   group.add(
@@ -668,17 +670,18 @@ export default function MindPage() {
       const pathRels = path.Relationships || []
 
       // Add nodes
-      pathNodes.forEach((n) => {
+      pathNodes.forEach((n, idx) => {
         const nodeId = n.id || n.name || JSON.stringify(n)
         if (!nodesMap.has(nodeId)) {
-          const isPersona = n.label === 'Persona'
+          const isRoot = n.label === 'Persona' || (n.label === 'Tribe' && (n.id === tribeId || idx === 0))
           const { core } = getNeuronColor(n.label)
           nodesMap.set(nodeId, {
             ...n,
             id: nodeId,
             name: n.name || nodeId,
             label: n.label,
-            val: isPersona ? 200 : 10,
+            isRoot,
+            val: isRoot ? 200 : 10,
             color: core,
           })
         }
@@ -690,15 +693,23 @@ export default function MindPage() {
           const sourceId = pathNodes[i].id || pathNodes[i].name || JSON.stringify(pathNodes[i])
           const targetId =
             pathNodes[i + 1].id || pathNodes[i + 1].name || JSON.stringify(pathNodes[i + 1])
-          const relType = pathRels[i]
+          const rawRel = pathRels[i]
+          const relType = typeof rawRel === 'object' ? rawRel?.type : rawRel
+          const affinity = typeof rawRel === 'object' ? rawRel?.affinity : null
 
           const linkKey = `${sourceId}-${relType}-${targetId}`
           if (!linksSet.has(linkKey)) {
             linksSet.add(linkKey)
+            const displayName = affinity != null && affinity !== 0 
+              ? `${relType} (${affinity > 0 ? '+' : ''}${affinity})`
+              : relType
+
             linksArr.push({
               source: sourceId,
               target: targetId,
-              name: relType,
+              name: displayName,
+              relType,
+              affinity,
             })
           }
         }
@@ -706,18 +717,18 @@ export default function MindPage() {
     })
 
     const nodes = Array.from(nodesMap.values())
-    const nonPersona = nodes.filter((n) => n.label !== 'Persona')
-    const total = nonPersona.length || 1
+    const nonRoot = nodes.filter((n) => !n.isRoot)
+    const total = nonRoot.length || 1
 
-    // Persona merkeze, diğerleri Fibonacci küre üzerine dağıt
+    // Root merkeze, diğerleri Fibonacci küre üzerine dağıt
     nodes.forEach((node) => {
-      if (node.label === 'Persona') {
+      if (node.isRoot) {
         node.x = 0
         node.y = 0
         node.z = 0
       }
     })
-    nonPersona.forEach((node, i) => {
+    nonRoot.forEach((node, i) => {
       const phi = Math.acos(-1 + (2 * i) / total)
       const theta = Math.sqrt(total * Math.PI) * phi
       const r = 280 + (i % 3) * 60 // 280-400 birim arasında hafif varyasyon
@@ -730,7 +741,7 @@ export default function MindPage() {
       nodes,
       links: linksArr,
     }
-  }, [rawData])
+  }, [rawData, tribeId, actorId])
 
   // Drag sınırı — node'lar bu yarıçapı aşamaz
   const MAX_DRAG_DIST = 650

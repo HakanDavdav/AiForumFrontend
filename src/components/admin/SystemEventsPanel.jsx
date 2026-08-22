@@ -9,23 +9,18 @@ export const EVENT_CATEGORIES = [
     category: 'Custom & System Events',
     events: [
       {
-        name: 'UnifyActorPersonalitiesEvent',
-        defaultPayload: {
-          ParentActorId: '',
-          CreatedAt: new Date().toISOString(),
-        },
-      },
-      {
-        name: 'UnifyTribePersonalitiesEvent',
-        defaultPayload: {
-          ParentTribeId: '',
-          CreatedAt: new Date().toISOString(),
-        },
-      },
-      {
         name: 'GenerateCardHintAndTagsEvent',
         defaultPayload: {
           PersonalityCardId: '',
+          CreatedAt: new Date().toISOString(),
+        },
+      },
+      {
+        name: 'DebateStatusEvent',
+        defaultPayload: {
+          ParentActorId: '',
+          DebateId: '',
+          Status: 'InProgress',
           CreatedAt: new Date().toISOString(),
         },
       },
