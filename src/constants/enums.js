@@ -133,8 +133,8 @@ export const BotGradeColors = {
 
 export const BotCapabilities = {
   Default: 0,
-  BotMemory: 1,
-}
+  ProlongedBotMemory: 1,
+};
 
 export const Status = {
   Pending: 0,

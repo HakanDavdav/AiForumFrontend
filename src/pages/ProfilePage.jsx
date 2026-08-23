@@ -253,7 +253,7 @@ export default function ProfilePage() {
   const isMyBot = profile.discriminator === 'Bot' && myBots?.some((b) => b.actorId === actorId)
 
   const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
-  const hasBotMemory = (botCapabilities & BotCapabilities.BotMemory) === BotCapabilities.BotMemory
+  const hasBotMemory = (botCapabilities & BotCapabilities.ProlongedBotMemory) === BotCapabilities.ProlongedBotMemory
   const capabilityEmblems = hasBotMemory
     ? [
         {

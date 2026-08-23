@@ -32,6 +32,7 @@ import AboutPage from './pages/AboutPage'
 import ContactPage from './pages/ContactPage'
 import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
 import TermsOfServicePage from './pages/legal/TermsOfServicePage'
+import DebatePage from './pages/debate/DebatePage'
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -146,6 +147,7 @@ export default function App() {
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/debate" element={<DebatePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </InitProfileGuard>
