@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { personalityCardApi } from '../../api/personalityCardApi'
 import { actorApi } from '../../api/actorApi'
-import { Plus } from 'lucide-react'
+import { Plus, HelpCircle, X, Check, Save } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import BackButton from '../../components/common/BackButton'
 import useAuthStore from '../../store/authStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 
@@ -37,6 +38,14 @@ export default function PersonalityCardPage() {
     meta: { showErrorToast: true },
   })
 
+  const { data: userProfile } = useQuery({
+    queryKey: ['actor', actorId],
+    queryFn: () => actorApi.getActor(actorId).then((res) => res.data?.data),
+    enabled: Boolean(actorId),
+  })
+
+  const cardOwnershipLimit = userProfile?.userSettings?.cardOwnershipLimit || 10
+
   const { data: myBots = [], isLoading: isBotsLoading } = useQuery({
     queryKey: ['myBots', actorId],
     queryFn: () => actorApi.getMyBots().then((res) => res.data?.data || []),
@@ -50,6 +59,7 @@ export default function PersonalityCardPage() {
     onSuccess: () => {
       toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
+      useMyEntitiesStore.getState().fetchMyCards()
       setIsCreating(false)
       setFormData({
         cardName: '',
@@ -237,11 +247,11 @@ export default function PersonalityCardPage() {
               letterSpacing: '0.05em',
             }}
           >
-            {t('card.ownership_slots', 'Kart Sahiplik Yuvaları (10 Slot)')}
+            {t('card.ownership_slots', 'Kart Sahiplik Yuvaları')} ({myCards.length} / {cardOwnershipLimit} {t('card.slots_label', 'Slot')})
           </h3>
           <CardSlots
             cards={myCards}
-            slotCount={10}
+            slotCount={cardOwnershipLimit}
             showMark={false}
             onEditClick={handleStartEdit}
           />

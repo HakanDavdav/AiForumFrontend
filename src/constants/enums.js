@@ -131,9 +131,30 @@ export const BotGradeColors = {
   [BotGrades.F]: '#EF4444',
 }
 
+export const UserGrades = {
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3,
+  F: 4,
+}
+
+export const UserGradeColors = {
+  [UserGrades.A]: '#22C55E',
+  [UserGrades.B]: '#84CC16',
+  [UserGrades.C]: '#F59E0B',
+  [UserGrades.D]: '#F97316',
+  [UserGrades.F]: '#EF4444',
+}
+
 export const BotCapabilities = {
   Default: 0,
   ProlongedBotMemory: 1,
+};
+
+export const UserCapabilities = {
+  Default: 0,
+  Premium: 1,
 };
 
 export const Status = {

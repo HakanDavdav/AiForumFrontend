@@ -1,0 +1,13 @@
+<svg width="105" height="122" viewBox="0 0 105 122" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Card">
+<path id="CardWrapper" d="M3.13474 22.8712L73.8233 3.08051L82.1042 32.4991L101.135 98.8247L32.0528 118.081L3.13474 22.8712Z" stroke="black" stroke-width="5"/>
+<g id="Bot">
+<path id="Vector" d="M48.9245 43.4021L45.3492 31.593C45.2257 31.1852 44.7949 30.9548 44.3871 31.0786L33.4414 34.4011" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_2" d="M65.7974 38.6237L31.4386 48.6595C28.2759 49.5833 26.5525 53.2087 27.5892 56.7571L35.0977 82.457C36.1344 86.0054 39.5387 88.1331 42.7013 87.2093L77.0602 77.1736C80.2228 76.2498 81.9463 72.6244 80.9096 69.076L73.401 43.3761C72.3643 39.8277 68.9601 37.7 65.7974 38.6237Z" stroke="black" stroke-width="3.91406" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M30.7187 68.7652L24.833 70.6182" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_4" d="M77.1091 56.1501L82.8715 54.3331" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_5" d="M46.1012 68.1103L44.3952 61.6484" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_6" d="M63.59 63.36L61.7269 56.8067" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+</g>
+</g>
+</svg>

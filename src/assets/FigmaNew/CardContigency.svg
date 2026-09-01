@@ -1,0 +1,43 @@
+<svg width="157" height="232" viewBox="0 0 157 232" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="CardContigency">
+<g id="Cards">
+<path id="BackCardWrappers" d="M96 37.0805L127 46.0805L121.97 67.0805M121.97 67.0805L107 129.58L44 116.08L91.5 156.58L150.5 95.5805L121.97 67.0805Z" stroke="black" stroke-width="5"/>
+<g id="Card">
+<path id="CardWrapper" d="M18 22.8712L88.6885 3.08049L96.9695 32.4991L116 98.8247L46.918 118.08L18 22.8712Z" stroke="black" stroke-width="5"/>
+<g id="Bot">
+<path id="Vector" d="M63.7897 43.4021L60.2145 31.593C60.091 31.1852 59.6601 30.9548 59.2524 31.0786L48.3067 34.4011" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_2" d="M80.6627 38.6237L46.3038 48.6595C43.1412 49.5833 41.4178 53.2087 42.4545 56.7571L49.963 82.457C50.9997 86.0054 54.404 88.1331 57.5666 87.2093L91.9255 77.1736C95.0881 76.2498 96.8115 72.6244 95.7748 69.076L88.2663 43.3761C87.2296 39.8277 83.8253 37.7 80.6627 38.6237Z" stroke="black" stroke-width="3.91406" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_3" d="M45.584 68.7652L39.6982 70.6182" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_4" d="M91.9744 56.1501L97.7367 54.3331" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_5" d="M60.9665 68.1103L59.2605 61.6484" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_6" d="M78.4553 63.36L76.5922 56.8067" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+<g id="Arrow">
+<path id="Vector_7" d="M117.992 156.835L117.011 128.408" stroke="black" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g id="Arrow_2">
+<path id="Vector_8" d="M77.0847 176.809L86.887 145.442" stroke="black" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g id="Bot_2">
+<path id="Vector_9" d="M29.6511 187.662L29.542 176.538C29.5382 176.154 29.2236 175.845 28.8394 175.849L18.5261 175.958" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_10" d="M45.4623 187.792H13.1882C10.2175 187.792 7.80942 190.494 7.80965 193.827L7.81131 217.968C7.81154 221.301 10.22 224.004 13.1907 224.004H45.4648C48.4355 224.004 50.8436 221.301 50.8434 217.968L50.8417 193.827C50.8415 190.494 48.4331 187.792 45.4623 187.792Z" stroke="black" stroke-width="3.52911" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_11" d="M7.48255 205.011L1.9201 205.127" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_12" d="M50.8218 205.82L56.2683 205.705" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_13" d="M20.9615 208.333L21.1185 202.309" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_14" d="M37.2986 208.643L37.3427 202.5" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+</g>
+<g id="Bot_3">
+<path id="Vector_15" d="M120.264 186.583L117.917 175.526C117.836 175.144 117.46 174.9 117.078 174.982L106.829 177.165" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_16" d="M136.037 183.531L103.894 190.025C100.935 190.623 99.0804 193.799 99.7513 197.118L104.61 221.161C105.281 224.481 108.224 226.687 111.182 226.089L143.326 219.595C146.284 218.998 148.139 215.822 147.468 212.502L142.609 188.46C141.938 185.14 138.996 182.934 136.037 183.531Z" stroke="black" stroke-width="3.58581" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_17" d="M101.676 208.323L96.1593 209.557" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_18" d="M145.002 200.408L150.403 199.197" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_19" d="M115.768 208.919L114.713 202.888" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_20" d="M132.102 205.94L130.91 199.813" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+</g>
+<g id="Arrow_3">
+<path id="Vector_21" d="M35.1441 160.708L51.8079 117.578" stroke="black" stroke-width="3" stroke-linecap="round"/>
+</g>
+</g>
+</svg>

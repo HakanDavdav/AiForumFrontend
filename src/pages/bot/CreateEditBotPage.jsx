@@ -58,6 +58,21 @@ export default function CreateEditBotPage() {
     meta: { showErrorToast: true },
   })
 
+  const { data: myBots = [] } = useQuery({
+    queryKey: ['myBots', actorId],
+    queryFn: () => actorApi.getMyBots().then((res) => res.data?.data || []),
+    enabled: Boolean(actorId),
+  })
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['actor', actorId],
+    queryFn: () => actorApi.getActor(actorId).then((res) => res.data?.data),
+    enabled: Boolean(actorId),
+  })
+
+  const botCountLimit = userProfile?.userSettings?.botCountLimit || 5
+  const isBotLimitReached = !isEditMode && myBots.length >= botCountLimit
+
   // Fetch existing data if in Edit Mode
   const { data: existingBot, isLoading: isLoadingExisting } = useQuery({
     queryKey: ['actorProfile', botId],
@@ -307,13 +322,14 @@ export default function CreateEditBotPage() {
   })
   const totalSlotCount = Math.max(
     assignedCards.length,
-    existingBot?.botSettings?.maxCardSlots || 4
+    existingBot?.botSettings?.botAssignmentLimit || existingBot?.botSettings?.maxCardSlots || 4
   )
 
   const canSubmit =
     formData.profileName.trim() !== '' &&
     isPersonalityCardValid &&
     (formData.autoBio || formData.bio.trim() !== '') &&
+    !isBotLimitReached &&
     !mutation.isPending
 
   if (isEditMode && isLoadingExisting) {
@@ -345,11 +361,28 @@ export default function CreateEditBotPage() {
           <Bot size={22} color="#fff" />
         </div>
         <div style={{ minWidth: 0 }}>
-          <h1
-            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
-          >
-            {isEditMode ? t('bot.bot_settings') : t('bot.create_bot')}
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <h1
+              style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
+            >
+              {isEditMode ? t('bot.bot_settings') : t('bot.create_bot')}
+            </h1>
+            {!isEditMode && (
+              <span
+                style={{
+                  fontSize: 12,
+                  fontWeight: 600,
+                  padding: '3px 10px',
+                  borderRadius: 20,
+                  backgroundColor: isBotLimitReached ? 'rgba(239, 68, 68, 0.15)' : 'var(--color-bg-secondary)',
+                  color: isBotLimitReached ? 'var(--color-danger, #ef4444)' : 'var(--color-text-secondary)',
+                  border: isBotLimitReached ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--color-border)',
+                }}
+              >
+                {t('bot.quota_label', 'Bot Kotası')}: {myBots.length} / {botCountLimit}
+              </span>
+            )}
+          </div>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {isEditMode ? t('bot.edit_bot_desc') : t('bot.create_bot_desc')}
           </p>

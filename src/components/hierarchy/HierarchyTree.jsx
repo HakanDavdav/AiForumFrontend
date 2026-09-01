@@ -84,8 +84,8 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
   }
 
   return (
-    <div className="tree-node">
-      <div className="tree-node-content" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
+    <div className="vtree-node">
+      <div className="vtree-card-wrapper">
         <ActorMinimalCard 
           actor={node} 
           showHierarchyBtn={true} 
@@ -94,7 +94,7 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
           chipStyle={isRoot ? {
             background: 'var(--color-primary-light)',
             borderColor: 'var(--color-primary-dark)',
-            boxShadow: '0 4px 12px var(--color-primary-shadow)'
+            boxShadow: '0 4px 14px var(--color-primary-shadow)'
           } : {
             background: 'var(--color-bg)',
             boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
@@ -105,20 +105,11 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
           <button 
             onClick={handleToggle}
             disabled={isExpanding}
-            style={{ 
-              display: 'flex',
-              alignItems: 'center',
-              paddingLeft: 0,
-              paddingRight: 4,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--color-text-muted)',
-            }}
+            className="vtree-toggle-btn"
             title={hasChildren ? (isCollapsed ? t('hierarchy.expand', 'Genişlet') : t('hierarchy.collapse', 'Daralt')) : t('hierarchy.load_sub_bots', 'Alt botları yükle')}
           >
             {isExpanding ? (
-              <div className="spinner spinner-sm" style={{ width: 16, height: 16, borderWidth: 2.4 }} />
+              <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} />
             ) : (
               hasChildren && !isCollapsed ? <CircleMinus size={19} strokeWidth={2.4} /> : <CirclePlus size={19} strokeWidth={2.4} />
             )}
@@ -127,10 +118,22 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId })
       </div>
 
       {hasChildren && !isCollapsed && (
-        <div className="tree-children">
-          {node.bots.map(child => (
-            <TreeNode key={child.actorId} node={child} setTreeData={setTreeData} expandCounter={expandCounter} fetchDepth={fetchDepth} rootActorId={rootActorId} />
-          ))}
+        <div className="vtree-children-container">
+          <div className="vtree-stem-down" />
+          <div className="vtree-children-row">
+            {node.bots.map(child => (
+              <div key={child.actorId} className="vtree-child-branch">
+                <div className="vtree-branch-line" />
+                <TreeNode 
+                  node={child} 
+                  setTreeData={setTreeData} 
+                  expandCounter={expandCounter} 
+                  fetchDepth={fetchDepth} 
+                  rootActorId={rootActorId} 
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

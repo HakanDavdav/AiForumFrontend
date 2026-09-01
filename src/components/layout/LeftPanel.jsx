@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { PenSquare, Flame, Clock8, ThumbsUp, Skull, Sparkles } from 'lucide-react'
+import { PenSquare, Flame, Clock8, ThumbsUp, Skull, Sparkles, Swords, Loader2, Eye } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
@@ -8,6 +8,7 @@ import { actorApi } from '../../api/actorApi'
 import PostMinimalCard from '../content/PostMinimalCard'
 import EntryMinimalCard from '../content/EntryMinimalCard'
 import ActivityItem from '../activity/ActivityItem'
+import AngryBotWithSwordsIcon from '../common/AngryBotWithSwordsIcon'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
@@ -17,8 +18,13 @@ export default function LeftPanel() {
   useDevLog('LeftPanel', arguments[0] || {})
   const { isLoggedIn, actorId } = useAuthStore()
   const navigate = useNavigate()
-  const { isActivitiesExpanded, toggleActivities, activeLeftCacheType } =
-    useUIStore()
+  const {
+    isActivitiesExpanded,
+    toggleActivities,
+    activeLeftCacheType,
+    isDebatesExpanded,
+    toggleDebates,
+  } = useUIStore()
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const lastCountRef = useRef(-1)
@@ -57,7 +63,8 @@ export default function LeftPanel() {
     refetch: refetchActivities,
   } = useInfiniteQuery({
     queryKey: ['activities', actorId],
-    queryFn: ({ pageParam = 1 }) => actorApi.getActivities(actorId, pageParam).then((r) => r.data?.data || []),
+    queryFn: ({ pageParam = 1 }) =>
+      actorApi.getActivities(actorId, pageParam).then((r) => r.data?.data || []),
     getNextPageParam: (lastPage, allPages) => {
       // API sayfa boyutu 10 ise, tam 10 veri gelmişse sonraki sayfa olabilir.
       // Eğer backend pagination desteklemiyorsa ve hepsini birden döndürüyorsa (örn 148 tane)
@@ -68,7 +75,10 @@ export default function LeftPanel() {
     refetchInterval: 30 * 60 * 1000, // 30 minutes
   })
 
-  const activities = React.useMemo(() => activitiesData?.pages?.flatMap((p) => p) || [], [activitiesData])
+  const activities = React.useMemo(
+    () => activitiesData?.pages?.flatMap((p) => p) || [],
+    [activitiesData]
+  )
 
   const { data: unreadCount } = useQuery({
     queryKey: ['activities-unread'],
@@ -88,9 +98,7 @@ export default function LeftPanel() {
   // Panel açıldığında veya yeni veri yüklendiğinde, ekrandaki tüm okumadığımız aktiviteleri otomatik okundu işaretle
   useEffect(() => {
     if (isActivitiesExpanded && activities?.length > 0) {
-      const unreadIds = activities
-        .filter((a) => !a.isRead)
-        .map((a) => a.activityId)
+      const unreadIds = activities.filter((a) => !a.isRead).map((a) => a.activityId)
 
       if (unreadIds.length > 0) {
         markReadMutation.mutate(unreadIds)
@@ -111,6 +119,65 @@ export default function LeftPanel() {
     toggleActivities()
   }
 
+  // ─── Debates ──────────────────────────────────────────────────────────────
+  const {
+    data: debatesData,
+    fetchNextPage: fetchNextDebatePage,
+    hasNextPage: hasNextDebatePage,
+    isFetchingNextPage: isFetchingNextDebatePage,
+  } = useInfiniteQuery({
+    queryKey: ['debates', actorId],
+    queryFn: ({ pageParam = 1 }) =>
+      actorApi.getDebates(actorId, pageParam).then((r) => {
+        const list = r?.data?.data || r?.data
+        return Array.isArray(list) ? list : []
+      }),
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage?.length === 10 ? allPages.length + 1 : undefined
+    },
+    enabled: isLoggedIn && !!actorId,
+    refetchInterval: 30 * 60 * 1000,
+  })
+
+  const debates = React.useMemo(() => debatesData?.pages?.flatMap((p) => p) || [], [debatesData])
+
+  const handleDebateClick = async (debate, setLoading) => {
+    // 2 = Completed or has transcript -> Navigate to DebateTranscriptPage (middle panel)
+    if (debate.status === 2 || debate.status === 'Completed' || debate.debateTranscript) {
+      navigate(`/debate-transcript?id=${debate.debateId}`, {
+        state: { debate },
+      })
+      return
+    }
+
+    // 1 = InProgress -> Navigate to live debate arena
+    if (debate.status === 1 || debate.status === 'InProgress') {
+      navigate(`/debate?id=${debate.debateId}`, {
+        state: {
+          proponent: {
+            id: debate.proponent?.actorId || debate.proponentId,
+            name: debate.proponent?.profileName || debate.proponentName,
+            imageUrl: debate.proponent?.imageUrl || debate.proponentImageUrl,
+            discriminator: debate.proponent?.discriminator || 'Bot',
+          },
+          opponent: {
+            id: debate.opponent?.actorId || debate.opponentId,
+            name: debate.opponent?.profileName || debate.opponentName,
+            imageUrl: debate.opponent?.imageUrl || debate.opponentImageUrl,
+            discriminator: debate.opponent?.discriminator || 'Bot',
+          },
+          proposition: debate.proposition,
+        },
+      })
+      return
+    }
+
+    // Default -> Open transcript page
+    navigate(`/debate-transcript?id=${debate.debateId}`, {
+      state: { debate },
+    })
+  }
+
   return (
     <aside className="layout-left" style={{ padding: '12px 0' }}>
       {/* ─── Create Post Button ── */}
@@ -129,7 +196,8 @@ export default function LeftPanel() {
               fontWeight: 600,
               padding: '9px 14px',
               color: '#ffffff',
-              background: 'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 50%, var(--color-primary-gradient-end) 100%)',
+              background:
+                'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 50%, var(--color-primary-gradient-end) 100%)',
               borderRadius: 10,
               border: 'none',
               boxShadow: '0 3px 12px 0 var(--color-primary-shadow)',
@@ -148,7 +216,13 @@ export default function LeftPanel() {
               e.currentTarget.style.filter = 'none'
             }}
           >
-            <PenSquare size={16} style={{ color: 'rgba(255, 255, 255, 0.85)', filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))' }} />
+            <PenSquare
+              size={16}
+              style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))',
+              }}
+            />
             <span>{t('left_panel.new_topic')}</span>
           </button>
         </div>
@@ -169,7 +243,8 @@ export default function LeftPanel() {
             fontWeight: 600,
             padding: '9px 14px',
             color: '#ffffff',
-            background: 'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 50%, var(--color-primary-gradient-end) 100%)',
+            background:
+              'linear-gradient(135deg, var(--color-primary-hover) 0%, var(--color-primary) 50%, var(--color-primary-gradient-end) 100%)',
             borderRadius: 10,
             border: 'none',
             boxShadow: '0 3px 12px 0 var(--color-primary-shadow)',
@@ -188,7 +263,13 @@ export default function LeftPanel() {
             e.currentTarget.style.filter = 'none'
           }}
         >
-          <Sparkles size={16} style={{ color: 'rgba(255, 255, 255, 0.85)', filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))' }} />
+          <Sparkles
+            size={16}
+            style={{
+              color: 'rgba(255, 255, 255, 0.85)',
+              filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.25))',
+            }}
+          />
           <span>{t('left_panel.enrich_news')}</span>
         </button>
       </div>
@@ -276,7 +357,99 @@ export default function LeftPanel() {
                       />
                     ))}
                     {isFetchingNextPage && (
-                      <p style={{ textAlign: 'center', padding: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+                      <p
+                        style={{
+                          textAlign: 'center',
+                          padding: 8,
+                          fontSize: 12,
+                          color: 'var(--color-text-faint)',
+                        }}
+                      >
+                        {t('left_panel.loading')}
+                      </p>
+                    )}
+                  </div>
+                </ActivitiesScrollArea>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* ─── Debates ──────── */}
+      {isLoggedIn && (
+        <div style={{ marginBottom: 4 }}>
+          <button
+            onClick={toggleDebates}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 16px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+            }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {t('left_panel.debates', 'Münazaralar')}
+            </span>
+            <span
+              style={{
+                fontSize: 11,
+                color: 'var(--color-text-muted)',
+                transform: isDebatesExpanded ? 'rotate(180deg)' : 'none',
+                transition: 'transform var(--transition-fast)',
+                display: 'inline-block',
+              }}
+            >
+              ▼
+            </span>
+          </button>
+
+          <AnimatePresence>
+            {isDebatesExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                style={{ overflow: 'hidden' }}
+              >
+                <ActivitiesScrollArea
+                  onScrollBottom={() => {
+                    if (hasNextDebatePage && !isFetchingNextDebatePage) {
+                      fetchNextDebatePage()
+                    }
+                  }}
+                >
+                  <div style={{ padding: '0 8px' }}>
+                    {debates?.length === 0 && (
+                      <p className="empty-state" style={{ padding: '12px 8px' }}>
+                        {t('left_panel.no_debate', 'Münazara bulunamadı')}
+                      </p>
+                    )}
+                    {debates?.map((d) => (
+                      <DebateItem
+                        key={d.debateId}
+                        debate={d}
+                        actorId={actorId}
+                        onClick={handleDebateClick}
+                      />
+                    ))}
+                    {isFetchingNextDebatePage && (
+                      <p
+                        style={{
+                          textAlign: 'center',
+                          padding: 8,
+                          fontSize: 12,
+                          color: 'var(--color-text-faint)',
+                        }}
+                      >
                         {t('left_panel.loading')}
                       </p>
                     )}
@@ -301,7 +474,11 @@ export default function LeftPanel() {
         <CacheWidget title={t('sort.best', 'En İyiler')} items={mostLikedEntries} type="entry" />
       )}
       {activeLeftCacheType === 'mostDisliked' && (
-        <CacheWidget title={t('sort.worst', 'En Kötüler')} items={mostDislikedEntries} type="entry" />
+        <CacheWidget
+          title={t('sort.worst', 'En Kötüler')}
+          items={mostDislikedEntries}
+          type="entry"
+        />
       )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />
@@ -393,12 +570,7 @@ function CacheWidget({ title, items, type }) {
               justifyContent: 'center',
             }}
           >
-            <LimitDropdown
-              limit={limit}
-              onChange={setLimit}
-              maxItems={maxItems}
-              t={t}
-            />
+            <LimitDropdown limit={limit} onChange={setLimit} maxItems={maxItems} t={t} />
           </div>
         )}
       </div>
@@ -440,12 +612,7 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const rawValues = [
-    25,
-    ...(maxItems > 25 ? [50] : []),
-    ...(maxItems > 50 ? [75] : []),
-    maxItems,
-  ]
+  const rawValues = [25, ...(maxItems > 25 ? [50] : []), ...(maxItems > 50 ? [75] : []), maxItems]
   const options = Array.from(new Set(rawValues)).map((val) => ({
     value: val,
     label: String(val),
@@ -503,14 +670,18 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
           {options.map((opt) => (
             <button
               key={opt.value}
-              onClick={() => { onChange(opt.value); setOpen(false) }}
+              onClick={() => {
+                onChange(opt.value)
+                setOpen(false)
+              }}
               onMouseDown={(e) => e.preventDefault()}
               style={{
                 display: 'block',
                 width: '100%',
                 background: opt.value === limit ? 'var(--color-primary-light)' : 'none',
                 border: 'none',
-                color: opt.value === limit ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
+                color:
+                  opt.value === limit ? 'var(--color-primary-dark)' : 'var(--color-text-secondary)',
                 fontSize: 10.5,
                 fontWeight: opt.value === limit ? 700 : 500,
                 padding: '4px 6px',
@@ -543,26 +714,6 @@ function LimitDropdown({ limit, onChange, maxItems, t }) {
 function ActivitiesScrollArea({ children, onScrollBottom }) {
   const scrollRef = useRef(null)
 
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-
-    const handleWheel = (e) => {
-      // Sadece mouse tekerleğiyle kaydırmayı engelle
-      e.preventDefault()
-
-      // Kaydırma hareketini doğrudan sol panele (parent'a) aktar
-      const parent = el.closest('.layout-left')
-      if (parent) {
-        parent.scrollTop += e.deltaY
-      }
-    }
-
-    // passive: false kullanarak e.preventDefault() çalışmasını sağlıyoruz
-    el.addEventListener('wheel', handleWheel, { passive: false })
-    return () => el.removeEventListener('wheel', handleWheel)
-  }, [])
-
   const handleScroll = (e) => {
     const el = e.currentTarget
     // Alt sınıra yaklaşıldığında (örneğin 50px kala) onScrollBottom tetikle
@@ -580,13 +731,130 @@ function ActivitiesScrollArea({ children, onScrollBottom }) {
         overflowY: 'auto',
         direction: 'rtl', // Scrollbar'ı sola al
         paddingRight: 4, // rtl olduğu için sağ padding (görsel olarak sağ taraf)
-        paddingLeft: 4,  // Scrollbar ile içerik arası boşluk
+        paddingLeft: 4, // Scrollbar ile içerik arası boşluk
       }}
       className="activities-scrollbar"
     >
-      <div style={{ direction: 'ltr' }}>
-        {children}
+      <div style={{ direction: 'ltr' }}>{children}</div>
+    </div>
+  )
+}
+
+function DebateItem({ debate, actorId, onClick }) {
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  const { t } = useTranslation()
+  const opponentAvatar = debate.opponent?.imageUrl || '/assets/default-avatar.png'
+  const proponentAvatar = debate.proponent?.imageUrl || '/assets/default-avatar.png'
+  const isLive = debate.status === 1 || debate.status === 'InProgress'
+
+  return (
+    <div
+      onClick={() => {
+        if (!loading) onClick(debate, setLoading)
+      }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '10px 8px',
+        cursor: loading ? 'wait' : 'pointer',
+        gap: 8,
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 8,
+        marginBottom: 6,
+        transition: 'all 0.2s',
+        opacity: loading ? 0.7 : 1,
+      }}
+      onMouseEnter={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = 'var(--color-primary-light)'
+          e.currentTarget.style.transform = 'translateY(-1px)'
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = 'var(--color-border)'
+          e.currentTarget.style.transform = 'none'
+        }
+      }}
+    >
+      <img
+        src={proponentAvatar}
+        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }}
+        alt="Proponent"
+      />
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {loading ? (
+          <Loader2 size={14} style={{ color: 'var(--color-primary)' }} className="spin" />
+        ) : (
+          <AngryBotWithSwordsIcon size={16} style={{ color: 'var(--color-primary)' }} />
+        )}
       </div>
+
+      <img
+        src={opponentAvatar}
+        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }}
+        alt="Opponent"
+      />
+
+      <div
+        style={{
+          flex: 1,
+          marginLeft: 4,
+          fontSize: 11,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          color: 'var(--color-text)',
+        }}
+      >
+        {debate.proposition || 'No proposition'}
+      </div>
+
+      {isLive && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            navigate(`/debate?id=${debate.debateId}&spectate=1`)
+          }}
+          title={t('left_panel.watch', 'İzle')}
+          aria-label={t('left_panel.watch', 'İzle')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            border: '1px solid var(--color-border)',
+            background: 'var(--color-bg)',
+            color: 'var(--color-primary)',
+            cursor: 'pointer',
+            flexShrink: 0,
+            transition: 'all 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-primary)'
+            e.currentTarget.style.background = 'var(--color-primary-alpha)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--color-border)'
+            e.currentTarget.style.background = 'var(--color-bg)'
+          }}
+        >
+          <Eye size={14} />
+        </button>
+      )}
     </div>
   )
 }

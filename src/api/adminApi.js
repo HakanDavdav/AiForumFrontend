@@ -3,7 +3,7 @@ import botApi from './botAxios'
 
 export const adminApi = {
   // PresentationLayer - AdminService
-  setActorPoint: (actorId, newScore) => api.post(`/admin/actor/${actorId}/set-point`, { newScore }),
+  setActorPoint: (actorId, newScore) => api.post(`/admin/actor/${actorId}/set-point`, newScore, { headers: { 'Content-Type': 'application/json' } }),
 
   // BotMicroservice - AdminController
   triggerBotEvent: (actorId, data) => botApi.post(`/admin/bot/${actorId}/trigger-event`, data),

@@ -1,16 +1,55 @@
-import { useEffect, useId, useState } from 'react'
-import { ShieldQuestion, X, Bot, Users, Sparkles, Newspaper, ArrowRight, Podium } from 'lucide-react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { ShieldQuestion, X, Bot, Users, Sparkles, Newspaper, ArrowRight, Podium, ChevronDown } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import IconActionButton from './IconActionButton'
 import BotFlashCardsIcon from './BotFlashCardsIcon'
+import AngryBotWithSwordsIcon from './AngryBotWithSwordsIcon'
 import Logo from './Logo'
+import ArrowCardTravel from './ArrowCardTravel'
+import InfoCard from './InfoCard'
+import PremiumModal from './PremiumModal'
+import WelcomeSvg from '../../assets/FigmaNew/Welcome.svg?react'
+import ModifierArrowSvg from '../../assets/FigmaNew/modifierarrow.svg?react'
 
 export default function BletchlyGuideModal({ triggerStyle }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false)
   const titleId = useId()
   const navigate = useNavigate()
   const { t } = useTranslation()
+
+  const scrollRef = useRef(null)
+  const welcomeRef = useRef(null)
+  const sectionsRef = useRef(null)
+  const [showScrollBtn, setShowScrollBtn] = useState(true)
+
+  const getNextTarget = () => {
+    const el = scrollRef.current
+    if (!el) return null
+    const containerTop = el.getBoundingClientRect().top
+    for (const ref of [welcomeRef, sectionsRef]) {
+      if (ref.current && ref.current.getBoundingClientRect().top > containerTop + 40) {
+        return ref.current
+      }
+    }
+    return null
+  }
+
+  const scrollToNext = () => {
+    const target = getNextTarget()
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+    const el = scrollRef.current
+    if (!el) return undefined
+    const update = () => setShowScrollBtn(getNextTarget() !== null)
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    return () => el.removeEventListener('scroll', update)
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -35,10 +74,18 @@ export default function BletchlyGuideModal({ triggerStyle }) {
 
   const handleNavigate = (path) => {
     setIsOpen(false)
-    navigate(path)
+    if (path) navigate(path)
   }
 
   const sections = [
+    {
+      icon: <ShieldQuestion size={22} color="var(--color-primary)" />,
+      title: t('bletchly_guide.hierarchy_title', 'Basic Concepts'),
+      desc: t('bletchly_guide.hierarchy_desc', 'Bletchly temel konseptler ve kart mekanizması.'),
+      linkText: t('bletchly_guide.hierarchy_link', 'BasicConcepts'),
+      path: '/basic-concepts',
+      fullWidth: true
+    },
     {
       icon: <Bot size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.bots_title'),
@@ -73,7 +120,32 @@ export default function BletchlyGuideModal({ triggerStyle }) {
       desc: t('bletchly_guide.leaderboard_desc'),
       linkText: t('bletchly_guide.leaderboard_link'),
       path: '/leaderboard'
-    }
+    },
+    {
+      icon: <AngryBotWithSwordsIcon size={22} color="var(--color-primary)" />,
+      title: t('bletchly_guide.debates_title'),
+      desc: t('bletchly_guide.debates_desc'),
+      linkText: t('bletchly_guide.debates_link'),
+      path: ''
+    },
+    {
+      icon: (
+        <ModifierArrowSvg
+          width={16}
+          height={22}
+          className="guide-premium-icon"
+          style={{ color: 'var(--color-primary)' }}
+        />
+      ),
+      title: t('bletchly_guide.premium_title', 'Premium'),
+      desc: t(
+        'bletchly_guide.premium_desc',
+        'Premium avantajlarıyla ekstra bot slotları, kart sahiplik limiti bonusu ve daha fazlasını kazanın.'
+      ),
+      linkText: t('bletchly_guide.premium_link', 'Premium'),
+      premium: true,
+      onClick: () => setIsPremiumOpen(true),
+    },
   ]
 
   return (
@@ -103,7 +175,8 @@ export default function BletchlyGuideModal({ triggerStyle }) {
             aria-labelledby={titleId}
             onClick={(event) => event.stopPropagation()}
             style={{
-              width: 'min(700px, calc(100vw - 32px))',
+              position: 'relative',
+              width: 'min(1400px, calc(100vw - 32px))',
               maxWidth: 'none',
               maxHeight: '90vh',
               padding: 0,
@@ -159,41 +232,56 @@ export default function BletchlyGuideModal({ triggerStyle }) {
             </div>
 
             {/* Body */}
-            <div style={{ padding: '24px', overflowY: 'auto' }}>
-              <p style={{ margin: '0 0 24px 0', fontSize: 14, color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                {t('bletchly_guide.intro')}
-              </p>
+            <div ref={scrollRef} style={{ padding: '24px', overflowY: 'auto' }}>
+              <div
+                style={{
+                  minHeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 24,
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 24,
+                    fontWeight: 700,
+                    color: 'var(--color-text-primary)',
+                    lineHeight: 1.5,
+                    textAlign: 'center',
+                    maxWidth: 720,
+                  }}
+                >
+                  {t('bletchly_guide.intro')}
+                </p>
+              </div>
+              <div ref={welcomeRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, gap: 90 }}>
+                <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: 2 }}>...</span>
+                <ArrowCardTravel
+                  Svg={WelcomeSvg}
+                  widthPct={60}
+                  svgStyle={{ color: 'var(--color-primary)' }}
+                  cardWidth={10}
+                  speed={14}
+                  spacing={200}
+                  maxCards={25}
+                  rerandomizeInterval={3000}
+                />
+                <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: 2 }}>...</span>
+              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              <div ref={sectionsRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                 {sections.map((sec, idx) => (
-                  <div
+                  <InfoCard
                     key={idx}
-                    onClick={() => handleNavigate(sec.path)}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      padding: 20,
-                      borderRadius: 12,
-                      border: '1px solid var(--color-border)',
-                      background: 'var(--color-bg)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      gap: 12
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-primary)'
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--color-border)'
-                      e.currentTarget.style.transform = 'none'
-                      e.currentTarget.style.boxShadow = 'none'
-                    }}
+                    onClick={() => (sec.onClick ? sec.onClick() : handleNavigate(sec.path))}
+                    fullWidth={sec.fullWidth}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{
-                        width: 40, height: 40, borderRadius: 10, background: 'var(--color-surface)',
+                        width: 40, height: 40, borderRadius: 10,
+                        background: sec.premium ? 'var(--color-warning)' : 'var(--color-surface)',
                         border: '1px solid var(--color-border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center'
                       }}>
                         {sec.icon}
@@ -209,13 +297,51 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                       {sec.linkText}
                       <ArrowRight size={14} strokeWidth={2.5} />
                     </div>
-                  </div>
+                  </InfoCard>
                 ))}
               </div>
             </div>
+
+            <style>{`
+              @keyframes guideBounce {
+                0%, 100% { transform: translateX(-50%) translateY(0); }
+                50% { transform: translateX(-50%) translateY(8px); }
+              }
+            `}</style>
+
+            {showScrollBtn && (
+              <button
+                type="button"
+                onClick={scrollToNext}
+                aria-label={t('bletchly_guide.scroll_down', 'Aşağı kaydır')}
+                style={{
+                  position: 'absolute',
+                  bottom: 18,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  background: 'var(--color-primary)',
+                  color: '#fff',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.28)',
+                  zIndex: 10,
+                  animation: 'guideBounce 2s ease-in-out infinite',
+                }}
+              >
+                <ChevronDown size={36} strokeWidth={2.5} />
+              </button>
+            )}
           </section>
         </div>
       )}
+
+      <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </>
   )
 }

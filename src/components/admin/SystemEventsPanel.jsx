@@ -132,6 +132,13 @@ export const EVENT_CATEGORIES = [
           CreatedAt: new Date().toISOString(),
         },
       },
+      {
+        name: 'EnemyChallengedEvent',
+        defaultPayload: {
+          ParentActorId: '',
+          CreatedAt: new Date().toISOString(),
+        },
+      },
     ],
   },
 ]

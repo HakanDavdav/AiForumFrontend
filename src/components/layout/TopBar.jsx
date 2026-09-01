@@ -16,6 +16,8 @@ import {
   CirclePlus,
   PaintbrushVertical,
   X,
+  Users,
+  Sparkles,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -37,6 +39,7 @@ import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
+import AngryBotWithSwordsIcon from '../common/AngryBotWithSwordsIcon'
 import BletchlyGuideModal from '../common/BletchlyGuideModal'
 import Logo from '../common/Logo'
 
@@ -51,6 +54,10 @@ export default function TopBar() {
     toggleLeftDrawer,
     activeLeftCacheType,
     setActiveLeftCacheType,
+    isBotsAmbience,
+    toggleBotsAmbience,
+    isWelcomeAmbience,
+    toggleWelcomeAmbience,
   } = useUIStore()
   const langs = [
     { code: 'tr', label: 'Türkçe', flagUrl: 'https://flagcdn.com/w20/tr.png' },
@@ -658,7 +665,10 @@ export default function TopBar() {
               disabled={searchMode === 'general'}
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               style={{
-                borderColor: (filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : undefined,
+                borderColor:
+                  filterOrderType || filterStartDate || filterEndDate
+                    ? 'var(--color-primary)'
+                    : undefined,
               }}
               title={
                 searchMode === 'general'
@@ -668,8 +678,16 @@ export default function TopBar() {
             >
               <Filter
                 size={14}
-                color={(filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : 'currentColor'}
-                fill={(filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : 'none'}
+                color={
+                  filterOrderType || filterStartDate || filterEndDate
+                    ? 'var(--color-primary)'
+                    : 'currentColor'
+                }
+                fill={
+                  filterOrderType || filterStartDate || filterEndDate
+                    ? 'var(--color-primary)'
+                    : 'none'
+                }
               />
             </button>
             {(filterOrderType || filterStartDate || filterEndDate) && (
@@ -678,7 +696,9 @@ export default function TopBar() {
                 onMouseDown={(e) => {
                   e.preventDefault()
                   suppressSuggestionsRef.current = true
-                  setTimeout(() => { suppressSuggestionsRef.current = false }, 300)
+                  setTimeout(() => {
+                    suppressSuggestionsRef.current = false
+                  }, 300)
                 }}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -1443,6 +1463,64 @@ export default function TopBar() {
             style={{ width: 38, height: 38, boxSizing: 'border-box' }}
           >
             <Podium size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/tribes')}
+            title={t('topbar.tribes', 'Klanlar')}
+            aria-label={t('topbar.tribes', 'Klanlar')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <Users size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/active-debates')}
+            title={t('topbar.active_debates', 'Aktif Münazaralar')}
+            aria-label={t('topbar.active_debates', 'Aktif Münazaralar')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <AngryBotWithSwordsIcon size={22} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={toggleBotsAmbience}
+            title={t('topbar.ambient_bots', 'Ambient Botlar')}
+            aria-label={t('topbar.ambient_bots', 'Ambient Botlar')}
+            style={{
+              width: 38,
+              height: 38,
+              boxSizing: 'border-box',
+              ...(isBotsAmbience
+                ? {
+                    color: 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
+                    background: 'var(--color-primary-alpha)',
+                  }
+                : {}),
+            }}
+          >
+            <Bot size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={toggleWelcomeAmbience}
+            title={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
+            aria-label={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
+            style={{
+              width: 38,
+              height: 38,
+              boxSizing: 'border-box',
+              ...(isWelcomeAmbience
+                ? {
+                    color: 'var(--color-primary)',
+                    borderColor: 'var(--color-primary)',
+                    background: 'var(--color-primary-alpha)',
+                  }
+                : {}),
+            }}
+          >
+            <Sparkles size={19} strokeWidth={2.2} />
           </IconActionButton>
 
           <IconActionButton

@@ -1,15 +1,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Bot, Check, Info, Edit2, Users, Crown, Pencil } from 'lucide-react'
+import { Bot, Check, Info, Edit2, Users, Crown, Pencil, Lock } from 'lucide-react'
 import CardActorListModal from './CardActorListModal'
 import CardDetailModal from './CardDetailModal'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
+import ActorAvatar from '../actor/ActorAvatar'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import SelectionMarker from '../common/SelectionMarker'
 import IconActionButton from '../common/IconActionButton'
 
 export default function PersonalityCard({
   card,
+  actor,
   slotNumber,
   onClick,
   disabled = false,
@@ -35,6 +37,88 @@ export default function PersonalityCard({
   const { t } = useTranslation()
   const [modalType, setModalType] = useState(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+
+  if (variant === 'distribute') {
+    const actorData = actor || card?.actor || card?.winnerActor || {}
+    const actorName = actorData.name || actorData.profileName || card?.cardName || t('card.card', 'Kart')
+
+    return (
+      <div
+        className="personality-card personality-card--filled personality-card--distribute"
+        style={{
+          width: '88px',
+          minWidth: '88px',
+          maxWidth: '88px',
+          height: '120px',
+          minHeight: 'unset',
+          maxHeight: 'unset',
+          padding: '10px 6px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'linear-gradient(145deg, var(--color-surface), color-mix(in srgb, var(--color-primary) 15%, var(--color-surface)))',
+          border: '1.5px solid var(--color-primary)',
+          borderRadius: 12,
+          boxShadow: '0 0 20px color-mix(in srgb, var(--color-primary) 60%, transparent), 0 8px 16px rgba(0,0,0,0.3)',
+          cursor: 'default',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          position: 'relative',
+          boxSizing: 'border-box',
+        }}
+      >
+        {/* Topline Card Title */}
+        <span
+          className="personality-card__title"
+          style={{
+            fontSize: 9.5,
+            fontWeight: 700,
+            color: 'var(--color-primary)',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textAlign: 'center',
+            lineHeight: 1.2,
+          }}
+        >
+          {card?.cardName || t('card.personality_card', 'Kişilik Kartı')}
+        </span>
+
+        {/* Center Avatar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '4px 0' }}>
+          <ActorAvatar
+            profileName={actorName}
+            imageUrl={actorData.imageUrl}
+            discriminator={actorData.discriminator}
+            actorId={actorData.actorId || actorData.id}
+            size="md"
+            clickable={false}
+          />
+        </div>
+
+        {/* Bottom Actor Name */}
+        <span
+          className="personality-card__hint"
+          style={{
+            fontSize: 9.5,
+            fontWeight: 600,
+            color: 'var(--color-text)',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            textAlign: 'center',
+            lineHeight: 1.2,
+            margin: 0,
+          }}
+        >
+          {actorName}
+        </span>
+      </div>
+    )
+  }
 
   if (variant === 'editor') {
     const canConfirm = editorCardName.trim() !== '' && editorPrompt.trim() !== ''
@@ -281,6 +365,27 @@ export default function PersonalityCard({
           >
             $
           </span>
+        </span>
+      )}
+      {locked && (
+        <span
+          title={t('card.locked_assignment', 'Bu atama kilitli')}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            color: 'var(--color-text-secondary)',
+            zIndex: 3,
+            background: 'rgba(0,0,0,0.6)',
+            padding: '4px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+          }}
+        >
+          <Lock size={16} strokeWidth={2.5} />
         </span>
       )}
       <div className="personality-card__topline">

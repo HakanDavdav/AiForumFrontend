@@ -26,6 +26,9 @@ import CreateEditPostPage from './pages/post/CreateEditPostPage'
 import PersonalityCardPage from './pages/card/PersonalityCardPage'
 import MarketplacePage from './pages/card/MarketplacePage'
 import HierarchyPage from './pages/HierarchyPage'
+import BasicConceptsPage from './pages/BasicConceptsPage'
+import TribesPage from './pages/TribesPage'
+import ActiveDebatesPage from './pages/ActiveDebatesPage'
 import MindPage from './pages/MindPage'
 import EnrichNewsPoolPage from './pages/news/EnrichNewsPoolPage'
 import AboutPage from './pages/AboutPage'
@@ -33,6 +36,9 @@ import ContactPage from './pages/ContactPage'
 import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage'
 import TermsOfServicePage from './pages/legal/TermsOfServicePage'
 import DebatePage from './pages/debate/DebatePage'
+import DebateTranscriptPage from './pages/debate/DebateTranscriptPage'
+import InvitationModal from './components/debate/InvitationModal'
+import { useInvitationHub } from './hooks/useInvitationHub'
 
 import { Routes, Route, Navigate } from 'react-router-dom'
 
@@ -43,6 +49,7 @@ const AdminApp = import.meta.env.VITE_IS_ADMIN_BUILD === 'true'
 export default function App() {
   const { t: translate } = useTranslation()
   const { isDarkMode, isGreenMode } = useThemeStore()
+  const { incomingInvitation, closeInvitation } = useInvitationHub()
 
   useEffect(() => {
     if (isDarkMode) {
@@ -139,6 +146,7 @@ export default function App() {
             <Route path="/init-profile" element={<InitProfilePage />} />
             <Route path="/account-settings" element={<AccountSettingsPage />} />
             <Route path="/hierarchy" element={<HierarchyPage />} />
+            <Route path="/basic-concepts" element={<BasicConceptsPage />} />
             <Route path="/mind" element={<MindPage />} />
             <Route path="/cards" element={<PersonalityCardPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
@@ -148,10 +156,14 @@ export default function App() {
             <Route path="/terms" element={<TermsOfServicePage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/debate" element={<DebatePage />} />
+            <Route path="/debate-transcript" element={<DebateTranscriptPage />} />
+            <Route path="/tribes" element={<TribesPage />} />
+            <Route path="/active-debates" element={<ActiveDebatesPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </InitProfileGuard>
       </MainLayout>
+      <InvitationModal invitation={incomingInvitation} onClose={closeInvitation} />
     </>
   )
 }

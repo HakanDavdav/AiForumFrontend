@@ -12,6 +12,7 @@ import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
 import Logo from '../../components/common/Logo'
 import SelectionMarker from '../../components/common/SelectionMarker'
 import PasswordInput from '../../components/common/PasswordInput'
+import AuthWelcomeBackground from '../../components/auth/AuthWelcomeBackground'
 
 export default function LoginPage() {
   useDevLog('LoginPage', arguments[0] || {})
@@ -152,42 +153,45 @@ export default function LoginPage() {
 
   if (requiresTwoFactor) {
     return (
-      <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
-        <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>{t('auth.two_factor')}</h2>
-        <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
-          {t('auth.two_factor_desc')}
-        </p>
+      <AuthWelcomeBackground>
+        <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8, textAlign: 'center' }}>{t('auth.two_factor')}</h2>
+          <p className="text-muted" style={{ textAlign: 'center', marginBottom: 24 }}>
+            {t('auth.two_factor_desc')}
+          </p>
 
-        <form noValidate onSubmit={handleTwoFactorSubmit} className="flex-col gap-4">
-          <div className="form-group">
-            <label className="form-label">{t('auth.two_factor_code')}</label>
-            <input 
-              className="input" 
-              type="text" 
-              value={twoFactorToken}
-              onChange={(e) => setTwoFactorToken(e.target.value)}
-              required 
-              maxLength={6}
-              style={{ textAlign: 'center', fontSize: 24, letterSpacing: 4, borderColor: getBorderColor('twoFactorToken', twoFactorToken, true), outline: 'none' }}
-              onFocus={() => setFocused('twoFactorToken')}
-              onBlur={() => setFocused(null)}
-            />
-          </div>
-          <button 
-            type="submit" 
-            className="btn btn-primary w-full"
-            disabled={twoFactorMutation.isPending}
-          >
-            {twoFactorMutation.isPending ? t('auth.verifying') : t('auth.verify')}
-          </button>
-        </form>
-      </div>
+          <form noValidate onSubmit={handleTwoFactorSubmit} className="flex-col gap-4">
+            <div className="form-group">
+              <label className="form-label">{t('auth.two_factor_code')}</label>
+              <input 
+                className="input" 
+                type="text" 
+                value={twoFactorToken}
+                onChange={(e) => setTwoFactorToken(e.target.value)}
+                required 
+                maxLength={6}
+                style={{ textAlign: 'center', fontSize: 24, letterSpacing: 4, borderColor: getBorderColor('twoFactorToken', twoFactorToken, true), outline: 'none' }}
+                onFocus={() => setFocused('twoFactorToken')}
+                onBlur={() => setFocused(null)}
+              />
+            </div>
+            <button 
+              type="submit" 
+              className="btn btn-primary w-full"
+              disabled={twoFactorMutation.isPending}
+            >
+              {twoFactorMutation.isPending ? t('auth.verifying') : t('auth.verify')}
+            </button>
+          </form>
+        </div>
+      </AuthWelcomeBackground>
     )
   }
 
   return (
     <>
-      <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
+      <AuthWelcomeBackground>
+        <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
         <div
           style={{
             display: 'flex',
@@ -294,7 +298,8 @@ export default function LoginPage() {
         <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--color-text-secondary)' }}>
           {t('auth.no_account')} <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/register')}>{t('common.register')}</button>
         </div>
-      </div>
+        </div>
+      </AuthWelcomeBackground>
 
       <ForgotPasswordModal isOpen={isForgotOpen} onClose={() => setIsForgotOpen(false)} />
     </>

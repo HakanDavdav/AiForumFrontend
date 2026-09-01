@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import svgr from 'vite-plugin-svgr'
+import { figmaSvgrPlugin } from './vite.figma-svgr.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -48,7 +50,7 @@ function clientLoggerPlugin() {
 }
 
 export default defineConfig({
-  plugins: [react(), clientLoggerPlugin()],
+  plugins: [react(), figmaSvgrPlugin(), svgr({ include: '**/*.svg?*react' }), clientLoggerPlugin()],
   server: {
     port: 5174,
     proxy: {
@@ -67,7 +69,13 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/bot-api/, '/api'), // BotMicroservice expects /api/admin...
-      }
+      },
+      '/hubs': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        ws: true,
+        secure: false,
+      },
     },
   },
   define: {

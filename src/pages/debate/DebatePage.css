@@ -1,136 +1,404 @@
 .debate-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - var(--topbar-height) - var(--footer-height));
+  min-height: calc(100vh - var(--topbar-height) - var(--footer-height));
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: var(--space-4);
-  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  gap: var(--space-3);
   position: relative;
-  overflow: hidden;
+  isolation: isolate;
 }
 
 .debate-header {
-  text-align: center;
-  padding: var(--space-6);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.debate-header__top {
+  display: flex;
   align-items: center;
-  gap: var(--space-2);
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
 }
 
-.dark .debate-header {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.debate-proposition {
-  font-size: var(--font-size-2xl);
+.debate-header__timeout {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  border: 1px solid var(--color-border);
+  padding: 2px 10px;
+  border-radius: 9999px;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-xs);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.dark .debate-header__timeout {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+}
+
+.debate-header__timeout.timeout-warning {
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  animation: pulseTimeout 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulseTimeout {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  100% {
+    transform: translateX(-50%) scale(1.06);
+  }
+}
+
+.debate-proposition-container {
+  background: rgba(0, 0, 0, 0.02);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-primary);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.debate-proposition-container:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.debate-proposition-text {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
   margin: 0;
+  line-height: 1.5;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.debate-proposition-container.expanded .debate-proposition-text {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.dark .debate-proposition-container {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .debate-status {
-  font-size: var(--font-size-sm);
+  font-size: 11px;
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .debate-arena {
   display: flex;
-  flex: 1;
-  gap: var(--space-4);
-  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 440px;
+  gap: var(--space-3);
   position: relative;
 }
 
-.participant-panel {
-  flex: 1;
+/* =========================================================================
+   DEBATE CHAT TIMELINE
+   ========================================================================= */
+
+.debate-arena-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 440px;
+  height: calc(100vh - 280px);
+  max-height: calc(100vh - 280px);
+  margin-top: 30px;
+}
+
+.debate-arena-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  transition: mask-image 0.4s ease, -webkit-mask-image 0.4s ease;
+}
+
+.debate-arena-backdrop.fade-center {
+  mask-image: radial-gradient(
+    ellipse 65% 75% at 50% 50%,
+    transparent 0%,
+    transparent 15%,
+    rgba(0, 0, 0, 0.10) 25%,
+    rgba(0, 0, 0, 0.30) 38%,
+    rgba(0, 0, 0, 0.60) 50%,
+    rgba(0, 0, 0, 0.85) 62%,
+    black 70%,
+    black 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 65% 75% at 50% 50%,
+    transparent 0%,
+    transparent 15%,
+    rgba(0, 0, 0, 0.10) 25%,
+    rgba(0, 0, 0, 0.30) 38%,
+    rgba(0, 0, 0, 0.60) 50%,
+    rgba(0, 0, 0, 0.85) 62%,
+    black 70%,
+    black 100%
+  );
+}
+
+/* =========================================================================
+   CROWD BOT EXCITEMENT (When speaking / typing in Mode 2)
+   ========================================================================= */
+
+.scattered-bot-positioner.is-excited {
+  color: var(--color-primary);
+}
+
+.dark .scattered-bot-positioner.is-excited {
+  color: #60a5fa;
+}
+
+.debate-ellipse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 77%;
+  height: 84%;
+  border: 2px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  border-radius: 50%;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: -1;
+  transition:
+    width 0.35s ease,
+    height 0.35s ease,
+    left 0.35s ease,
+    top 0.35s ease;
+}
+
+.debate-ellipse::before,
+.debate-ellipse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.debate-ellipse::before {
+  width: calc(100% + 12.5%);
+  height: calc(100% + 12.5%);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+}
+
+.debate-ellipse::after {
+  width: calc(100% + 25%);
+  height: calc(100% + 25%);
+  border: 1px solid var(--color-border);
+}
+
+.dark .debate-ellipse {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .debate-ellipse::before,
+.dark .debate-ellipse::after {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.debate-arena.single-chat {
   display: flex;
   flex-direction: column;
+  width: 60%;
+  height: 100%;
+  margin: 0 auto;
+  flex: 0 1 auto;
+  position: relative;
+  z-index: 1;
   background: var(--color-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  overflow: hidden;
-  transition: var(--transition-base);
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
-.dark .participant-panel {
+.dark .debate-arena.single-chat {
   background: var(--color-surface-2);
   border-color: rgba(255, 255, 255, 0.05);
 }
 
-.participant-panel.active-speaker {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-  transform: scale(1.02);
-}
-
-.participant-header {
+.chat-messages-container {
+  flex: 1;
+  overflow-y: auto;
   padding: var(--space-4);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--space-3);
-  background: rgba(0,0,0,0.03);
-  border-bottom: 1px solid var(--color-border);
+  scroll-behavior: smooth;
 }
 
-.dark .participant-header {
-  background: rgba(255,255,255,0.03);
+.chat-message-block {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3);
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.dark .chat-message-block {
+  background: rgba(0, 0, 0, 0.2);
   border-color: rgba(255, 255, 255, 0.05);
 }
 
-.participant-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--color-primary-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  color: var(--color-primary-dark);
+/* Subtle border color hints for Proponent and Opponent */
+.chat-message-block.msg-proponent {
+  border-left: 3px solid #3b82f6; /* Blue for Proponent */
 }
 
-.participant-info {
+.chat-message-block.msg-opponent {
+  border-left: 3px solid #ec4899; /* Pink for Opponent */
+}
+
+.chat-message-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: 6px;
+}
+
+.dark .chat-message-header {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.chat-message-info {
   display: flex;
   flex-direction: column;
 }
 
-.participant-name {
+.chat-message-name {
   font-weight: 600;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-sm);
   color: var(--color-text);
 }
 
-.participant-role {
-  font-size: var(--font-size-sm);
+.chat-message-role {
+  font-size: 10px;
   color: var(--color-text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.participant-body {
-  padding: var(--space-4);
-  flex: 1;
-  overflow-y: auto;
+.chat-message-body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--color-text);
+  min-height: 24px;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  word-wrap: break-word;
 }
 
 .speech-stream {
   white-space: pre-wrap;
   font-family: monospace;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.chat-waiting-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  margin-top: var(--space-1);
+  opacity: 0.6;
+  align-self: flex-start;
+}
+
+.waiting-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.waiting-dots span {
+  width: 5px;
+  height: 5px;
+  background-color: var(--color-text-muted);
+  border-radius: 50%;
+  opacity: 0.5; /* Default static state */
+}
+
+.waiting-dots.animated span {
+  animation: waitingDots 1.4s infinite ease-in-out both;
+}
+
+.waiting-dots.animated span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.waiting-dots.animated span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes waitingDots {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .blinking-cursor {
@@ -144,127 +412,514 @@
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
-.debate-controls {
-  padding: var(--space-4);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  display: flex;
-  gap: var(--space-3);
+.inline-debate-input {
+  display: block;
+  position: relative;
+  width: 100%;
 }
 
-.dark .debate-controls {
-  background: var(--color-surface-2);
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-.speech-input {
-  flex: 1;
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: inherit;
+.inline-speech-ghost {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  min-height: 24px;
+  font-family: monospace; /* match speech-stream */
   font-size: var(--font-size-base);
-  resize: none;
-  min-height: 80px;
+  line-height: 1.6;
+  color: var(--color-text);
 }
 
-.speech-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-blue);
-}
-
-.btn-submit-speech {
-  padding: 0 var(--space-6);
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.btn-submit-speech:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-}
-
-.btn-submit-speech:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.verdict-overlay {
+.inline-speech-textarea {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: transparent; /* Text is invisible, ghost shows underneath */
+  caret-color: transparent; /* Native cursor is invisible, custom cursor in ghost div shows */
+  font-family: monospace;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  resize: none;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  word-wrap: break-word;
+  z-index: 10;
+}
+
+.inline-speech-textarea::selection {
+  background: rgba(59, 130, 246, 0.2);
+  color: transparent; /* Keep text transparent even when selected */
+}
+
+.dark .inline-speech-textarea {
+  background: transparent;
+  border: none;
+}
+
+.inline-speech-textarea:focus {
+  outline: none;
+}
+
+/* =========================================================================
+   WINNER PANEL & BADGE
+   ========================================================================= */
+
+.participant-panel.winner-panel {
+  border-color: #f59e0b;
+  box-shadow:
+    0 0 25px rgba(245, 158, 11, 0.4),
+    inset 0 0 15px rgba(245, 158, 11, 0.1);
+  position: relative;
+}
+
+.winner-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.5);
+  animation: bounceWinner 1s ease infinite alternate;
+  z-index: 10;
+}
+
+@keyframes bounceWinner {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-4px);
+  }
+}
+
+/* =========================================================================
+   JURY PANEL (Full-Sized Balanced Gallery)
+   ========================================================================= */
+
+.jury-panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 24px;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.dark .jury-panel {
+  background: var(--color-bg);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.jury-panel__title {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.jury-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.jury-seat {
+  display: flex;
+  flex: 0 0 275px;
+  width: 275px;
+  min-width: 275px;
+  max-width: 275px;
+  box-sizing: border-box;
+}
+
+.jury-seat .actor-chip {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
+
+.jury-seat .actor-chip-name {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .jury-seat {
+    flex: 0 0 calc(33.333% - 10px);
+    width: calc(33.333% - 10px);
+    min-width: calc(33.333% - 10px);
+    max-width: calc(33.333% - 10px);
+  }
+}
+
+@media (max-width: 640px) {
+  .jury-seat {
+    flex: 0 0 calc(50% - 8px);
+    width: calc(50% - 8px);
+    min-width: calc(50% - 8px);
+    max-width: calc(50% - 8px);
+  }
+}
+
+.score-winner {
+  font-weight: 900;
+  border: 1px solid currentColor;
+}
+
+/* =========================================================================
+   FLYING WINNER CARDS TO JURIES
+   ========================================================================= */
+
+.flying-winner-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0;
+  animation: flyWinnerCard ease-in-out both;
+}
+
+.personality-card.personality-card--distribute {
+  min-height: unset !important;
+  height: 120px !important;
+  width: 88px !important;
+  min-width: 88px !important;
+  max-width: 88px !important;
+  padding: 8px 6px !important;
+  gap: 0 !important;
+  border-radius: 12px !important;
+  box-sizing: border-box !important;
+}
+
+.personality-card.personality-card--distribute::before {
+  inset: 4px !important;
+  border-radius: 8px !important;
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent) !important;
+}
+
+.personality-card.personality-card--distribute::after {
+  height: 3px !important;
+  border-radius: 11px 11px 0 0 !important;
+}
+
+@keyframes flyWinnerCard {
+  0% {
+    transform: translate(calc(var(--start-x) - 50%), calc(var(--start-y) - 50%)) scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  15% {
+    transform: translate(calc(var(--start-x) - 50%), calc(var(--start-y) - 50%)) scale(1.05) rotate(6deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(
+      calc(var(--start-x) + (var(--target-x) - var(--start-x)) * 0.75 - 50%),
+      calc(var(--start-y) + (var(--target-y) - var(--start-y)) * 0.75 - 40px)
+    ) scale(0.95) rotate(-4deg);
+    opacity: 1;
+  }
+  92% {
+    transform: translate(calc(var(--target-x) - 50%), calc(var(--target-y) - 50%)) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--target-x) - 50%), calc(var(--target-y) - 50%)) scale(0.15) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+.jury-seat.jury-seat--impacted {
+  animation: jurySeatImpact 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes jurySeatImpact {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.08);
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.7);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: none;
+  }
+}
+
+/* =========================================================================
+   VERDICT BANNER
+   ========================================================================= */
+
+.verdict-banner {
+  background: var(--color-surface);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 12%, transparent),
+    var(--color-surface) 70%
+  );
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  animation: slideUp 0.5s ease forwards;
+  position: relative;
+  z-index: 1;
+}
+
+.dark .verdict-banner {
+  background: var(--color-surface-2);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 15%, transparent),
+    var(--color-surface-2) 70%
+  );
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verdict-banner__content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.verdict-banner__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.verdict-banner__title {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.verdict-banner__winner {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.btn-back-home {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back-home:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  transform: translateX(-2px);
+}
+
+/* =========================================================================
+   READY BUTTON & MATCHUP PREVIEW
+   ========================================================================= */
+
+.debate-ready-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  border-radius: var(--radius-lg);
-  color: white;
-  animation: fadeIn 0.5s ease;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
 }
 
-.verdict-title {
-  font-size: var(--font-size-3xl);
-  font-weight: 800;
-  margin-bottom: var(--space-4);
-  color: var(--color-warning);
-}
-
-.verdict-scores {
+.debate-ready-block {
   display: flex;
-  gap: var(--space-8);
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
-.verdict-winner {
-  margin-top: var(--space-6);
-  font-size: var(--font-size-xl);
-  color: var(--color-success);
+.scattered-bot-positioner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1; /* Above rings, but behind content */
+  pointer-events: none;
+  color: var(--color-primary);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.dark .scattered-bot-positioner {
+  color: rgba(255, 255, 255, 0.5); /* or var(--color-primary-light) */
 }
 
-.ready-button-container {
+.scattered-bot-animator {
+  animation: floatScattered ease-in-out infinite alternate;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
 }
 
-.btn-ready {
-  padding: var(--space-4) var(--space-8);
-  font-size: var(--font-size-xl);
-  background: linear-gradient(135deg, var(--color-success), #16a34a);
-  color: white;
-  border: none;
-  border-radius: var(--radius-full);
+@keyframes floatScattered {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(1px, -4px) scale(1.03) rotate(-2deg);
+  }
+  66% {
+    transform: translate(-1px, -7px) scale(0.98) rotate(2deg);
+  }
+  100% {
+    transform: translate(0px, -2px) scale(1.05) rotate(0deg);
+  }
+}
+
+.ready-matchup-preview {
+  display: grid;
+  grid-template-columns: 1fr 76px 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: 24px 30px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+}
+
+.dark .ready-matchup-preview {
+  background: rgba(15, 23, 42, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.ready-participant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
+
+.ready-participant .actor-avatar-wrap {
+  align-self: center !important;
+  margin: 0 auto !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+}
+
+.ready-participant-name {
+  font-size: var(--font-size-base);
   font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: var(--color-text);
+  width: 100%;
+  max-width: 160px;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  display: block;
 }
 
-.btn-ready:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.6);
+.ready-vs-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  flex-shrink: 0;
+}
+
+.debate-ready-content .btn-ready {
+  position: absolute !important;
+  top: calc(100% + 24px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 10px 38px !important;
+  min-width: 150px !important;
+  min-height: 46px !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  letter-spacing: 0.5px !important;
+  background: var(--color-primary) !important;
+  color: #ffffff !important;
+  border: none !important;
+  transition: all var(--transition-fast) ease !important;
+}
+
+.debate-ready-content .btn-ready:hover {
+  background: var(--color-primary-hover) !important;
 }

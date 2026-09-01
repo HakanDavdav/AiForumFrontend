@@ -1,5 +1,5 @@
 import { Bot, User, Crown } from 'lucide-react'
-import { BotGradeColors } from '../../constants/enums'
+import { BotGradeColors, UserGradeColors } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import { useTranslation } from 'react-i18next'
@@ -13,7 +13,10 @@ import { useTranslation } from 'react-i18next'
  * @param {string|null} props.imageUrl
  * @param {'User'|'Bot'|null} props.discriminator
  * @param {string} props.actorId
- * @param {'sm'|'md'|'lg'|'xl'} [props.size='md']
+ * @param {number|null} [props.botGrade]
+ * @param {number|null} [props.userGrade]
+ * @param {number|null} [props.grade]
+ * @param {'sm'|'md'|'lg'|'xl'|'xxl'|'xxxl'} [props.size='md']
  * @param {function} [props.onClick] - navigasyon yerine custom handler
  */
 export default function ActorAvatar({
@@ -22,6 +25,8 @@ export default function ActorAvatar({
   discriminator,
   actorId,
   botGrade,
+  userGrade,
+  grade,
   size = 'md',
   onClick,
 }) {
@@ -29,7 +34,7 @@ export default function ActorAvatar({
   const { t } = useTranslation()
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
-  
+
   const myBots = useMyEntitiesStore((s) => s.myBots)
   const isMyBot = isBot && myBots?.some((b) => b.actorId === actorId)
 
@@ -52,10 +57,21 @@ export default function ActorAvatar({
     xxxl: { size: 44, icon: 26, bottom: 4, right: 4 },
   }
   const badgeOpts = badgeSizeMap[size] || badgeSizeMap.md
-  const gradeLabel =
-    isBot && botGrade !== null && botGrade !== undefined
-      ? ['A', 'B', 'C', 'D', 'F'][botGrade] || '?'
+
+  const effectiveBotGrade = botGrade ?? (isBot ? grade : null)
+  const botGradeLabel =
+    isBot && effectiveBotGrade !== null && effectiveBotGrade !== undefined
+      ? ['A', 'B', 'C', 'D', 'F'][effectiveBotGrade] ||
+        (typeof effectiveBotGrade === 'string' ? effectiveBotGrade : '?')
       : null
+
+  const effectiveUserGrade = userGrade ?? (!isBot ? grade : null)
+  const userGradeLabel =
+    !isBot && effectiveUserGrade !== null && effectiveUserGrade !== undefined
+      ? ['A', 'B', 'C', 'D', 'F'][effectiveUserGrade] ||
+        (typeof effectiveUserGrade === 'string' ? effectiveUserGrade : '?')
+      : null
+
   const gradeBadgeSize = Math.max(12, Math.round(badgeOpts.size * 0.52))
 
   const handleClick = (e) => {
@@ -78,7 +94,11 @@ export default function ActorAvatar({
       onClick={handleClick}
     >
       {imageUrl ? (
-        <img src={imageUrl} alt={profileName || t('actor.avatar_alt', 'Aktör')} className={`avatar ${sizeClass}`} />
+        <img
+          src={imageUrl}
+          alt={profileName || t('actor.avatar_alt', 'Aktör')}
+          className={`avatar ${sizeClass}`}
+        />
       ) : (
         <div
           className={`avatar-fallback ${sizeClass}`}
@@ -103,7 +123,7 @@ export default function ActorAvatar({
             filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
             transform: 'rotate(-15deg)',
             display: 'flex',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
           }}
         >
           <Crown size={Math.max(16, badgeOpts.size * 0.9)} strokeWidth={2.5} />
@@ -122,34 +142,57 @@ export default function ActorAvatar({
           >
             <Bot size={badgeOpts.icon} color="white" strokeWidth={2.5} />
           </div>
-          {gradeLabel && (
+          {botGradeLabel && (
             <div
               className="actor-avatar-grade-badge"
-              title={t('actor.bot_grade', { grade: gradeLabel, defaultValue: `Bot derecesi: ${gradeLabel}` })}
+              title={t('actor.bot_grade', {
+                grade: botGradeLabel,
+                defaultValue: `Bot derecesi: ${botGradeLabel}`,
+              })}
               style={{
                 width: gradeBadgeSize,
                 height: gradeBadgeSize,
-                background: BotGradeColors[botGrade] ?? 'var(--color-primary)',
+                background: BotGradeColors[effectiveBotGrade] ?? 'var(--color-primary)',
                 fontSize: Math.max(9, Math.round(gradeBadgeSize * 0.42)),
               }}
             >
-              {gradeLabel}
+              {botGradeLabel}
             </div>
           )}
         </div>
       )}
       {discriminator === 'User' && (
         <div
-          className="actor-avatar-user-badge"
-          title={t('actor.user', 'Kullanıcı')}
-          style={{
-            width: badgeOpts.size,
-            height: badgeOpts.size,
-            bottom: badgeOpts.bottom,
-            right: badgeOpts.right,
-          }}
+          className="actor-avatar-badge-group"
+          style={{ bottom: badgeOpts.bottom, right: badgeOpts.right }}
         >
-          <User size={badgeOpts.icon} color="white" strokeWidth={2.5} />
+          <div
+            className="actor-avatar-user-badge"
+            title={t('actor.user', 'Kullanıcı')}
+            style={{ width: badgeOpts.size, height: badgeOpts.size }}
+          >
+            <User size={badgeOpts.icon} color="white" strokeWidth={2.5} />
+          </div>
+          {userGradeLabel && (
+            <div
+              className="actor-avatar-grade-badge"
+              title={t('actor.user_grade', {
+                grade: userGradeLabel,
+                defaultValue: `Kullanıcı derecesi: ${userGradeLabel}`,
+              })}
+              style={{
+                width: gradeBadgeSize,
+                height: gradeBadgeSize,
+                background:
+                  UserGradeColors[effectiveUserGrade] ??
+                  BotGradeColors[effectiveUserGrade] ??
+                  'var(--color-primary)',
+                fontSize: Math.max(9, Math.round(gradeBadgeSize * 0.42)),
+              }}
+            >
+              {userGradeLabel}
+            </div>
+          )}
         </div>
       )}
     </div>

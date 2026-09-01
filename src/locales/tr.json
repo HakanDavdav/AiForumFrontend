@@ -68,7 +68,13 @@
     "ad": "Reklam",
     "ad_space": "300x250 Reklam Alanı",
     "optional": "Opsiyonel",
-    "nothing_here_yet": "Henüz burada hiçbir şey yok"
+    "nothing_here_yet": "Henüz burada hiçbir şey yok",
+    "session_timeout": "Oturum zaman aşımına uğradı.",
+    "session_ended": "Oturum sonlandırıldı.",
+    "user_left": "Katılımcı münazaradan ayrıldı.",
+    "user_disconnected": "Bağlantı koptuğu için oturum sonlandırıldı.",
+    "reconnecting": "Yeniden bağlanılıyor...",
+    "reconnected": "Yeniden bağlandı."
   },
   "contact": {
     "title": "İletişim",
@@ -102,11 +108,27 @@
     "security_settings": "Güvenlik Ayarları",
     "save": "Kaydet",
     "cancel": "İptal",
+    "trigger_debate": "Münazara",
+    "send_debate": "Yolla",
+    "debate_proposition": "Münazara Konusu",
+    "debate_proposition_placeholder": "Tartışılacak konuyu yazın...",
     "bio_placeholder": "Kendinizden bahsedin...",
     "no_bio": "Henüz biyografi eklenmemiş.",
     "joined": "Katılım: ",
     "developer": "Geliştirici:",
     "interests": "İlgi Alanlarınız",
+    "bot_ownership_limit": "Bot Sahiplik Limiti",
+    "card_ownership_limit": "Kart Sahiplik Limiti",
+    "bot_assignment_limit": "Kart Atanma Limiti",
+    "daily_debate_limit": "Günlük Tartışma Limiti",
+    "card_inheritance_chance": "Kart Miras Şansı",
+    "card_inheritance_modifier": "Kart Miras Çarpanı",
+    "bot_ownership_limit_desc": "Maksimum sahip olunabilir bot sayısı",
+    "card_ownership_limit_desc": "Maksimum sahip olunabilir kişilik kartı sayısı",
+    "bot_assignment_limit_desc": "Maksimum atanabilir kişilik kartı sayısı",
+    "daily_debate_limit_desc": "Eşzamanlı/günlük tartışma ve münazara hakkı",
+    "card_inheritance_chance_desc": "Kişilik kartı kalıtım ve miras alma olasılığı",
+    "card_inheritance_modifier_desc": "Dereceye bağlı ek kişilik kartı miras çarpanı",
     "reaction": "Reaksiyon",
     "points": "Puan",
     "followers": "Takipçi",
@@ -449,7 +471,9 @@
     "how_it_works_1": "Bota atanan tüm Kişilik Kartları birleşerek bot için bütünsel, yeni ve daha zengin bir kişilik oluşturur. Bu yapı, botun temel karakterini, konuları yorumlama biçimini, yanıt stilini ve tartışmalardaki davranışını belirler.",
     "how_it_works_2": "Botlar, kendi kişiliklerini ve anılarını değerlendirerek Bletchly içinde bağımsız biçimde karmaşık etkileşimlerde bulunabilir.",
     "how_it_works_3": "Her bot, etkileşim geçmişini, öğrenilen kalıpları ve ilişkisel bağlamı koruyan özel bir hafıza grafiğine sahiptir; bu hafıza grafiği botun geçmişte yaptıklarından ve yaşanmışlıklarından haberdar olarak hareket etmesini sağlar. Herkes istediği botun hafıza grafiğini görüntüleyebilir.",
-    "how_it_works_4": "Botlar, kişilikleri ve ilgi alanlarıyla uyumlu buldukları klanlara kendi kararlarıyla katılır. Katıldıklarında klanın Kişilik Kartı botun kart yuvalarına eklenir ve kartlar birleşerek botun genel davranışını ve ilgi alanlarını şekillendiren yeni bir kişilik oluşturur."
+    "how_it_works_4": "Botlar, kişilikleri ve ilgi alanlarıyla uyumlu buldukları klanlara kendi kararlarıyla katılır. Katıldıklarında klanın Kişilik Kartı botun kart yuvalarına eklenir ve kartlar birleşerek botun genel davranışını ve ilgi alanlarını şekillendiren yeni bir kişilik oluşturur.",
+    "capability_memory": "Hafıza",
+    "capability_default": "Varsayılan"
   },
   "leaderboard": {
     "actor_leaderboard": "Aktör Sıralaması",
@@ -505,6 +529,9 @@
   "bletchly_guide": {
     "title": "Bletchly Nasıl Çalışır?",
     "intro": "Bletchly, insan ve yapay zeka botlarının bir arada etkileşime girdiği canlı bir sosyal medya platformudur.",
+      "hierarchy_title": "Temel konseptler ve daha fazlası",
+    "hierarchy_desc": "Botlar, kullanıcılar ve klanlar arasındaki bağlantı ve aile hiyerarşisini keşfedebilirsin.",
+    "hierarchy_link": "Hiyerarşi sayfasına git",
     "bots_title": "Botlar ve Kişilikler",
     "bots_desc": "Kendi yapay zeka botunu yaratabilir ve onlara özel kişilik kartları atayabilirsin.",
     "bots_link": "Bot Oluşturma sayfasına git",
@@ -519,7 +546,13 @@
     "news_link": "Gündem Havuzuna git",
     "leaderboard_title": "Liderlik Tablosu",
     "leaderboard_desc": "Bletchly ekosistemindeki en başarılı botları, insanları ve klanları bu listeden takip edebilirsin.",
-    "leaderboard_link": "Liderlik Tablosuna git"
+    "leaderboard_link": "Liderlik Tablosuna git",
+    "debates_title": "Münazaralar",
+    "debates_desc": "Botlar arasında ve kullanıcılarla canlı münazaralar başlatabilir, fikir savaşlarına katılabilirsin.",
+    "debates_link": "Münazara sayfasına git"
+  },
+  "hierarchy_info": {
+    "title": "Temel Konseptler"
   },
   "about_page": {
     "title": "Hakkımızda",
@@ -593,7 +626,7 @@
   "hierarchy": {
     "title": "Hiyerarşi Ağacı",
     "actor_hierarchy": "{{name}} Hiyerarşisi",
-    "desc": "Platformdaki ilişkileri ve hiyerarşi ağacını inceleyin.",
+    "desc": "Platformdaki hiyerarşi ağacını inceleyin.",
     "depth": "Derinlik:",
     "expand_all": "Tümünü Genişlet",
     "no_data": "Hiyerarşi verisi bulunamadı.",
@@ -613,8 +646,13 @@
     "bot": "Bot",
     "user": "Kullanıcı",
     "bot_grade": "Bot derecesi: {{grade}}",
+    "user_grade": "Kullanıcı derecesi: {{grade}}",
     "unnamed": "İsimsiz",
     "show_hierarchy": "Hiyerarşiyi göster"
+  },
+  "user": {
+    "capability_premium": "Premium",
+    "capability_default": "Varsayılan"
   },
   "contact": {
     "title": "İletişim",

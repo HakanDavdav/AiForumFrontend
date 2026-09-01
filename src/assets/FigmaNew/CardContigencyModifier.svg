@@ -1,0 +1,48 @@
+<svg width="271" height="232" viewBox="0 0 271 232" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="CardContigencyModifier">
+<g id="modifierarrow">
+<path id="Vector" d="M52.875 161.664C52.875 163.808 53.494 165.864 54.5957 167.38C55.6975 168.896 57.1918 169.747 58.75 169.747H82.25C83.8081 169.747 85.3025 168.896 86.4042 167.38C87.506 165.864 88.125 163.808 88.125 161.664V113.164C88.125 111.02 88.744 108.964 89.8457 107.448C90.9475 105.932 92.4419 105.08 94 105.08H113.346C114.168 105.081 114.971 104.746 115.654 104.118C116.338 103.49 116.87 102.597 117.185 101.553C117.499 100.508 117.581 99.3591 117.421 98.2503C117.261 97.1416 116.865 96.1232 116.284 95.3239L74.6536 38.0454C73.5519 36.53 72.0578 35.6787 70.5 35.6787C68.9422 35.6787 67.4481 36.53 66.3464 38.0454L24.7161 95.3239C24.135 96.1232 23.7393 97.1416 23.579 98.2503C23.4186 99.3591 23.5009 100.508 23.8153 101.553C24.1298 102.597 24.6623 103.49 25.3455 104.118C26.0287 104.746 26.832 105.081 27.6536 105.08H47C48.5581 105.08 50.0525 105.932 51.1542 107.448C52.256 108.964 52.875 111.02 52.875 113.164V161.664Z" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="CardContigency">
+<g id="Cards">
+<path id="BackCardWrappers" d="M210 37.0805L241 46.0805L235.97 67.0805M235.97 67.0805L221 129.58L158 116.08L205.5 156.58L264.5 95.5805L235.97 67.0805Z" stroke="black" stroke-width="5"/>
+<g id="Card">
+<path id="CardWrapper" d="M132 22.8712L202.689 3.08049L210.969 32.4991L230 98.8247L160.918 118.08L132 22.8712Z" stroke="black" stroke-width="5"/>
+<g id="Bot">
+<path id="Vector_2" d="M177.79 43.4021L174.214 31.593C174.091 31.1852 173.66 30.9548 173.252 31.0786L162.307 34.4011" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_3" d="M194.663 38.6237L160.304 48.6595C157.141 49.5833 155.418 53.2087 156.454 56.7571L163.963 82.457C165 86.0054 168.404 88.1331 171.567 87.2093L205.925 77.1736C209.088 76.2498 210.812 72.6244 209.775 69.076L202.266 43.3761C201.23 39.8277 197.825 37.7 194.663 38.6237Z" stroke="black" stroke-width="3.91406" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_4" d="M159.584 68.7652L153.698 70.6182" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_5" d="M205.974 56.1501L211.737 54.3331" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_6" d="M174.967 68.1103L173.26 61.6484" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+<path id="Vector_7" d="M192.455 63.36L190.592 56.8067" stroke="black" stroke-width="3.91406" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+<g id="Arrow">
+<path id="Vector_8" d="M231.992 156.835L231.011 128.408" stroke="black" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g id="Arrow_2">
+<path id="Vector_9" d="M191.085 176.809L200.887 145.442" stroke="black" stroke-width="3" stroke-linecap="round"/>
+</g>
+<g id="Bot_2">
+<path id="Vector_10" d="M143.651 187.662L143.542 176.538C143.538 176.154 143.224 175.845 142.839 175.849L132.526 175.958" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_11" d="M159.462 187.792H127.188C124.218 187.792 121.809 190.494 121.81 193.827L121.811 217.968C121.812 221.301 124.22 224.004 127.191 224.004H159.465C162.436 224.004 164.844 221.301 164.843 217.968L164.842 193.827C164.842 190.494 162.433 187.792 159.462 187.792Z" stroke="black" stroke-width="3.52911" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_12" d="M121.483 205.011L115.92 205.127" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_13" d="M164.822 205.82L170.268 205.705" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_14" d="M134.961 208.333L135.118 202.309" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+<path id="Vector_15" d="M151.299 208.643L151.343 202.5" stroke="black" stroke-width="3.52911" stroke-linecap="round"/>
+</g>
+<g id="Bot_3">
+<path id="Vector_16" d="M234.264 186.583L231.917 175.526C231.836 175.144 231.46 174.9 231.078 174.982L220.829 177.165" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_17" d="M250.037 183.531L217.894 190.025C214.935 190.623 213.08 193.799 213.751 197.118L218.61 221.161C219.281 224.481 222.224 226.687 225.182 226.089L257.325 219.595C260.284 218.998 262.139 215.822 261.468 212.502L256.609 188.46C255.938 185.14 252.996 182.934 250.037 183.531Z" stroke="black" stroke-width="3.58581" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Vector_18" d="M215.676 208.323L210.159 209.557" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_19" d="M259.002 200.408L264.403 199.197" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_20" d="M229.768 208.919L228.713 202.888" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+<path id="Vector_21" d="M246.102 205.94L244.91 199.813" stroke="black" stroke-width="3.58581" stroke-linecap="round"/>
+</g>
+<g id="Arrow_3">
+<path id="Vector_22" d="M149.144 160.708L165.808 117.578" stroke="black" stroke-width="3" stroke-linecap="round"/>
+</g>
+</g>
+</g>
+</svg>

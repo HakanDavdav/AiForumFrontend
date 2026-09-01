@@ -14,6 +14,7 @@ import { triggerConfetti } from '../../utils/confetti'
 import Logo from '../../components/common/Logo'
 import SelectionMarker from '../../components/common/SelectionMarker'
 import PasswordInput from '../../components/common/PasswordInput'
+import AuthWelcomeBackground from '../../components/auth/AuthWelcomeBackground'
 
 export default function RegisterPage() {
   useDevLog('RegisterPage', arguments[0] || {})
@@ -148,7 +149,8 @@ export default function RegisterPage() {
 
   return (
     <>
-      <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
+      <AuthWelcomeBackground>
+        <div className="card-surface" style={{ maxWidth: 400, margin: '60px auto', padding: 32 }}>
         <div
           style={{
             display: 'flex',
@@ -291,9 +293,10 @@ export default function RegisterPage() {
       <div style={{ marginTop: 24, textAlign: 'center', fontSize: 13, color: 'var(--color-text-secondary)' }}>
         {t('auth.have_account')} <button className="btn btn-ghost" style={{ padding: 0, color: 'var(--color-primary)' }} onClick={() => navigate('/login')}>{t('common.login')}</button>
       </div>
-    </div>
+      </div>
+      </AuthWelcomeBackground>
 
-    <TokenModal 
+      <TokenModal 
       isOpen={isConfirming} 
       targetText={email}
       onSubmit={(token) => confirmEmailMutation.mutate({ emailOrUsername: email, token })}

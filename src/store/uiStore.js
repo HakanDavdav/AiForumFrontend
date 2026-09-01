@@ -33,6 +33,9 @@ const useUIStore = create(
       isActivitiesExpanded: false,
       toggleActivities: () => set((state) => ({ isActivitiesExpanded: !state.isActivitiesExpanded })),
 
+      isDebatesExpanded: false,
+      toggleDebates: () => set((state) => ({ isDebatesExpanded: !state.isDebatesExpanded })),
+
       // ─── Responsive Drawers ───────────────────────────────────────────────────
       isLeftDrawerOpen: false,
       isRightDrawerOpen: false,
@@ -48,6 +51,20 @@ const useUIStore = create(
       // ─── Search ───────────────────────────────────────────────────────────────
       searchMode: 'general', // 'general' | 'posts' | 'actors' | 'tribes'
       setSearchMode: (mode) => set({ searchMode: mode }),
+
+      // ─── Ambient Bots / Welcome (profil arka planı seçenekleri) ───────────────
+      isBotsAmbience: false,
+      toggleBotsAmbience: () =>
+        set((state) => ({
+          isBotsAmbience: !state.isBotsAmbience,
+          isWelcomeAmbience: false,
+        })),
+      isWelcomeAmbience: false,
+      toggleWelcomeAmbience: () =>
+        set((state) => ({
+          isWelcomeAmbience: !state.isWelcomeAmbience,
+          isBotsAmbience: false,
+        })),
     }),
     {
       name: 'ui-store-storage', // sessionStorage key

@@ -11,6 +11,9 @@ import {
   Users,
   Crown,
 } from 'lucide-react'
+import BotFlashCardsIcon from '../components/common/BotFlashCardsIcon'
+import CardContingencyIcon from '../components/common/CardContingencyIcon'
+import CardContingencyModifierIcon from '../components/common/CardContingencyModifierIcon'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
@@ -123,7 +126,9 @@ export default function TribePage() {
                   <CalendarFold size={14} />
                   <span>
                     {t('tribe.founded')}
-                    {new Date(tribe.createdAt).toLocaleDateString(i18n.language && i18n.language.startsWith('en') ? 'en-US' : 'tr-TR')}
+                    {new Date(tribe.createdAt).toLocaleDateString(
+                      i18n.language && i18n.language.startsWith('en') ? 'en-US' : 'tr-TR'
+                    )}
                   </span>
                 </p>
               )}
@@ -160,7 +165,7 @@ export default function TribePage() {
               flexDirection: 'column',
               alignItems: 'center',
               paddingBottom: 0,
-              position: 'relative'
+              position: 'relative',
             }}
           >
             {isMyTribe && (
@@ -175,7 +180,7 @@ export default function TribePage() {
                   filter: 'drop-shadow(0px 3px 4px rgba(0,0,0,0.5))',
                   transform: 'rotate(-15deg)',
                   display: 'flex',
-                  pointerEvents: 'auto'
+                  pointerEvents: 'auto',
                 }}
               >
                 <Crown size={40} strokeWidth={2.5} />
@@ -288,15 +293,99 @@ export default function TribePage() {
         >
           <div className="profile-stats-grid" style={{ width: '100%' }}>
             <div className="profile-stat-box">
-              <span className="profile-stat-value">
-                {tribe.tribePoint?.toLocaleString() ?? 0}
-              </span>
+              <span className="profile-stat-value">{tribe.tribePoint?.toLocaleString() ?? 0}</span>
               <span className="profile-stat-label">{t('profile.points')}</span>
             </div>
             <div className="profile-stat-box">
               <span className="profile-stat-value">{tribe.memberCount ?? 0}</span>
               <span className="profile-stat-label">{t('tribe.member_count_label')}</span>
             </div>
+          </div>
+
+          {/* ─── LIMITS TOP DIVIDER ─── */}
+          <div
+            style={{
+              width: '100%',
+              height: 0,
+              borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+              margin: '16px 0 12px 0',
+            }}
+          />
+
+          <div
+            className="profile-limits-row"
+            style={{ marginTop: 0, paddingLeft: 4, paddingRight: 4 }}
+          >
+            <div
+              className="profile-limit-chip"
+              title={t(
+                'profile.bot_assignment_limit_desc',
+                'Maksimum atanabilir kişilik kartı sayısı'
+              )}
+            >
+              <BotFlashCardsIcon
+                size={25}
+                style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+              />
+              <span>{t('profile.bot_assignment_limit', 'Kart Atanma Limiti')}:</span>
+              <span className="profile-limit-chip__val">
+                {tribe.personalityCards?.length || 0} / {tribe.tribeAssignmentLimit || 4}
+              </span>
+            </div>
+          </div>
+
+          {/* ─── INHERITANCE DIVIDER ─── */}
+          <div
+            style={{
+              width: '100%',
+              height: 0,
+              borderTop: '1px solid var(--color-border)',
+              margin: '16px 0 12px 0',
+            }}
+          />
+
+          <div
+            className="profile-limits-row"
+            style={{ marginTop: 0, marginBottom: 0, paddingLeft: 4, paddingRight: 4 }}
+          >
+            <div
+              className="profile-limit-chip"
+              title={t(
+                'profile.card_inheritance_chance_desc',
+                'Kişilik kartı kalıtım ve miras alma olasılığı'
+              )}
+            >
+              <CardContingencyIcon
+                size={25}
+                style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+              />
+              <span>{t('profile.card_inheritance_chance', 'Kart Miras Şansı')}:</span>
+              <span className="profile-limit-chip__val">
+                %{Math.round((tribe.cardInheritanceChance || 0.25) * 100)}
+              </span>
+            </div>
+            {tribe.cardInheritanceModifier !== undefined &&
+              tribe.cardInheritanceModifier !== null && (
+                <>
+                  <span className="profile-limit-divider">•</span>
+                  <div
+                    className="profile-limit-chip"
+                    title={t(
+                      'profile.card_inheritance_modifier_desc',
+                      'Dereceye bağlı ek kişilik kartı miras çarpanı'
+                    )}
+                  >
+                    <CardContingencyModifierIcon
+                      size={42}
+                      style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                    />
+                    <span>{t('profile.card_inheritance_modifier', 'Kart Miras Çarpanı')}:</span>
+                    <span className="profile-limit-chip__val">
+                      +%{Math.round((tribe.cardInheritanceModifier || 0) * 100)}
+                    </span>
+                  </div>
+                </>
+              )}
           </div>
 
           {tribe.personalityCards?.length > 0 && (
@@ -306,7 +395,7 @@ export default function TribePage() {
                 style={{
                   width: '100%',
                   height: 0,
-                  borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+                  borderTop: '1px solid var(--color-border)',
                   margin: '16px 0 12px 0',
                 }}
               />
@@ -330,12 +419,14 @@ export default function TribePage() {
                       letterSpacing: '0.04em',
                     }}
                   >
-                    {t('tribe.collective_personality_cards', 'Kollektif Kişilik Kartları')}
+                    {t('tribe.collective_personality_cards', 'Kollektif Kişilik Kartları')} (
+                    {tribe.personalityCards?.length || 0} / {tribe.tribeAssignmentLimit || 6}{' '}
+                    {t('card.slots_label', 'Slot')})
                   </span>
                 </div>
                 <CardSlots
                   cards={tribe.personalityCards}
-                  slotCount={tribe.personalityCards.length}
+                  slotCount={tribe.tribeAssignmentLimit || 6}
                   showMark={false}
                   tribeBadgeLabel={t('tribe.badge_tribe', 'KLAN')}
                 />

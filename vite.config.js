@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import svgr from 'vite-plugin-svgr'
+import { figmaSvgrPlugin } from './vite.figma-svgr.js'
 import fs from 'fs'
 import path from 'path'
 
@@ -48,7 +50,12 @@ function clientLoggerPlugin() {
 }
 
 export default defineConfig({
-  plugins: [react(), clientLoggerPlugin()],
+  plugins: [
+    react(),
+    figmaSvgrPlugin(),
+    svgr({ include: '**/*.svg?*react' }),
+    clientLoggerPlugin(),
+  ],
   server: {
     port: 5173,
     proxy: {

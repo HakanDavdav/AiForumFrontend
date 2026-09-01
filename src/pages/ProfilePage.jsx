@@ -16,12 +16,20 @@ import {
   Settings,
   UserPlus,
   UserMinus,
+  Sparkles,
 } from 'lucide-react'
+import AngryBotWithSwordsIcon from '../components/common/AngryBotWithSwordsIcon'
+import AmbientBots from '../components/common/AmbientBots'
+import WelcomeAmbience from '../components/common/WelcomeAmbience'
+import BotFlashCardsIcon from '../components/common/BotFlashCardsIcon'
+import CardContingencyIcon from '../components/common/CardContingencyIcon'
+import CardContingencyModifierIcon from '../components/common/CardContingencyModifierIcon'
 import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
 import { personalityCardApi } from '../api/personalityCardApi'
-import { BotCapabilities } from '../constants/enums'
+import { BotCapabilities, UserCapabilities } from '../constants/enums'
+import TriggerDebateModal from '../components/profile/TriggerDebateModal'
 import BackButton from '../components/common/BackButton'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import CardSlots from '../components/card/CardSlots'
@@ -39,6 +47,8 @@ import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import AvatarUpload from '../components/common/AvatarUpload'
+import PremiumModal from '../components/common/PremiumModal'
+import ModifierArrowSvg from '../assets/FigmaNew/modifierarrow.svg?react'
 
 const TOPIC_TYPES = [
   { value: 1, enumName: 'Politics', label: 'Politika' },
@@ -65,6 +75,7 @@ export default function ProfilePage() {
   const actorId = searchParams.get('actorId')
   useDevLog('ProfilePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('bots')
   const [postsPage, setPostsPage] = useState(1)
@@ -97,9 +108,106 @@ export default function ProfilePage() {
   // FollowListModal state
   const [followModalConfig, setFollowModalConfig] = useState({ isOpen: false, type: 'followers' })
   const [likesModalOpen, setLikesModalOpen] = useState(false)
+  const [debateModalOpen, setDebateModalOpen] = useState(false)
+  const [debatePending, setDebatePending] = useState(false)
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false)
+
+  const handleTriggerDebate = async (proposition) => {
+    try {
+      setDebatePending(true)
+      toast.loading(t('profile.triggering_debate', 'Münazara başlatılıyor...'), {
+        id: 'debate-trigger',
+      })
+      const res = await actorApi.triggerDebate({
+        targetActorId: actorId,
+        proposition: proposition,
+      })
+      const isBotTarget = profile?.discriminator === 'Bot'
+      if (isBotTarget) {
+        toast.success(
+          t('profile.debate_triggered', 'Münazara başlatıldı! Arenaya aktarılıyorsunuz...'),
+          {
+            id: 'debate-trigger',
+          }
+        )
+      } else {
+        toast.success(
+          t(
+            'profile.debate_invitation_sent',
+            'Münazara meydan okuması kullanıcıya iletildi. Rakibin kabul etmesi bekleniyor...'
+          ),
+          {
+            id: 'debate-trigger',
+            duration: 6000,
+          }
+        )
+      }
+      setDebateModalOpen(false)
+
+      const debateId = res?.data?.data || (typeof res?.data === 'string' ? res.data : null)
+      queryClient.invalidateQueries({ queryKey: ['debates'] })
+      if (debateId && isBotTarget) {
+        navigate(`/debate?id=${debateId}`, {
+          state: {
+            proponent: {
+              id: currentUserId,
+              name: t('actor.you', 'Sen'),
+              imageUrl: null,
+              discriminator: 'User',
+            },
+            opponent: {
+              id: profile?.actorId || actorId,
+              name: profile?.profileName || 'Opponent',
+              imageUrl: profile?.imageUrl || null,
+              discriminator: profile?.discriminator || 'Bot',
+            },
+            proposition: proposition,
+          },
+        })
+      }
+    } catch (err) {
+      const rawErrors = err.response?.data?.errors || err.response?.data?.Errors
+      let errorMessages = []
+      if (rawErrors) {
+        if (Array.isArray(rawErrors)) {
+          errorMessages = rawErrors.map(
+            (e) => e.description || e.Description || e.message || e.Message || e
+          )
+        } else if (typeof rawErrors === 'object') {
+          errorMessages = Object.values(rawErrors).flat()
+        }
+      }
+      if (errorMessages.length === 0) {
+        errorMessages = [
+          err.response?.data?.message ||
+            err.message ||
+            t('profile.debate_error', 'Münazara başlatılamadı.'),
+        ]
+      }
+
+      errorMessages.forEach((msg, idx) => {
+        toast.error(msg, {
+          ...(idx === 0 ? { id: 'debate-trigger' } : {}),
+          style: {
+            borderRadius: '10px',
+            background: 'var(--color-surface)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
+          },
+        })
+      })
+    } finally {
+      setDebatePending(false)
+    }
+  }
 
   const [isEditing, setIsEditing] = useState(false)
-  const [editForm, setEditForm] = useState({ profileName: '', bio: '', imageUrl: '', topicTypes: [] })
+  const [editForm, setEditForm] = useState({
+    profileName: '',
+    bio: '',
+    imageUrl: '',
+    topicTypes: [],
+  })
 
   const toggleTopic = (value) => {
     setEditForm((prev) => ({
@@ -118,8 +226,6 @@ export default function ProfilePage() {
     queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data ?? null),
     enabled: !!actorId,
   })
-
-  const queryClient = useQueryClient()
 
   const followMutation = useMutation({
     mutationFn: () => actorApi.follow(actorId),
@@ -162,7 +268,7 @@ export default function ProfilePage() {
     onSuccess: () => {
       toast.success(t('profile.update_success'))
       setIsEditing(false)
-      queryClient.invalidateQueries(['actorProfile', actorId])
+      queryClient.invalidateQueries({ queryKey: ['actorProfile', actorId] })
     },
     onError: (err) => {
       const errMsgs = err.response?.data?.error?.errors || [t('profile.error_occurred')]
@@ -253,7 +359,8 @@ export default function ProfilePage() {
   const isMyBot = profile.discriminator === 'Bot' && myBots?.some((b) => b.actorId === actorId)
 
   const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
-  const hasBotMemory = (botCapabilities & BotCapabilities.ProlongedBotMemory) === BotCapabilities.ProlongedBotMemory
+  const hasBotMemory =
+    (botCapabilities & BotCapabilities.ProlongedBotMemory) === BotCapabilities.ProlongedBotMemory
   const capabilityEmblems = hasBotMemory
     ? [
         {
@@ -272,6 +379,26 @@ export default function ProfilePage() {
         },
       ]
 
+  const userCapabilities = profile.userSettings?.userCapabilities ?? UserCapabilities.Default
+  const isPremiumUser = (userCapabilities & UserCapabilities.Premium) === UserCapabilities.Premium
+  const userCapabilityEmblems = isPremiumUser
+    ? [
+        {
+          key: 'premium',
+          label: t('user.capability_premium', 'Premium'),
+          Icon: Sparkles,
+          tone: 'premium',
+        },
+      ]
+    : [
+        {
+          key: 'default',
+          label: t('user.capability_default', 'Varsayılan'),
+          Icon: ShieldCheck,
+          tone: 'default',
+        },
+      ]
+
   return (
     <div className="flex-col gap-4">
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
@@ -280,6 +407,8 @@ export default function ProfilePage() {
 
       {/* ─── Profile Header ─── */}
       <div className="profile-header-card">
+        <AmbientBots />
+        <WelcomeAmbience />
         <div
           className="flex justify-between"
           style={{ gap: 20, width: '100%', alignItems: 'stretch', marginBottom: -6 }}
@@ -339,29 +468,82 @@ export default function ProfilePage() {
             </div>
 
             {isEditing ? (
-              <textarea
-                style={{
-                  margin: '8px 0',
-                  width: '100%',
-                  maxWidth: 600,
-                  minHeight: 80,
-                  fontSize: 14,
-                  padding: '12px 16px',
-                  borderRadius: 12,
-                  border: '1.5px solid var(--color-border)',
-                  background: 'var(--color-surface)',
-                  color: 'var(--color-text-primary)',
-                  fontFamily: 'inherit',
-                  outline: 'none',
-                  transition: 'border-color 0.2s',
-                  resize: 'vertical',
-                }}
-                onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
-                onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
-                value={editForm.bio}
-                onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
-                placeholder={t('profile.bio_placeholder')}
-              />
+              <>
+                <textarea
+                  style={{
+                    margin: '8px 0',
+                    width: '100%',
+                    maxWidth: 600,
+                    minHeight: 80,
+                    fontSize: 14,
+                    padding: '12px 16px',
+                    borderRadius: 12,
+                    border: '1.5px solid var(--color-border)',
+                    background: 'var(--color-surface)',
+                    color: 'var(--color-text-primary)',
+                    fontFamily: 'inherit',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                    resize: 'vertical',
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = 'var(--color-primary)')}
+                  onBlur={(e) => (e.target.style.borderColor = 'var(--color-border)')}
+                  value={editForm.bio}
+                  onChange={(e) => setEditForm((f) => ({ ...f, bio: e.target.value }))}
+                  placeholder={t('profile.bio_placeholder')}
+                />
+                <div style={{ margin: '4px 0 12px 0', maxWidth: 600 }}>
+                  <label
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: 'var(--color-text-secondary)',
+                      display: 'block',
+                      marginBottom: 8,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('profile.interests')}
+                  </label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    {TOPIC_TYPES.map((topic) => {
+                      const isSelected = editForm.topicTypes.includes(topic.value)
+                      return (
+                        <label
+                          key={topic.value}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            cursor: 'pointer',
+                            padding: '6px 12px',
+                            borderRadius: 20,
+                            fontSize: 12,
+                            fontWeight: 500,
+                            background: isSelected
+                              ? 'var(--color-primary)'
+                              : 'var(--color-surface)',
+                            color: isSelected ? '#fff' : 'var(--color-text-secondary)',
+                            border: isSelected
+                              ? '1px solid var(--color-primary)'
+                              : '1px solid var(--color-border)',
+                            transition: 'all 0.2s ease',
+                            userSelect: 'none',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleTopic(topic.value)}
+                            style={{ display: 'none' }}
+                          />
+                          {t(`topics.${topic.enumName.toLowerCase()}`)}
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
+              </>
             ) : (
               <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
                 {profile.bio || t('profile.no_bio')}
@@ -445,6 +627,24 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {profile.discriminator === 'User' && (
+              <div style={{ marginTop: 0, marginBottom: 0, maxWidth: 600 }}>
+                <div className="bot-capability-emblems" style={{ marginBottom: 0 }}>
+                  {userCapabilityEmblems.map(({ key, label, Icon, tone }) => (
+                    <span
+                      key={key}
+                      className={`bot-capability-emblem bot-capability-emblem--${tone}`}
+                      title={label}
+                      aria-label={label}
+                      role="img"
+                    >
+                      <Icon size={20} strokeWidth={2.2} aria-hidden="true" />
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div style={{ flexGrow: 1 }} />
 
             <div className="flex flex-wrap gap-2" style={{ paddingTop: 12, paddingBottom: 0 }}>
@@ -462,6 +662,11 @@ export default function ProfilePage() {
               >
                 <Network size={14} /> {t('profile.network')}
               </button>
+              {isLoggedIn && !isOwnProfile && (
+                <button className="btn btn-outline btn-sm" onClick={() => setDebateModalOpen(true)}>
+                  <AngryBotWithSwordsIcon size={14} /> {t('profile.trigger_debate', 'Münazara')}
+                </button>
+              )}
             </div>
           </div>
 
@@ -489,8 +694,10 @@ export default function ProfilePage() {
             {isEditing ? (
               <AvatarUpload
                 imageUrl={editForm.imageUrl}
-                onImageUploaded={(url) => setEditForm(prev => ({ ...prev, imageUrl: url }))}
+                onImageUploaded={(url) => setEditForm((prev) => ({ ...prev, imageUrl: url }))}
                 disabled={editMutation.isPending}
+                compact={true}
+                size={144}
               />
             ) : (
               <ActorAvatar
@@ -499,6 +706,7 @@ export default function ProfilePage() {
                 discriminator={profile.discriminator}
                 actorId={profile.actorId}
                 botGrade={profile.botSettings?.botGrade}
+                userGrade={profile.userSettings?.userGrades}
                 size="xxxl"
                 clickable={false}
               />
@@ -553,16 +761,25 @@ export default function ProfilePage() {
                   >
                     <Settings size={14} /> {t('profile.security_settings')}
                   </button>
+                  <button
+                    className="btn btn-primary btn-sm profile-premium-btn"
+                    onClick={() => setIsPremiumOpen(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <ModifierArrowSvg
+                      width={10}
+                      height={14}
+                      style={{ display: 'block' }}
+                    />
+                    {t('premium.title', 'Premium')}
+                  </button>
                 </>
               )}
               {isOwnProfile && isEditing && (
                 <>
                   <button
-                    className="btn btn-success btn-sm"
+                    className="btn btn-primary btn-sm"
                     style={{
-                      background: 'var(--color-success)',
-                      color: '#fff',
-                      border: 'none',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
@@ -641,65 +858,175 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* ─── LIMITS TOP DIVIDER ─── */}
+          {((profile.discriminator === 'User' && profile.userSettings) ||
+            (profile.discriminator === 'Bot' && profile.botSettings)) && (
+            <div
+              style={{
+                width: '100%',
+                height: 0,
+                borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+                margin: '16px 0 12px 0',
+              }}
+            />
+          )}
+
+          {profile.discriminator === 'User' && profile.userSettings && (
+            <div
+              className="profile-limits-row"
+              style={{ marginTop: 0, paddingLeft: 4, paddingRight: 4 }}
+            >
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.bot_ownership_limit_desc',
+                  'Maksimum sahip olunabilir bot sayısı'
+                )}
+              >
+                <Bot size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                <span>{t('profile.bot_ownership_limit', 'Bot Sahiplik Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.botsCount ?? (profile.bots?.length || 0)} /{' '}
+                  {profile.userSettings.botCountLimit || 5}
+                </span>
+              </div>
+              <span className="profile-limit-divider">•</span>
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.card_ownership_limit_desc',
+                  'Maksimum sahip olunabilir kişilik kartı sayısı'
+                )}
+              >
+                <BotFlashCardsIcon
+                  size={25}
+                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                />
+                <span>{t('profile.card_ownership_limit', 'Kart Sahiplik Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.ownedCards?.length || 0} /{' '}
+                  {profile.userSettings.cardOwnershipLimit || 10}
+                </span>
+              </div>
+              <span className="profile-limit-divider">•</span>
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.daily_debate_limit_desc',
+                  'Eşzamanlı/günlük tartışma ve münazara hakkı'
+                )}
+              >
+                <AngryBotWithSwordsIcon
+                  size={25}
+                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                />
+                <span>{t('profile.daily_debate_limit', 'Günlük Tartışma Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.userSettings.debateLimit || 3}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {profile.discriminator === 'Bot' && profile.botSettings && (
+            <div
+              className="profile-limits-row"
+              style={{ marginTop: 0, paddingLeft: 4, paddingRight: 4 }}
+            >
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.bot_assignment_limit_desc',
+                  'Maksimum atanabilir kişilik kartı sayısı'
+                )}
+              >
+                <BotFlashCardsIcon
+                  size={25}
+                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                />
+                <span>{t('profile.bot_assignment_limit', 'Kart Atanma Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.assignedCards?.length || 0} /{' '}
+                  {profile.botSettings.botAssignmentLimit || 4}
+                </span>
+              </div>
+              <span className="profile-limit-divider">•</span>
+              <div
+                className="profile-limit-chip"
+                title={t('profile.daily_debate_limit_desc', 'Eşzamanlı aktif münazara hakkı')}
+              >
+                <AngryBotWithSwordsIcon
+                  size={25}
+                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                />
+                <span>{t('profile.daily_debate_limit', 'Günlük Tartışma Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.botSettings.debateLimit || 1}
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* ─── STATS BOTTOM DIVIDER ─── */}
           <div
             style={{
               width: '100%',
               height: 0,
-              borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+              borderTop: '1px solid var(--color-border)',
               margin: '16px 0 12px 0',
             }}
           />
 
-          {isEditing && (
-            <div style={{ marginBottom: 12, maxWidth: 600 }}>
-              <label
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: 'var(--color-text-secondary)',
-                  display: 'block',
-                  marginBottom: 8,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('profile.interests')}
-              </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                {TOPIC_TYPES.map((topic) => {
-                  const isSelected = editForm.topicTypes.includes(topic.value)
-                  return (
-                    <label
-                      key={topic.value}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        cursor: 'pointer',
-                        padding: '8px 14px',
-                        borderRadius: 20,
-                        fontSize: 13,
-                        fontWeight: 500,
-                        background: isSelected ? 'var(--color-primary)' : 'var(--color-surface)',
-                        color: isSelected ? '#fff' : 'var(--color-text-secondary)',
-                        border: isSelected
-                          ? '1px solid var(--color-primary)'
-                          : '1px solid var(--color-border)',
-                        transition: 'all 0.2s ease',
-                        userSelect: 'none',
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleTopic(topic.value)}
-                        style={{ display: 'none' }}
-                      />
-                      {t(`topics.${topic.enumName.toLowerCase()}`)}
-                    </label>
-                  )
-                })}
-              </div>
+          {((profile.discriminator === 'User' && profile.userSettings) ||
+            (profile.discriminator === 'Bot' && profile.botSettings)) && (
+            <div
+              className="profile-limits-row"
+              style={{ marginTop: 0, marginBottom: 24, paddingLeft: 4, paddingRight: 4 }}
+            >
+                <div
+                  className="profile-limit-chip"
+                  title={t(
+                    'profile.card_inheritance_chance_desc',
+                    'Kişilik kartı kalıtım ve miras alma olasılığı'
+                  )}
+                >
+                  <CardContingencyIcon
+                    size={25}
+                    style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                  />
+                  <span>{t('profile.card_inheritance_chance', 'Kart Miras Şansı')}:</span>
+                  <span className="profile-limit-chip__val">
+                    %{Math.round(
+                      ((profile.discriminator === 'User'
+                        ? profile.userSettings
+                        : profile.botSettings
+                      ).cardInheritanceChance || 0.25) * 100
+                    )}
+                  </span>
+                </div>
+                {profile.discriminator === 'Bot' &&
+                  profile.botSettings.cardInheritanceModifier !== undefined &&
+                  profile.botSettings.cardInheritanceModifier !== null && (
+                    <>
+                      <span className="profile-limit-divider">•</span>
+                      <div
+                        className="profile-limit-chip"
+                        title={t(
+                          'profile.card_inheritance_modifier_desc',
+                          'Dereceye bağlı ek kişilik kartı miras çarpanı'
+                        )}
+                      >
+                        <CardContingencyModifierIcon
+                          size={42}
+                          style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                        />
+                        <span>{t('profile.card_inheritance_modifier', 'Kart Miras Çarpanı')}:</span>
+                        <span className="profile-limit-chip__val">
+                          +%{Math.round((profile.botSettings.cardInheritanceModifier || 0) * 100)}
+                        </span>
+                      </div>
+                    </>
+                  )}
             </div>
           )}
 
@@ -724,16 +1051,23 @@ export default function ProfilePage() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  {t('card.personality_slots', 'Atanmış Kişilik Kartları')}
+                  {t('card.personality_slots', 'Atanmış Kişilik Kartları')} (
+                  {profile.assignedCards?.length || 0} /{' '}
+                  {profile.botSettings?.botAssignmentLimit || 4} {t('card.slots_label', 'Slot')})
                 </span>
               </div>
 
               <CardSlots
                 cards={profile.assignedCards}
-                slotCount={profile.botSettings?.maxCardSlots || 4}
+                slotCount={profile.botSettings?.botAssignmentLimit || 4}
                 showMark={false}
               />
+            </div>
+          )}
 
+          {((profile.discriminator === 'Bot' && profile.botSettings) ||
+            (profile.discriminator === 'User' && profile.userSettings)) && (
+            <div style={{ marginBottom: 8, width: '100%' }}>
               <div
                 style={{
                   display: 'flex',
@@ -753,11 +1087,24 @@ export default function ProfilePage() {
                     letterSpacing: '0.04em',
                   }}
                 >
-                  {t('card.owned_cards', 'Sahip Olunan Kartlar')}
+                  {t('card.owned_cards', 'Sahip Olunan Kartlar')} ({profile.ownedCards?.length || 0}{' '}
+                  /{' '}
+                  {profile.discriminator === 'Bot'
+                    ? profile.botSettings?.botAssignmentLimit || 4
+                    : profile.userSettings?.cardOwnershipLimit || 10}{' '}
+                  {t('card.slots_label', 'Slot')})
                 </span>
               </div>
 
-              <CardSlots cards={profile.ownedCards} slotCount={10} showMark={false} />
+              <CardSlots
+                cards={profile.ownedCards}
+                slotCount={
+                  profile.discriminator === 'Bot'
+                    ? profile.botSettings?.botAssignmentLimit || 4
+                    : profile.userSettings?.cardOwnershipLimit || 10
+                }
+                showMark={false}
+              />
             </div>
           )}
         </div>
@@ -901,6 +1248,16 @@ export default function ProfilePage() {
         isOpen={likesModalOpen}
         onClose={() => setLikesModalOpen(false)}
       />
+
+      <TriggerDebateModal
+        isOpen={debateModalOpen}
+        onClose={() => setDebateModalOpen(false)}
+        onSubmit={handleTriggerDebate}
+        targetName={profile?.profileName}
+        isPending={debatePending}
+      />
+
+      <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </div>
   )
 }

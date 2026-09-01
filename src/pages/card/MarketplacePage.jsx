@@ -13,6 +13,7 @@ import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import ActorMinimalCard from '../../components/actor/ActorMinimalCard'
 import useAuthStore from '../../store/authStore'
+import useMyEntitiesStore from '../../store/myEntitiesStore'
 
 export default function MarketplacePage() {
   const navigate = useNavigate()
@@ -115,6 +116,7 @@ export default function MarketplacePage() {
     onSuccess: () => {
       toast.success(t('card.buy_success', 'Kart başarıyla satın alındı!'))
       queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
+      useMyEntitiesStore.getState().fetchMyCards()
       refetch()
     },
     onError: (err) => {

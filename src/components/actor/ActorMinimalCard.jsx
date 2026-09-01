@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Network, Edit2, Brain } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +9,8 @@ import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import SelectionMarker from '../common/SelectionMarker'
+import PremiumModal from '../common/PremiumModal'
+import ModifierArrowSvg from '../../assets/FigmaNew/modifierarrow.svg?react'
 
 /**
  * ActorMinimalCard — avatar + isim, hierarchy button, selection support.
@@ -18,6 +21,9 @@ export default function ActorMinimalCard({
   showHierarchyBtn = true,
   showMindBtn = true,
   showPoint = false,
+  showJuryPoints = false,
+  juryProponentScore = null,
+  juryOpponentScore = null,
   showEditBtn = true,
   clickable = true,
   variant = 'compact',
@@ -33,6 +39,7 @@ export default function ActorMinimalCard({
   const { t } = useTranslation()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const currentUserId = useAuthStore((s) => s.actorId)
+  const [isPremiumOpen, setIsPremiumOpen] = useState(false)
 
   const myBots = useMyEntitiesStore((s) => s.myBots)
 
@@ -42,17 +49,26 @@ export default function ActorMinimalCard({
   const isMyBot = myBots?.some((b) => b.actorId === actor.actorId)
   const isOwner = isMe || isMyBot
 
+  const pScore = juryProponentScore ?? actor?.proponentScore ?? actor?.juryProponentScore ?? null
+  const oScore = juryOpponentScore ?? actor?.opponentScore ?? actor?.juryOpponentScore ?? null
+  const hasJuryScores = pScore !== null && oScore !== null
+  const isPropLeading = hasJuryScores && pScore >= oScore
+  const isOppLeading = hasJuryScores && oScore >= pScore
+
   const handleActorClick = (e) => {
-    if (e && typeof e.stopPropagation === 'function') {
-      e.stopPropagation()
-    }
     if (selectable) {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation()
+      }
       if (!disabled && onSelect) {
         onSelect(!selected, actor)
       }
       return
     }
     if (!clickable) return
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation()
+    }
     navigate('/profile?actorId=' + actor.actorId)
   }
 
@@ -83,10 +99,12 @@ export default function ActorMinimalCard({
     (showMindBtn && !selectable && actor.discriminator === 'Bot') ||
     (showEditBtn && !selectable && isOwner) ||
     (showPoint && actor.actorPoint != null) ||
+    showJuryPoints ||
     selectable ||
     Boolean(children)
 
   return (
+    <>
     <div
       className={`actor-chip flex items-center gap-1${selectable ? ' actor-chip--selectable' : ''}${selected ? ' actor-chip--selected' : ''}`}
       onClick={selectable ? handleActorClick : undefined}
@@ -129,6 +147,9 @@ export default function ActorMinimalCard({
         <span
           className="actor-chip-name"
           style={{
+            display: 'block',
+            minWidth: 0,
+            maxWidth: '14ch',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -168,6 +189,24 @@ export default function ActorMinimalCard({
           <Edit2 size={12} />
         </button>
       )}
+      {showEditBtn && !selectable && isOwner && (
+        <button
+          type="button"
+          className="actor-chip-premium-btn"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setIsPremiumOpen(true)
+          }}
+          title={t('premium.title', 'Premium')}
+        >
+          <ModifierArrowSvg
+            width={16}
+            height={22}
+            style={{ display: 'block' }}
+          />
+        </button>
+      )}
       {showPoint && actor.actorPoint != null && (
         <span
           style={{
@@ -182,6 +221,64 @@ export default function ActorMinimalCard({
           {actor.actorPoint} P
         </span>
       )}
+      {showJuryPoints && (
+        <div
+          className="actor-chip-jury-scores"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 3,
+            marginLeft: 'auto',
+            flexShrink: 0,
+          }}
+        >
+          {hasJuryScores ? (
+            <>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: isPropLeading ? 800 : 600,
+                  color: '#3b82f6',
+                  backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  border: isPropLeading ? '1px solid #3b82f6' : '1px solid transparent',
+                  lineHeight: '14px',
+                }}
+                title={`Proponent: ${pScore}`}
+              >
+                P:{pScore}
+              </span>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: isOppLeading ? 800 : 600,
+                  color: '#ec4899',
+                  backgroundColor: 'rgba(236, 72, 153, 0.15)',
+                  padding: '1px 5px',
+                  borderRadius: 4,
+                  border: isOppLeading ? '1px solid #ec4899' : '1px solid transparent',
+                  lineHeight: '14px',
+                }}
+                title={`Opponent: ${oScore}`}
+              >
+                O:{oScore}
+              </span>
+            </>
+          ) : (
+            <span
+              style={{
+                fontSize: 9,
+                color: 'var(--color-text-muted)',
+                fontStyle: 'italic',
+                padding: '0 4px',
+              }}
+            >
+              ...
+            </span>
+          )}
+        </div>
+      )}
       {selectable && (
         <div style={{ marginLeft: 'auto', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
           <SelectionMarker
@@ -194,5 +291,7 @@ export default function ActorMinimalCard({
       )}
       {children}
     </div>
+      <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
+    </>
   )
 }

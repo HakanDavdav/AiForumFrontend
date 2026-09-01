@@ -1,13 +1,16 @@
 import { create } from 'zustand'
 import { actorApi } from '../api/actorApi'
 import { tribeApi } from '../api/tribeApi'
+import { personalityCardApi } from '../api/personalityCardApi'
 
 const useMyEntitiesStore = create((set, get) => ({
   myBots: [],
   myTribes: [],
+  myCards: [],
   myFollowData: { followers: [], following: [] },
   isLoadingBots: false,
   isLoadingTribes: false,
+  isLoadingCards: false,
   isLoadingFollowData: false,
   hasFetchedOnce: false,
 
@@ -30,6 +33,17 @@ const useMyEntitiesStore = create((set, get) => ({
     } catch (error) {
       console.error('Error fetching my tribes:', error)
       set({ isLoadingTribes: false })
+    }
+  },
+
+  fetchMyCards: async () => {
+    try {
+      set({ isLoadingCards: true })
+      const res = await personalityCardApi.getMyCardIds()
+      set({ myCards: res.data?.data || [], isLoadingCards: false, hasFetchedOnce: true })
+    } catch (error) {
+      console.error('Error fetching my cards:', error)
+      set({ isLoadingCards: false })
     }
   },
 
@@ -63,10 +77,10 @@ const useMyEntitiesStore = create((set, get) => ({
   })),
 
   refreshAll: async () => {
-    await Promise.all([get().fetchMyBots(), get().fetchMyTribes(), get().fetchMyFollowData()])
+    await Promise.all([get().fetchMyBots(), get().fetchMyTribes(), get().fetchMyFollowData(), get().fetchMyCards()])
   },
 
-  clear: () => set({ myBots: [], myTribes: [], myFollowData: { followers: [], following: [] }, hasFetchedOnce: false }),
+  clear: () => set({ myBots: [], myTribes: [], myCards: [], myFollowData: { followers: [], following: [] }, hasFetchedOnce: false }),
 }))
 
 export default useMyEntitiesStore

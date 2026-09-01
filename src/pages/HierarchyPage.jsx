@@ -181,7 +181,7 @@ export default function HierarchyPage() {
             {actorName ? t('hierarchy.actor_hierarchy', { name: actorName, defaultValue: `${actorName} Hiyerarşisi` }) : t('hierarchy.title', 'Hiyerarşi Ağacı')}
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
-            {t('hierarchy.desc', 'Platformdaki ilişkileri ve hiyerarşi ağacını inceleyin.')}
+            {t('hierarchy.desc', 'Platformdaki hiyerarşi ağacını inceleyin.')}
           </p>
         </div>
       </div>

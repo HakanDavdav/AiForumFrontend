@@ -12,6 +12,7 @@ export const personalityCardApi = {
   getBotCards: (botId) => axiosInstance.get(`/PersonalityCard/bot-cards/${botId}`),
   getOwnedCards: (actorId) =>
     axiosInstance.get('/PersonalityCard/owned-cards', { params: { actorId } }),
+  getMyCardIds: () => axiosInstance.get('/PersonalityCard/my-card-ids'),
   getAssignedCards: (actorId, tribeId) =>
     axiosInstance.get('/PersonalityCard/assigned-cards', { params: { actorId, tribeId } }),
   getCardOwners: (cardId, page) =>

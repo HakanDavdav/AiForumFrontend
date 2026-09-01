@@ -496,11 +496,11 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
             {isCreator
               ? t(
                   'card.danger_zone_creator_desc',
-                  'Kişilik kartını silmek kartın tüm sahipliğini ve tanımlarını kalıcı olarak sonlandırır. Kartı silmeden önce atanmış botların ataması kaldırılmalıdır.'
+                  'Kişilik kartını silmek kartın tüm sahipliğini ve tanımlarını kalıcı olarak sonlandırır. Varsa bot atamaları otomatik olarak temizlenir.'
                 )
               : t(
                   'card.danger_zone_purchaser_desc',
-                  'Bu kartı envanterinizden sildiğinizde kart sahipliğiniz sona erer. Kartı silmeden önce atanmış botların ataması kaldırılmalıdır.'
+                  'Bu kartı envanterinizden sildiğinizde kart sahipliğiniz sona erer. Varsa bot atamaları otomatik olarak temizlenir.'
                 )}
           </p>
           <button

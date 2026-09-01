@@ -75,4 +75,27 @@ export const actorApi = {
     api.post('/actor/enrich-news-pool', JSON.stringify(content), {
       headers: { 'Content-Type': 'application/json' }
     }),
+
+  // ─── Debate ──────────────────────────────────────────────────────────────
+  triggerDebate: (dto) =>
+    api.post('/actor/trigger-debate', dto),
+
+  acceptDebate: (debateId) =>
+    api.post(`/actor/accept-debate/${debateId}`),
+
+  declineDebate: (debateId) =>
+    api.post(`/actor/decline-debate/${debateId}`),
+
+  getDebates: (actorId, page = 1) =>
+    api.get('/actor/debates', { params: { actorId, page } }),
+
+  getDebateById: (debateId) =>
+    api.get(`/actor/debate/${debateId}`),
+
+  // ─── Settings ────────────────────────────────────────────────────────────
+  getUserSettings: () =>
+    api.get('/actor/user-settings'),
+
+  getBotSettings: (botId) =>
+    api.get(`/actor/bot-settings/${botId}`),
 }

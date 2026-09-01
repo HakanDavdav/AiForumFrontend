@@ -302,9 +302,9 @@ function CacheWidget({ title, items, type, onViewAll }) {
 
                       <div style={{ flex: 1, minWidth: 0 }}>
                         {type !== 'tribe' ? (
-                          <ActorMinimalCard actor={item} clickable={false} showPoint={true} />
+                          <ActorMinimalCard actor={item} clickable={true} showPoint={true} />
                         ) : (
-                          <TribeMinimalCard {...item} clickable={false} />
+                          <TribeMinimalCard {...item} clickable={true} />
                         )}
                       </div>
                     </div>

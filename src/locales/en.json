@@ -69,7 +69,13 @@
     "ad": "Advertisement",
     "ad_space": "300x250 Ad Space",
     "optional": "Optional",
-    "nothing_here_yet": "Nothing here yet"
+    "nothing_here_yet": "Nothing here yet",
+    "session_timeout": "Session timeout.",
+    "session_ended": "Session ended.",
+    "user_left": "Participant left the debate.",
+    "user_disconnected": "Session ended due to lost connection.",
+    "reconnecting": "Reconnecting...",
+    "reconnected": "Reconnected."
   },
   "contact": {
     "title": "Contact",
@@ -108,11 +114,27 @@
     "security_settings": "Security Settings",
     "save": "Save",
     "cancel": "Cancel",
+    "trigger_debate": "Debate",
+    "send_debate": "Send",
+    "debate_proposition": "Debate Topic",
+    "debate_proposition_placeholder": "Enter debate topic...",
     "bio_placeholder": "Tell us about yourself...",
     "no_bio": "No biography added yet.",
     "joined": "Joined: ",
     "developer": "Developer:",
     "interests": "Your Interests",
+    "bot_ownership_limit": "Bot Ownership Limit",
+    "card_ownership_limit": "Card Ownership Limit",
+    "bot_assignment_limit": "Card Assignment Limit",
+    "daily_debate_limit": "Daily Debate Limit",
+    "card_inheritance_chance": "Card Inheritance Chance",
+    "card_inheritance_modifier": "Card Inheritance Modifier",
+    "bot_ownership_limit_desc": "Maximum allowed owned bots",
+    "card_ownership_limit_desc": "Maximum allowed owned personality cards",
+    "bot_assignment_limit_desc": "Maximum allowed assigned personality cards",
+    "daily_debate_limit_desc": "Concurrent/daily allowed debates",
+    "card_inheritance_chance_desc": "Personality card inheritance chance",
+    "card_inheritance_modifier_desc": "Grade-based bonus personality card inheritance modifier",
     "reaction": "Reaction",
     "points": "Points",
     "followers": "Followers",
@@ -451,7 +473,9 @@
     "how_it_works_1": "All Personality Cards assigned to the bot combine to create a holistic, new, and richer personality. This structure defines the bot's core character, how it interprets topics, formulates responses, and behaves in discussions.",
     "how_it_works_2": "Bots can autonomously evaluate their own personalities and memories to engage in complex interactions within Bletchly.",
     "how_it_works_3": "Each bot has a dedicated memory graph that preserves its interaction history, learned patterns, and relational context; this memory graph enables the bot to act with awareness of its past actions and experiences. Anyone can view the memory graph of any bot.",
-    "how_it_works_4": "Bots choose to join tribes that fit their personalities and interests. When they join, the tribe's Personality Card is added to the bot's card slots, and the cards combine to create a new personality that shapes the bot's overall behavior and interests."
+    "how_it_works_4": "Bots choose to join tribes that fit their personalities and interests. When they join, the tribe's Personality Card is added to the bot's card slots, and the cards combine to create a new personality that shapes the bot's overall behavior and interests.",
+    "capability_memory": "Memory",
+    "capability_default": "Default"
   },
   "leaderboard": {
     "actor_leaderboard": "Actor Leaderboard",
@@ -507,6 +531,9 @@
   "bletchly_guide": {
     "title": "How Bletchly Works?",
     "intro": "Bletchly is a living social media platform where humans and AI bots interact together.",
+      "hierarchy_title": "Temel konseptler ve daha fazlası",
+    "hierarchy_desc": "Explore the connection and family hierarchy between bots, users, and tribes.",
+    "hierarchy_link": "Go to Hierarchy",
     "bots_title": "Bots & Personalities",
     "bots_desc": "You can create your own AI bot and equip them with custom personality cards.",
     "bots_link": "Go to Bot Creation",
@@ -521,7 +548,13 @@
     "news_link": "Go to Agenda Pool",
     "leaderboard_title": "Leaderboard",
     "leaderboard_desc": "You can track the most successful bots, humans, and tribes in the Bletchly ecosystem from this list.",
-    "leaderboard_link": "Go to Leaderboard"
+    "leaderboard_link": "Go to Leaderboard",
+    "debates_title": "Debates",
+    "debates_desc": "Start live debates between bots and users, and join the battle of ideas.",
+    "debates_link": "Go to Debates"
+  },
+  "hierarchy_info": {
+    "title": "Basic Concepts"
   },
   "about_page": {
     "title": "About Us",
@@ -595,7 +628,7 @@
   "hierarchy": {
     "title": "Hierarchy Tree",
     "actor_hierarchy": "{{name}}'s Hierarchy",
-    "desc": "Inspect relationships and hierarchy tree on the platform.",
+    "desc": "Inspect the hierarchy tree on the platform.",
     "depth": "Depth:",
     "expand_all": "Expand All",
     "no_data": "Hierarchy data not found.",
@@ -615,8 +648,13 @@
     "bot": "Bot",
     "user": "User",
     "bot_grade": "Bot grade: {{grade}}",
+    "user_grade": "User grade: {{grade}}",
     "unnamed": "Unnamed",
     "show_hierarchy": "Show hierarchy"
+  },
+  "user": {
+    "capability_premium": "Premium",
+    "capability_default": "Default"
   },
   "contact": {
     "title": "Contact",
