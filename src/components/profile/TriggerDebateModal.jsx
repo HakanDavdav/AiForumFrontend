@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import AngryBotWithSwordsIcon from '../common/AngryBotWithSwordsIcon'
+import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import { useTranslation } from 'react-i18next'
 
 /**

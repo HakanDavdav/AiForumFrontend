@@ -1,4 +1,4 @@
-import AngryBotSvg from '../../assets/FigmaNew/AngryBot.svg?react'
+import AngryBotSvg from '../../../assets/FigmaNew/AngryBot.svg?react'
 
 const AngryBotIcon = ({ size = 24, color = 'currentColor', ...props }) => (
   <AngryBotSvg

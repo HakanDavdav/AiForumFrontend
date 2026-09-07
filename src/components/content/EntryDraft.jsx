@@ -5,6 +5,7 @@ import { contentItemApi } from '../../api/contentItemApi'
 import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import { trackCreateEntry } from '../../utils/analytics'
 
 /**
  * EntryDraft — plan.md Component #22
@@ -23,7 +24,12 @@ export default function EntryDraft({ parentContentItemId, editContentItemId = nu
     },
     meta: { showErrorToast: true },
     onSuccess: () => {
-      if (!editContentItemId) setContent('')
+      if (!editContentItemId) {
+        trackCreateEntry({
+          parent_content_id: parentContentItemId,
+        })
+        setContent('')
+      }
       if (onSuccess) onSuccess(content)
     },
   })

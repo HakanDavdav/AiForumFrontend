@@ -18,6 +18,7 @@ import {
   X,
   Users,
   Sparkles,
+  Brain,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -37,11 +38,11 @@ import useUIStore from '../../store/uiStore'
 import useThemeStore from '../../store/themeStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
-import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
+import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
-import AngryBotWithSwordsIcon from '../common/AngryBotWithSwordsIcon'
+import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import BletchlyGuideModal from '../common/BletchlyGuideModal'
-import Logo from '../common/Logo'
+import Logo from '../common/icons/Logo'
 
 export default function TopBar() {
   useDevLog('TopBar', arguments[0] || {})
@@ -54,10 +55,6 @@ export default function TopBar() {
     toggleLeftDrawer,
     activeLeftCacheType,
     setActiveLeftCacheType,
-    isBotsAmbience,
-    toggleBotsAmbience,
-    isWelcomeAmbience,
-    toggleWelcomeAmbience,
   } = useUIStore()
   const langs = [
     { code: 'tr', label: 'Türkçe', flagUrl: 'https://flagcdn.com/w20/tr.png' },
@@ -123,6 +120,7 @@ export default function TopBar() {
     fetchMyTribes,
     fetchMyBots,
     fetchMyFollowData,
+    fetchMyCards,
     hasFetchedOnce,
     clear: clearEntities,
   } = useMyEntitiesStore()
@@ -132,8 +130,9 @@ export default function TopBar() {
       fetchMyTribes()
       fetchMyBots()
       fetchMyFollowData()
+      fetchMyCards()
     }
-  }, [isLoggedIn, hasFetchedOnce, fetchMyTribes, fetchMyBots, fetchMyFollowData])
+  }, [isLoggedIn, hasFetchedOnce, fetchMyTribes, fetchMyBots, fetchMyFollowData, fetchMyCards])
 
   // Current user profile
   const { data: myProfile } = useQuery({
@@ -1481,46 +1480,6 @@ export default function TopBar() {
             style={{ width: 38, height: 38, boxSizing: 'border-box' }}
           >
             <AngryBotWithSwordsIcon size={22} />
-          </IconActionButton>
-
-          <IconActionButton
-            onClick={toggleBotsAmbience}
-            title={t('topbar.ambient_bots', 'Ambient Botlar')}
-            aria-label={t('topbar.ambient_bots', 'Ambient Botlar')}
-            style={{
-              width: 38,
-              height: 38,
-              boxSizing: 'border-box',
-              ...(isBotsAmbience
-                ? {
-                    color: 'var(--color-primary)',
-                    borderColor: 'var(--color-primary)',
-                    background: 'var(--color-primary-alpha)',
-                  }
-                : {}),
-            }}
-          >
-            <Bot size={19} strokeWidth={2.2} />
-          </IconActionButton>
-
-          <IconActionButton
-            onClick={toggleWelcomeAmbience}
-            title={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
-            aria-label={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
-            style={{
-              width: 38,
-              height: 38,
-              boxSizing: 'border-box',
-              ...(isWelcomeAmbience
-                ? {
-                    color: 'var(--color-primary)',
-                    borderColor: 'var(--color-primary)',
-                    background: 'var(--color-primary-alpha)',
-                  }
-                : {}),
-            }}
-          >
-            <Sparkles size={19} strokeWidth={2.2} />
           </IconActionButton>
 
           <IconActionButton

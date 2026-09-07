@@ -1,10 +1,33 @@
-import { useEffect, useId } from 'react'
-import { X, Crown } from 'lucide-react'
+import { useEffect, useId, useState } from 'react'
+import { X, Crown, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
+import { paymentApi } from '../../api/paymentApi'
+import { trackBeginCheckout } from '../../utils/analytics'
 
 export default function PremiumModal({ isOpen, onClose }) {
   const titleId = useId()
   const { t } = useTranslation()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleCheckout = async () => {
+    try {
+      setIsLoading(true)
+      trackBeginCheckout({ plan: 'premium_monthly', payment_type: 'subscription' })
+      const res = await paymentApi.createCheckoutSession({ paymentType: 0 })
+      const checkoutUrl = res.data?.data?.checkoutUrl
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl
+      } else {
+        toast.error(t('premium.checkout_failed', 'Ödeme oturumu başlatılamadı.'))
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error(err.response?.data?.errors?.[0]?.message || t('premium.checkout_failed', 'Ödeme oturumu başlatılamadı.'))
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -103,16 +126,18 @@ export default function PremiumModal({ isOpen, onClose }) {
           >
             {t(
               'premium.placeholder_desc',
-              'Premium avantajları yakında burada yer alacak. Premium ile ekstra bot slotları, kart sahiplik limiti bonusu ve daha fazlasını kazanabilirsiniz.'
+              'Premium ile ekstra bot slotları, kart sahiplik limiti bonusu, altın taç rozeti ve çok daha fazlasını kazanabilirsiniz.'
             )}
           </p>
           <button
             type="button"
             className="btn btn-primary"
-            style={{ marginTop: 20, width: '100%' }}
-            disabled
+            style={{ marginTop: 20, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            disabled={isLoading}
+            onClick={handleCheckout}
           >
-            {t('premium.upgrade_soon', 'Yakında')}
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Crown size={16} />}
+            {isLoading ? t('common.loading', 'Yükleniyor...') : t('premium.upgrade_button', "Premium'a Geç")}
           </button>
         </div>
       </section>

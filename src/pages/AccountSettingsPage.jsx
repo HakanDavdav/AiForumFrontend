@@ -1,7 +1,12 @@
 import { useState } from 'react'
 import { ArrowLeft, Settings } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 import BackButton from '../components/common/BackButton'
+import SelectionMarker from '../components/common/SelectionMarker'
+import { identityApi } from '../api/identityApi'
+import { actorApi } from '../api/actorApi'
 
 import ChangeUsernameModal from '../components/auth/ChangeUsernameModal'
 import ChangePasswordModal from '../components/auth/ChangePasswordModal'
@@ -15,10 +20,38 @@ import useAuthStore from '../store/authStore'
 
 export default function AccountSettingsPage() {
   useDevLog('AccountSettingsPage', arguments[0] || {})
-  const { isExternalAuth } = useAuthStore()
-  const [activeModal, setActiveModal] = useState(null) // null, 'editProfile', 'changeUsername', 'changePassword', 'twoFactor', 'deleteAccount', 'changeEmail', 'changePhone'
+  const { actorId, isExternalAuth } = useAuthStore()
+  const queryClient = useQueryClient()
+  const [activeModal, setActiveModal] = useState(null)
   const navigate = useNavigate()
   const { t } = useTranslation()
+
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ['actorProfile', actorId],
+    queryFn: () => actorApi.getProfile(actorId),
+    enabled: !!actorId,
+    select: (res) => res.data?.data,
+  })
+
+  const currentEmailPref = profile?.userSettings?.socialEmailPreference ?? profile?.socialEmailPreference ?? true
+  const [localEmailPref, setLocalEmailPref] = useState(null)
+  const isEmailNotificationsEnabled = localEmailPref !== null ? localEmailPref : currentEmailPref
+
+  const switchNotificationMutation = useMutation({
+    mutationFn: (newVal) => identityApi.switchNotification({ emailPreference: newVal }),
+    onSuccess: (res, newVal) => {
+      setLocalEmailPref(newVal)
+      toast.success(t('settings.notification_updated', 'Bildirim tercihi güncellendi'))
+      queryClient.invalidateQueries({ queryKey: ['actorProfile', actorId] })
+    },
+    onError: () => {
+      toast.error(t('common.error', 'Bir hata oluştu'))
+    }
+  })
+
+  const handleToggleNotification = (newVal) => {
+    switchNotificationMutation.mutate(newVal)
+  }
 
   return (
     <div className="flex-col gap-4">
@@ -93,6 +126,40 @@ export default function AccountSettingsPage() {
           </div>
         </div>
       )}
+
+      {/* E-posta Bildirimleri Bölümü */}
+      <div style={{ marginBottom: 32 }}>
+        <div
+          style={{
+            padding: '16px 20px',
+            borderRadius: 14,
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <SelectionMarker
+            checked={isEmailNotificationsEnabled}
+            disabled={isLoadingProfile || switchNotificationMutation.isPending}
+            onChange={(e) => handleToggleNotification(e.target.checked)}
+            label={t('settings.email_notifications', 'E-posta Bildirimleri')}
+            style={{ alignItems: 'center', width: '100%' }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                {t('settings.email_notifications', 'E-posta Bildirimleri')}
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                {t(
+                  'settings.email_notifications_desc',
+                  'Hesabınızdaki sosyal etkileşimler, takipler ve önemli güncellemeler için e-posta bildirimleri alın.'
+                )}
+              </span>
+            </div>
+          </SelectionMarker>
+        </div>
+      </div>
 
       {/* Tehlikeli Alan Bölümü */}
       <div

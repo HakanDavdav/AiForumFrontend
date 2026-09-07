@@ -9,6 +9,7 @@ import { User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import AvatarUpload from '../../components/common/AvatarUpload'
+import SelectionMarker from '../../components/common/SelectionMarker'
 
 const TOPIC_TYPES = [
   { value: 1, enumName: 'Politics', label: 'Politika' },
@@ -40,7 +41,20 @@ export default function InitProfilePage() {
   const [bio, setBio] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [selectedTopics, setSelectedTopics] = useState([])
+  const [socialEmailPreference, setSocialEmailPreference] = useState(true)
   const { t } = useTranslation()
+
+  const switchNotificationMutation = useMutation({
+    mutationFn: (newVal) => identityApi.switchNotification({ emailPreference: newVal }),
+    onError: () => {
+      setSocialEmailPreference((prev) => !prev)
+    }
+  })
+
+  const handleToggleEmailPreference = (newVal) => {
+    setSocialEmailPreference(newVal)
+    switchNotificationMutation.mutate(newVal)
+  }
 
   const initProfileMutation = useMutation({
     mutationFn: (data) => actorApi.editUser(data),
@@ -96,7 +110,7 @@ export default function InitProfilePage() {
 
       postPerPage: 20,
       socialNotificationPreference: true,
-      socialEmailPreference: true
+      socialEmailPreference: socialEmailPreference
     }
 
     initProfileMutation.mutate(payload)
@@ -278,6 +292,38 @@ export default function InitProfilePage() {
               )
             })}
           </div>
+        </div>
+
+        {/* Email Notification Preference */}
+        <div
+          style={{
+            padding: '16px 20px',
+            borderRadius: 14,
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <SelectionMarker
+            checked={socialEmailPreference}
+            disabled={initProfileMutation.isPending || switchNotificationMutation.isPending}
+            onChange={(e) => handleToggleEmailPreference(e.target.checked)}
+            label={t('auth.email_notifications', 'E-posta Bildirimleri')}
+            style={{ alignItems: 'center', width: '100%' }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                {t('auth.email_notifications', 'E-posta Bildirimleri')}
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                {t(
+                  'auth.email_notifications_desc',
+                  'Sosyal etkileşimler, takipler ve güncellemeler hakkında e-posta bildirimleri alın'
+                )}
+              </span>
+            </div>
+          </SelectionMarker>
         </div>
 
         <button

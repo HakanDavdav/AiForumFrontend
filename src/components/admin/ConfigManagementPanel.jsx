@@ -487,11 +487,118 @@ export default function ConfigManagementPanel() {
     )
   }
 
+  const isPromptString = (key, value) => {
+    if (typeof value !== 'string') return false
+    const k = key.toLowerCase()
+    return k.includes('prompt') || k.includes('description') || value.length > 50
+  }
+
+  const renderPromptStringField = (path, key, value, level = 0) => {
+    const cardPathKey = [...path, key].join('.')
+    const isExpanded = expandedCards[cardPathKey] !== false
+    const accentColor = depthColors[level % depthColors.length]
+    const text = typeof value === 'string' ? value : ''
+    const calculatedRows = Math.max(
+      2,
+      Math.min(
+        text
+          .split('\n')
+          .reduce((acc, line) => acc + Math.max(1, Math.ceil(line.length / 80)), 0),
+        15
+      )
+    )
+
+    return (
+      <div
+        key={key}
+        style={{
+          padding: '14px 14px 14px 18px',
+          borderRadius: 'var(--radius-lg)',
+          background: level === 0 ? 'var(--color-surface-2)' : 'var(--color-surface)',
+          border: '1px solid var(--color-border-light)',
+          borderLeft: `3px solid ${accentColor}`,
+          marginBottom: 2,
+        }}
+      >
+        <div
+          className="config-card-header flex items-center gap-2 mb-2"
+          onClick={() => toggleExpand(cardPathKey)}
+        >
+          <span
+            className="config-card-title"
+            style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)' }}
+          >
+            {formatLabel(key)}
+          </span>
+          <span
+            style={{
+              fontSize: 10,
+              padding: '1px 6px',
+              borderRadius: '9999px',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            {text.length} {t('admin.chars', 'chars')}
+          </span>
+          <span
+            className="config-card-arrow"
+            style={{
+              fontSize: 12,
+              color: 'var(--color-text-muted)',
+              transform: isExpanded ? 'rotate(180deg)' : 'none',
+            }}
+          >
+            ▼
+          </span>
+        </div>
+
+        {isExpanded && (
+          <div className="flex flex-col gap-2.5" style={{ marginTop: 8 }}>
+            <div
+              style={{
+                padding: '8px 10px',
+                borderRadius: 'var(--radius-md)',
+                background: level === 0 ? 'var(--color-surface)' : 'var(--color-surface-2)',
+                border: '1px solid var(--color-border-light)',
+              }}
+            >
+              <textarea
+                className="input w-full"
+                rows={calculatedRows}
+                value={value || ''}
+                onChange={(e) => updateValueByPath([...path, key], e.target.value)}
+                style={{
+                  padding: '8px 10px',
+                  fontSize: 12.5,
+                  lineHeight: 1.45,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  display: 'block',
+                  width: '100%',
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   const renderObjectNode = (path, obj, level = 0) => {
     if (!obj || typeof obj !== 'object') return null
 
     const entries = Object.entries(obj)
-    const primitives = entries.filter(([, v]) => v !== null && typeof v !== 'object')
+    const promptStrings = entries.filter(([k, v]) => isPromptString(k, v))
+    const primitives = entries.filter(
+      ([k, v]) => v !== null && typeof v !== 'object' && !isPromptString(k, v)
+    )
     const objects = entries.filter(
       ([, v]) => v !== null && typeof v === 'object' && !Array.isArray(v)
     )
@@ -499,7 +606,7 @@ export default function ConfigManagementPanel() {
 
     return (
       <div className="flex flex-col gap-3">
-        {/* Render primitive fields in a clean flex grid */}
+        {/* Render regular primitive fields in a clean flex grid */}
         {primitives.length > 0 && (
           <div
             style={{
@@ -619,8 +726,11 @@ export default function ConfigManagementPanel() {
           )
         })}
 
-        {/* Render arrays */}
+        {/* Render array prompts */}
         {arrays.map(([k, v]) => renderArrayField(path, k, v, level))}
+
+        {/* Render single prompt string fields in the exact same prominent card layout */}
+        {promptStrings.map(([k, v]) => renderPromptStringField(path, k, v, level))}
       </div>
     )
   }

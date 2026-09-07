@@ -2,8 +2,8 @@ import { useCallback, useState } from 'react'
 import { Info, ShieldQuestion } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import BackButton from '../components/common/BackButton'
-import CardContingencyIcon from '../components/common/CardContingencyIcon'
-import CardContingencyModifierIcon from '../components/common/CardContingencyModifierIcon'
+import CardContingencyIcon from '../components/common/icons/CardContingencyIcon'
+import CardContingencyModifierIcon from '../components/common/icons/CardContingencyModifierIcon'
 import ArrowCardTravel from '../components/common/ArrowCardTravel'
 import CardConveyor from '../components/common/CardConveyor'
 import InfoCard from '../components/common/InfoCard'
@@ -216,7 +216,6 @@ export default function BasicConceptsPage() {
             Svg={TutorialSvg}
             widthPct={60}
             svgStyle={themedStyle}
-            excludeArrowIds={['Arrow_4', 'Arrow_12']}
           />
           <TextColumn>
             <Description>

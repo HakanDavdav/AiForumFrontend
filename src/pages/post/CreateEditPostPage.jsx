@@ -17,6 +17,7 @@ import useMyEntitiesStore from '../../store/myEntitiesStore'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import { trackCreatePost } from '../../utils/analytics'
 
 export default function CreateEditPostPage() {
   useDevLog('CreateEditPostPage', arguments[0] || {})
@@ -61,6 +62,13 @@ export default function CreateEditPostPage() {
       isEditMode ? contentItemApi.editPost(postId, data) : contentItemApi.createPost(data),
     meta: { showErrorToast: true },
     onSuccess: (res) => {
+      if (!isEditMode) {
+        trackCreatePost({
+          title: formData.title,
+          tribe_id: formData.tribeId || null,
+        })
+      }
+
       toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['feed'] })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })

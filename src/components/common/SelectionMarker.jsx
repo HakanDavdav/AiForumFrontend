@@ -8,6 +8,8 @@ export default function SelectionMarker({
   children,
   size = 'md',
   locked = false,
+  className = '',
+  style,
 }) {
   const marker = (
     <span
@@ -22,9 +24,10 @@ export default function SelectionMarker({
   if (typeof onChange !== 'function') {
     return (
       <span
-        className="selection-marker-display"
+        className={`selection-marker-display${className ? ` ${className}` : ''}`}
         role={label ? 'img' : undefined}
         aria-label={label}
+        style={style}
       >
         {marker}
       </span>
@@ -32,7 +35,10 @@ export default function SelectionMarker({
   }
 
   return (
-    <label className={`selection-control${disabled ? ' is-disabled' : ''}`}>
+    <label
+      className={`selection-control${disabled ? ' is-disabled' : ''}${className ? ` ${className}` : ''}`}
+      style={style}
+    >
       <input
         type="checkbox"
         checked={checked}

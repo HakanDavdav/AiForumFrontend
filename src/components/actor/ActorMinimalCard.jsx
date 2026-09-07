@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Network, Edit2, Brain } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import SelectionMarker from '../common/SelectionMarker'
 import PremiumModal from '../common/PremiumModal'
 import ModifierArrowSvg from '../../assets/FigmaNew/modifierarrow.svg?react'
+import CardIcon from '../common/icons/CardIcon'
 
 /**
  * ActorMinimalCard — avatar + isim, hierarchy button, selection support.
@@ -42,6 +43,37 @@ export default function ActorMinimalCard({
   const [isPremiumOpen, setIsPremiumOpen] = useState(false)
 
   const myBots = useMyEntitiesStore((s) => s.myBots)
+  const myCards = useMyEntitiesStore((s) => s.myCards)
+
+  // Matching personality cards between current actor and logged-in user
+  const matchingCardsCount = useMemo(() => {
+    if (!isLoggedIn || !myCards?.length || !actor) return 0
+
+    const rawAssigned = [
+      ...(actor.assignedCardIds || actor.AssignedCardIds || []),
+      ...(actor.assignedCards || actor.AssignedCards || []).map((c) => c?.cardId || c?.CardId || c),
+    ]
+    if (!rawAssigned.length) return 0
+
+    const assignedIds = rawAssigned
+      .map((c) => (typeof c === 'string' ? c : c?.cardId || c?.CardId || c?.id || c?.Id))
+      .filter(Boolean)
+
+    if (!assignedIds.length) return 0
+
+    const myCardIds = myCards
+      .map((c) => (typeof c === 'string' ? c : c?.cardId || c?.CardId || c?.id || c?.Id))
+      .filter(Boolean)
+
+    if (!myCardIds.length) return 0
+
+    const matches = assignedIds.filter((aId) =>
+      myCardIds.some((mId) => mId.toLowerCase() === aId.toLowerCase())
+    )
+    return matches.length
+  }, [isLoggedIn, myCards, actor])
+
+  const visibleCardsCount = Math.min(matchingCardsCount, 5)
 
   if (!actor) return null
 
@@ -81,7 +113,7 @@ export default function ActorMinimalCard({
   const handleMindClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate('/mind?actorId=' + actor.actorId)
+    navigate('/mind?actorId=' + actor.actorId, { state: { profileName: actor.profileName } })
   }
 
   const handleEditClick = (e) => {
@@ -103,16 +135,17 @@ export default function ActorMinimalCard({
     selectable ||
     Boolean(children)
 
-  return (
-    <>
+  const chipContent = (
     <div
       className={`actor-chip flex items-center gap-1${selectable ? ' actor-chip--selectable' : ''}${selected ? ' actor-chip--selected' : ''}`}
       onClick={selectable ? handleActorClick : undefined}
       style={{
+        position: 'relative',
+        zIndex: 2,
         width: selectable ? '100%' : undefined,
         maxWidth: '100%',
         justifyContent: selectable ? 'space-between' : undefined,
-        paddingRight: hasExtraElements ? (selectable ? 8 : 4) : undefined,
+        paddingRight: matchingCardsCount > 0 ? (selectable ? 15 : 13) : (hasExtraElements ? (selectable ? 8 : 4) : undefined),
         paddingLeft: selectable ? 6 : undefined,
         cursor: selectable ? (disabled ? 'not-allowed' : 'pointer') : undefined,
         border: selectable && selected ? '1.5px solid var(--color-primary)' : undefined,
@@ -134,6 +167,7 @@ export default function ActorMinimalCard({
           cursor: clickable || selectable ? 'pointer' : 'default',
           flex: 1,
           minWidth: 0,
+          marginRight: hasExtraElements || matchingCardsCount > 0 ? 15 : 0,
         }}
       >
         <ActorAvatar
@@ -290,7 +324,63 @@ export default function ActorMinimalCard({
         </div>
       )}
       {children}
+      {matchingCardsCount > 0 && (
+        <div
+          className="actor-chip-card-stack"
+          title={t('card.matching_cards_assigned', {
+            count: matchingCardsCount,
+            defaultValue: `${matchingCardsCount} adet kişisel kartınız bu botta takılı`,
+          })}
+          onClick={clickable && !selectable ? handleActorClick : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            flexShrink: 0,
+            marginLeft: 8,
+            cursor: clickable && !selectable ? 'pointer' : 'default',
+            pointerEvents: clickable && !selectable ? 'auto' : 'none',
+          }}
+        >
+          {Array.from({ length: visibleCardsCount }).map((_, idx) => (
+            <span
+              key={idx}
+              className="actor-chip-card-item"
+              style={{
+                position: 'relative',
+                marginLeft: idx === 0 ? 0 : -10,
+                zIndex: idx + 1,
+              }}
+            >
+              <CardIcon crowned width={21} height={24} style={{ display: 'block' }} />
+            </span>
+          ))}
+        </div>
+      )}
     </div>
+  )
+
+  return (
+    <>
+      {matchingCardsCount > 0 ? (
+        <div
+          className={`actor-chip-wrapper${selectable ? ' actor-chip-wrapper--selectable' : ''}`}
+          style={{
+            position: 'relative',
+            display: selectable || chipStyle?.width === '100%' ? 'flex' : 'inline-flex',
+            alignItems: 'center',
+            verticalAlign: 'middle',
+            maxWidth: chipStyle?.maxWidth || '100%',
+            width: selectable || chipStyle?.width === '100%' ? '100%' : (chipStyle?.width || undefined),
+            minWidth: chipStyle?.minWidth || undefined,
+            flexShrink: chipStyle?.flexShrink !== undefined ? chipStyle.flexShrink : undefined,
+            flex: chipStyle?.flex !== undefined ? chipStyle.flex : undefined,
+          }}
+        >
+          {chipContent}
+        </div>
+      ) : (
+        chipContent
+      )}
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </>
   )

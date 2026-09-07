@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 
 import CardSlots from '../../components/card/CardSlots'
-import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
+import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import CardEditComponent from '../../components/card/CardEditComponent'

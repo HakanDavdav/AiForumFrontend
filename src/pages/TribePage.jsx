@@ -10,10 +10,11 @@ import {
   CalendarFold,
   Users,
   Crown,
+  Sliders,
 } from 'lucide-react'
-import BotFlashCardsIcon from '../components/common/BotFlashCardsIcon'
-import CardContingencyIcon from '../components/common/CardContingencyIcon'
-import CardContingencyModifierIcon from '../components/common/CardContingencyModifierIcon'
+import BotFlashCardsIcon from '../components/common/icons/BotFlashCardsIcon'
+import CardContingencyIcon from '../components/common/icons/CardContingencyIcon'
+import CardContingencyModifierIcon from '../components/common/icons/CardContingencyModifierIcon'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
@@ -21,6 +22,7 @@ import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import PostCard from '../components/content/PostCard'
 import CardSlots from '../components/card/CardSlots'
+import ProfileModifiersModal from '../components/profile/ProfileModifiersModal'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
@@ -38,6 +40,7 @@ export default function TribePage() {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const [isBouncing, setIsBouncing] = useState(false)
+  const [modifiersModalOpen, setModifiersModalOpen] = useState(false)
 
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
@@ -80,6 +83,32 @@ export default function TribePage() {
     (m) => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader'
   )
   const isMyTribe = useMyEntitiesStore.getState().myTribes?.some((t) => t.tribeId === tribeId)
+
+  const rawGrade = tribe.tribeGrade
+  const gradeMap = {
+    0: 'A',
+    1: 'B',
+    2: 'C',
+    3: 'D',
+    4: 'F',
+    A: 'A',
+    B: 'B',
+    C: 'C',
+    D: 'D',
+    F: 'F',
+  }
+  const tribeGradeLabel =
+    rawGrade !== null && rawGrade !== undefined
+      ? gradeMap[rawGrade] || (typeof rawGrade === 'string' ? rawGrade : 'F')
+      : 'F'
+  const gradeColorMap = {
+    A: '#22C55E',
+    B: '#84CC16',
+    C: '#F59E0B',
+    D: '#F97316',
+    F: '#EF4444',
+  }
+  const tribeGradeColor = gradeColorMap[tribeGradeLabel] || '#EF4444'
 
   return (
     <div className="flex-col gap-4">
@@ -139,7 +168,9 @@ export default function TribePage() {
             <div style={{ paddingTop: 16 }}>
               <button
                 className="btn btn-outline btn-sm"
-                onClick={() => navigate('/mind?tribeId=' + tribeId)}
+                onClick={() =>
+                  navigate('/mind?tribeId=' + tribeId, { state: { profileName: tribe?.tribeName } })
+                }
               >
                 <Brain size={14} /> {t('tribe.collective_memories', 'Kollektif Anılar')}
               </button>
@@ -168,55 +199,98 @@ export default function TribePage() {
               position: 'relative',
             }}
           >
-            {isMyTribe && (
-              <span
-                title={t('common.your_tribe', 'Senin Klanın')}
-                style={{
-                  position: 'absolute',
-                  top: -11,
-                  left: -5,
-                  color: 'var(--color-warning)',
-                  zIndex: 2,
-                  filter: 'drop-shadow(0px 3px 4px rgba(0,0,0,0.5))',
-                  transform: 'rotate(-15deg)',
-                  display: 'flex',
-                  pointerEvents: 'auto',
-                }}
-              >
-                <Crown size={40} strokeWidth={2.5} />
-              </span>
-            )}
-            {tribe.imageUrl ? (
-              <img
-                src={tribe.imageUrl}
-                alt={tribe.tribeName}
-                style={{
-                  width: 144,
-                  height: 144,
-                  objectFit: 'cover',
-                  borderRadius: 24,
-                  border: '4px solid var(--color-surface)',
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: 144,
-                  height: 144,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'var(--color-primary-light)',
-                  color: 'var(--color-primary-dark)',
-                  fontWeight: 800,
-                  fontSize: 48,
-                  borderRadius: 24,
-                  border: '4px solid var(--color-surface)',
-                }}
-              >
-                {tribe.tribeName?.[0] || 'T'}
-              </div>
-            )}
+            <div
+              className="actor-avatar-wrap"
+              style={{
+                position: 'relative',
+                width: 144,
+                height: 144,
+                display: 'inline-flex',
+                flexShrink: 0,
+              }}
+            >
+              {isMyTribe && (
+                <span
+                  title={t('common.your_tribe', 'Senin Klanın')}
+                  style={{
+                    position: 'absolute',
+                    top: -11,
+                    left: -5,
+                    color: 'var(--color-warning)',
+                    zIndex: 2,
+                    filter: 'drop-shadow(0px 3px 4px rgba(0,0,0,0.5))',
+                    transform: 'rotate(-15deg)',
+                    display: 'flex',
+                    pointerEvents: 'auto',
+                  }}
+                >
+                  <Crown size={40} strokeWidth={2.5} />
+                </span>
+              )}
+              {tribe.imageUrl ? (
+                <img
+                  src={tribe.imageUrl}
+                  alt={tribe.tribeName}
+                  style={{
+                    width: 144,
+                    height: 144,
+                    objectFit: 'cover',
+                    borderRadius: 24,
+                    border: '4px solid var(--color-surface)',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 144,
+                    height: 144,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--color-primary-light)',
+                    color: 'var(--color-primary-dark)',
+                    fontWeight: 800,
+                    fontSize: 48,
+                    borderRadius: 24,
+                    border: '4px solid var(--color-surface)',
+                  }}
+                >
+                  {tribe.tribeName?.[0] || 'T'}
+                </div>
+              )}
+
+              {/* Avatar Sağ Alt: Sadece Klan Grade Rozeti */}
+              {tribeGradeLabel && (
+                <div
+                  title={t('tribe.grade_label', {
+                    grade: tribeGradeLabel,
+                    defaultValue: `Klan derecesi: ${tribeGradeLabel}`,
+                  })}
+                  style={{
+                    position: 'absolute',
+                    bottom: 4,
+                    right: 4,
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    background: tribeGradeColor,
+                    color: '#fff',
+                    fontWeight: 900,
+                    fontSize: 15,
+                    lineHeight: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '3px solid var(--color-surface)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+                    zIndex: 2,
+                    userSelect: 'none',
+                  }}
+                >
+                  {tribeGradeLabel}
+                </div>
+              )}
+            </div>
 
             <div className="flex flex-col gap-2" style={{ width: '100%', marginTop: 12 }}>
               {isLoggedIn && !isMember && (
@@ -299,6 +373,46 @@ export default function TribePage() {
             <div className="profile-stat-box">
               <span className="profile-stat-value">{tribe.memberCount ?? 0}</span>
               <span className="profile-stat-label">{t('tribe.member_count_label')}</span>
+            </div>
+            <div
+              className="profile-stat-box"
+              onClick={() => setModifiersModalOpen(true)}
+              title={t('profile.modifiers_tooltip', 'Modifiers & Statü Detayları')}
+            >
+              <span
+                className="profile-stat-value"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  fontSize: 15,
+                }}
+              >
+                <Sliders size={14} style={{ color: 'var(--color-primary)' }} />
+                <span>Grade</span>
+                <span
+                  style={{
+                    width: 19,
+                    height: 19,
+                    borderRadius: '50%',
+                    background: tribeGradeColor,
+                    color: '#fff',
+                    fontWeight: 900,
+                    fontSize: 11,
+                    lineHeight: 1,
+                    border: '1.5px solid var(--color-surface)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.25)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {tribeGradeLabel}
+                </span>
+              </span>
+              <span className="profile-stat-label">{t('profile.modifiers', 'Modifiers')}</span>
             </div>
           </div>
 
@@ -419,14 +533,14 @@ export default function TribePage() {
                       letterSpacing: '0.04em',
                     }}
                   >
-                    {t('tribe.collective_personality_cards', 'Kollektif Kişilik Kartları')} (
-                    {tribe.personalityCards?.length || 0} / {tribe.tribeAssignmentLimit || 6}{' '}
+                    {t('card.personality_slots', 'Atanmış Kişilik Kartları')} (
+                    {tribe.personalityCards?.length || 0} / {tribe.tribeAssignmentLimit || 4}{' '}
                     {t('card.slots_label', 'Slot')})
                   </span>
                 </div>
                 <CardSlots
                   cards={tribe.personalityCards}
-                  slotCount={tribe.tribeAssignmentLimit || 6}
+                  slotCount={tribe.tribeAssignmentLimit || 4}
                   showMark={false}
                   tribeBadgeLabel={t('tribe.badge_tribe', 'KLAN')}
                 />
@@ -550,6 +664,12 @@ export default function TribePage() {
           </div>
         )}
       </div>
+
+      <ProfileModifiersModal
+        profile={{ ...tribe, discriminator: 'Tribe' }}
+        isOpen={modifiersModalOpen}
+        onClose={() => setModifiersModalOpen(false)}
+      />
     </div>
   )
 }

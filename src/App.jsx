@@ -25,6 +25,7 @@ import CreateTribePage from './pages/tribe/CreateTribePage'
 import CreateEditPostPage from './pages/post/CreateEditPostPage'
 import PersonalityCardPage from './pages/card/PersonalityCardPage'
 import MarketplacePage from './pages/card/MarketplacePage'
+import PersonalityCardHierarchyPage from './pages/card/PersonalityCardHierarchyPage'
 import HierarchyPage from './pages/HierarchyPage'
 import BasicConceptsPage from './pages/BasicConceptsPage'
 import TribesPage from './pages/TribesPage'
@@ -40,7 +41,8 @@ import DebateTranscriptPage from './pages/debate/DebateTranscriptPage'
 import InvitationModal from './components/debate/InvitationModal'
 import { useInvitationHub } from './hooks/useInvitationHub'
 
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { initGA, trackPageView } from './utils/analytics'
 
 const AdminApp = import.meta.env.VITE_IS_ADMIN_BUILD === 'true'
   ? lazy(() => import('./AdminApp'))
@@ -50,6 +52,15 @@ export default function App() {
   const { t: translate } = useTranslation()
   const { isDarkMode, isGreenMode } = useThemeStore()
   const { incomingInvitation, closeInvitation } = useInvitationHub()
+  const location = useLocation()
+
+  useEffect(() => {
+    initGA()
+  }, [])
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
 
   useEffect(() => {
     if (isDarkMode) {
@@ -146,6 +157,7 @@ export default function App() {
             <Route path="/init-profile" element={<InitProfilePage />} />
             <Route path="/account-settings" element={<AccountSettingsPage />} />
             <Route path="/hierarchy" element={<HierarchyPage />} />
+            <Route path="/card-hierarchy" element={<PersonalityCardHierarchyPage />} />
             <Route path="/basic-concepts" element={<BasicConceptsPage />} />
             <Route path="/mind" element={<MindPage />} />
             <Route path="/cards" element={<PersonalityCardPage />} />

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-hot-toast'
 import { Swords, Check, X, ShieldAlert, User, Timer } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
+import { trackDebate } from '../../utils/analytics'
 
 export default function InvitationModal({ invitation, onClose }) {
   const { t } = useTranslation()
@@ -45,6 +46,7 @@ export default function InvitationModal({ invitation, onClose }) {
     try {
       setLoading(true)
       await actorApi.acceptDebate(invitation.debateId)
+      trackDebate('accept_challenge', { debate_id: invitation.debateId })
       toast.success(t('debate.invitation_accepted', 'Münazara kabul edildi! Arenaya aktarılıyorsunuz...'))
       onClose()
       navigate(`/debate?id=${invitation.debateId}`, {

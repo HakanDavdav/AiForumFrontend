@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { identityApi } from '../../api/identityApi'
 import useAuthStore from '../../store/authStore'
@@ -8,8 +8,9 @@ import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import { signInWithPopup } from 'firebase/auth'
 import { auth, googleProvider, microsoftProvider } from '../../config/firebase'
+import { trackLogin } from '../../utils/analytics'
 
-import Logo from '../../components/common/Logo'
+import Logo from '../../components/common/icons/Logo'
 import SelectionMarker from '../../components/common/SelectionMarker'
 import PasswordInput from '../../components/common/PasswordInput'
 import AuthWelcomeBackground from '../../components/auth/AuthWelcomeBackground'
@@ -31,6 +32,7 @@ export default function LoginPage() {
   const [twoFactorToken, setTwoFactorToken] = useState('')
   const [tempUserId, setTempUserId] = useState(null)
   const { t } = useTranslation()
+  const providerRef = useRef('google')
 
   const loginMutation = useMutation({
     mutationFn: (data) => identityApi.login(data),
@@ -42,6 +44,7 @@ export default function LoginPage() {
       const isAdmin = res.data?.data?.isAdmin
 
       if (actorId) {
+         trackLogin('password')
          setAuth(actorId, isProfileCreated, false, isAdmin)
          queryClient.invalidateQueries()
          if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
@@ -68,6 +71,7 @@ export default function LoginPage() {
       const isAdmin = res.data?.data?.isAdmin
 
       if (actorId) {
+         trackLogin('two_factor')
          setAuth(actorId, isProfileCreated, false, isAdmin)
          queryClient.invalidateQueries()
          if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
@@ -90,6 +94,7 @@ export default function LoginPage() {
       const isAdmin = res.data?.data?.isAdmin
 
       if (actorId) {
+         trackLogin(providerRef.current)
          setAuth(actorId, isProfileCreated, true, isAdmin)
          queryClient.invalidateQueries()
          if (isAdmin && import.meta.env.VITE_IS_ADMIN_BUILD === 'true') {
@@ -103,8 +108,9 @@ export default function LoginPage() {
     }
   })
 
-  const handleProviderLogin = async (provider) => {
+  const handleProviderLogin = async (provider, providerName = 'google') => {
     try {
+      providerRef.current = providerName
       const result = await signInWithPopup(auth, provider)
       const idToken = await result.user.getIdToken()
       firebaseLoginMutation.mutate({ idToken })
@@ -267,7 +273,7 @@ export default function LoginPage() {
             style={{ background: '#fff', color: '#757575', border: '1px solid #ddd', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             type="button"
             disabled={firebaseLoginMutation.isPending}
-            onClick={() => handleProviderLogin(googleProvider)}
+            onClick={() => handleProviderLogin(googleProvider, 'google')}
           >
             <svg width="18" height="18" viewBox="0 0 48 48" style={{ marginRight: 8 }}>
               <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
@@ -283,7 +289,7 @@ export default function LoginPage() {
             style={{ background: '#2F2F2F', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             type="button"
             disabled={firebaseLoginMutation.isPending}
-            onClick={() => handleProviderLogin(microsoftProvider)}
+            onClick={() => handleProviderLogin(microsoftProvider, 'microsoft')}
           >
             <svg width="18" height="18" viewBox="0 0 21 21" style={{ marginRight: 8 }}>
               <path fill="#f25022" d="M1 1h9v9H1z"/>

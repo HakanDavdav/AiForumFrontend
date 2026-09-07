@@ -28,9 +28,16 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
   useEffect(() => {
     if (!card) return
     const innerCardData = card.card || card.originalCard || card
-    const innerIsCreator = card.acquisitionType === 0 || innerCardData.acquisitionType === 0
-    const assignedBots = card.assignedBots || innerCardData.assignedBots || []
-    const assignedBotIds = assignedBots.map((b) => b.actorId || b.id).filter(Boolean)
+    const rawAssignments = Array.isArray(card.assignments)
+      ? card.assignments
+      : Array.isArray(innerCardData.assignments)
+        ? innerCardData.assignments
+        : []
+    const assignedBots =
+      card.assignedBots ||
+      innerCardData.assignedBots ||
+      rawAssignments.map((a) => a.bot).filter(Boolean)
+    const assignedBotIds = assignedBots.map((b) => b.actorId || b.id || b.botId).filter(Boolean)
 
     setEditFormData({
       cardName: innerCardData.cardName || card.cardName || '',

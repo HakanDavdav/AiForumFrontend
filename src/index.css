@@ -123,7 +123,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-
 /* Personality card deck */
 .personality-card-slots {
   --personality-card-width: clamp(144px, 17vw, 190px);
@@ -1418,8 +1417,8 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-xs);
@@ -1952,15 +1951,42 @@ select {
   color: white;
 }
 
+.hierarchy-viewport {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.hierarchy-viewport::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* %%% Vertical Top-Down Hierarchy Tree %%% */
 .hierarchy-tree-container {
   width: 100%;
   display: flex;
   justify-content: center;
-  overflow-x: auto;
+  overflow: visible;
   padding: 24px 16px;
   box-sizing: border-box;
   font-family: inherit;
+  zoom: 0.82;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.hierarchy-tree-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+@supports not (zoom: 1) {
+  .hierarchy-tree-container {
+    transform: scale(0.82);
+    transform-origin: top center;
+  }
 }
 
 .vtree-node {
@@ -1990,7 +2016,9 @@ select {
   padding: 0;
   margin-top: 4px;
   z-index: 3;
-  transition: transform 0.15s ease, color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
 }
 
 .vtree-toggle-btn:hover:not(:disabled) {
@@ -2009,7 +2037,7 @@ select {
 .vtree-stem-down {
   width: 2px;
   height: 24px;
-  background: var(--color-border);
+  background: transparent;
 }
 
 .vtree-children-row {
@@ -2026,36 +2054,89 @@ select {
   position: relative;
 }
 
-/* Horizontal connecting bar between siblings */
+/* Horizontal connecting bar between siblings - now handled by SVG overlay */
 .vtree-child-branch::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  height: 2px;
-  background: var(--color-border);
-  width: 100%;
-  left: 0;
-}
-
-/* Branch line caps */
-.vtree-child-branch:first-child::before {
-  left: 50%;
-  width: 50%;
-}
-
-.vtree-child-branch:last-child::before {
-  left: 0;
-  width: 50%;
-}
-
-.vtree-child-branch:only-child::before {
-  display: none;
+  display: none !important;
 }
 
 .vtree-branch-line {
   width: 2px;
   height: 24px;
-  background: var(--color-border);
+  background: transparent;
+}
+
+/* Global SVG Connection & Card Travel Overlay */
+.hierarchy-connections-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.hierarchy-connections-svg {
+  display: block;
+  overflow: visible;
+}
+
+@keyframes heartBeat {
+  0%,
+  30%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.35);
+  }
+  45% {
+    transform: scale(1.12);
+  }
+}
+
+/* Tribe altındaki bot ikonları (Hiyerarşi Ağacı - Sol dizilimli & Mavi/Yeşil tema uyumlu) */
+.vtree-tribe-bots {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 10px;
+  margin-top: 2px;
+}
+
+.vtree-tribe-bot-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+}
+
+.vtree-tribe-bot-stem {
+  width: 2px;
+  height: 10px;
+  background: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+}
+
+.vtree-tribe-bot-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
+  border: 1.5px solid color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
+  color: var(--color-primary);
+  box-shadow: 0 2px 8px var(--color-primary-shadow);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.vtree-tribe-bot-icon:hover {
+  transform: translateY(-2px) scale(1.06);
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 18%, var(--color-surface));
+  box-shadow: 0 4px 14px var(--color-primary-shadow);
 }
 
 /* %%% Premium Minimal Cards %%% */
@@ -2081,6 +2162,61 @@ select {
   border-color: var(--color-primary-light);
   background: var(--color-bg);
   z-index: 2;
+}
+
+/* Actor Chip Personality Card Stack Indicator */
+.actor-chip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.actor-chip-wrapper--selectable {
+  display: flex;
+  width: 100%;
+}
+
+.actor-chip-card-stack {
+  transition: transform var(--transition-fast) ease;
+}
+
+.actor-chip-wrapper:hover .actor-chip-card-stack {
+  transform: translateY(-2px);
+}
+
+.actor-chip-wrapper:hover .actor-chip {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary-light);
+  background: var(--color-bg);
+  z-index: 2;
+}
+
+.actor-chip-card-item {
+  transition: transform var(--transition-fast) ease;
+  filter: drop-shadow(0 -1.5px 2px rgba(0, 0, 0, 0.12));
+}
+
+.actor-chip-card-item:hover {
+  transform: translateY(-1px);
+}
+
+.actor-chip-card-item svg {
+  display: block;
+  overflow: visible;
+}
+
+.actor-chip-card-item svg #CardWrapper,
+.actor-chip-card-item svg path:first-of-type {
+  fill: var(--color-surface);
+  transition: fill var(--transition-fast) ease;
+}
+
+.actor-chip-wrapper:hover .actor-chip-card-item svg #CardWrapper,
+.actor-chip-wrapper:hover .actor-chip-card-item svg path:first-of-type {
+  fill: var(--color-bg);
 }
 
 .actor-chip--selectable {
@@ -2402,7 +2538,7 @@ select {
   opacity: 0.8;
 }
 
-/* â”€â”€â”€ Premium Post Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Post Card ───────────────────────────────────────────────────────── */
 .post-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -2631,6 +2767,35 @@ select {
   border-color: #0f172a !important;
 }
 
+.actor-chip-premium-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast) ease;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
+}
+
+.actor-chip-premium-btn path {
+  stroke: currentColor;
+  stroke-width: 9;
+}
+
+.actor-chip-premium-btn:hover {
+  background: var(--color-warning);
+  color: #000;
+  border-color: var(--color-warning);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-warning) 45%, transparent);
+}
+
 /* â”€â”€â”€ Leaderboard List Items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .lb-card {
   display: flex;
@@ -2667,7 +2832,49 @@ select {
   white-space: nowrap;
 }
 
-/* lb-card iÃ§indeki minimal kartlarÄ±n kendi border/hover efektlerini iptal et */
+.profile-premium-btn.btn:hover {
+  background: color-mix(in srgb, var(--color-warning) 88%, #fff);
+  border-color: #000;
+  color: #fff;
+  transform: translateY(-2px) scale(1.06);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-warning) 50%, transparent);
+}
+
+/* Profile tema butonları — premium yoksa üstü çizili (kilitli) görsel efekt */
+.profile-theme-btn--locked {
+  position: relative;
+}
+
+.profile-theme-btn--locked > svg {
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
+}
+
+.profile-theme-btn--locked:hover > svg {
+  opacity: 0.9;
+}
+
+.profile-theme-btn--locked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 2px;
+  background: var(--color-warning);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 0 3px color-mix(in srgb, var(--color-warning) 60%, transparent);
+  transition: all 0.2s ease;
+}
+
+.profile-theme-btn--locked:hover::after {
+  background: color-mix(in srgb, var(--color-warning) 88%, #fff);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--color-warning) 80%, transparent);
+}
+
+/* lb-card içindeki minimal kartların kendi border/hover efektlerini iptal et */
 .lb-card .actor-chip,
 .lb-card .tribe-card {
   background: transparent !important;
@@ -2683,7 +2890,7 @@ select {
   box-shadow: none !important;
 }
 
-/* â”€â”€â”€ Profile Page & Tribe Page Headers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ──────────────────────────────────────────────────────── */
 .profile-header-card {
   position: relative;
   background: var(--color-bg);
@@ -2697,10 +2904,26 @@ select {
   transition: all var(--transition-base) ease;
 }
 
-/* Ambient bot / welcome arka planı: kart içeriğini üstte tut */
-.profile-header-card > *:not(.ambient-bots):not(.welcome-ambience) {
+/* Ambient bot / welcome / mind arka planı: kart içeriğini üstte tut */
+.profile-header-card > *:not(.ambient-bots):not(.welcome-ambience):not(.mind-ambience) {
   position: relative;
   z-index: 1;
+}
+
+.profile-header-card > .ambient-bots,
+.profile-header-card > .welcome-ambience,
+.profile-header-card > .mind-ambience {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 350px;
+  overflow: hidden;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
 :root.dark .profile-header-card {
@@ -2937,27 +3160,29 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
+  width: 50px;
   height: 28px;
   border-radius: var(--radius-full);
-  background: var(--color-warning);
-  border: 2px solid #000;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all var(--transition-fast) ease;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-warning) 45%, transparent);
+  box-shadow: var(--shadow-xs);
 }
 
 .actor-chip-premium-btn path {
+  stroke: currentColor;
   stroke-width: 9;
 }
 
 .actor-chip-premium-btn:hover {
-  background: color-mix(in srgb, var(--color-warning) 88%, #fff);
-  border-color: #000;
-  transform: translateY(-2px) scale(1.08);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-warning) 50%, transparent);
+  background: var(--color-warning);
+  color: #000;
+  border-color: var(--color-warning);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-warning) 45%, transparent);
 }
 
 /* Profile premium butonu — taç sarısı, yanındakilerle aynı temel tasarım */
@@ -2965,6 +3190,8 @@ textarea {
   background: var(--color-warning);
   border-color: #000;
   color: #fff;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 .profile-premium-btn.btn:hover {
@@ -2975,7 +3202,30 @@ textarea {
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-warning) 50%, transparent);
 }
 
+/* BletchlyGuideModal kart ikon kutusu */
+.guide-icon-box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-primary);
+  transition: all 0.2s ease;
+}
+
+/* Premium kart veya ikon hover olunca sarı renge bürünmesi */
+.guide-card-premium:hover .guide-icon-box--premium,
+.guide-icon-box--premium:hover {
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  color: #000;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-warning) 45%, transparent);
+}
+
+.guide-card-premium:hover {
+  border-color: var(--color-warning);
+}
+
 /* BletchlyGuideModal Premium kart ikonu — kalin */
 .guide-premium-icon path {
+  stroke: currentColor;
   stroke-width: 12;
+  transition: stroke 0.2s ease;
 }

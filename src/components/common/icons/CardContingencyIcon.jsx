@@ -1,6 +1,6 @@
-import CardContigencyModifierSvg from '../../assets/FigmaNew/CardContigencyModifier.svg?react'
+import CardContigencySvg from '../../../assets/FigmaNew/CardContigency.svg?react'
 
-export default function CardContingencyModifierIcon({
+export default function CardContingencyIcon({
   size = 16,
   color,
   className,
@@ -8,10 +8,10 @@ export default function CardContingencyModifierIcon({
   ...props
 }) {
   const renderedWidth = typeof size === 'number' ? Math.round(size * 1.2) : size
-  const renderedHeight = Math.round(renderedWidth * (248 / 297))
+  const renderedHeight = Math.round(renderedWidth * (248 / 166))
 
   return (
-    <CardContigencyModifierSvg
+    <CardContigencySvg
       width={renderedWidth}
       height={renderedHeight}
       className={className}

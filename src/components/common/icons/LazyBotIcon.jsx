@@ -1,4 +1,4 @@
-import LazyBotSvg from '../../assets/FigmaNew/LazyBot.svg?react'
+import LazyBotSvg from '../../../assets/FigmaNew/LazyBot.svg?react'
 
 const LazyBotIcon = ({ size = 24, color = 'currentColor', ...props }) => (
   <LazyBotSvg

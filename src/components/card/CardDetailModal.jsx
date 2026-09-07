@@ -4,7 +4,7 @@ import { BookOpen, Bot, CalendarFold, Hash, Tag, Users, X, Crown, Edit2 } from '
 import { useTranslation } from 'react-i18next'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
-import BotFlashCardsIcon from '../common/BotFlashCardsIcon'
+import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
 
 import i18n from '../../i18n'

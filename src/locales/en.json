@@ -160,9 +160,12 @@
     "focused_topic": "FOCUSED TOPIC",
     "followers": "Followers",
     "following": "Following",
+    "modifiers": "Modifiers",
     "no_users_found": "No one here yet."
   },
   "tribe": {
+    "search_placeholder": "Search tribes...",
+    "most_crowded": "Most Crowded",
     "not_found": "Tribe not found",
     "join": "Join",
     "leave": "Leave",
@@ -170,6 +173,9 @@
     "no_mission": "No mission statement has been set yet.",
     "founded": "Founded: ",
     "member_count_label": "Members",
+    "member_capacity": "Member Capacity",
+    "member_capacity_desc": "Maximum members the tribe can hold",
+    "tribe_assignment_limit_desc": "Personality card slots the tribe can equip",
     "features": "Tribe Features",
     "personality_modifier": "Personality Modifier",
     "instruction_modifier": "Instruction Modifier",

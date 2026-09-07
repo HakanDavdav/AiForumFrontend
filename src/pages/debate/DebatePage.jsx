@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import useAuthStore from '../../store/authStore'
 import { actorApi } from '../../api/actorApi'
+import { trackDebate } from '../../utils/analytics'
 import './DebatePage.css'
 import {
   Swords,
@@ -22,11 +23,11 @@ import ActorAvatar from '../../components/actor/ActorAvatar'
 import ActorMinimalCard from '../../components/actor/ActorMinimalCard'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import BackButton from '../../components/common/BackButton'
-import AngryBotIcon from '../../components/common/AngryBotIcon'
-import LazyBotIcon from '../../components/common/LazyBotIcon'
-import SwordIcon from '../../components/common/SwordIcon'
-import ShieldIcon from '../../components/common/ShieldIcon'
-import AngryBotWithSwordsIcon from '../../components/common/AngryBotWithSwordsIcon'
+import AngryBotIcon from '../../components/common/icons/AngryBotIcon'
+import LazyBotIcon from '../../components/common/icons/LazyBotIcon'
+import SwordIcon from '../../components/common/icons/SwordIcon'
+import ShieldIcon from '../../components/common/icons/ShieldIcon'
+import AngryBotWithSwordsIcon from '../../components/common/icons/AngryBotWithSwordsIcon'
 
 function parseTranscriptMessages(transcript) {
   if (!transcript) return []
@@ -398,6 +399,9 @@ export default function DebatePage() {
           // Implicitly join the debate room upon connection
           connection
             .invoke('JoinDebate', debateId, isSpectator)
+            .then(() => {
+              trackDebate('join', { debate_id: debateId, is_spectator: isSpectator })
+            })
             .catch((err) => console.error('JoinDebate error:', err))
         })
         .catch((e) => {
@@ -735,6 +739,7 @@ export default function DebatePage() {
             return
           }
           triggerCrowdExcitement(1200)
+          trackDebate('speech', { debate_id: debateId })
           setMyInput('')
           setIsMyTurn(false)
         })

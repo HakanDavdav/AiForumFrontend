@@ -3,6 +3,18 @@ import api from './axios'
 // ─── Tribe API ────────────────────────────────────────────────────────────────
 
 export const tribeApi = {
+  loadTribes: (page = 1, query = '', orderType = '', startDate = null, endDate = null) => {
+    return api.get('/tribe/load', {
+      params: {
+        page,
+        query: query || undefined,
+        orderType: orderType || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+      },
+    })
+  },
+
   getTribe: (tribeId) =>
     api.get(`/tribe/${tribeId}`),
 

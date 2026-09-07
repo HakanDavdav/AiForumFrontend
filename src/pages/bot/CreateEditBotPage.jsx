@@ -15,8 +15,9 @@ import SelectionMarker from '../../components/common/SelectionMarker'
 import CardSelectionSlots from '../../components/card/CardSelectionSlots'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
-import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
+import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import AvatarUpload from '../../components/common/AvatarUpload'
+import { trackCreateBot } from '../../utils/analytics'
 
 const RANDOM_BOT_NAMES = ['GigaChad', 'Nietzsche', 'Doge', 'Kitty']
 
@@ -168,6 +169,13 @@ export default function CreateEditBotPage() {
           ? res.data?.data
           : res.data?.data?.actorId
 
+      if (!isEditMode) {
+        trackCreateBot({
+          bot_id: newBotId,
+          name: formData.profileName,
+        })
+      }
+
       toast.success(t('common.success', 'Başarılı'), { duration: 3000 })
       queryClient.invalidateQueries({ queryKey: ['myBots'] })
       queryClient.invalidateQueries({ queryKey: ['actorProfile'] })
@@ -208,6 +216,11 @@ export default function CreateEditBotPage() {
 
     if (!canSubmit) {
       setHasSubmitted(true)
+      if (!formData.profileName.trim()) {
+        toast.error(t('bot.name_required', 'Bot ismi gereklidir.'))
+      } else if (!formData.autoBio && !formData.bio.trim()) {
+        toast.error(t('bot.bio_required', 'Biyografi girilmeli veya otomatik biyografi seçilmelidir.'))
+      }
       const firstInvalid = Array.from(e.currentTarget.querySelectorAll('[data-field]')).find(
         (el) => !(el.value || '').trim()
       )
@@ -291,10 +304,6 @@ export default function CreateEditBotPage() {
     formData.personalityCardName.trim() !== '' || formData.personalityCardPrompt.trim() !== ''
   )
 
-  const isPersonalityCardValid = hasNewCard
-    ? formData.personalityCardName.trim() !== '' && formData.personalityCardPrompt.trim() !== ''
-    : true
-
   const isExistingCardSelected =
     !!existingCard &&
     formData.selectedCardIds.some(
@@ -327,7 +336,6 @@ export default function CreateEditBotPage() {
 
   const canSubmit =
     formData.profileName.trim() !== '' &&
-    isPersonalityCardValid &&
     (formData.autoBio || formData.bio.trim() !== '') &&
     !isBotLimitReached &&
     !mutation.isPending
@@ -367,21 +375,6 @@ export default function CreateEditBotPage() {
             >
               {isEditMode ? t('bot.bot_settings') : t('bot.create_bot')}
             </h1>
-            {!isEditMode && (
-              <span
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  padding: '3px 10px',
-                  borderRadius: 20,
-                  backgroundColor: isBotLimitReached ? 'rgba(239, 68, 68, 0.15)' : 'var(--color-bg-secondary)',
-                  color: isBotLimitReached ? 'var(--color-danger, #ef4444)' : 'var(--color-text-secondary)',
-                  border: isBotLimitReached ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--color-border)',
-                }}
-              >
-                {t('bot.quota_label', 'Bot Kotası')}: {myBots.length} / {botCountLimit}
-              </span>
-            )}
           </div>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {isEditMode ? t('bot.edit_bot_desc') : t('bot.create_bot_desc')}

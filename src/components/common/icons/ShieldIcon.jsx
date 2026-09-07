@@ -1,4 +1,4 @@
-import ShieldSvg from '../../assets/FigmaNew/Shield.svg?react'
+import ShieldSvg from '../../../assets/FigmaNew/Shield.svg?react'
 
 const ShieldIcon = ({ size = 24, color = 'currentColor', ...props }) => (
   <ShieldSvg

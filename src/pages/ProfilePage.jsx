@@ -16,20 +16,24 @@ import {
   Settings,
   UserPlus,
   UserMinus,
-  Sparkles,
+  Sliders,
+  Users,
 } from 'lucide-react'
-import AngryBotWithSwordsIcon from '../components/common/AngryBotWithSwordsIcon'
-import AmbientBots from '../components/common/AmbientBots'
-import WelcomeAmbience from '../components/common/WelcomeAmbience'
-import BotFlashCardsIcon from '../components/common/BotFlashCardsIcon'
-import CardContingencyIcon from '../components/common/CardContingencyIcon'
-import CardContingencyModifierIcon from '../components/common/CardContingencyModifierIcon'
+import KingIcon from '../components/common/icons/KingIcon'
+import AngryBotWithSwordsIcon from '../components/common/icons/AngryBotWithSwordsIcon'
+import AmbientBots from '../components/common/ambiances/AmbientBots'
+import WelcomeAmbience from '../components/common/ambiances/WelcomeAmbience'
+import MindAmbience from '../components/common/ambiances/MindAmbience'
+import BotFlashCardsIcon from '../components/common/icons/BotFlashCardsIcon'
+import CardContingencyIcon from '../components/common/icons/CardContingencyIcon'
+import CardContingencyModifierIcon from '../components/common/icons/CardContingencyModifierIcon'
 import toast from 'react-hot-toast'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { actorApi } from '../api/actorApi'
 import { personalityCardApi } from '../api/personalityCardApi'
-import { BotCapabilities, UserCapabilities } from '../constants/enums'
+import { BotCapabilities, UserCapabilities, Theme } from '../constants/enums'
 import TriggerDebateModal from '../components/profile/TriggerDebateModal'
+import { trackDebate } from '../utils/analytics'
 import BackButton from '../components/common/BackButton'
 import ActorAvatar from '../components/actor/ActorAvatar'
 import CardSlots from '../components/card/CardSlots'
@@ -41,9 +45,11 @@ import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import FollowListModal from '../components/profile/FollowListModal'
 import ProfileLikesModal from '../components/profile/ProfileLikesModal'
+import ProfileModifiersModal from '../components/profile/ProfileModifiersModal'
 import ProfileActivitiesPanel from '../components/profile/ProfileActivitiesPanel'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
+import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import AvatarUpload from '../components/common/AvatarUpload'
@@ -69,6 +75,74 @@ const TOPIC_TYPES = [
   { value: 32768, enumName: 'Education', label: 'Eğitim' },
   { value: 65536, enumName: 'Relationships', label: 'İlişkiler' },
 ]
+
+function FramedThemeIcon({ type, isLocked, size = 20 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ display: 'block', overflow: 'visible' }}
+    >
+      {/* Bütünsel Dış Çerçeve (Integrated Frame) */}
+      <rect x="1.5" y="1.5" width="21" height="21" rx="4.5" strokeWidth="1.6" />
+
+      {/* İkon Vektörü (Brain / Hierarchy (Network) / Bot) */}
+      <g transform="translate(3.6, 3.6) scale(0.7)" opacity={isLocked ? 0.65 : 1}>
+        {type === 'brain' && (
+          <>
+            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
+            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
+            <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+            <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5" />
+            <path d="M3.477 10.896a4 4 0 0 1 .585-.396" />
+            <path d="M19.938 10.5a4 4 0 0 1 .585.396" />
+            <path d="M6 18a4 4 0 0 1-1.967-.516" />
+            <path d="M19.967 17.484A4 4 0 0 1 18 18" />
+          </>
+        )}
+        {(type === 'hierarchy' || type === 'network') && (
+          <>
+            <rect x="16" y="16" width="6" height="6" rx="1" />
+            <rect x="2" y="16" width="6" height="6" rx="1" />
+            <rect x="9" y="2" width="6" height="6" rx="1" />
+            <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+            <path d="M12 12V8" />
+          </>
+        )}
+        {type === 'bot' && (
+          <>
+            <path d="M12 8V4H8" />
+            <rect width="16" height="12" x="4" y="8" rx="2" />
+            <path d="M2 14h2" />
+            <path d="M20 14h2" />
+            <path d="M15 13v2" />
+            <path d="M9 13v2" />
+          </>
+        )}
+      </g>
+
+      {/* Premium yoksa üstü çizili (1.5px Sarı Çizik) */}
+      {isLocked && (
+        <line
+          x1="2.5"
+          y1="21.5"
+          x2="21.5"
+          y2="2.5"
+          stroke="var(--color-warning)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  )
+}
 
 export default function ProfilePage() {
   const [searchParams] = useSearchParams()
@@ -111,6 +185,7 @@ export default function ProfilePage() {
   const [debateModalOpen, setDebateModalOpen] = useState(false)
   const [debatePending, setDebatePending] = useState(false)
   const [isPremiumOpen, setIsPremiumOpen] = useState(false)
+  const [modifiersModalOpen, setModifiersModalOpen] = useState(false)
 
   const handleTriggerDebate = async (proposition) => {
     try {
@@ -145,6 +220,13 @@ export default function ProfilePage() {
       setDebateModalOpen(false)
 
       const debateId = res?.data?.data || (typeof res?.data === 'string' ? res.data : null)
+      if (debateId) {
+        trackDebate('trigger', {
+          debate_id: debateId,
+          target_id: profile?.actorId || actorId,
+          is_bot: isBotTarget,
+        })
+      }
       queryClient.invalidateQueries({ queryKey: ['debates'] })
       if (debateId && isBotTarget) {
         navigate(`/debate?id=${debateId}`, {
@@ -226,6 +308,205 @@ export default function ProfilePage() {
     queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data ?? null),
     enabled: !!actorId,
   })
+
+  const isMyBot =
+    profile?.discriminator === 'Bot' &&
+    (profile?.parentActorId === currentUserId ||
+      profile?.parentActor?.actorId === currentUserId ||
+      myBots?.some((b) => (b.actorId || b.id) === actorId))
+
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ['actorProfile', currentUserId],
+    queryFn: () => actorApi.getProfile(currentUserId).then((r) => r.data?.data ?? null),
+    enabled: !!currentUserId && !isOwnProfile && isMyBot,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const currentUserCapabilities = isOwnProfile
+    ? (profile?.userSettings?.userCapabilities ?? UserCapabilities.Default)
+    : (currentUserProfile?.userSettings?.userCapabilities ?? UserCapabilities.Default)
+
+  const isCurrentUserPremium =
+    (currentUserCapabilities & UserCapabilities.Premium) === UserCapabilities.Premium
+
+  const rawTheme = profile?.userSettings?.theme ?? profile?.botSettings?.theme
+  const activeProfileTheme =
+    typeof rawTheme === 'string' ? (Theme[rawTheme] ?? Theme.None) : (rawTheme ?? Theme.None)
+
+  const themeMutation = useMutation({
+    mutationFn: ({ theme, targetActorId }) => actorApi.selectTheme(theme, targetActorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['actorProfile', actorId] })
+    },
+    onError: (err) => {
+      const errMsgs = err.response?.data?.errors || [
+        err.response?.data?.message || t('profile.error_occurred', 'Bir hata oluştu.'),
+      ]
+      if (Array.isArray(errMsgs)) {
+        errMsgs.forEach((m) =>
+          toast.error(
+            typeof m === 'string' ? m : m.description || m.message || t('profile.error_occurred')
+          )
+        )
+      } else {
+        toast.error(typeof errMsgs === 'string' ? errMsgs : t('profile.error_occurred'))
+      }
+    },
+  })
+
+  const handleSelectTheme = (targetTheme) => {
+    if (!isCurrentUserPremium) {
+      setIsPremiumOpen(true)
+      return
+    }
+
+    const nextTheme = activeProfileTheme === targetTheme ? Theme.None : targetTheme
+    themeMutation.mutate({
+      theme: nextTheme,
+      targetActorId: isOwnProfile ? null : actorId,
+    })
+  }
+
+  const renderThemeSelector = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+      <button
+        type="button"
+        className={
+          isCurrentUserPremium ? 'btn btn-sm' : 'btn btn-primary btn-sm profile-premium-btn'
+        }
+        onClick={isCurrentUserPremium ? undefined : () => setIsPremiumOpen(true)}
+        disabled={isCurrentUserPremium}
+        title={
+          isCurrentUserPremium
+            ? t('premium.active', 'Premium Aktif')
+            : t('premium.title', 'Premium')
+        }
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          background: 'var(--color-warning)',
+          borderColor: '#000',
+          color: '#fff',
+          cursor: isCurrentUserPremium ? 'default' : 'pointer',
+          paddingTop: 6,
+          paddingBottom: 6,
+        }}
+      >
+        {isCurrentUserPremium ? (
+          <Check size={14} strokeWidth={2.5} />
+        ) : (
+          <ModifierArrowSvg width={10} height={14} style={{ display: 'block' }} />
+        )}
+        {t('premium.title', 'Premium')}
+      </button>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          marginTop: -1,
+        }}
+      >
+        <button
+          type="button"
+          className={`btn btn-sm ${activeProfileTheme === Theme.Mind ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => handleSelectTheme(Theme.Mind)}
+          disabled={themeMutation.isPending}
+          title={t('topbar.mind_ambience', 'Mind Arka Planı')}
+          aria-label={t('topbar.mind_ambience', 'Mind Arka Planı')}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            padding: '4px 0',
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomRightRadius: 0,
+            position: 'relative',
+            zIndex: activeProfileTheme === Theme.Mind ? 2 : 1,
+            ...(activeProfileTheme === Theme.Mind
+              ? {}
+              : {
+                  borderColor: 'var(--color-border-light)',
+                  color: 'var(--color-text-muted)',
+                  background: 'var(--color-surface)',
+                }),
+          }}
+        >
+          <FramedThemeIcon type="brain" isLocked={!isCurrentUserPremium} size={20} />
+        </button>
+        <button
+          type="button"
+          className={`btn btn-sm ${activeProfileTheme === Theme.Welcome ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => handleSelectTheme(Theme.Welcome)}
+          disabled={themeMutation.isPending}
+          title={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
+          aria-label={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            padding: '4px 0',
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 0,
+            marginLeft: -1,
+            position: 'relative',
+            zIndex: activeProfileTheme === Theme.Welcome ? 2 : 1,
+            ...(activeProfileTheme === Theme.Welcome
+              ? {}
+              : {
+                  borderColor: 'var(--color-border-light)',
+                  color: 'var(--color-text-muted)',
+                  background: 'var(--color-surface)',
+                }),
+          }}
+        >
+          <FramedThemeIcon type="hierarchy" isLocked={!isCurrentUserPremium} size={20} />
+        </button>
+        <button
+          type="button"
+          className={`btn btn-sm ${activeProfileTheme === Theme.Bots ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => handleSelectTheme(Theme.Bots)}
+          disabled={themeMutation.isPending}
+          title={t('topbar.ambient_bots', 'Bot Arka Planı')}
+          aria-label={t('topbar.ambient_bots', 'Bot Arka Planı')}
+          style={{
+            flex: 1,
+            minWidth: 0,
+            padding: '4px 0',
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderTopLeftRadius: 0,
+            borderTopRightRadius: 0,
+            borderBottomLeftRadius: 0,
+            marginLeft: -1,
+            position: 'relative',
+            zIndex: activeProfileTheme === Theme.Bots ? 2 : 1,
+            ...(activeProfileTheme === Theme.Bots
+              ? {}
+              : {
+                  borderColor: 'var(--color-border-light)',
+                  color: 'var(--color-text-muted)',
+                  background: 'var(--color-surface)',
+                }),
+          }}
+        >
+          <FramedThemeIcon type="bot" isLocked={!isCurrentUserPremium} size={20} />
+        </button>
+      </div>
+    </div>
+  )
 
   const followMutation = useMutation({
     mutationFn: () => actorApi.follow(actorId),
@@ -356,48 +637,52 @@ export default function ProfilePage() {
     )
   if (!profile) return <div className="empty-state">{t('profile.not_found')}</div>
 
-  const isMyBot = profile.discriminator === 'Bot' && myBots?.some((b) => b.actorId === actorId)
-
   const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
   const hasBotMemory =
     (botCapabilities & BotCapabilities.ProlongedBotMemory) === BotCapabilities.ProlongedBotMemory
-  const capabilityEmblems = hasBotMemory
-    ? [
-        {
-          key: 'memory',
-          label: t('bot.capability_memory', 'Hafıza'),
-          Icon: Brain,
-          tone: 'memory',
-        },
-      ]
-    : [
-        {
-          key: 'default',
-          label: t('bot.capability_default', 'Varsayılan'),
-          Icon: ShieldCheck,
-          tone: 'default',
-        },
-      ]
+  const capabilityEmblems = [
+    {
+      key: 'default',
+      label: t('bot.capability_default', 'Varsayılan'),
+      Icon: ShieldCheck,
+      tone: 'default',
+      size: 25,
+    },
+    ...(hasBotMemory
+      ? [
+          {
+            key: 'memory',
+            label: t('bot.capability_memory', 'Hafıza'),
+            Icon: Brain,
+            tone: 'memory',
+            size: 25,
+          },
+        ]
+      : []),
+  ]
 
   const userCapabilities = profile.userSettings?.userCapabilities ?? UserCapabilities.Default
   const isPremiumUser = (userCapabilities & UserCapabilities.Premium) === UserCapabilities.Premium
-  const userCapabilityEmblems = isPremiumUser
-    ? [
-        {
-          key: 'premium',
-          label: t('user.capability_premium', 'Premium'),
-          Icon: Sparkles,
-          tone: 'premium',
-        },
-      ]
-    : [
-        {
-          key: 'default',
-          label: t('user.capability_default', 'Varsayılan'),
-          Icon: ShieldCheck,
-          tone: 'default',
-        },
-      ]
+  const userCapabilityEmblems = [
+    {
+      key: 'default',
+      label: t('user.capability_default', 'Varsayılan'),
+      Icon: ShieldCheck,
+      tone: 'default',
+      size: 25,
+    },
+    ...(isPremiumUser
+      ? [
+          {
+            key: 'premium',
+            label: t('user.capability_premium', 'Premium'),
+            Icon: KingIcon,
+            tone: 'premium',
+            size: 25,
+          },
+        ]
+      : []),
+  ]
 
   return (
     <div className="flex-col gap-4">
@@ -407,8 +692,12 @@ export default function ProfilePage() {
 
       {/* ─── Profile Header ─── */}
       <div className="profile-header-card">
-        <AmbientBots />
-        <WelcomeAmbience />
+        <AmbientBots active={activeProfileTheme === Theme.Bots} />
+        <WelcomeAmbience active={activeProfileTheme === Theme.Welcome} />
+        <MindAmbience
+          profileName={profile?.profileName}
+          active={activeProfileTheme === Theme.Mind}
+        />
         <div
           className="flex justify-between"
           style={{ gap: 20, width: '100%', alignItems: 'stretch', marginBottom: -6 }}
@@ -609,10 +898,10 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {profile.discriminator === 'Bot' && (
+            {profile.discriminator === 'Bot' ? (
               <div style={{ marginTop: 0, marginBottom: 0, maxWidth: 600 }}>
                 <div className="bot-capability-emblems" style={{ marginBottom: 0 }}>
-                  {capabilityEmblems.map(({ key, label, Icon, tone }) => (
+                  {capabilityEmblems.map(({ key, label, Icon, tone, size = 25 }) => (
                     <span
                       key={key}
                       className={`bot-capability-emblem bot-capability-emblem--${tone}`}
@@ -620,17 +909,15 @@ export default function ProfilePage() {
                       aria-label={label}
                       role="img"
                     >
-                      <Icon size={20} strokeWidth={2.2} aria-hidden="true" />
+                      <Icon size={size} strokeWidth={2.2} aria-hidden="true" />
                     </span>
                   ))}
                 </div>
               </div>
-            )}
-
-            {profile.discriminator === 'User' && (
+            ) : (
               <div style={{ marginTop: 0, marginBottom: 0, maxWidth: 600 }}>
                 <div className="bot-capability-emblems" style={{ marginBottom: 0 }}>
-                  {userCapabilityEmblems.map(({ key, label, Icon, tone }) => (
+                  {userCapabilityEmblems.map(({ key, label, Icon, tone, size = 25 }) => (
                     <span
                       key={key}
                       className={`bot-capability-emblem bot-capability-emblem--${tone}`}
@@ -638,7 +925,7 @@ export default function ProfilePage() {
                       aria-label={label}
                       role="img"
                     >
-                      <Icon size={20} strokeWidth={2.2} aria-hidden="true" />
+                      <Icon size={size} strokeWidth={2.2} aria-hidden="true" />
                     </span>
                   ))}
                 </div>
@@ -651,7 +938,11 @@ export default function ProfilePage() {
               {profile.discriminator === 'Bot' && (
                 <button
                   className="btn btn-outline btn-sm"
-                  onClick={() => navigate('/mind?actorId=' + actorId)}
+                  onClick={() =>
+                    navigate('/mind?actorId=' + actorId, {
+                      state: { profileName: profile.profileName },
+                    })
+                  }
                 >
                   <Brain size={14} /> {t('profile.memories')}
                 </button>
@@ -737,13 +1028,16 @@ export default function ProfilePage() {
                 </button>
               )}
               {isMyBot && !isOwnProfile && (
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => navigate('/edit-bot?botId=' + actorId)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-                >
-                  <Edit2 size={14} /> {t('profile.edit')}
-                </button>
+                <>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => navigate('/edit-bot?botId=' + actorId)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                  >
+                    <Edit2 size={14} /> {t('profile.edit')}
+                  </button>
+                  {renderThemeSelector()}
+                </>
               )}
               {isOwnProfile && !isEditing && (
                 <>
@@ -761,18 +1055,7 @@ export default function ProfilePage() {
                   >
                     <Settings size={14} /> {t('profile.security_settings')}
                   </button>
-                  <button
-                    className="btn btn-primary btn-sm profile-premium-btn"
-                    onClick={() => setIsPremiumOpen(true)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-                  >
-                    <ModifierArrowSvg
-                      width={10}
-                      height={14}
-                      style={{ display: 'block' }}
-                    />
-                    {t('premium.title', 'Premium')}
-                  </button>
+                  {renderThemeSelector()}
                 </>
               )}
               {isOwnProfile && isEditing && (
@@ -856,6 +1139,75 @@ export default function ProfilePage() {
               <span className="profile-stat-value">{profile.followedCount ?? 0}</span>
               <span className="profile-stat-label">{t('profile.following')}</span>
             </div>
+            <div
+              className="profile-stat-box"
+              onClick={() => setModifiersModalOpen(true)}
+              title={t('profile.modifiers_tooltip', 'Modifiers & Statü Detayları')}
+            >
+              <span
+                className="profile-stat-value"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  fontSize: 15,
+                }}
+              >
+                <Sliders size={14} style={{ color: 'var(--color-primary)' }} />
+                <span>Grade</span>
+                {(() => {
+                  const rawG =
+                    profile.discriminator === 'Bot'
+                      ? profile.botSettings?.botGrade
+                      : profile.userSettings?.userGrades
+                  const gMap = {
+                    0: 'A',
+                    1: 'B',
+                    2: 'C',
+                    3: 'D',
+                    4: 'F',
+                    A: 'A',
+                    B: 'B',
+                    C: 'C',
+                    D: 'D',
+                    F: 'F',
+                  }
+                  const letter = gMap[rawG] || 'F'
+                  const colorMap = {
+                    A: '#22C55E',
+                    B: '#84CC16',
+                    C: '#F59E0B',
+                    D: '#F97316',
+                    F: '#EF4444',
+                  }
+                  const badgeColor = colorMap[letter] || '#EF4444'
+                  return (
+                    <span
+                      style={{
+                        width: 19,
+                        height: 19,
+                        borderRadius: '50%',
+                        background: badgeColor,
+                        color: '#fff',
+                        fontWeight: 900,
+                        fontSize: 11,
+                        lineHeight: 1,
+                        border: '1.5px solid var(--color-surface)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.25)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  )
+                })()}
+              </span>
+              <span className="profile-stat-label">{t('profile.modifiers', 'Modifiers')}</span>
+            </div>
           </div>
 
           {/* ─── LIMITS TOP DIVIDER ─── */}
@@ -894,18 +1246,15 @@ export default function ProfilePage() {
               <div
                 className="profile-limit-chip"
                 title={t(
-                  'profile.card_ownership_limit_desc',
-                  'Maksimum sahip olunabilir kişilik kartı sayısı'
+                  'profile.tribe_limit_desc',
+                  'Dahil olunabilecek maksimum kabile sayısı'
                 )}
               >
-                <BotFlashCardsIcon
-                  size={25}
-                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
-                />
-                <span>{t('profile.card_ownership_limit', 'Kart Sahiplik Limiti')}:</span>
+                <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                <span>{t('profile.tribe_limit', 'Kabile Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.ownedCards?.length || 0} /{' '}
-                  {profile.userSettings.cardOwnershipLimit || 10}
+                  {profile.tribes?.length || 0} /{' '}
+                  {profile.userSettings.tribeCountLimit || 3}
                 </span>
               </div>
               <span className="profile-limit-divider">•</span>
@@ -936,18 +1285,30 @@ export default function ProfilePage() {
               <div
                 className="profile-limit-chip"
                 title={t(
-                  'profile.bot_assignment_limit_desc',
-                  'Maksimum atanabilir kişilik kartı sayısı'
+                  'profile.bot_ownership_limit_desc',
+                  'Maksimum sahip olunabilir bot sayısı'
                 )}
               >
-                <BotFlashCardsIcon
-                  size={25}
-                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
-                />
-                <span>{t('profile.bot_assignment_limit', 'Kart Atanma Limiti')}:</span>
+                <Bot size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                <span>{t('profile.bot_ownership_limit', 'Bot Sahiplik Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.assignedCards?.length || 0} /{' '}
-                  {profile.botSettings.botAssignmentLimit || 4}
+                  {profile.botsCount ?? (profile.bots?.length || 0)} /{' '}
+                  {profile.botSettings.botCountLimit || 4}
+                </span>
+              </div>
+              <span className="profile-limit-divider">•</span>
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.tribe_limit_desc',
+                  'Dahil olunabilecek maksimum kabile sayısı'
+                )}
+              >
+                <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                <span>{t('profile.tribe_limit', 'Kabile Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.tribes?.length || 0} /{' '}
+                  {profile.botSettings.tribeCountLimit || 3}
                 </span>
               </div>
               <span className="profile-limit-divider">•</span>
@@ -983,50 +1344,91 @@ export default function ProfilePage() {
               className="profile-limits-row"
               style={{ marginTop: 0, marginBottom: 24, paddingLeft: 4, paddingRight: 4 }}
             >
-                <div
-                  className="profile-limit-chip"
-                  title={t(
-                    'profile.card_inheritance_chance_desc',
-                    'Kişilik kartı kalıtım ve miras alma olasılığı'
-                  )}
-                >
-                  <CardContingencyIcon
-                    size={25}
-                    style={{ color: 'var(--color-primary)', flexShrink: 0 }}
-                  />
-                  <span>{t('profile.card_inheritance_chance', 'Kart Miras Şansı')}:</span>
-                  <span className="profile-limit-chip__val">
-                    %{Math.round(
-                      ((profile.discriminator === 'User'
-                        ? profile.userSettings
-                        : profile.botSettings
-                      ).cardInheritanceChance || 0.25) * 100
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.card_ownership_limit_desc',
+                  'Maksimum sahip olunabilir kişilik kartı sayısı'
+                )}
+              >
+                <BotFlashCardsIcon
+                  size={25}
+                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                />
+                <span>{t('profile.card_ownership_limit', 'Kart Sahiplik Limiti')}:</span>
+                <span className="profile-limit-chip__val">
+                  {profile.ownedCards?.length || 0} /{' '}
+                  {(profile.discriminator === 'Bot'
+                    ? profile.botSettings?.cardOwnershipLimit
+                    : profile.userSettings?.cardOwnershipLimit) || 10}
+                </span>
+              </div>
+              {profile.discriminator === 'Bot' && profile.botSettings && (
+                <>
+                  <span className="profile-limit-divider">•</span>
+                  <div
+                    className="profile-limit-chip"
+                    title={t(
+                      'profile.bot_assignment_limit_desc',
+                      'Maksimum atanabilir kişilik kartı sayısı'
                     )}
-                  </span>
-                </div>
-                {profile.discriminator === 'Bot' &&
-                  profile.botSettings.cardInheritanceModifier !== undefined &&
-                  profile.botSettings.cardInheritanceModifier !== null && (
-                    <>
-                      <span className="profile-limit-divider">•</span>
-                      <div
-                        className="profile-limit-chip"
-                        title={t(
-                          'profile.card_inheritance_modifier_desc',
-                          'Dereceye bağlı ek kişilik kartı miras çarpanı'
-                        )}
-                      >
-                        <CardContingencyModifierIcon
-                          size={42}
-                          style={{ color: 'var(--color-primary)', flexShrink: 0 }}
-                        />
-                        <span>{t('profile.card_inheritance_modifier', 'Kart Miras Çarpanı')}:</span>
-                        <span className="profile-limit-chip__val">
-                          +%{Math.round((profile.botSettings.cardInheritanceModifier || 0) * 100)}
-                        </span>
-                      </div>
-                    </>
+                  >
+                    <BotFlashCardsIcon
+                      size={25}
+                      style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                    />
+                    <span>{t('profile.bot_assignment_limit', 'Kart Atanma Limiti')}:</span>
+                    <span className="profile-limit-chip__val">
+                      {profile.assignedCards?.length || 0} /{' '}
+                      {profile.botSettings.botAssignmentLimit || 4}
+                    </span>
+                  </div>
+                </>
+              )}
+              <span className="profile-limit-divider">•</span>
+              <div
+                className="profile-limit-chip"
+                title={t(
+                  'profile.card_inheritance_chance_desc',
+                  'Kişilik kartı kalıtım ve miras alma olasılığı'
+                )}
+              >
+                <CardContingencyIcon
+                  size={25}
+                  style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                />
+                <span>{t('profile.card_inheritance_chance', 'Kart Miras Şansı')}:</span>
+                <span className="profile-limit-chip__val">
+                  %
+                  {Math.round(
+                    ((profile.discriminator === 'User' ? profile.userSettings : profile.botSettings)
+                      .cardInheritanceChance || 0.25) * 100
                   )}
+                </span>
+              </div>
+              {profile.discriminator === 'Bot' &&
+                profile.botSettings.cardInheritanceModifier !== undefined &&
+                profile.botSettings.cardInheritanceModifier !== null && (
+                  <>
+                    <span className="profile-limit-divider">•</span>
+                    <div
+                      className="profile-limit-chip"
+                      title={t(
+                        'profile.card_inheritance_modifier_desc',
+                        'Dereceye bağlı ek kişilik kartı miras çarpanı'
+                      )}
+                    >
+                      <CardContingencyModifierIcon
+                        size={42}
+                        style={{ color: 'var(--color-primary)', flexShrink: 0 }}
+                      />
+                      <span>{t('profile.card_inheritance_modifier', 'Kart Miras Çarpanı')}:</span>
+                      <span className="profile-limit-chip__val">
+                        +%{Math.round((profile.botSettings.cardInheritanceModifier || 0) * 100)}
+                      </span>
+                    </div>
+                  </>
+                )}
             </div>
           )}
 
@@ -1089,9 +1491,9 @@ export default function ProfilePage() {
                 >
                   {t('card.owned_cards', 'Sahip Olunan Kartlar')} ({profile.ownedCards?.length || 0}{' '}
                   /{' '}
-                  {profile.discriminator === 'Bot'
-                    ? profile.botSettings?.botAssignmentLimit || 4
-                    : profile.userSettings?.cardOwnershipLimit || 10}{' '}
+                  {(profile.discriminator === 'Bot'
+                    ? profile.botSettings?.cardOwnershipLimit
+                    : profile.userSettings?.cardOwnershipLimit) || 10}{' '}
                   {t('card.slots_label', 'Slot')})
                 </span>
               </div>
@@ -1099,9 +1501,9 @@ export default function ProfilePage() {
               <CardSlots
                 cards={profile.ownedCards}
                 slotCount={
-                  profile.discriminator === 'Bot'
-                    ? profile.botSettings?.botAssignmentLimit || 4
-                    : profile.userSettings?.cardOwnershipLimit || 10
+                  (profile.discriminator === 'Bot'
+                    ? profile.botSettings?.cardOwnershipLimit
+                    : profile.userSettings?.cardOwnershipLimit) || 10
                 }
                 showMark={false}
               />
@@ -1258,6 +1660,12 @@ export default function ProfilePage() {
       />
 
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
+
+      <ProfileModifiersModal
+        profile={profile}
+        isOpen={modifiersModalOpen}
+        onClose={() => setModifiersModalOpen(false)}
+      />
     </div>
   )
 }

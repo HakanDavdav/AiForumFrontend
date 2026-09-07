@@ -52,18 +52,27 @@ const useUIStore = create(
       searchMode: 'general', // 'general' | 'posts' | 'actors' | 'tribes'
       setSearchMode: (mode) => set({ searchMode: mode }),
 
-      // ─── Ambient Bots / Welcome (profil arka planı seçenekleri) ───────────────
+      // ─── Ambient Bots / Welcome / Mind (profil arka planı seçenekleri) ────────
       isBotsAmbience: false,
       toggleBotsAmbience: () =>
         set((state) => ({
           isBotsAmbience: !state.isBotsAmbience,
           isWelcomeAmbience: false,
+          isMindAmbience: false,
         })),
       isWelcomeAmbience: false,
       toggleWelcomeAmbience: () =>
         set((state) => ({
           isWelcomeAmbience: !state.isWelcomeAmbience,
           isBotsAmbience: false,
+          isMindAmbience: false,
+        })),
+      isMindAmbience: false,
+      toggleMindAmbience: () =>
+        set((state) => ({
+          isMindAmbience: !state.isMindAmbience,
+          isBotsAmbience: false,
+          isWelcomeAmbience: false,
         })),
     }),
     {

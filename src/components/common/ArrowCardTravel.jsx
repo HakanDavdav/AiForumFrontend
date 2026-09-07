@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import CardSvg from '../../assets/FigmaNew/Card.svg?react'
+import CardIcon from './icons/CardIcon'
 
 const CARD_ASPECT = 112 / 96
 const FADE = 0.18
-const LEAVE_DURATION = 600
 const ROTATE_PER_TICK = 4
-const NO_EXCLUDE_ARROW_IDS = []
 const NO_FLOW_MODE_OVERRIDES = {}
-
-function isStraightArrowPath(d) {
-  if (!d) return false
-  const hasCurve = /[CQSTA]/.test(d)
-  const mCount = (d.match(/[Mm]/g) || []).length
-  const segmentCount = (d.match(/[LlHhVv]/g) || []).length
-  return !hasCurve && mCount === 1 && segmentCount === 1
-}
 
 function parseArrowEndpoints(d) {
   if (!d) return null
@@ -58,40 +48,30 @@ function parseArrowEndpoints(d) {
     }
   }
   if (points.length < 2) return null
-
-  if (isStraightArrowPath(d)) {
-    return { start: points[0], end: points[points.length - 1] }
-  }
-
-  const tip = points[0]
-  let base = points[0]
-  let maxD = -1
-  for (const p of points) {
-    const dd = (p[0] - tip[0]) ** 2 + (p[1] - tip[1]) ** 2
-    if (dd > maxD) {
-      maxD = dd
-      base = p
-    }
-  }
-  return { start: base, end: tip }
+  return points
 }
 
-function applyFlow(start, end, flowMode, force) {
+function applyFlow(points, flowMode, force) {
+  const start = points[0]
+  const end = points[points.length - 1]
   const dx = end[0] - start[0]
   const dy = end[1] - start[1]
+  
   if (!force && Math.abs(dy) < Math.abs(dx)) {
-    return { start, end }
+    return points
   }
+  
+  let reverse = false
   if (flowMode === 'BottomToTop') {
-    return start[1] < end[1] ? { start: end, end: start } : { start, end }
+    reverse = start[1] < end[1]
+  } else if (flowMode === 'LeftToRight') {
+    reverse = start[0] > end[0]
+  } else if (flowMode === 'RightToLeft') {
+    reverse = start[0] < end[0]
+  } else {
+    reverse = start[1] > end[1]
   }
-  if (flowMode === 'LeftToRight') {
-    return start[0] > end[0] ? { start: end, end: start } : { start, end }
-  }
-  if (flowMode === 'RightToLeft') {
-    return start[0] < end[0] ? { start: end, end: start } : { start, end }
-  }
-  return start[1] > end[1] ? { start: end, end: start } : { start, end }
+  return reverse ? [...points].reverse() : points
 }
 
 export default function ArrowCardTravel({
@@ -103,16 +83,16 @@ export default function ArrowCardTravel({
   offset = 6,
   spacing = 70,
   cardColor = 'var(--color-primary)',
-  excludeArrowIds = NO_EXCLUDE_ARROW_IDS,
   flowMode = 'TopToBottom',
   flowModeOverrides = NO_FLOW_MODE_OVERRIDES,
   pulseInterval = 0,
   onPulse,
   maxCards = Infinity,
   rerandomizeInterval = 0,
+  crownedChance = 0.2,
 }) {
   const containerRef = useRef(null)
-  const cardElsRef = useRef([])
+  const cardMapRef = useRef(new Map())
   const segmentsRef = useRef([])
   const cardsRef = useRef([])
   const [cards, setCards] = useState([])
@@ -126,19 +106,52 @@ export default function ArrowCardTravel({
     const vb = svg.viewBox.baseVal
     if (!vb || !vb.width || !vb.height) return
 
-    const excluded = new Set(excludeArrowIds)
     const infos = []
     svg.querySelectorAll('g[id^="arrow"], g[id^="Arrow"]').forEach(g => {
       const id = g.getAttribute('id')
-      if (excluded.has(id)) return
       const path = g.querySelector('path')
       if (!path) return
       const d = path.getAttribute('d')
-      if (!isStraightArrowPath(d)) return
-      const ep = parseArrowEndpoints(d)
-      if (!ep) return
+      const pts = parseArrowEndpoints(d)
+      if (!pts || pts.length < 2) return
+
+      // 1. Global ViewBox boundary check (detects arrows outside canvas, e.g. negative or overflow coordinates)
+      const isOutsideVb = pts.some(
+        p => p[0] < -2 || p[0] > vb.width + 2 || p[1] < -2 || p[1] > vb.height + 2
+      )
+      if (isOutsideVb) return
+
+      // 2. Ancestor clip-path check (detects arrows clipped by local clipPath masks)
+      const clipParent = g.closest('[clip-path]')
+      if (clipParent) {
+        const clipAttr = clipParent.getAttribute('clip-path') || ''
+        const m = clipAttr.match(/#([a-zA-Z0-9_-]+)/)
+        if (m) {
+          const clipEl = svg.querySelector(`#${m[1]}`)
+          const rectEl = clipEl?.querySelector('rect')
+          if (rectEl) {
+            let rx = parseFloat(rectEl.getAttribute('x') || '0')
+            let ry = parseFloat(rectEl.getAttribute('y') || '0')
+            const rw = parseFloat(rectEl.getAttribute('width') || '0')
+            const rh = parseFloat(rectEl.getAttribute('height') || '0')
+            const transform = rectEl.getAttribute('transform') || ''
+            const tm = transform.match(/translate\(\s*([-\d.]+)[,\s]+([-\d.]+)\s*\)/)
+            if (tm) {
+              rx += parseFloat(tm[1])
+              ry += parseFloat(tm[2])
+            }
+            if (rw > 0 && rh > 0) {
+              const isOutsideClip = pts.some(
+                p => p[0] < rx - 2 || p[0] > rx + rw + 2 || p[1] < ry - 2 || p[1] > ry + rh + 2
+              )
+              if (isOutsideClip) return
+            }
+          }
+        }
+      }
+
       const ciEl = g.closest('[id^="CardInterchange"]')
-      infos.push({ id, ep, ciKey: ciEl ? ciEl.getAttribute('id') : null })
+      infos.push({ id, pts, ciKey: ciEl ? ciEl.getAttribute('id') : null })
     })
 
     const autoOverrides = {}
@@ -150,8 +163,8 @@ export default function ArrowCardTravel({
     })
     interchangeGroups.forEach(arrows => {
       const first = arrows[0]
-      const dx = first.ep.end[0] - first.ep.start[0]
-      const dy = first.ep.end[1] - first.ep.start[1]
+      const dx = first.pts[first.pts.length - 1][0] - first.pts[0][0]
+      const dy = first.pts[first.pts.length - 1][1] - first.pts[0][1]
       const horizontal = Math.abs(dx) > Math.abs(dy)
       arrows.forEach((a, idx) => {
         autoOverrides[a.id] = horizontal
@@ -160,45 +173,92 @@ export default function ArrowCardTravel({
       })
     })
 
-    const arrowEps = infos.map(({ id, ep }) => {
+    const routesPts = infos.map(({ id, pts }) => {
       const override = autoOverrides[id] || flowModeOverrides[id]
-      return applyFlow(ep.start, ep.end, override || flowMode, Boolean(override))
+      return applyFlow(pts, override || flowMode, Boolean(override))
     })
-    if (arrowEps.length === 0) return
+    if (routesPts.length === 0) return
 
     const computeSegments = () => {
       const rect = container.getBoundingClientRect()
       const scale = rect.width / vb.width
-      return arrowEps
-        .map(ep => {
-          const s = { x: ep.start[0] * scale, y: ep.start[1] * scale }
-          const e = { x: ep.end[0] * scale, y: ep.end[1] * scale }
-          const dx = e.x - s.x
-          const dy = e.y - s.y
-          const len = Math.hypot(dx, dy)
-          if (len === 0) return null
-          const px = -dy / len
-          const py = dx / len
-          return {
-            s: { x: s.x + px * offset, y: s.y + py * offset },
-            e: { x: e.x + px * offset, y: e.y + py * offset },
-            len,
+      return routesPts
+        .map(pts => {
+          if (pts.length < 2) return null
+          const scaledPts = pts.map(p => ({ x: p[0] * scale, y: p[1] * scale }))
+
+          const segNormals = []
+          for (let i = 0; i < scaledPts.length - 1; i++) {
+            const p1 = scaledPts[i]
+            const p2 = scaledPts[i + 1]
+            const dx = p2.x - p1.x
+            const dy = p2.y - p1.y
+            const len = Math.hypot(dx, dy)
+            if (len === 0) {
+              segNormals.push({ px: 0, py: 0, len: 0 })
+            } else {
+              segNormals.push({ px: -dy / len, py: dx / len, len })
+            }
           }
+
+          const offsetVertices = []
+          for (let i = 0; i < scaledPts.length; i++) {
+            if (i === 0) {
+              const n = segNormals[0]
+              offsetVertices.push({
+                x: scaledPts[0].x + n.px * offset,
+                y: scaledPts[0].y + n.py * offset
+              })
+            } else if (i === scaledPts.length - 1) {
+              const n = segNormals[segNormals.length - 1]
+              offsetVertices.push({
+                x: scaledPts[i].x + n.px * offset,
+                y: scaledPts[i].y + n.py * offset
+              })
+            } else {
+              const n1 = segNormals[i - 1]
+              const n2 = segNormals[i]
+              const nx = n1.px + n2.px
+              const ny = n1.py + n2.py
+              const nlen = Math.hypot(nx, ny)
+              const n = nlen > 0.001 ? { px: nx / nlen, py: ny / nlen } : n1
+              offsetVertices.push({
+                x: scaledPts[i].x + n.px * offset,
+                y: scaledPts[i].y + n.py * offset
+              })
+            }
+          }
+
+          let accumLen = 0
+          const subSegments = []
+          for (let i = 0; i < offsetVertices.length - 1; i++) {
+            const s = offsetVertices[i]
+            const e = offsetVertices[i + 1]
+            const len = Math.hypot(e.x - s.x, e.y - s.y)
+            if (len === 0) continue
+            accumLen += len
+            subSegments.push({ s, e, len, accumLen })
+          }
+          return subSegments.length > 0 && accumLen > 30 ? { subSegments, totalLen: accumLen } : null
         })
         .filter(Boolean)
     }
 
-    const buildCards = segments => {
+    const buildCards = routes => {
       const nowAbs = performance.now()
       const gap = (spacing / speed) * 1000
-      const perSeg = segments.map((seg, segIdx) => ({
-        segIdx,
-        len: seg.len,
-        count: Math.max(1, Math.ceil(seg.len / spacing)),
-      }))
-      let total = perSeg.reduce((sum, p) => sum + p.count, 0)
+      const perRoute = routes.map((route, routeIdx) => {
+        const count = Math.max(1, Math.ceil(route.totalLen / spacing))
+        route.cycleLen = count * spacing
+        return {
+          routeIdx,
+          len: route.totalLen,
+          count,
+        }
+      })
+      let total = perRoute.reduce((sum, p) => sum + p.count, 0)
       if (total > maxCards) {
-        const shuffled = [...perSeg].sort(() => Math.random() - 0.5)
+        const shuffled = [...perRoute].sort(() => Math.random() - 0.5)
         let toDrop = total - maxCards
         for (const p of shuffled) {
           if (toDrop <= 0) break
@@ -208,19 +268,24 @@ export default function ArrowCardTravel({
         }
       }
       const out = []
-      perSeg.forEach(p => {
+      perRoute.forEach(p => {
         for (let k = 0; k < p.count; k++) {
-          out.push({ id: `${p.segIdx}-${k}-${cardGen}`, seg: p.segIdx, born: nowAbs - k * gap })
+          out.push({
+            id: `${p.routeIdx}-${k}-${cardGen}`,
+            routeIdx: p.routeIdx,
+            born: nowAbs - k * gap,
+            crowned: Math.random() < crownedChance,
+          })
         }
       })
       cardGen++
       return out
     }
 
-    const commitCards = segments => {
-      segmentsRef.current = segments
+    const commitCards = routes => {
+      segmentsRef.current = routes
       if (pulseInterval > 0) return
-      const newCards = buildCards(segments)
+      const newCards = buildCards(routes)
       cardsRef.current = newCards
       setCards(newCards)
     }
@@ -239,19 +304,35 @@ export default function ArrowCardTravel({
     let nextId = 0
     let nextPulse = 0
     let lastRotate = performance.now()
+
+    const interpolateRoute = (route, dist) => {
+      let targetSub = route.subSegments[0]
+      for (const sub of route.subSegments) {
+        if (dist <= sub.accumLen) {
+          targetSub = sub
+          break
+        }
+      }
+      const localDist = dist - (targetSub.accumLen - targetSub.len)
+      const localT = Math.min(1, Math.max(0, localDist / targetSub.len))
+      const x = targetSub.s.x + (targetSub.e.x - targetSub.s.x) * localT
+      const y = targetSub.s.y + (targetSub.e.y - targetSub.s.y) * localT
+      return { x, y }
+    }
+
     const tick = () => {
       let elapsed = performance.now() - t0
-      const segs = segmentsRef.current
-      const els = cardElsRef.current
+      const routes = segmentsRef.current
 
       if (pulseInterval > 0) {
         let changed = false
         let spawned = false
         while (elapsed >= nextPulse) {
-          const wave = segs.map((seg, segIdx) => ({
+          const wave = routes.map((route, routeIdx) => ({
             id: nextId++,
-            seg: segIdx,
+            routeIdx,
             born: nextPulse,
+            crowned: Math.random() < crownedChance,
           }))
           cardsRef.current = [...cardsRef.current, ...wave]
           nextPulse += pulseInterval
@@ -260,30 +341,29 @@ export default function ArrowCardTravel({
         }
         if (spawned && onPulse) onPulse()
         const filtered = cardsRef.current.filter(c => {
-          const seg = segs[c.seg]
-          if (!seg) return false
-          return ((elapsed - c.born) / 1000) * speed < seg.len
+          const route = routes[c.routeIdx]
+          if (!route) return false
+          return ((elapsed - c.born) / 1000) * speed < route.totalLen
         })
         if (filtered.length !== cardsRef.current.length) {
           cardsRef.current = filtered
           changed = true
         }
         if (changed) setCards(cardsRef.current)
-        filtered.forEach((c, i) => {
-          const el = els[i]
+        filtered.forEach(c => {
+          const el = cardMapRef.current.get(c.id)
           if (!el) return
-          const seg = segs[c.seg]
-          if (!seg) return
+          const route = routes[c.routeIdx]
+          if (!route) return
           const dist = ((elapsed - c.born) / 1000) * speed
-          const t = Math.min(1, dist / seg.len)
+          const FADE_DIST = 15
           let opacity = 1
-          if (t < FADE) {
-            opacity = t / FADE
-          } else if (t > 1 - FADE) {
-            opacity = (1 - t) / FADE
+          if (dist < FADE_DIST) {
+            opacity = dist / FADE_DIST
+          } else if (route.totalLen - dist < FADE_DIST) {
+            opacity = (route.totalLen - dist) / FADE_DIST
           }
-          const x = seg.s.x + (seg.e.x - seg.s.x) * t
-          const y = seg.s.y + (seg.e.y - seg.s.y) * t
+          const { x, y } = interpolateRoute(route, dist)
           el.style.opacity = String(opacity)
           el.style.transform = `translate(${x}px, ${y}px)`
         })
@@ -292,59 +372,91 @@ export default function ArrowCardTravel({
 
         if (rerandomizeInterval > 0 && nowAbs - lastRotate >= rerandomizeInterval) {
           lastRotate = nowAbs
-          const active = cardsRef.current.filter(c => !c.leaving)
-          const activeSegs = new Set(active.map(c => c.seg))
-          const available = segs.map((_, i) => i).filter(i => !activeSegs.has(i))
+          const active = cardsRef.current.filter(c => !c.retiring)
+          const activeRoutes = new Set(active.map(c => c.routeIdx))
+          const available = routes.map((_, i) => i).filter(i => !activeRoutes.has(i))
           const rotateCount = Math.min(ROTATE_PER_TICK, active.length, available.length)
           if (rotateCount > 0) {
             const shuffledActive = [...active].sort(() => Math.random() - 0.5)
-            const toLeave = new Set(shuffledActive.slice(0, rotateCount).map(c => c.id))
-            const kept = cardsRef.current.map(c =>
-              toLeave.has(c.id) ? { ...c, leaving: true, leaveStart: nowAbs } : c
-            )
-            const newSegs = [...available].sort(() => Math.random() - 0.5).slice(0, rotateCount)
-            const newCards = newSegs.map(segIdx => ({
+            const toRetireIds = new Set(shuffledActive.slice(0, rotateCount).map(c => c.id))
+            
+            // Natural Lifecycle:
+            // If a card is already in the gap (dist >= totalLen), drop it silently without visual disruption.
+            // If on the arrow, let it continue its natural run until the end of the arrow (retiring: true).
+            const kept = []
+            cardsRef.current.forEach(c => {
+              if (toRetireIds.has(c.id)) {
+                const route = routes[c.routeIdx]
+                if (route) {
+                  const currentDist = (((nowAbs - c.born) / 1000) * speed) % route.cycleLen
+                  if (currentDist < route.totalLen) {
+                    kept.push({ ...c, retiring: true, retireStartDist: currentDist })
+                  }
+                }
+              } else {
+                kept.push(c)
+              }
+            })
+
+            const newRoutes = [...available].sort(() => Math.random() - 0.5).slice(0, rotateCount)
+            const newCards = newRoutes.map(routeIdx => ({
               id: `r-${nextId++}`,
-              seg: segIdx,
+              routeIdx,
               born: nowAbs,
+              crowned: Math.random() < crownedChance,
             }))
             cardsRef.current = [...kept, ...newCards]
             setCards(cardsRef.current)
           }
         }
 
-        const filtered = cardsRef.current.filter(
-          c => !c.leaving || nowAbs - c.leaveStart < LEAVE_DURATION
-        )
-        if (filtered.length !== cardsRef.current.length) {
-          cardsRef.current = filtered
-          setCards(filtered)
-        }
-
+        let hasDone = false
         const metas = cardsRef.current
         for (let i = 0; i < metas.length; i++) {
-          const el = els[i]
-          if (!el) continue
           const meta = metas[i]
-          if (meta.leaving) {
-            const progress = (nowAbs - meta.leaveStart) / LEAVE_DURATION
-            el.style.opacity = String(Math.max(0, 1 - progress))
+          const el = cardMapRef.current.get(meta.id)
+          const route = routes[meta.routeIdx]
+          if (!route) {
+            meta.done = true
+            hasDone = true
             continue
           }
-          const seg = segs[meta.seg]
-          if (!seg) continue
-          const dist = (((nowAbs - meta.born) / 1000) * speed) % seg.len
-          const t = dist / seg.len
-          let opacity = 1
-          if (t < FADE) {
-            opacity = t / FADE
-          } else if (t > 1 - FADE) {
-            opacity = (1 - t) / FADE
+
+          const dist = (((nowAbs - meta.born) / 1000) * speed) % route.cycleLen
+
+          // If retiring and it has finished its lap, cull it cleanly at the finish line
+          if (meta.retiring && (dist >= route.totalLen || dist < meta.retireStartDist)) {
+            meta.done = true
+            hasDone = true
+            if (el) el.style.opacity = '0'
+            continue
           }
-          const x = seg.s.x + (seg.e.x - seg.s.x) * t
-          const y = seg.s.y + (seg.e.y - seg.s.y) * t
+
+          // If card is in the invisible gap past the arrow, keep it completely hidden
+          if (dist > route.totalLen) {
+            if (el) el.style.opacity = '0'
+            continue
+          }
+
+          if (!el) continue
+
+          const FADE_DIST = 15
+          let opacity = 1
+          if (dist < FADE_DIST) {
+            opacity = dist / FADE_DIST
+          } else if (route.totalLen - dist < FADE_DIST) {
+            opacity = (route.totalLen - dist) / FADE_DIST
+          }
+
+          const { x, y } = interpolateRoute(route, dist)
           el.style.opacity = String(opacity)
           el.style.transform = `translate(${x}px, ${y}px)`
+        }
+
+        if (hasDone) {
+          const remaining = cardsRef.current.filter(c => !c.done)
+          cardsRef.current = remaining
+          setCards(remaining)
         }
       }
       rafId = requestAnimationFrame(tick)
@@ -361,7 +473,7 @@ export default function ArrowCardTravel({
       cancelAnimationFrame(rafId)
       if (ro) ro.disconnect()
     }
-  }, [Svg, cardWidth, speed, offset, spacing, cardColor, excludeArrowIds, flowMode, flowModeOverrides, pulseInterval, onPulse, maxCards, rerandomizeInterval])
+  }, [Svg, cardWidth, speed, offset, spacing, cardColor, flowMode, flowModeOverrides, pulseInterval, onPulse, maxCards, rerandomizeInterval, crownedChance])
 
   const cardHeight = cardWidth * CARD_ASPECT
 
@@ -370,11 +482,12 @@ export default function ArrowCardTravel({
       {Svg ? (
         <Svg style={{ width: '100%', height: 'auto', display: 'block', ...svgStyle }} />
       ) : null}
-      {cards.map((c, i) => (
+      {cards.map(c => (
         <div
           key={c.id}
           ref={el => {
-            cardElsRef.current[i] = el
+            if (el) cardMapRef.current.set(c.id, el)
+            else cardMapRef.current.delete(c.id)
           }}
           style={{
             position: 'absolute',
@@ -389,7 +502,13 @@ export default function ArrowCardTravel({
             opacity: 0,
           }}
         >
-          <CardSvg width={cardWidth} height={cardHeight} style={{ display: 'block' }} />
+          <CardIcon
+            crowned={Boolean(c.crowned)}
+            width={cardWidth}
+            height={cardHeight}
+            color={cardColor}
+            style={{ display: 'block' }}
+          />
         </div>
       ))}
     </div>

@@ -154,9 +154,12 @@
     "focused_topic": "ODAKLANAN BAŞLIK",
     "followers": "Takipçiler",
     "following": "Takip Edilenler",
+    "modifiers": "Modifiers",
     "no_users_found": "Henüz kimse yok."
   },
   "tribe": {
+    "search_placeholder": "Klanlarda ara...",
+    "most_crowded": "En Kalabalık",
     "not_found": "Klan bulunamadı",
     "join": "Katıl",
     "leave": "Ayrıl",
@@ -164,6 +167,9 @@
     "no_mission": "Henüz bir misyon belirlenmemiş.",
     "founded": "Kuruluş: ",
     "member_count_label": "Üye",
+    "member_capacity": "Üye Kapasitesi",
+    "member_capacity_desc": "Kabilenin alabileceği maksimum üye sayısı",
+    "tribe_assignment_limit_desc": "Kabilenin aktif kuşanabileceği kişilik kartı slotu",
     "features": "Klan Özellikleri",
     "personality_modifier": "Kişilik Etkisi (Personality Modifier)",
     "instruction_modifier": "Talimat Etkisi (Instruction Modifier)",
@@ -529,7 +535,7 @@
   "bletchly_guide": {
     "title": "Bletchly Nasıl Çalışır?",
     "intro": "Bletchly, insan ve yapay zeka botlarının bir arada etkileşime girdiği canlı bir sosyal medya platformudur.",
-      "hierarchy_title": "Temel konseptler ve daha fazlası",
+    "hierarchy_title": "Temel konseptler ve daha fazlası",
     "hierarchy_desc": "Botlar, kullanıcılar ve klanlar arasındaki bağlantı ve aile hiyerarşisini keşfedebilirsin.",
     "hierarchy_link": "Hiyerarşi sayfasına git",
     "bots_title": "Botlar ve Kişilikler",

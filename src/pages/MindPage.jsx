@@ -1,106 +1,181 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import useThemeStore from '../store/themeStore'
 import ForceGraph3D from 'react-force-graph-3d'
 import * as THREE from 'three'
 import { actorApi } from '../api/actorApi'
 import { tribeApi } from '../api/tribeApi'
-import { ArrowLeft, Loader2, Brain, Focus } from 'lucide-react'
+import { ArrowLeft, Loader2, Brain, Focus, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 
-// Nöron renk paleti — koyu arka planda biyolüminesans tonlar
+// Nöron renk paleti — Koyu arka planda biyolüminesans tonlar
+// (Persona/Merkez düğüm dinamik olarak tema rengine [Yeşil/Mavi] bağlanır)
 const NEURON_COLORS = {
-  Persona: { core: '#ff6b35', glow: '#ff4500' },
-  Tribe: { core: '#c084fc', glow: '#a855f7' },
-  Actor: { core: '#38bdf8', glow: '#0284c7' },
-  GeneralThought: { core: '#10b981', glow: '#059669' },
-  Topic: { core: '#00e5ff', glow: '#00bcd4' },
-  default: { core: '#818cf8', glow: '#6366f1' },
+  Tribe: { core: '#c084fc', glow: '#a855f7' },          // Asil Mor (Topluluklar)
+  Actor: { core: '#f97316', glow: '#ea580c' },          // Canlı Turuncu / Mercan (Diğer Kullanıcı & Botlar)
+  GeneralThought: { core: '#facc15', glow: '#eab308' }, // Parlak Altın Sarısı (Düşünceler, Fikirler, Konular)
+  default: { core: '#e879f9', glow: '#d946ef' },        // Fuşya
 }
 
-function getNeuronColor(label) {
+function getNeuronColor(label, isRoot = false) {
+  const isGreen = useThemeStore.getState().isGreenMode
+  if (label === 'Persona' || isRoot) {
+    return isGreen
+      ? { core: '#10b981', glow: '#059669' } // Canlı Zümrüt Yeşili
+      : { core: '#3b82f6', glow: '#1d4ed8' } // Siber Mavi
+  }
   return NEURON_COLORS[label] || NEURON_COLORS.default
 }
 
-// Three.js ile parlayan küre nesnesi oluştur (3 katman: çekirdek + orta hale + dış hale)
-function buildNeuronObject(node) {
-  const isRoot = node.label === 'Persona' || (node.label === 'Tribe' && node.isRoot)
-  const { core, glow } = getNeuronColor(node.label)
-  const group = new THREE.Group()
+// Nöron görsel dokuları ve rozet önbelleği (MindAmbience estetiği)
+const nodeTextureCache = new Map()
+const nodeBadgeCache = new Map()
 
-  // Yarıçap: ForceGraph3D link offset'iyle eşleşecek boyutta
-  const r = isRoot ? 30 : (node.label === 'GeneralThought' || node.label === 'Topic' ? 16 : 12)
-
-  // İç parlak çekirdek
-  group.add(
-    new THREE.Mesh(
-      new THREE.SphereGeometry(r, 24, 24),
-      new THREE.MeshBasicMaterial({ color: core })
-    )
-  )
-  // Orta hale
-  group.add(
-    new THREE.Mesh(
-      new THREE.SphereGeometry(r * 1.45, 18, 18),
-      new THREE.MeshBasicMaterial({ color: glow, transparent: true, opacity: 0.2 })
-    )
-  )
-  // Dış yumuşak hale
-  group.add(
-    new THREE.Mesh(
-      new THREE.SphereGeometry(r * 2.1, 12, 12),
-      new THREE.MeshBasicMaterial({ color: glow, transparent: true, opacity: 0.07 })
-    )
-  )
-
-  let titleText = node.name || node.label
-  if (titleText.length > 18) {
-    titleText = titleText.substring(0, 18) + '...'
+function getNodeVisualTextures(coreColor, glowColor) {
+  const cacheKey = `${coreColor}_${glowColor}`
+  if (nodeTextureCache.has(cacheKey)) {
+    return nodeTextureCache.get(cacheKey)
   }
-  const subtitleText = node.label
 
-  // Yazıların genişliğini önceden ölç
-  const tempCtx = document.createElement('canvas').getContext('2d')
-  tempCtx.font = 'bold 72px Inter, sans-serif'
-  const titleWidth = tempCtx.measureText(titleText).width
-  tempCtx.font = 'bold 56px Inter, sans-serif'
-  const subtitleWidth = tempCtx.measureText(subtitleText).width
-  const maxTextWidth = Math.max(titleWidth, subtitleWidth)
+  // 1. Halo Canvas (MindAmbience radyal gradyan halesi - <radialGradient>)
+  const haloCanvas = document.createElement('canvas')
+  const haloSize = 256
+  haloCanvas.width = haloSize
+  haloCanvas.height = haloSize
+  const hCtx = haloCanvas.getContext('2d')
+  const hCenter = haloSize / 2
+  const hGrad = hCtx.createRadialGradient(hCenter, hCenter, 0, hCenter, hCenter, hCenter)
+  hGrad.addColorStop(0, coreColor)
+  hGrad.addColorStop(0.45, glowColor)
+  hGrad.addColorStop(0.80, glowColor)
+  hGrad.addColorStop(1, 'rgba(0,0,0,0)')
+  hCtx.fillStyle = hGrad
+  hCtx.fillRect(0, 0, haloSize, haloSize)
+  const haloTex = new THREE.CanvasTexture(haloCanvas)
 
-  // Kutunun genişliğini yazıya göre dinamik ayarla (minimum 900px, yazı çok uzunsa daha geniş)
-  const rectWidth = Math.max(900, maxTextWidth + 180)
-  const canvasWidth = rectWidth + 100 // X=50 boşlukları için (sağ ve sol)
-  const canvasHeight = 420
+  // 2. Pearl Face Canvas (MindAmbience: core circle + sol-üst beyaz parlaklık merkezi)
+  const pearlCanvas = document.createElement('canvas')
+  const pearlSize = 256
+  pearlCanvas.width = pearlSize
+  pearlCanvas.height = pearlSize
+  const pCtx = pearlCanvas.getContext('2d')
+  const pCenter = pearlSize / 2
+  const pR = (pearlSize / 2) * 0.76
 
-  const canvas = document.createElement('canvas')
-  canvas.width = canvasWidth
-  canvas.height = canvasHeight
-  const ctx = canvas.getContext('2d')
+  // Dış ışıma
+  pCtx.save()
+  pCtx.shadowColor = glowColor
+  pCtx.shadowBlur = 24
+  pCtx.fillStyle = coreColor
+  pCtx.beginPath()
+  pCtx.arc(pCenter, pCenter, pR, 0, Math.PI * 2)
+  pCtx.fill()
+  pCtx.restore()
 
-  // Kutucuğun arka planını eski hafif şeffaf, koyu mor/lacivert cam formuna döndürüyoruz
-  ctx.fillStyle = 'rgba(10, 5, 20, 0.85)'
-  ctx.beginPath()
-  ctx.roundRect(50, 40, rectWidth, 340, 50)
-  ctx.fill()
-  ctx.strokeStyle = core
-  ctx.lineWidth = 12
-  ctx.stroke()
+  // Biyolüminesans çekirdek gradyanı
+  const coreGrad = pCtx.createRadialGradient(
+    pCenter - pR * 0.28,
+    pCenter - pR * 0.28,
+    pR * 0.04,
+    pCenter,
+    pCenter,
+    pR
+  )
+  coreGrad.addColorStop(0, '#ffffff')
+  coreGrad.addColorStop(0.30, coreColor)
+  coreGrad.addColorStop(1, glowColor)
+  pCtx.fillStyle = coreGrad
+  pCtx.beginPath()
+  pCtx.arc(pCenter, pCenter, pR, 0, Math.PI * 2)
+  pCtx.fill()
 
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  const centerX = canvasWidth / 2
+  // MindAmbience: Beyaz parlaklık merkezi (Specular Glint)
+  // cx={node.x - node.r * 0.28} cy={node.y - node.r * 0.28} r={node.r * 0.32} fill="#ffffff" opacity="0.85"
+  pCtx.save()
+  pCtx.fillStyle = 'rgba(255, 255, 255, 0.92)'
+  pCtx.shadowColor = '#ffffff'
+  pCtx.shadowBlur = 12
+  pCtx.beginPath()
+  pCtx.arc(pCenter - pR * 0.28, pCenter - pR * 0.28, pR * 0.32, 0, Math.PI * 2)
+  pCtx.fill()
+  pCtx.restore()
 
-  ctx.font = 'bold 72px Inter, sans-serif'
-  ctx.fillStyle = '#ffffff'
-  ctx.fillText(titleText, centerX, 155)
+  const pearlTex = new THREE.CanvasTexture(pearlCanvas)
 
-  ctx.font = 'bold 56px Inter, sans-serif'
-  ctx.fillStyle = glow
-  ctx.fillText(subtitleText, centerX, 260)
+  const result = { haloTex, pearlTex }
+  nodeTextureCache.set(cacheKey, result)
+  return result
+}
 
-  const tex = new THREE.CanvasTexture(canvas)
-  tex.minFilter = THREE.LinearFilter
+// 3D Canvas Düğüm Bilgi Bloğu (MindAmbience tarzı sade, zarif, okunaklı cam kart)
+function buildNodeBlock(node, core, glow, isPersona, r) {
+  let titleText = node.name || node.label
+  if (titleText.length > 22) {
+    titleText = titleText.substring(0, 22) + '...'
+  }
+  const subtitleText = node.label || ''
+  const cacheKey = `${titleText}_${subtitleText}_${core}_${glow}_${isPersona}_v2`
+
+  let tex = nodeBadgeCache.get(cacheKey)
+  if (!tex) {
+    // 2x Retina ölçeği ile kristal netliğinde çizim
+    const scale = 2
+    const tempCanvas = document.createElement('canvas')
+    const tempCtx = tempCanvas.getContext('2d')
+    tempCtx.font = '700 28px Inter, sans-serif'
+    const titleWidth = tempCtx.measureText(titleText).width
+    tempCtx.font = '600 18px Inter, sans-serif'
+    const subtitleWidth = tempCtx.measureText(subtitleText.toUpperCase()).width
+    const textWidth = Math.max(titleWidth, subtitleWidth)
+
+    const padX = 36 * scale
+    const cardW = Math.max(140 * scale, textWidth + padX)
+    const cardH = 58 * scale
+
+    const canvas = document.createElement('canvas')
+    canvas.width = cardW + 12
+    canvas.height = cardH + 12
+    const ctx = canvas.getContext('2d')
+
+    const ox = 6
+    const oy = 6
+
+    // MindAmbience sade cam kart: fill="rgba(10, 5, 20, 0.90)" stroke={core}
+    ctx.fillStyle = isPersona ? 'rgba(8, 4, 20, 0.94)' : 'rgba(10, 5, 20, 0.90)'
+    ctx.beginPath()
+    ctx.roundRect(ox, oy, cardW, cardH, 8 * scale)
+    ctx.fill()
+
+    ctx.strokeStyle = core
+    ctx.lineWidth = 1.6 * scale
+    ctx.stroke()
+
+    // Başlık (Beyaz, net Inter)
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    const centerX = canvas.width / 2
+
+    ctx.font = '700 28px Inter, sans-serif'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText(titleText, centerX, oy + 20 * scale)
+
+    // Alt etiket (Tema rengi, sade, opacity: 0.90)
+    ctx.font = '600 18px Inter, sans-serif'
+    ctx.fillStyle = glow
+    ctx.globalAlpha = 0.90
+    ctx.fillText(subtitleText.toUpperCase(), centerX, oy + 42 * scale)
+    ctx.globalAlpha = 1.0
+
+    tex = new THREE.CanvasTexture(canvas)
+    tex.minFilter = THREE.LinearFilter
+    tex.userData = { cardW: cardW / scale, cardH: cardH / scale }
+    nodeBadgeCache.set(cacheKey, tex)
+  }
+
+  const baseW = tex.userData?.cardW || 140
+  const baseH = tex.userData?.cardH || 58
+
   const badgeMat = new THREE.MeshBasicMaterial({
     map: tex,
     transparent: true,
@@ -108,28 +183,98 @@ function buildNeuronObject(node) {
     depthWrite: false,
   })
 
-  // Dinamik orantı: Canvas genişliğine göre Mesh'in X genişliğini uzatıyoruz
-  // Persona node'u çok büyük olduğu için kutucuğu devasa yapmamak adına boyut çarpanını kısıtlıyoruz
-  const scaleR = isPersona ? 20 : r
-  const scaleX = (canvasWidth / 1000) * (scaleR * 12.0)
-  const scaleY = scaleR * 4.2
+  // Rahatça okunabilecek belirgin ve dengeli 3D boyutu
+  const scaleFactor = isPersona ? 0.72 : 0.56
+  const meshW = baseW * scaleFactor
+  const meshH = baseH * scaleFactor
 
-  const badgeGeo = new THREE.PlaneGeometry(scaleX, scaleY)
+  const badgeGeo = new THREE.PlaneGeometry(meshW, meshH)
   const badgeMesh = new THREE.Mesh(badgeGeo, badgeMat)
 
-  // Gerçek r'ye göre yüksekliği ayarla ki kürenin içine girmesin ama çok da uçmasın
-  const heightMultiplier = isPersona ? 2.5 : 5.0
-  badgeMesh.position.set(0, r * heightMultiplier, 0)
+  // Düğümün hemen üstünde estetik süzülme
+  badgeMesh.position.set(0, r + meshH * 0.5 + 6, 0)
   badgeMesh.renderOrder = 9999999
   badgeMesh.userData = { isBadge: true }
 
-  // Mesh'in her zaman kameraya bakmasını sağla
   badgeMesh.onBeforeRender = function (renderer, scene, camera) {
     this.quaternion.copy(camera.quaternion)
   }
 
-  group.add(badgeMesh)
+  return badgeMesh
+}
 
+// Three.js ile parlayan nöron nesnesi oluştur (MindAmbience estetiğiyle birebir)
+function buildNeuronObject(node) {
+  const isRoot = node.label === 'Persona' || (node.label === 'Tribe' && node.isRoot)
+  const isPersona = isRoot
+  const { core, glow } = getNeuronColor(node.label, isRoot)
+  const group = new THREE.Group()
+
+  // MindAmbience oranları: Persona hafifçe daha büyük (22 vs 13)
+  const r = isPersona ? 22 : (node.label === 'GeneralThought' || node.label === 'Topic' ? 15 : 12)
+
+  // Biyolüminesans süzülme için alt grup (MindAmbience mindFloatCenter)
+  const visualGroup = new THREE.Group()
+  visualGroup.userData = {
+    isVisualGroup: true,
+    isPersonaNode: isPersona,
+    seed: (strHash(node.id || node.name || 'node') % 1000) / 1000,
+  }
+
+  const { haloTex, pearlTex } = getNodeVisualTextures(core, glow)
+
+  // 1. Dış en yumuşak ışıma (MindAmbience r * 2.8 radyal gradyan halesi - mindPulseHalo)
+  const haloGeo = new THREE.PlaneGeometry(r * 5.6, r * 5.6)
+  const haloMat = new THREE.MeshBasicMaterial({
+    map: haloTex,
+    transparent: true,
+    opacity: isPersona ? 0.45 : 0.32,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  })
+  const haloMesh = new THREE.Mesh(haloGeo, haloMat)
+  haloMesh.userData = { isHalo: true, isPersona: isPersona, baseOpacity: isPersona ? 0.45 : 0.32 }
+  haloMesh.onBeforeRender = function (renderer, scene, camera) {
+    this.quaternion.copy(camera.quaternion)
+  }
+  visualGroup.add(haloMesh)
+
+  // 2. Orta hale küresi (MindAmbience r * 1.6 - fill={node.glow} opacity="0.32")
+  const midHaloGeo = new THREE.SphereGeometry(r * 1.55, 20, 20)
+  const midHaloMat = new THREE.MeshBasicMaterial({
+    color: glow,
+    transparent: true,
+    opacity: isPersona ? 0.32 : 0.22,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  })
+  visualGroup.add(new THREE.Mesh(midHaloGeo, midHaloMat))
+
+  // 3. 3D İç Fiziksel Çekirdek Küresi (Tıklama ve 3D derinlik)
+  const coreSphereGeo = new THREE.SphereGeometry(r, 28, 28)
+  const coreSphereMat = new THREE.MeshBasicMaterial({ color: core })
+  visualGroup.add(new THREE.Mesh(coreSphereGeo, coreSphereMat))
+
+  // 4. Biyolüminesans Pearl Yüzeyi ve Beyaz Parlaklık Merkezi (MindAmbience Glossy Pearl Face)
+  // Kameraya dönük parlak pearl diski: Çekirdek rengi + sol üst beyaz parlaklık noktası (Specular Glint)
+  const pearlGeo = new THREE.PlaneGeometry(r * 2.15, r * 2.15)
+  const pearlMat = new THREE.MeshBasicMaterial({
+    map: pearlTex,
+    transparent: true,
+    depthWrite: false,
+  })
+  const pearlMesh = new THREE.Mesh(pearlGeo, pearlMat)
+  pearlMesh.renderOrder = 999
+  pearlMesh.onBeforeRender = function (renderer, scene, camera) {
+    this.quaternion.copy(camera.quaternion)
+  }
+  visualGroup.add(pearlMesh)
+
+  // 5. Düğüm Başlık Bloğu (Orijinal 3D Canvas Kart Yapısı)
+  const badgeMesh = buildNodeBlock(node, core, glow, isPersona, r)
+  visualGroup.add(badgeMesh)
+
+  group.add(visualGroup)
   return group
 }
 
@@ -154,70 +299,98 @@ function strHash(str) {
   return Math.abs(h)
 }
 
-// Global shader uniforms
+// Global shader uniforms (Biyolüminesans elektrik impulsu)
+const isInitialGreen = typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isGreenMode : false
 const globalUniforms = {
   uTime: { value: 0 },
-  uPulseColor: { value: new THREE.Vector3(1.0, 0.05, 0.05) },
+  uPulseColor: {
+    value: new THREE.Vector3(
+      isInitialGreen ? 0.2 : 0.23,
+      isInitialGreen ? 0.83 : 0.51,
+      isInitialGreen ? 0.6 : 0.98
+    ),
+  },
 }
 
-// Shader enjeksiyonu: Kan nabzı efekti (kalp atışı ritmi)
-const injectPulseShader = (shader) => {
-  shader.uniforms.uTime = globalUniforms.uTime
-  shader.uniforms.uPulseColor = globalUniforms.uPulseColor
-
-  // vertexShader: uv koordinatlarını varying olarak frag shader'a gönder
-  shader.vertexShader = `
-    varying vec2 vUvPulse;
-    ${shader.vertexShader}
-  `.replace(
-    `#include <begin_vertex>`,
-    `#include <begin_vertex>
-     vUvPulse = uv;`
-  )
-
-  // fragmentShader: emissive rengine dalga fonksiyonu ekle
-  shader.fragmentShader = `
-    uniform float uTime;
-    uniform vec3 uPulseColor;
-    varying vec2 vUvPulse;
-    ${shader.fragmentShader}
-  `.replace(
-    `vec3 totalEmissiveRadiance = emissive;`,
-    `
-    // vUvPulse.x tüp boyunca (start -> end) ilerler
-    // Hız ve dalga yoğunluğu
-    float speed = 1.2;
-    float phase = uTime * speed - vUvPulse.x * 4.0;
-    
-    // Kalp atışı (çift vuruş) efekti
-    float beat = fract(phase);
-    float pulse = exp(-18.0 * beat) + 0.6 * exp(-18.0 * fract(beat + 0.15));
-    
-    // Parlak kan kırmızısı ışıma
-    vec3 pulseColor = uPulseColor * pulse * 2.8;
-    vec3 totalEmissiveRadiance = emissive + pulseColor;
-    `
-  )
-}
-
-// Global materyaller (performans için)
-const _vesselMat = new THREE.MeshPhongMaterial({
-  color: '#b30000',
-  emissive: '#3d0000',
-  shininess: 70,
-  opacity: 1.0,
-  transparent: false, // Damarlar OPAQUE pass'te çizilecek! Böylece Transparent pass'teki panolar her halükarda onların üzerine çizecek.
-})
-_vesselMat.onBeforeCompile = injectPulseShader
-
-const _branchMat = new THREE.MeshPhongMaterial({
-  color: '#990000',
-  emissive: '#2b0000',
-  shininess: 50,
-  opacity: 0.85,
+// ─── MindAmbience Sinaps Bağlantı Materyalleri ────────────────────────────────
+// 1. Sinaps ana omurga yolu (MindAmbience stroke="var(--color-border)" strokeWidth="1.6" strokeOpacity="0.5")
+const _synapseTrackMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#064e3b' : '#1e293b',
   transparent: true,
+  opacity: 0.4,
+  depthWrite: false,
 })
-_branchMat.onBeforeCompile = injectPulseShader
+
+// 2. Sinaps dış eterik ışıma halesi (MindAmbience filter="url(#synapseGlow)" strokeOpacity="0.15")
+const _synapseHaloMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#10b981' : '#3b82f6',
+  transparent: true,
+  opacity: 0.16,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+})
+
+// 3. Akıcı nöral kesikli elektrik sinyali shader'ı (MindAmbience strokeDasharray="6 14" ve @keyframes mindSynapseDash)
+const _synapseDashShaderMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: globalUniforms.uTime,
+    uColor: {
+      value: new THREE.Color(isInitialGreen ? '#34d399' : '#60a5fa'),
+    },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    uniform vec3 uColor;
+    varying vec2 vUv;
+
+    void main() {
+      // vUv.x tüp boyunca (başlangıçtan bitişe) 0..1 arası akar
+      // MindAmbience akıcı kesikli sinyal çizgisi ritmi
+      float speed = 3.2;
+      float segments = 22.0;
+      float stream = fract(vUv.x * segments - uTime * speed);
+
+      // MindAmbience "6 14" oranı: ~%30 çizgi, ~%70 boşluk
+      float dash = smoothstep(0.0, 0.06, stream) * (1.0 - smoothstep(0.28, 0.35, stream));
+
+      if (dash < 0.02) discard;
+
+      // Beyaz-sıcak elektrik kıvılcım çekirdeği + neon gövde
+      vec3 coreWhite = vec3(1.0, 1.0, 1.0);
+      vec3 electricColor = mix(uColor, coreWhite, pow(dash, 1.8) * 0.75);
+
+      gl_FragColor = vec4(electricColor, dash * 0.95);
+    }
+  `,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  side: THREE.DoubleSide,
+})
+
+// 4. Seyahat eden darbe küresi (Traveling Pulse Orb) ışıma materyalleri
+const _orbGlowMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#34d399' : '#60a5fa',
+  transparent: true,
+  opacity: 0.75,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+})
+
+const _orbCoronaMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#10b981' : '#3b82f6',
+  transparent: true,
+  opacity: 0.25,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+})
 
 const linkLabelCache = new Map()
 
@@ -227,28 +400,29 @@ function buildCapillaryObject(link) {
 
   if (link && link.name) {
     if (!linkLabelCache.has(link.name)) {
+      const isGreen = useThemeStore.getState().isGreenMode
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
-      ctx.font = 'bold 36px Inter, sans-serif'
+      ctx.font = 'bold 44px Inter, sans-serif'
       const textWidth = ctx.measureText(link.name).width
 
-      const rectWidth = Math.max(160, textWidth + 80)
-      canvas.width = rectWidth + 20
-      canvas.height = 80
+      const rectWidth = Math.max(180, textWidth + 90)
+      canvas.width = rectWidth + 24
+      canvas.height = 96
 
-      ctx.fillStyle = 'rgba(20, 0, 5, 0.85)'
+      ctx.fillStyle = 'rgba(10, 15, 25, 0.9)'
       ctx.beginPath()
-      ctx.roundRect(10, 10, rectWidth, 60, 15)
+      ctx.roundRect(12, 12, rectWidth, 72, 18)
       ctx.fill()
-      ctx.strokeStyle = '#b30000'
-      ctx.lineWidth = 2
+      ctx.strokeStyle = isGreen ? '#10b981' : '#3b82f6'
+      ctx.lineWidth = 3
       ctx.stroke()
 
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.font = 'bold 36px Inter, sans-serif'
-      ctx.fillStyle = '#ffb3b3'
-      ctx.fillText(link.name, canvas.width / 2, 40)
+      ctx.font = 'bold 44px Inter, sans-serif'
+      ctx.fillStyle = isGreen ? '#a7f3d0' : '#bfdbfe'
+      ctx.fillText(link.name, canvas.width / 2, 48)
 
       const tex = new THREE.CanvasTexture(canvas)
       tex.minFilter = THREE.LinearFilter
@@ -260,13 +434,13 @@ function buildCapillaryObject(link) {
         depthWrite: false,
       })
 
-      const scaleX = (canvas.width / 400) * 40
+      const scaleX = (canvas.width / 400) * 44
       linkLabelCache.set(link.name, { mat: labelMat, width: scaleX })
     }
 
     const { mat, width } = linkLabelCache.get(link.name)
-    const baseScale = 1.6 // Etiketleri default olarak çok daha büyük yaptık
-    const labelGeo = new THREE.PlaneGeometry(width * baseScale, 8 * baseScale)
+    const baseScale = 2.1 // Bağlantı blokçuğu boyutu büyütüldü
+    const labelGeo = new THREE.PlaneGeometry(width * baseScale, 9.6 * baseScale)
     const labelMesh = new THREE.Mesh(labelGeo, mat)
 
     labelMesh.renderOrder = 9999998
@@ -282,81 +456,45 @@ function buildCapillaryObject(link) {
   return g
 }
 
-// Organik dal oluşturucu — recursif çağrılabilir
-function addVesselBranch(obj, mat, rng, startPt, direction, length, radius, depth, perp1, perp2) {
-  if (depth === 0 || length < 4 || radius < 0.25) return
-
-  const pts = [startPt.clone()]
-  const segments = 4 + Math.floor(rng() * 3) // 4–6 segment
-  for (let s = 1; s <= segments; s++) {
-    const t = s / segments
-    const base = startPt.clone().addScaledVector(direction, length * t)
-
-    // Eğer ana damar hedefe ulaşıyorsa sapma ekleme, tam hedef node'a (uca) kilitlensin!
-    // Bu sayede damar ucu boşlukta kalmaz, fiziksel olarak diğer node'a bağlanır.
-    if (s < segments) {
-      const warpMag = length * (0.28 + rng() * 0.18)
-      base
-        .addScaledVector(perp1, (rng() - 0.5) * warpMag)
-        .addScaledVector(perp2, (rng() - 0.5) * warpMag)
-        .addScaledVector(direction, (rng() - 0.5) * length * 0.08) // boyunca da hafif zikzak
-    }
-    pts.push(base)
-  }
-
-  const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.7)
-  const tubeSegs = Math.max(8, Math.floor(segments * 5))
-  const geo = new THREE.TubeGeometry(curve, tubeSegs, radius, 6, false)
-  const mesh = new THREE.Mesh(geo, mat)
-  mesh.renderOrder = -999 // Damarları her zaman arkaya it (ilk çizilsinler)
-  obj.add(mesh)
-
-  // Bu dal üzerinde 1–3 alt dal oluştur
-  const childCount = depth === 1 ? 1 + Math.floor(rng() * 2) : 2 + Math.floor(rng() * 2)
-  for (let i = 0; i < childCount; i++) {
-    const t = 0.2 + rng() * 0.65 // dallanma noktası
-    const bStart = curve.getPoint(t)
-    const mainTangent = curve.getTangent(t).normalize()
-
-    // Tamamen rastgele bir dik yön — geometrik değil
-    const randVec = new THREE.Vector3(rng() - 0.5, rng() - 0.5, rng() - 0.5).normalize()
-    const bDir = new THREE.Vector3()
-      .crossVectors(mainTangent, randVec)
-      .normalize()
-      .addScaledVector(randVec, 0.35 + rng() * 0.4) // biraz rastgele bileşen ekle
-      .normalize()
-
-    const bLen = length * (0.35 + rng() * 0.35) // %35–%70 uzunluk
-    const bRadius = radius * (0.42 + rng() * 0.18) // incelme
-
-    // Alt dalın kendi dik vektörleri
-    const bUp = Math.abs(bDir.y) < 0.85 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
-    const bPerp1 = new THREE.Vector3().crossVectors(bDir, bUp).normalize()
-    const bPerp2 = new THREE.Vector3().crossVectors(bDir, bPerp1).normalize()
-
-    addVesselBranch(obj, mat, rng, bStart, bDir, bLen, bRadius, depth - 1, bPerp1, bPerp2)
-  }
-}
-
+// Temiz, organik kavisli sinaps hattı ve seyahat eden darbe küresi oluşturucu (MindAmbience stili)
 function updateCapillaryPosition(obj, { start, end }, link) {
   const sv = new THREE.Vector3(start.x, start.y, start.z)
   const ev = new THREE.Vector3(end.x, end.y, end.z)
-  const dir = ev.clone().sub(sv).normalize()
   const len = sv.distanceTo(ev)
   if (len < 1) return true
 
   // Pozisyon cache — gereksiz yeniden çizimi önle
-  const posKey = `${start.x.toFixed(0)},${start.y.toFixed(0)},${end.x.toFixed(0)},${end.y.toFixed(0)}`
+  const posKey = `${start.x.toFixed(0)},${start.y.toFixed(0)},${start.z?.toFixed(0) || 0},${end.x.toFixed(0)},${end.y.toFixed(0)},${end.z?.toFixed(0) || 0}`
   if (obj.userData._posKey === posKey) return true
   obj.userData._posKey = posKey
 
-  // Önceki geometrileri temizle, ancak isim etiketini koru ve pozisyonunu güncelle
+  // Organik kavis için yay (MindAmbience beziere eğrisi gibi dışa doğru kavisli kubbe)
+  const mid = new THREE.Vector3().addVectors(sv, ev).multiplyScalar(0.5)
+  const dir = new THREE.Vector3().subVectors(ev, sv)
+  const dirNorm = dir.clone().normalize()
+
+  // Merkezden dışa doğru radyal yayılma vektörü
+  const radial = mid.clone().normalize()
+  const dot = radial.dot(dirNorm)
+  const perp = radial.sub(dirNorm.clone().multiplyScalar(dot)).normalize()
+
+  // Tohum değerine göre kavis yönü ve dış bükey kubbe eğimi
+  const seedVal = strHash(link?.id || link?.name || 'seed')
+  const bowAmount = Math.min(len * 0.16, 42)
+  mid.addScaledVector(perp, bowAmount)
+
+  const curve = new THREE.QuadraticBezierCurve3(sv, mid, ev)
+  obj.userData.curve = curve
+  obj.userData.seed = (seedVal % 1000) / 1000
+
+  // Önceki geometrileri temizle, ancak etiket ve orb'u koru
   const toRemove = []
   obj.children.forEach((c) => {
-    if (c.userData && c.userData.isLinkLabel) {
-      const midPoint = new THREE.Vector3().addVectors(sv, ev).multiplyScalar(0.5)
-      midPoint.y += 4 // Etiket damarın hafif üzerinde yüzsün
-      c.position.copy(midPoint)
+    if (c.userData && (c.userData.isLinkLabel || c.userData.isPulseOrb)) {
+      if (c.userData.isLinkLabel) {
+        c.position.copy(curve.getPoint(0.5))
+        c.position.y += 6
+      }
     } else {
       c.geometry?.dispose()
       toRemove.push(c)
@@ -364,22 +502,52 @@ function updateCapillaryPosition(obj, { start, end }, link) {
   })
   toRemove.forEach((c) => obj.remove(c))
 
-  const linkId =
-    typeof link.source === 'object'
-      ? `${link.source.id ?? ''}-${link.target?.id ?? ''}`
-      : `${link.source}-${link.target}`
-  const rng = makeRng(strHash(linkId))
+  // 1. Dış yumuşak ışıma kılıfı (Halo - MindAmbience filter="url(#synapseGlow)" stili)
+  const haloGeo = new THREE.TubeGeometry(curve, 24, 1.5, 6, false)
+  const haloMesh = new THREE.Mesh(haloGeo, _synapseHaloMat)
+  haloMesh.renderOrder = -1000
+  obj.add(haloMesh)
 
-  // Ana dik eksenler
-  const up = Math.abs(dir.y) < 0.85 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0)
-  const perp1 = new THREE.Vector3().crossVectors(dir, up).normalize()
-  const perp2 = new THREE.Vector3().crossVectors(dir, perp1).normalize()
+  // 2. Akıcı nöral kesikli çizgi tüpü (MindAmbience strokeDasharray="6 14" akışı)
+  const dashGeo = new THREE.TubeGeometry(curve, 32, 0.7, 6, false)
+  const dashMesh = new THREE.Mesh(dashGeo, _synapseDashShaderMat)
+  dashMesh.renderOrder = -999
+  obj.add(dashMesh)
 
-  // Ana damar kalınlığı
-  const mainRadius = 2.2 + rng() * 1.0 // 2.2 – 3.2
+  // 3. İç ana omurga yolu (Base track - MindAmbience stroke="var(--color-border)")
+  const trackGeo = new THREE.TubeGeometry(curve, 28, 0.42, 6, false)
+  const trackMesh = new THREE.Mesh(trackGeo, _synapseTrackMat)
+  trackMesh.renderOrder = -998
+  obj.add(trackMesh)
 
-  // Ana damarı recursif fonksiyonla çiz, depth=2 → 2 seviye dallanma
-  addVesselBranch(obj, _vesselMat, rng, sv, dir, len, mainRadius, 2, perp1, perp2)
+  // 4. Hat boyunca seyahat eden parıltılı enerji küresi (Pulse Orb - MindAmbience <circle> darbesi)
+  let pulseOrb = obj.children.find((c) => c.userData && c.userData.isPulseOrb)
+  if (!pulseOrb) {
+    pulseOrb = new THREE.Group()
+    pulseOrb.userData = { isPulseOrb: true }
+    // Beyaz-sıcak parlak çekirdek (MindAmbience r="3.5" fill="#ffffff")
+    const inner = new THREE.Mesh(
+      new THREE.SphereGeometry(1.6, 16, 16),
+      new THREE.MeshBasicMaterial({ color: '#ffffff' })
+    )
+    // Renkli parıldayan yoğun neon iç hale (MindAmbience r="7" fill={personaColors.core} opacity="0.45")
+    const outer = new THREE.Mesh(
+      new THREE.SphereGeometry(4.2, 16, 16),
+      _orbGlowMat
+    )
+    // Geniş eterik dış korona
+    const corona = new THREE.Mesh(
+      new THREE.SphereGeometry(7.2, 12, 12),
+      _orbCoronaMat
+    )
+    pulseOrb.add(inner)
+    pulseOrb.add(outer)
+    pulseOrb.add(corona)
+    pulseOrb.renderOrder = -990
+    obj.add(pulseOrb)
+  }
+  obj.userData.pulseOrb = pulseOrb
+  pulseOrb.position.copy(curve.getPoint(0))
 
   return true
 }
@@ -390,8 +558,8 @@ const TOPBAR_HEIGHT = 'var(--topbar-height)'
 function NodeDetailPanel({ node, onClose }) {
   const { t } = useTranslation()
   const { isDarkMode } = useThemeStore()
-  const { core, glow } = getNeuronColor(node.label)
-  const icon = node.label === 'Persona' ? '🧠' : node.label === 'Topic' ? '📌' : '💠'
+  const isRoot = node.label === 'Persona' || (node.label === 'Tribe' && node.isRoot)
+  const { core, glow } = getNeuronColor(node.label, isRoot)
 
   return (
     <div
@@ -420,22 +588,17 @@ function NodeDetailPanel({ node, onClose }) {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div
             style={{
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: 'rgba(255,255,255,0.05)',
-              border: `1px solid ${glow}`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 28,
+              width: 14,
+              height: 14,
+              borderRadius: '50%',
+              background: core,
+              boxShadow: `0 0 12px ${glow}`,
+              flexShrink: 0,
             }}
-          >
-            {icon}
-          </div>
+          />
           <div>
             <div
               style={{
@@ -485,9 +648,9 @@ function NodeDetailPanel({ node, onClose }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {Object.entries(node).map(([key, value]) => {
-          // Grafik içi gereksiz 3D koordinat bilgilerini filtrele
+          // Grafik içi gereksiz 3D koordinat ve dahili durum bilgilerini filtrele
           if (
-            ['id', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'index', 'name', 'label', 'val', 'color', '__indexColor', '__threeObj'].includes(key) ||
+            ['id', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'fx', 'fy', 'fz', 'index', 'name', 'label', 'val', 'color', 'isRoot', 'embedding', '__indexColor', '__threeObj'].includes(key) ||
             typeof value === 'object'
           )
             return null
@@ -537,8 +700,11 @@ function NodeDetailPanel({ node, onClose }) {
 export default function MindPage() {
   const { t } = useTranslation()
   const [searchParams] = useSearchParams()
+  const location = useLocation()
   const actorId = searchParams.get('actorId')
   const tribeId = searchParams.get('tribeId')
+  const queryName = searchParams.get('name') || location.state?.name || location.state?.profileName || null
+  const [rootName, setRootName] = useState(queryName)
   const navigate = useNavigate()
   const isGreenMode = useThemeStore((s) => s.isGreenMode)
   const isDarkMode = useThemeStore((s) => s.isDarkMode)
@@ -553,43 +719,83 @@ export default function MindPage() {
   const btnBorder = isGreenMode ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(59, 130, 246, 0.3)'
 
   useEffect(() => {
-    if (isGreenMode) {
-      _vesselMat.color.set('#059669')
-      _vesselMat.emissive.set('#022c22')
-      _branchMat.color.set('#10b981')
-      _branchMat.emissive.set('#064e3b')
-      globalUniforms.uPulseColor.value.set(0.05, 1.0, 0.2)
-    } else {
-      _vesselMat.color.set('#2563eb')
-      _vesselMat.emissive.set('#1e3a8a')
-      _branchMat.color.set('#3b82f6')
-      _branchMat.emissive.set('#1e40af')
-      globalUniforms.uPulseColor.value.set(0.05, 0.5, 1.0)
+    linkLabelCache.clear()
+    nodeTextureCache.clear()
+    nodeBadgeCache.clear()
+    const green = isGreenMode
+    _synapseTrackMat.color.set(green ? '#064e3b' : '#1e293b')
+    _synapseHaloMat.color.set(green ? '#10b981' : '#3b82f6')
+    _synapseHaloMat.opacity = green ? 0.18 : 0.15
+    _orbGlowMat.color.set(green ? '#34d399' : '#60a5fa')
+    _orbCoronaMat.color.set(green ? '#10b981' : '#3b82f6')
+
+    if (_synapseDashShaderMat.uniforms.uColor) {
+      _synapseDashShaderMat.uniforms.uColor.value.set(green ? '#34d399' : '#60a5fa')
+    }
+
+    globalUniforms.uPulseColor.value.set(
+      green ? 0.2 : 0.23,
+      green ? 0.83 : 0.51,
+      green ? 0.6 : 0.98
+    )
+    if (fgRef.current) {
+      fgRef.current.refresh()
     }
   }, [isGreenMode])
 
   const [isLoading, setIsLoading] = useState(true)
   const [rawData, setRawData] = useState([])
   const [selectedNode, setSelectedNode] = useState(null)
+  const [nodeSearch, setNodeSearch] = useState('')
+  const [isNodeListCollapsed, setIsNodeListCollapsed] = useState(false)
 
   const fgRef = useRef()
   const containerRef = useRef()
   const isInitialZoomRef = useRef(true)
   const hoveredLinkRef = useRef(null)
   const selectedLinkRef = useRef(null)
+  const selectedNodeRef = useRef(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
-  // Shader'lar için global zaman sayacı ve etiket animasyonları
+  useEffect(() => {
+    selectedNodeRef.current = selectedNode
+  }, [selectedNode])
+
+  // Shader'lar için global zaman sayacı ve animasyonlar
   useEffect(() => {
     let frameId
     const startTime = Date.now()
     const updateTime = () => {
-      globalUniforms.uTime.value = (Date.now() - startTime) / 1000
+      const nowSec = (Date.now() - startTime) / 1000
+      globalUniforms.uTime.value = nowSec
 
-      // Damar etiketleri için pürüzsüz büyüme/küçülme (smooth lerp) animasyonu
+      // Persona süzülme, haleler, seyahat eden sinaps orbları ve etiketler
       if (fgRef.current) {
         const scene = fgRef.current.scene()
         scene.traverse((obj) => {
+          if (obj.userData && obj.userData.isVisualGroup) {
+            const speed = obj.userData.isPersonaNode ? 1.3 : 1.1
+            const seed = obj.userData.seed || 0
+            // MindAmbience mindFloatCenter süzülme animasyonu
+            obj.position.y = Math.sin(nowSec * speed + seed) * (obj.userData.isPersonaNode ? 4.5 : 2.8)
+          }
+          if (obj.userData && obj.userData.isHalo) {
+            // MindAmbience mindPulseHalo 3s nefes alma
+            const p = 1.0 + Math.sin(nowSec * 2.1) * 0.08
+            obj.scale.set(p, p, 1)
+            if (obj.material) {
+              obj.material.opacity = obj.userData.baseOpacity * (0.85 + Math.sin(nowSec * 2.1) * 0.15)
+            }
+          }
+          if (obj.userData && obj.userData.curve && obj.userData.pulseOrb) {
+            const speed = 0.38
+            const seed = obj.userData.seed || 0
+            const t = (nowSec * speed + seed) % 1
+            obj.userData.pulseOrb.position.copy(obj.userData.curve.getPoint(t))
+            // Uç noktalara yaklaşırken yumuşak nefes alma (fade in/out)
+            const fade = Math.sin(t * Math.PI)
+            obj.userData.pulseOrb.scale.setScalar(Math.max(0.01, fade))
+          }
           if (obj.userData && obj.userData.isLinkLabel) {
             const isHovered = obj.userData.link === hoveredLinkRef.current
             const isSelected = obj.userData.link === selectedLinkRef.current
@@ -627,25 +833,40 @@ export default function MindPage() {
     const fetchMemory = async () => {
       setIsLoading(true)
       try {
-        const response = actorId 
-          ? await actorApi.getFullMemory(actorId)
-          : await tribeApi.getFullMemory(tribeId)
-        
-        if (response.data.succeeded) {
-          if (response.data.data) {
-            try {
-              const parsedData = JSON.parse(response.data.data)
-              setRawData(parsedData)
-            } catch (e) {
-              console.error('Failed to parse neo4j output:', e)
-              toast.error(t('mind.parse_error', 'Failed to parse memory data.'))
+        const [memoryRes, profileRes] = await Promise.allSettled([
+          actorId ? actorApi.getFullMemory(actorId) : tribeApi.getFullMemory(tribeId),
+          actorId ? actorApi.getProfile(actorId) : tribeApi.getTribe(tribeId),
+        ])
+
+        if (profileRes.status === 'fulfilled' && profileRes.value?.data?.succeeded) {
+          const pData = profileRes.value.data.data
+          const resolvedName = pData?.profileName || pData?.tribeName || pData?.name
+          if (resolvedName) {
+            setRootName(resolvedName)
+          }
+        }
+
+        if (memoryRes.status === 'fulfilled') {
+          const response = memoryRes.value
+          if (response.data.succeeded) {
+            if (response.data.data) {
+              try {
+                const parsedData = JSON.parse(response.data.data)
+                setRawData(parsedData)
+              } catch (e) {
+                console.error('Failed to parse neo4j output:', e)
+                toast.error(t('mind.parse_error', 'Failed to parse memory data.'))
+                setRawData([])
+              }
+            } else {
               setRawData([])
             }
           } else {
-            setRawData([])
+            toast.error(response.data.errors?.[0]?.description || t('mind.fetch_error', 'Failed to fetch memory.'))
           }
         } else {
-          toast.error(response.data.errors?.[0]?.description || t('mind.fetch_error', 'Failed to fetch memory.'))
+          console.error(memoryRes.reason)
+          toast.error(t('mind.generic_error', 'An error occurred while fetching memory.'))
         }
       } catch (error) {
         console.error(error)
@@ -656,7 +877,7 @@ export default function MindPage() {
     }
 
     fetchMemory()
-  }, [actorId, navigate, t])
+  }, [actorId, tribeId, navigate, t])
 
   const graphData = useMemo(() => {
     if (!rawData || !Array.isArray(rawData)) return { nodes: [], links: [] }
@@ -674,11 +895,18 @@ export default function MindPage() {
         const nodeId = n.id || n.name || JSON.stringify(n)
         if (!nodesMap.has(nodeId)) {
           const isRoot = n.label === 'Persona' || (n.label === 'Tribe' && (n.id === tribeId || idx === 0))
-          const { core } = getNeuronColor(n.label)
+          const { core } = getNeuronColor(n.label, isRoot)
+
+          let displayName = n.name || nodeId
+          // Kök düğümde GUID yerine aktörün/grubun gerçek kullanıcı adını ver
+          if (isRoot && rootName) {
+            displayName = rootName
+          }
+
           nodesMap.set(nodeId, {
             ...n,
             id: nodeId,
-            name: n.name || nodeId,
+            name: displayName,
             label: n.label,
             isRoot,
             val: isRoot ? 200 : 10,
@@ -741,7 +969,25 @@ export default function MindPage() {
       nodes,
       links: linksArr,
     }
-  }, [rawData, tribeId, actorId])
+  }, [rawData, tribeId, actorId, rootName])
+
+  const sortedNodes = useMemo(() => {
+    return [...graphData.nodes].sort((a, b) => {
+      if (a.isRoot && !b.isRoot) return -1
+      if (!a.isRoot && b.isRoot) return 1
+      return (a.name || '').localeCompare(b.name || '')
+    })
+  }, [graphData.nodes])
+
+  const filteredNodes = useMemo(() => {
+    if (!nodeSearch.trim()) return sortedNodes
+    const q = nodeSearch.toLowerCase()
+    return sortedNodes.filter(
+      (n) =>
+        (n.name && n.name.toLowerCase().includes(q)) ||
+        (n.label && n.label.toLowerCase().includes(q))
+    )
+  }, [sortedNodes, nodeSearch])
 
   // Drag sınırı — node'lar bu yarıçapı aşamaz
   const MAX_DRAG_DIST = 650
@@ -756,35 +1002,11 @@ export default function MindPage() {
   }, [])
 
   const handleNodeClick = useCallback((node) => {
+    if (!node) return
+    selectedNodeRef.current = node
     setSelectedNode(node)
     selectedLinkRef.current = null // Node seçildiğinde damar seçimini iptal et
-    const r = node.label === 'Persona' ? 30 : (node.label === 'Topic' ? 14 : 8)
-    const distance = r * 1.1
-
-    if (fgRef.current) {
-      if (node.x === 0 && node.y === 0 && node.z === 0) {
-        fgRef.current.cameraPosition({ x: 0, y: 0, z: distance }, node, 1000)
-      } else {
-        const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z)
-        fgRef.current.cameraPosition(
-          { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
-          node,
-          1000
-        )
-      }
-    }
   }, [])
-
-  // Panel açıkken (bir node seçiliyken) arkadaki tüm 3D isim kutucuklarını ve damar bağlantı yazılarını gizle
-  useEffect(() => {
-    if (!fgRef.current) return
-    const scene = fgRef.current.scene()
-    scene.traverse((obj) => {
-      if (obj.userData && (obj.userData.isBadge || obj.userData.isLinkLabel)) {
-        obj.visible = !selectedNode
-      }
-    })
-  }, [selectedNode])
 
   // Grafik yüklenince iç D3 node'larına Fibonacci küre pozisyonu ata
   // useEffect + setTimeout: ForceGraph3D'nin kendi iç veri yapısını hazırlamasını bekle
@@ -877,8 +1099,15 @@ export default function MindPage() {
     if (!fgRef.current || graphData.nodes.length === 0) return
     let angle = 0
     const id = setInterval(() => {
-      if (!fgRef.current || userInteractingRef.current) return
-      angle += 0.002
+      // Bir düğüm veya bağlantı seçiliyken ya da kullanıcı etkileşim halindeyken rotasyonu durdur
+      if (!fgRef.current || userInteractingRef.current || selectedNodeRef.current || selectedLinkRef.current) return
+      
+      const cam = fgRef.current.camera?.()
+      if (cam) {
+        angle = Math.atan2(cam.position.x, cam.position.z) + 0.002
+      } else {
+        angle += 0.002
+      }
       fgRef.current.cameraPosition({ x: 600 * Math.sin(angle), z: 600 * Math.cos(angle) })
     }, 30)
     return () => clearInterval(id)
@@ -950,7 +1179,7 @@ export default function MindPage() {
                     letterSpacing: '0.02em',
                   }}
                 >
-                  {t('mind.graph_title', 'MIND GRAPH')}
+                  {t('mind.graph_title', 'MIND GRAPH')}{rootName ? ` • ${rootName}` : ''}
                 </h1>
 
               </div>
@@ -959,9 +1188,10 @@ export default function MindPage() {
           {/* Sağ: renk legend */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             {[
-              { color: '#ff6b35', label: 'Persona' },
-              { color: '#00e5ff', label: 'Topic' },
-              { color: '#c084fc', label: 'Entity' },
+              { color: isGreenMode ? '#10b981' : '#3b82f6', label: tribeId ? 'Tribe (Root)' : 'Persona' },
+              { color: NEURON_COLORS.Tribe.core, label: tribeId ? 'Other Tribes' : 'Tribe' },
+              { color: NEURON_COLORS.Actor.core, label: 'Actor' },
+              { color: NEURON_COLORS.GeneralThought.core, label: 'GeneralThought' },
             ].map(({ color, label }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <div
@@ -1065,74 +1295,321 @@ export default function MindPage() {
             <NodeDetailPanel
               node={selectedNode}
               onClose={() => {
-                if (fgRef.current && selectedNode) {
-                  const distance = 250 // Tüm grafiğe (çok uzağa) gitmek yerine sadece nodun biraz dışına çık
-                  if (selectedNode.x === 0 && selectedNode.y === 0 && selectedNode.z === 0) {
-                    fgRef.current.cameraPosition({ x: 0, y: 0, z: distance }, selectedNode, 800)
-                  } else {
-                    const distRatio =
-                      1 + distance / Math.hypot(selectedNode.x, selectedNode.y, selectedNode.z)
-                    fgRef.current.cameraPosition(
-                      {
-                        x: selectedNode.x * distRatio,
-                        y: selectedNode.y * distRatio,
-                        z: selectedNode.z * distRatio,
-                      },
-                      selectedNode,
-                      800
-                    )
-                  }
-                }
+                selectedNodeRef.current = null
                 setSelectedNode(null)
               }}
             />
           )}
 
-          {/* Reset View Butonu */}
-          <button
-            onClick={() => {
-              setSelectedNode(null);
-              if (fgRef.current) {
-                // Tıpkı ilk açılıştaki gibi sabit, yakın bir açıya dön
-                fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000);
-              }
-            }}
+          {/* Sağ Üst Kontrol & Düğüm Listesi */}
+          <div
             style={{
               position: 'absolute',
               top: 24,
               right: 24,
-              padding: '10px 18px',
-              background: headerBg,
-              border: `1px solid ${borderColor}`,
-              borderRadius: 12,
-              color: isDarkMode ? '#f0e6ff' : '#000000',
-              cursor: 'pointer',
               zIndex: 100,
               display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              fontFamily: 'Inter, sans-serif',
-              fontSize: 14,
-              fontWeight: 500,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = isDarkMode ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)' : 'rgba(0, 0, 0, 0.05)';
-              e.currentTarget.style.borderColor = isDarkMode ? 'color-mix(in srgb, var(--color-primary) 60%, transparent)' : 'rgba(0, 0, 0, 0.2)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = headerBg;
-              e.currentTarget.style.borderColor = borderColor;
-              e.currentTarget.style.transform = 'translateY(0)';
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: 12,
+              maxHeight: 'calc(100vh - 120px)',
+              pointerEvents: 'none',
             }}
           >
-            <Focus size={18} style={{ color: 'var(--color-primary)' }} />
-            {t('mind.default_view', 'Varsayılan Görünüm')}
-          </button>
+            {/* Reset View Butonu */}
+            <button
+              onClick={() => {
+                selectedNodeRef.current = null
+                setSelectedNode(null)
+                if (fgRef.current) {
+                  // Tıpkı ilk açılıştaki gibi sabit, yakın bir açıya dön
+                  fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
+                }
+              }}
+              style={{
+                pointerEvents: 'auto',
+                padding: '10px 18px',
+                background: headerBg,
+                border: `1px solid ${borderColor}`,
+                borderRadius: 12,
+                color: isDarkMode ? '#f0e6ff' : '#000000',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: 14,
+                fontWeight: 500,
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = isDarkMode
+                  ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)'
+                  : 'rgba(0, 0, 0, 0.05)'
+                e.currentTarget.style.borderColor = isDarkMode
+                  ? 'color-mix(in srgb, var(--color-primary) 60%, transparent)'
+                  : 'rgba(0, 0, 0, 0.2)'
+                e.currentTarget.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = headerBg
+                e.currentTarget.style.borderColor = borderColor
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              <Focus size={18} style={{ color: 'var(--color-primary)' }} />
+              {t('mind.default_view', 'Varsayılan Görünüm')}
+            </button>
+
+            {/* Anılar Listesi Paneli (Memories - Varsayılan Görünümün Altında) */}
+            {graphData.nodes.length > 0 && (
+              <div
+                style={{
+                  pointerEvents: 'auto',
+                  width: 280,
+                  maxHeight: 'calc(100vh - 200px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  background: headerBg,
+                  border: `1px solid ${borderColor}`,
+                  borderRadius: 16,
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  boxShadow: '0 12px 36px rgba(0,0,0,0.5)',
+                  overflow: 'hidden',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+              >
+                {/* Panel Başlığı */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 14px',
+                    borderBottom: isNodeListCollapsed
+                      ? 'none'
+                      : `1px solid ${isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Brain size={16} style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: isDarkMode ? '#f0e6ff' : '#111827' }}>
+                      {t('mind.memories_title', 'Anılar')}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: '1px 7px',
+                        borderRadius: 999,
+                        background: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                        color: 'var(--color-primary)',
+                      }}
+                    >
+                      {graphData.nodes.length}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => setIsNodeListCollapsed((prev) => !prev)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px 6px',
+                      borderRadius: 6,
+                      color: isDarkMode ? 'rgba(240,230,255,0.7)' : 'rgba(0,0,0,0.6)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    title={isNodeListCollapsed ? t('common.expand', 'Genişlet') : t('common.collapse', 'Daralt')}
+                  >
+                    <span
+                      style={{
+                        fontSize: 9,
+                        display: 'inline-block',
+                        transform: isNodeListCollapsed ? 'none' : 'rotate(180deg)',
+                        transition: 'transform var(--transition-fast, 0.2s ease)',
+                      }}
+                    >
+                      ▼
+                    </span>
+                  </button>
+                </div>
+
+                {/* Genişletilmiş Liste İçeriği */}
+                {!isNodeListCollapsed && (
+                  <>
+                    {/* Arama Kutusu */}
+                    {graphData.nodes.length > 5 && (
+                      <div
+                        style={{
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          borderBottom: `1px solid ${isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                        }}
+                      >
+                        <Search size={14} style={{ color: isDarkMode ? 'rgba(240,230,255,0.4)' : 'rgba(0,0,0,0.4)' }} />
+                        <input
+                          type="text"
+                          placeholder={t('mind.search_memories', 'Anı ara...')}
+                          value={nodeSearch}
+                          onChange={(e) => setNodeSearch(e.target.value)}
+                          style={{
+                            flex: 1,
+                            background: 'transparent',
+                            border: 'none',
+                            outline: 'none',
+                            fontSize: 12,
+                            color: isDarkMode ? '#f0e6ff' : '#000000',
+                          }}
+                        />
+                        {nodeSearch && (
+                          <button
+                            onClick={() => setNodeSearch('')}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: 2,
+                              color: isDarkMode ? 'rgba(240,230,255,0.6)' : 'rgba(0,0,0,0.5)',
+                              display: 'flex',
+                            }}
+                          >
+                            <X size={12} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Anılar Listesi */}
+                    <div
+                      style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: '6px 8px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                        maxHeight: 340,
+                      }}
+                    >
+                      {filteredNodes.length === 0 ? (
+                        <div
+                          style={{
+                            padding: '16px 8px',
+                            textAlign: 'center',
+                            fontSize: 12,
+                            color: isDarkMode ? 'rgba(240,230,255,0.4)' : 'rgba(0,0,0,0.4)',
+                          }}
+                        >
+                          {t('mind.no_memories_found', 'Eşleşen anı bulunamadı')}
+                        </div>
+                      ) : (
+                        filteredNodes.map((node) => {
+                          const isSelected = selectedNode?.id === node.id
+                          const { core, glow } = getNeuronColor(node.label, node.isRoot)
+
+                          return (
+                            <div
+                              key={node.id}
+                              onClick={() => {
+                                let targetNode = node
+                                if (fgRef.current) {
+                                  const scene = fgRef.current.scene()
+                                  scene?.traverse((obj) => {
+                                    if (obj.__data && obj.__data.id === node.id) {
+                                      targetNode = obj.__data
+                                    }
+                                  })
+                                }
+                                handleNodeClick(targetNode)
+                              }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10,
+                                padding: '8px 10px',
+                                borderRadius: 10,
+                                cursor: 'pointer',
+                                background: isSelected
+                                  ? isDarkMode
+                                    ? 'rgba(255,255,255,0.12)'
+                                    : 'rgba(0,0,0,0.08)'
+                                  : 'transparent',
+                                border: isSelected ? `1px solid ${core}` : '1px solid transparent',
+                                transition: 'all 0.15s ease',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) {
+                                  e.currentTarget.style.background = isDarkMode
+                                    ? 'rgba(255,255,255,0.06)'
+                                    : 'rgba(0,0,0,0.04)'
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) {
+                                  e.currentTarget.style.background = 'transparent'
+                                }
+                              }}
+                            >
+                              {/* Nokta göstergesi */}
+                              <div
+                                style={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  background: core,
+                                  boxShadow: `0 0 6px ${glow}`,
+                                  flexShrink: 0,
+                                }}
+                              />
+
+                              {/* İsim ve Etiket */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div
+                                  style={{
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    color: isDarkMode ? '#f0e6ff' : '#111827',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                  }}
+                                  title={node.name}
+                                >
+                                  {node.name || t('mind.unknown_memory', 'Anı')}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: 10,
+                                    fontWeight: 500,
+                                    color: core,
+                                    letterSpacing: '0.03em',
+                                    textTransform: 'uppercase',
+                                    marginTop: 1,
+                                  }}
+                                >
+                                  {node.label}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div style={{ height: '60vh' }} />

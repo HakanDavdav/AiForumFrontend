@@ -1,4 +1,4 @@
-import CardsSvg from '../../assets/FigmaNew/Cards.svg?react'
+import CardsSvg from '../../../assets/FigmaNew/Cards.svg?react'
 
 export default function BotFlashCardsIcon({
   size = 24,

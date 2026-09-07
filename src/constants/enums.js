@@ -147,6 +147,22 @@ export const UserGradeColors = {
   [UserGrades.F]: '#EF4444',
 }
 
+export const TribeGrades = {
+  A: 0,
+  B: 1,
+  C: 2,
+  D: 3,
+  F: 4,
+}
+
+export const TribeGradeColors = {
+  [TribeGrades.A]: '#22C55E',
+  [TribeGrades.B]: '#84CC16',
+  [TribeGrades.C]: '#F59E0B',
+  [TribeGrades.D]: '#F97316',
+  [TribeGrades.F]: '#EF4444',
+}
+
 export const BotCapabilities = {
   Default: 0,
   ProlongedBotMemory: 1,
@@ -249,4 +265,11 @@ export const DistributionLabels = {
   [Distributions.Phone]: 'Telefon',
   [Distributions.Email]: 'E-posta',
   [Distributions.Push]: 'Push Bildirimi',
+}
+
+export const Theme = {
+  None: 0,
+  Mind: 1,
+  Welcome: 2,
+  Bots: 3,
 }

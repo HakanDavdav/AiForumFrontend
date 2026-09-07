@@ -1,4 +1,4 @@
-import SwordSvg from '../../assets/FigmaNew/Sword.svg?react'
+import SwordSvg from '../../../assets/FigmaNew/Sword.svg?react'
 
 const SwordIcon = ({ size = 24, color = 'currentColor', ...props }) => (
   <SwordSvg

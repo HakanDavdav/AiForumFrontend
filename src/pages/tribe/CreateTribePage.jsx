@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import SelectionMarker from '../../components/common/SelectionMarker'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
-import BotFlashCardsIcon from '../../components/common/BotFlashCardsIcon'
+import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import AvatarUpload from '../../components/common/AvatarUpload'
 
@@ -71,18 +71,42 @@ export default function CreateTribePage() {
     },
   })
 
+  const hasAtLeastOneCard =
+    formData.personalityCardConfirmed || selectedCardIds.length > 0
+
+  const canSubmit =
+    formData.tribeName.trim() !== '' &&
+    formData.mission.trim() !== '' &&
+    hasAtLeastOneCard &&
+    !mutation.isPending
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!canSubmit) {
       setHasSubmitted(true)
+      if (!formData.tribeName.trim()) {
+        toast.error(t('tribe_settings.name_required', 'Klan adı gereklidir.'))
+      } else if (!formData.mission.trim()) {
+        toast.error(t('tribe_settings.mission_required', 'Klan misyonu gereklidir.'))
+      } else if (!hasAtLeastOneCard) {
+        toast.error(
+          t('tribe_settings.card_required', 'En az bir kişilik kartı onaylanmalı veya seçilmelidir.')
+        )
+      }
       const firstInvalid = Array.from(e.currentTarget.querySelectorAll('[data-field]')).find(
         (el) => !(el.value || '').trim()
       )
       firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
-    const { personalityCardConfirmed, ...payload } = formData
-    mutation.mutate({ ...payload, assignedCardIds: selectedCardIds })
+    const { personalityCardName, personalityCardPrompt, personalityCardConfirmed, ...payload } =
+      formData
+    mutation.mutate({
+      ...payload,
+      assignedCardIds: selectedCardIds,
+      personalityCardName: personalityCardConfirmed ? personalityCardName : null,
+      personalityCardPrompt: personalityCardConfirmed ? personalityCardPrompt : null,
+    })
   }
 
   const toggleCard = (cardId) => {
@@ -115,13 +139,7 @@ export default function CreateTribePage() {
     return 'var(--color-border)'
   }
 
-  const canSubmit =
-    formData.tribeName.trim() !== '' &&
-    formData.mission.trim() !== '' &&
-    formData.personalityCardName.trim() !== '' &&
-    formData.personalityCardPrompt.trim() !== '' &&
-    formData.personalityCardConfirmed &&
-    !mutation.isPending
+
 
   return (
     <div className="flex-col gap-4">
@@ -290,7 +308,7 @@ export default function CreateTribePage() {
               textTransform: 'uppercase',
             }}
           >
-            {t('card.create_personality', 'Kişilik kartı oluştur')} ({t('common.optional', 'Opsiyonel')})
+            {t('card.create_personality_optional', 'Kişilik kartı oluştur (Opsiyonel)')}
           </label>
           <PersonalityCard
             variant="editor"

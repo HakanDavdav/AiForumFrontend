@@ -98,4 +98,10 @@ export const actorApi = {
 
   getBotSettings: (botId) =>
     api.get(`/actor/bot-settings/${botId}`),
+
+  // ─── Theme ───────────────────────────────────────────────────────────────
+  selectTheme: (theme, targetActorId = null) =>
+    api.put(`/actor/select-theme/${theme}`, null, {
+      params: targetActorId ? { targetActorId } : {}
+    }),
 }

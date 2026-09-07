@@ -1,4 +1,4 @@
-import LogoSvg from '../../assets/FigmaNew/Logo.svg?react'
+import LogoSvg from '../../../assets/FigmaNew/Logo.svg?react'
 
 export default function Logo({ width = 36, height = 48, fill = 'var(--color-primary)', ...props }) {
   return (

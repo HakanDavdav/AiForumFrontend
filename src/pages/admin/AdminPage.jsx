@@ -3,7 +3,7 @@ import SystemEventsPanel from '../../components/admin/SystemEventsPanel'
 import MemoryManagementPanel from '../../components/admin/MemoryManagementPanel'
 import ActorManagementPanel from '../../components/admin/ActorManagementPanel'
 import ConfigManagementPanel from '../../components/admin/ConfigManagementPanel'
-import Logo from '../../components/common/Logo'
+import Logo from '../../components/common/icons/Logo'
 import BackButton from '../../components/common/BackButton'
 import { useTranslation } from 'react-i18next'
 

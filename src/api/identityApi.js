@@ -76,4 +76,8 @@ export const identityApi = {
 
   deleteAccount: (dto) =>
     api.delete('/identity/account', { data: dto }),
+
+  // ─── Notification ────────────────────────────────────────────────────────
+  switchNotification: (dto) =>
+    api.post('/identity/switch-notification', dto),
 }

@@ -1,11 +1,21 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { ShieldQuestion, X, Bot, Users, Sparkles, Newspaper, ArrowRight, Podium, ChevronDown } from 'lucide-react'
+import {
+  ShieldQuestion,
+  X,
+  Bot,
+  Users,
+  Sparkles,
+  Newspaper,
+  ArrowRight,
+  Podium,
+  ChevronDown,
+} from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import IconActionButton from './IconActionButton'
-import BotFlashCardsIcon from './BotFlashCardsIcon'
-import AngryBotWithSwordsIcon from './AngryBotWithSwordsIcon'
-import Logo from './Logo'
+import BotFlashCardsIcon from './icons/BotFlashCardsIcon'
+import AngryBotWithSwordsIcon from './icons/AngryBotWithSwordsIcon'
+import Logo from './icons/Logo'
 import ArrowCardTravel from './ArrowCardTravel'
 import InfoCard from './InfoCard'
 import PremiumModal from './PremiumModal'
@@ -84,49 +94,49 @@ export default function BletchlyGuideModal({ triggerStyle }) {
       desc: t('bletchly_guide.hierarchy_desc', 'Bletchly temel konseptler ve kart mekanizması.'),
       linkText: t('bletchly_guide.hierarchy_link', 'BasicConcepts'),
       path: '/basic-concepts',
-      fullWidth: true
+      fullWidth: true,
     },
     {
       icon: <Bot size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.bots_title'),
       desc: t('bletchly_guide.bots_desc'),
       linkText: t('bletchly_guide.bots_link'),
-      path: '/create-bot'
+      path: '/create-bot',
     },
     {
       icon: <Users size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.tribes_title'),
       desc: t('bletchly_guide.tribes_desc'),
       linkText: t('bletchly_guide.tribes_link'),
-      path: '/create-tribe'
+      path: '/create-tribe',
     },
     {
       icon: <BotFlashCardsIcon size={22} style={{ color: 'var(--color-primary)' }} />,
       title: t('bletchly_guide.cards_title'),
       desc: t('bletchly_guide.cards_desc'),
       linkText: t('bletchly_guide.cards_link'),
-      path: '/marketplace'
+      path: '/marketplace',
     },
     {
       icon: <Sparkles size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.news_title'),
       desc: t('bletchly_guide.news_desc'),
       linkText: t('bletchly_guide.news_link'),
-      path: '/enrich-news'
+      path: '/enrich-news',
     },
     {
       icon: <Podium size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.leaderboard_title'),
       desc: t('bletchly_guide.leaderboard_desc'),
       linkText: t('bletchly_guide.leaderboard_link'),
-      path: '/leaderboard'
+      path: '/leaderboard',
     },
     {
       icon: <AngryBotWithSwordsIcon size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.debates_title'),
       desc: t('bletchly_guide.debates_desc'),
       linkText: t('bletchly_guide.debates_link'),
-      path: ''
+      path: '',
     },
     {
       icon: (
@@ -134,7 +144,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
           width={16}
           height={22}
           className="guide-premium-icon"
-          style={{ color: 'var(--color-primary)' }}
+          style={{ display: 'block' }}
         />
       ),
       title: t('bletchly_guide.premium_title', 'Premium'),
@@ -185,7 +195,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
               border: '1px solid var(--color-border)',
               overflow: 'hidden',
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
             }}
           >
             {/* Header */}
@@ -196,14 +206,21 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                 justifyContent: 'space-between',
                 padding: '20px 24px',
                 borderBottom: '1px solid var(--color-border-light)',
-                background: 'rgba(0,0,0,0.02)'
+                background: 'rgba(0,0,0,0.02)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: '50%', background: 'var(--color-primary-alpha)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    background: 'var(--color-primary-alpha)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
                   <Logo width={32} height={32} fill="var(--color-primary)" />
                 </div>
                 <div>
@@ -256,44 +273,111 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                   {t('bletchly_guide.intro')}
                 </p>
               </div>
-              <div ref={welcomeRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, gap: 90 }}>
-                <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: 2 }}>...</span>
+              <div
+                ref={welcomeRef}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 24,
+                  gap: 90,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 700,
+                    color: 'var(--color-primary)',
+                    letterSpacing: 2,
+                  }}
+                >
+                  ...
+                </span>
                 <ArrowCardTravel
                   Svg={WelcomeSvg}
                   widthPct={60}
                   svgStyle={{ color: 'var(--color-primary)' }}
-                  cardWidth={10}
+                  cardWidth={12}
                   speed={14}
                   spacing={200}
                   maxCards={25}
                   rerandomizeInterval={3000}
                 />
-                <span style={{ fontSize: 30, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: 2 }}>...</span>
+                <span
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 700,
+                    color: 'var(--color-primary)',
+                    letterSpacing: 2,
+                  }}
+                >
+                  ...
+                </span>
               </div>
 
-              <div ref={sectionsRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              <div
+                ref={sectionsRef}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: 16,
+                }}
+              >
                 {sections.map((sec, idx) => (
                   <InfoCard
                     key={idx}
                     onClick={() => (sec.onClick ? sec.onClick() : handleNavigate(sec.path))}
                     fullWidth={sec.fullWidth}
+                    className={sec.premium ? 'guide-card-premium' : ''}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{
-                        width: 40, height: 40, borderRadius: 10,
-                        background: sec.premium ? 'var(--color-warning)' : 'var(--color-surface)',
-                        border: '1px solid var(--color-border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
+                      <div
+                        className={`guide-icon-box ${sec.premium ? 'guide-icon-box--premium' : ''}`}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
                         {sec.icon}
                       </div>
-                      <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontSize: 15,
+                          fontWeight: 600,
+                          color: 'var(--color-text-primary)',
+                        }}
+                      >
                         {sec.title}
                       </h3>
                     </div>
-                    <p style={{ margin: 0, fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.5, flex: 1 }}>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: 13,
+                        color: 'var(--color-text-secondary)',
+                        lineHeight: 1.5,
+                        flex: 1,
+                      }}
+                    >
                       {sec.desc}
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-primary)', fontSize: 13, fontWeight: 600, marginTop: 'auto' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        color: 'var(--color-primary)',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        marginTop: 'auto',
+                      }}
+                    >
                       {sec.linkText}
                       <ArrowRight size={14} strokeWidth={2.5} />
                     </div>

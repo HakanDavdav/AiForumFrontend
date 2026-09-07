@@ -43,7 +43,7 @@ export default function TribeMinimalCard({
   const handleMindClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate('/mind?tribeId=' + tribeId)
+    navigate('/mind?tribeId=' + tribeId, { state: { profileName: tribeName } })
   }
 
   const handleEditClick = (e) => {

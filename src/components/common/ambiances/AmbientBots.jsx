@@ -1,17 +1,18 @@
 import { useMemo } from 'react'
 import { Bot as BotIcon } from 'lucide-react'
-import AngryBotIcon from './AngryBotIcon'
-import LazyBotIcon from './LazyBotIcon'
-import SwordIcon from './SwordIcon'
-import ShieldIcon from './ShieldIcon'
-import useUIStore from '../../store/uiStore'
+import AngryBotIcon from '../icons/AngryBotIcon'
+import LazyBotIcon from '../icons/LazyBotIcon'
+import SwordIcon from '../icons/SwordIcon'
+import ShieldIcon from '../icons/ShieldIcon'
+import useUIStore from '../../../store/uiStore'
 
 /**
  * Profil kartının arkasında, debate sahnesiyle aynı prensipte
  * rastgele dağılımlı, hafif blur'lu ve silik duran bot ikonları.
  */
-export default function AmbientBots() {
-  const isActive = useUIStore((s) => s.isBotsAmbience)
+export default function AmbientBots({ active }) {
+  const storeActive = useUIStore((s) => s.isBotsAmbience)
+  const isActive = active !== undefined ? active : storeActive
 
   const bots = useMemo(() => {
     return Array.from({ length: 55 }, (_, i) => {
@@ -40,11 +41,18 @@ export default function AmbientBots() {
       aria-hidden="true"
       style={{
         position: 'absolute',
-        inset: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: '100%',
         overflow: 'hidden',
+        borderRadius: 'inherit',
         pointerEvents: 'none',
         opacity: 0.5,
         filter: 'blur(1px)',
+        maskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
       }}
     >
       <style>{`
@@ -53,7 +61,14 @@ export default function AmbientBots() {
           50% { transform: translateY(-6px); }
         }
       `}</style>
-      {bots.map((bot) => (
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        {bots.map((bot) => (
         <div
           key={bot.id}
           style={{
@@ -110,7 +125,8 @@ export default function AmbientBots() {
             )}
           </div>
         </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

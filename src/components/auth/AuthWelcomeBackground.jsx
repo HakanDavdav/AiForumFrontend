@@ -33,7 +33,7 @@ export default function AuthWelcomeBackground({ children }) {
             Svg={WelcomeSvg}
             widthPct={100}
             svgStyle={{ color: 'var(--color-primary)' }}
-            cardWidth={10}
+            cardWidth={12}
             speed={14}
             spacing={200}
             maxCards={25}
