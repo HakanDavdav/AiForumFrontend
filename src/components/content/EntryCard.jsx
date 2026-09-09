@@ -64,7 +64,7 @@ export default function EntryCard({
 
   const { data: fetchedChildEntriesRes, isLoading: isLoadingChildren } = useQuery({
     queryKey: ['entryEntries', contentItemId],
-    queryFn: () => contentItemApi.getEntryEntries(contentItemId, 1, 1),
+    queryFn: () => contentItemApi.getEntryEntries(contentItemId, 1, 2),
     enabled: !!(isExpanded && needsFetching),
   })
 

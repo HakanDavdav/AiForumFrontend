@@ -25,6 +25,7 @@ import CardSlots from '../components/card/CardSlots'
 import ProfileModifiersModal from '../components/profile/ProfileModifiersModal'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
+import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
@@ -41,6 +42,8 @@ export default function TribePage() {
   const { t } = useTranslation()
   const [isBouncing, setIsBouncing] = useState(false)
   const [modifiersModalOpen, setModifiersModalOpen] = useState(false)
+  // Limitler & Miras paneli açma/kapama durumu (ProfilePage ile ORTAK global state)
+  const { isLimitsExpanded, toggleLimits } = useUIStore()
 
   const { data: tribe, isLoading } = useQuery({
     queryKey: ['tribe', tribeId],
@@ -416,19 +419,59 @@ export default function TribePage() {
             </div>
           </div>
 
-          {/* ─── LIMITS TOP DIVIDER ─── */}
+          {/* ─── LİMİTLER & MİRAS AÇILIR PANELİ (uiStore.isLimitsExpanded — Profil & Tribe ortak) ─── */}
+          <button
+            type="button"
+            className="profile-limits-toggle"
+            onClick={toggleLimits}
+            aria-expanded={isLimitsExpanded}
+            title={t(
+              'profile.limits_header_desc',
+              isLimitsExpanded
+                ? 'Limitler ve miras detaylarını gizle'
+                : 'Limitler ve miras detaylarını göster'
+            )}
+          >
+            <span
+              aria-hidden="true"
+              className={`profile-limits-toggle__chevron ${isLimitsExpanded ? 'expanded' : ''}`}
+            >
+              ▼
+            </span>
+          </button>
+
+          {isLimitsExpanded && (
+            <>
+          {/* Üye Kapasitesi — gri çizginin ÜSTÜNDE (modaldaki gibi) */}
+          <div
+            className="profile-limits-row"
+            style={{ marginTop: 10, marginBottom: 0, paddingLeft: 4, paddingRight: 4 }}
+          >
+            <div
+              className="profile-limit-chip"
+              title={t('tribe.member_capacity_desc', 'Kabilenin alabileceği maksimum üye sayısı')}
+            >
+              <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+              <span>{t('tribe.member_capacity', 'Üye Kapasitesi')}:</span>
+              <span className="profile-limit-chip__val">
+                {tribe.memberCount ?? 0} / 50
+              </span>
+            </div>
+          </div>
+
+          {/* ─── GRİ AYRAÇ — kart bloğu hep bu çizginin ALTINDA (profil düzeniyle uyumlu) ─── */}
           <div
             style={{
               width: '100%',
               height: 0,
-              borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
+              borderTop: '1px solid var(--color-border)',
               margin: '16px 0 12px 0',
             }}
           />
 
           <div
             className="profile-limits-row"
-            style={{ marginTop: 0, paddingLeft: 4, paddingRight: 4 }}
+            style={{ marginTop: 0, marginBottom: 0, paddingLeft: 4, paddingRight: 4 }}
           >
             <div
               className="profile-limit-chip"
@@ -446,22 +489,7 @@ export default function TribePage() {
                 {tribe.personalityCards?.length || 0} / {tribe.tribeAssignmentLimit || 4}
               </span>
             </div>
-          </div>
-
-          {/* ─── INHERITANCE DIVIDER ─── */}
-          <div
-            style={{
-              width: '100%',
-              height: 0,
-              borderTop: '1px solid var(--color-border)',
-              margin: '16px 0 12px 0',
-            }}
-          />
-
-          <div
-            className="profile-limits-row"
-            style={{ marginTop: 0, marginBottom: 0, paddingLeft: 4, paddingRight: 4 }}
-          >
+            <span className="profile-limit-divider">•</span>
             <div
               className="profile-limit-chip"
               title={t(
@@ -501,6 +529,8 @@ export default function TribePage() {
                 </>
               )}
           </div>
+            </>
+          )}
 
           {tribe.personalityCards?.length > 0 && (
             <>

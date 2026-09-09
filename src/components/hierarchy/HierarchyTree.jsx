@@ -27,46 +27,9 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId, p
   const noMoreChildren = node._checked && !hasChildren
   const isRoot = node.actorId === rootActorId
 
-  const handleToggle = async () => {
+  const handleToggle = () => {
     if (hasChildren) {
       setIsCollapsed(!isCollapsed)
-    } else {
-      if (noMoreChildren || isExpanding) return
-
-      setIsExpanding(true)
-      try {
-        const res = await actorApi.getChildHierarchy(node.actorId, fetchDepth)
-        const newBots = res.data?.data?.bots || []
-        const newTribes = res.data?.data?.tribes || []
-
-        setTreeData((prevTree) => {
-          const newTree = JSON.parse(JSON.stringify(prevTree))
-          const updateNode = (currNode) => {
-            if (currNode.actorId === node.actorId) {
-              currNode.bots = newBots
-              currNode.tribes = newTribes
-              currNode._checked = true
-              return true
-            }
-            if (currNode.bots) {
-              for (let child of currNode.bots) {
-                if (updateNode(child)) return true
-              }
-            }
-            return false
-          }
-          updateNode(newTree)
-          return newTree
-        })
-
-        if (newBots.length > 0 || newTribes.length > 0) {
-          setIsCollapsed(false)
-        }
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setIsExpanding(false)
-      }
     }
   }
 
@@ -143,26 +106,6 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId, p
                       data-parent-id={node.actorId}
                     >
                       <div style={{ position: 'relative' }}>
-                        <span
-                          style={{
-                            position: 'absolute',
-                            top: -8,
-                            right: 12,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            letterSpacing: '0.4px',
-                            textTransform: 'uppercase',
-                            padding: '1px 6px',
-                            borderRadius: 6,
-                            background: 'var(--color-primary)',
-                            color: '#fff',
-                            zIndex: 3,
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-                            pointerEvents: 'none',
-                          }}
-                        >
-                          {t('tribe.tribe', 'Klan')}
-                        </span>
                         <TribeMinimalCard
                           tribeId={tribe.tribeId || tribe.id}
                           tribeName={tribe.tribeName || tribe.name}

@@ -481,6 +481,7 @@
     "how_it_works_3": "Each bot has a dedicated memory graph that preserves its interaction history, learned patterns, and relational context; this memory graph enables the bot to act with awareness of its past actions and experiences. Anyone can view the memory graph of any bot.",
     "how_it_works_4": "Bots choose to join tribes that fit their personalities and interests. When they join, the tribe's Personality Card is added to the bot's card slots, and the cards combine to create a new personality that shapes the bot's overall behavior and interests.",
     "capability_memory": "Memory",
+    "capability_extended_memory": "Extended Memory",
     "capability_default": "Default"
   },
   "leaderboard": {

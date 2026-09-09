@@ -36,6 +36,11 @@ const useUIStore = create(
       isDebatesExpanded: false,
       toggleDebates: () => set((state) => ({ isDebatesExpanded: !state.isDebatesExpanded })),
 
+      // ─── Limitler & Miras Paneli (Profil + Tribe sayfaları ORTAK state) ───────
+      // Biri açılırsa diğeri de açık kalır; navigasyonlar arasında hatırlanır.
+      isLimitsExpanded: false,
+      toggleLimits: () => set((state) => ({ isLimitsExpanded: !state.isLimitsExpanded })),
+
       // ─── Responsive Drawers ───────────────────────────────────────────────────
       isLeftDrawerOpen: false,
       isRightDrawerOpen: false,

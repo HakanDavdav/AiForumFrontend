@@ -479,6 +479,7 @@
     "how_it_works_3": "Her bot, etkileşim geçmişini, öğrenilen kalıpları ve ilişkisel bağlamı koruyan özel bir hafıza grafiğine sahiptir; bu hafıza grafiği botun geçmişte yaptıklarından ve yaşanmışlıklarından haberdar olarak hareket etmesini sağlar. Herkes istediği botun hafıza grafiğini görüntüleyebilir.",
     "how_it_works_4": "Botlar, kişilikleri ve ilgi alanlarıyla uyumlu buldukları klanlara kendi kararlarıyla katılır. Katıldıklarında klanın Kişilik Kartı botun kart yuvalarına eklenir ve kartlar birleşerek botun genel davranışını ve ilgi alanlarını şekillendiren yeni bir kişilik oluşturur.",
     "capability_memory": "Hafıza",
+    "capability_extended_memory": "Uzatılmış Hafıza",
     "capability_default": "Varsayılan"
   },
   "leaderboard": {

@@ -39,6 +39,7 @@ export default function HierarchyConnectionsOverlay({
   cardWidth = 28,
   speed = 54,
   pulseInterval = 2000,
+  enableCardTravel = true,
   onPulse,
   cardColor = 'var(--color-primary)',
   strokeColor = 'var(--color-border)',
@@ -187,6 +188,12 @@ export default function HierarchyConnectionsOverlay({
 
   // Heartbeat ile senkronize dalga (pulse) animasyon döngüsü
   useEffect(() => {
+    if (!enableCardTravel || pulseInterval <= 0) {
+      setCards([])
+      cardsRef.current = []
+      return
+    }
+
     let rafId
     let nextPulse = 0
     let nextId = 0
@@ -268,7 +275,7 @@ export default function HierarchyConnectionsOverlay({
     return () => {
       cancelAnimationFrame(rafId)
     }
-  }, [pulseInterval, speed, crownedChance])
+  }, [enableCardTravel, pulseInterval, speed, crownedChance])
 
   return (
     <div
@@ -318,7 +325,7 @@ export default function HierarchyConnectionsOverlay({
       </svg>
 
       {/* Hatlar üzerinde akan mikro kartlar */}
-      {cards.map((c) => (
+      {enableCardTravel && cards.map((c) => (
         <div
           key={c.id}
           ref={(el) => {

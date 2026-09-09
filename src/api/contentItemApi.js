@@ -20,7 +20,7 @@ export const contentItemApi = {
   getPostEntries: (postId, page = 1) =>
     api.get(`/contentitem/post/${postId}/entries`, { params: { page } }),
 
-  getEntryEntries: (entryId, page = 1, depth = 1) =>
+  getEntryEntries: (entryId, page = 1, depth = 2) =>
     api.get(`/contentitem/entry/${entryId}/entries`, { params: { page, depth } }),
     
   createPost: (dto) =>

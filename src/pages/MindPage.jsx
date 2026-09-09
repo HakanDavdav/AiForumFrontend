@@ -712,11 +712,6 @@ export default function MindPage() {
   const bgColor = isDarkMode ? '#09090b' : '#ffffff'
   const headerBg = isDarkMode ? 'rgba(9, 9, 11, 0.85)' : 'rgba(255, 255, 255, 0.85)'
   const borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.1)'
-  
-  const btnColor = isGreenMode ? '#10b981' : '#3b82f6'
-  const btnBg = isGreenMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(59, 130, 246, 0.08)'
-  const btnBgHover = isGreenMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)'
-  const btnBorder = isGreenMode ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(59, 130, 246, 0.3)'
 
   useEffect(() => {
     linkLabelCache.clear()
@@ -1130,86 +1125,158 @@ export default function MindPage() {
           overflow: 'hidden',
         }}
       >
-        {/* Header — glassmorphism */}
+        {/* Header — PersonalityCardHierarchyPage tarzı yüzen (floating) pill çifti */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '10px 20px',
-            background: headerBg,
-            backdropFilter: 'blur(16px)',
-            borderBottom: `1px solid ${borderColor}`,
+            gap: 12,
+            padding: '10px 16px',
             flexShrink: 0,
-            height: 56,
+            minHeight: 56,
           }}
         >
-          {/* Sol: geri + başlık */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Sol: Geri + Kimlik bloğu */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              minHeight: 44,
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 12,
+              padding: '6px 14px',
+              boxShadow: 'var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1))',
+              maxWidth: '55%',
+              minWidth: 0,
+            }}
+          >
             <button
               onClick={() => navigate(-1)}
+              title={t('common.back', 'Geri')}
               style={{
-                padding: 8,
+                width: 30,
+                height: 30,
+                padding: 0,
                 borderRadius: '50%',
-                border: btnBorder,
-                background: btnBg,
+                border: 'none',
+                background: 'transparent',
                 cursor: 'pointer',
-                color: btnColor,
+                color: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = btnBgHover
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = btnBg
+                justifyContent: 'center',
+                flexShrink: 0,
               }}
             >
               <ArrowLeft size={18} />
             </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Brain size={20} style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }} />
-              <div>
-                <h1
+            <div style={{ width: 1, height: 24, background: 'var(--color-border)', flexShrink: 0 }} />
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <Brain size={18} color="var(--color-primary)" style={{ flexShrink: 0, display: 'block' }} />
+              <span
+                style={{
+                  fontWeight: 800,
+                  fontSize: 11,
+                  color: 'var(--color-text-secondary)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {t('mind.graph_title', 'MIND GRAPH')}
+              </span>
+              <span style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
+              {rootName && (
+                <span
                   style={{
-                    fontSize: 16,
                     fontWeight: 700,
-                    color: isGreenMode ? '#10b981' : '#3b82f6',
-                    margin: 0,
-                    letterSpacing: '0.02em',
+                    fontSize: 15,
+                    lineHeight: 1,
+                    color: 'var(--color-text)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    transform: 'translateY(1px)',
+                    minWidth: 0,
                   }}
                 >
-                  {t('mind.graph_title', 'MIND GRAPH')}{rootName ? ` • ${rootName}` : ''}
-                </h1>
-
-              </div>
+                  {rootName}
+                </span>
+              )}
             </div>
           </div>
-          {/* Sağ: renk legend */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+
+          {/* Sağ: Node tanımları + Varsayılan Görünüm */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              minHeight: 44,
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 12,
+              padding: '6px 12px',
+              boxShadow: 'var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1))',
+              flexShrink: 0,
+              maxWidth: '100%',
+            }}
+          >
             {[
               { color: isGreenMode ? '#10b981' : '#3b82f6', label: tribeId ? 'Tribe (Root)' : 'Persona' },
               { color: NEURON_COLORS.Tribe.core, label: tribeId ? 'Other Tribes' : 'Tribe' },
               { color: NEURON_COLORS.Actor.core, label: 'Actor' },
               { color: NEURON_COLORS.GeneralThought.core, label: 'GeneralThought' },
-            ].map(({ color, label }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div
+            ].map(({ color, label }, idx) => (
+              <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {idx > 0 && <span style={{ width: 1, height: 18, background: 'var(--color-border)', marginRight: 2 }} />}
+                <span
                   style={{
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
                     background: color,
                     boxShadow: `0 0 8px ${color}`,
+                    flexShrink: 0,
                   }}
                 />
                 <span
-                  style={{ fontSize: 11, color: isDarkMode ? 'rgba(240,230,255,0.5)' : 'rgba(0,0,0,0.6)', letterSpacing: '0.04em' }}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: 'var(--color-text-secondary)',
+                    letterSpacing: '0.04em',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
                   {label}
                 </span>
-              </div>
+              </span>
             ))}
+
+            <span style={{ width: 1, height: 20, background: 'var(--color-border)' }} />
+
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => {
+                selectedNodeRef.current = null
+                setSelectedNode(null)
+                selectedLinkRef.current = null
+                if (fgRef.current) {
+                  fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
+                }
+              }}
+              title={t('hierarchy.default_view', 'Varsayılan görünüme dön')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
+            >
+              <Focus size={13} />
+              <span>Default</span>
+            </button>
           </div>
         </div>
 
@@ -1316,55 +1383,7 @@ export default function MindPage() {
               pointerEvents: 'none',
             }}
           >
-            {/* Reset View Butonu */}
-            <button
-              onClick={() => {
-                selectedNodeRef.current = null
-                setSelectedNode(null)
-                if (fgRef.current) {
-                  // Tıpkı ilk açılıştaki gibi sabit, yakın bir açıya dön
-                  fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
-                }
-              }}
-              style={{
-                pointerEvents: 'auto',
-                padding: '10px 18px',
-                background: headerBg,
-                border: `1px solid ${borderColor}`,
-                borderRadius: 12,
-                color: isDarkMode ? '#f0e6ff' : '#000000',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 14,
-                fontWeight: 500,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = isDarkMode
-                  ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)'
-                  : 'rgba(0, 0, 0, 0.05)'
-                e.currentTarget.style.borderColor = isDarkMode
-                  ? 'color-mix(in srgb, var(--color-primary) 60%, transparent)'
-                  : 'rgba(0, 0, 0, 0.2)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = headerBg
-                e.currentTarget.style.borderColor = borderColor
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              <Focus size={18} style={{ color: 'var(--color-primary)' }} />
-              {t('mind.default_view', 'Varsayılan Görünüm')}
-            </button>
-
-            {/* Anılar Listesi Paneli (Memories - Varsayılan Görünümün Altında) */}
+            {/* Anılar Listesi Paneli (Sağ Üstte) */}
             {graphData.nodes.length > 0 && (
               <div
                 style={{

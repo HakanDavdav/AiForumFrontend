@@ -826,6 +826,34 @@
   color: var(--color-primary-dark);
 }
 
+/* Büyük "Kart Hiyerarşisi" butonu — üstteki küçük butoncuklarla aynı tasarım dili */
+.personality-card__hierarchy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 9px 12px;
+  margin-top: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    border-color var(--transition-fast) ease,
+    background var(--transition-fast) ease,
+    color var(--transition-fast) ease;
+}
+
+.personality-card__hierarchy-btn:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-primary-lighter);
+  color: var(--color-primary-dark);
+}
+
 @media (max-width: 640px) {
   .personality-card-slots {
     --personality-card-width: 136px;
@@ -2480,6 +2508,68 @@ select {
   pointer-events: none;
 }
 
+/* Assigned bloğu: "Assigned:" etiketinden tek bağlantı hattı iner;
+   altında zincir card'lar bitişik (flush) alt alta dizilir. */
+.personality-card__assignment-chain {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+  padding-left: 16px;
+}
+
+.personality-card__assignment-chain::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 10px;
+  bottom: 6px;
+  border-left: 1.5px solid var(--color-border-light);
+  pointer-events: none;
+}
+
+.personality-card__assignment-chain::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 10px;
+  width: 12px;
+  border-top: 1.5px solid var(--color-border-light);
+  border-top-left-radius: 4px;
+  pointer-events: none;
+}
+
+/* ── 2-Katmanlı Assignment Akışı (Kaynak Katmanı → Hedef Katmanı) ──────────
+   Merdiven (staircase) geometrisi:
+   - Kaynak katmanı (1. Assigned) owner etiketinin 'O' hizasından (x:2) girer.
+   - Kaynak katmanının kendi "Assigned:" etiketinin 'A' hizasından (x:20), metin
+     baseline'ının ALTINDAN (top:20px) aşağı inen dikey dal → A harfini kesmeden
+     tam altından başlar; hedef katmanının `::before` dirseğiyle buluşur
+     (source `bottom:4px` ↔ target `top:-10px`, container gap 6px).
+   - Hedef katmanı (2. Assigned) bu noktadan sağa basamaklanır (padding-left 38px);
+     dirsek kolu spine'dan (x:20) hedef etiketinin başladığı x:38'e kadar uzanır. */
+.personality-card__assignment-row--source-layer.personality-card__assignment-row--has-target-layer::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  bottom: 4px;
+  border-left: 1.5px solid var(--color-border-light);
+  pointer-events: none;
+}
+
+.personality-card__assignment-row--target-layer.personality-card__assignment-row--has-source-layer {
+  padding-left: 38px;
+}
+
+.personality-card__assignment-row--target-layer.personality-card__assignment-row--has-source-layer::before {
+  left: 20px;
+  width: 18px;
+}
+
 .personality-card__assignment-label--owner,
 .personality-card__assignment-label--tribe,
 .personality-card__assignment-label--assigned,
@@ -3004,6 +3094,48 @@ select {
   color: var(--color-border);
   opacity: 0.6;
   font-size: 10px;
+}
+
+/* Limitler & Miras açılır paneli (Profil + Tribe ortak)
+   Gri dolgu yok — arka planla bütünleşik, yalnızca dış çizgili blok.
+   Çizgi rengi sayfa teması (primary) ile uyumludur. */
+.profile-limits-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 0;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color var(--transition-fast) ease;
+}
+
+/* Kapalıyken alttaki kart bölümüyle arasına mesafe; açıkken bölücü devreye girer */
+.profile-limits-toggle[aria-expanded='false'] {
+  margin-bottom: 36px;
+}
+
+.profile-limits-toggle[aria-expanded='true'] {
+  margin-bottom: 4px;
+}
+
+.profile-limits-toggle:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 85%, transparent);
+}
+
+.profile-limits-toggle__chevron {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--color-primary);
+  transition: transform var(--transition-fast) ease;
+}
+
+.profile-limits-toggle__chevron.expanded {
+  transform: rotate(180deg);
 }
 
 .profile-tabs-container {

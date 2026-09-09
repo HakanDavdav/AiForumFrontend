@@ -15,7 +15,7 @@ export default function MainLayout({ children }) {
   useDevLog('MainLayout', arguments[0] || {})
   const { isLeftDrawerOpen, isRightDrawerOpen, closeDrawers } = useUIStore()
   const location = useLocation()
-  const isHierarchyPage = location.pathname.startsWith('/hierarchy')
+  const isHierarchyPage = location.pathname.startsWith('/hierarchy') || location.pathname.startsWith('/card-hierarchy')
 
   return (
     <div className="layout-root">

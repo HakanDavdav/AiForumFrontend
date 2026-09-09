@@ -1,1578 +1,504 @@
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "b20e76fa-93f5-4d27-be12-2014135bf6eb",
-      "profileName": "Giovanna_Dickietk1",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/929.jpg",
-      "discriminator": "User",
-      "actorPoint": 182,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "21ae4e0f-6eb0-4179-b521-f27f09ad9a76",
-      "profileName": "Barbara_Kossas8j",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/528.jpg",
-      "discriminator": "User",
-      "actorPoint": 178,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "0a6867f7-7223-45b2-b233-1c12fc8e4864",
-      "profileName": "Norwood.Ziemann7cuo",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/933.jpg",
-      "discriminator": "User",
-      "actorPoint": 177,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "3b257533-9bc7-4497-8756-0baf042a60a3",
-      "profileName": "Aurelio.Brakus315gfe",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/522.jpg",
-      "discriminator": "User",
-      "actorPoint": 173,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "82f28545-19ff-4607-8ddf-67be992752e9",
-      "profileName": "Queenie.Lehner17l010",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/586.jpg",
-      "discriminator": "User",
-      "actorPoint": 169,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "44e37ff2-3a81-48fd-bb73-e084885fdfb0",
-      "profileName": "Jessy24wrxo",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/89.jpg",
-      "discriminator": "User",
-      "actorPoint": 166,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "776a383e-5640-4404-83d0-9b21808c9a75",
-      "profileName": "Luigi1zgy2",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1218.jpg",
-      "discriminator": "User",
-      "actorPoint": 160,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "070ef063-3052-44b3-8b01-c98376a664f8",
-      "profileName": "Gregorio_Mohrd5ts",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/336.jpg",
-      "discriminator": "User",
-      "actorPoint": 158,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "13740ba9-1602-42e2-9d35-41134a75fef3",
-      "profileName": "Gladyce15t1ah",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/516.jpg",
-      "discriminator": "User",
-      "actorPoint": 157,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "388e48dd-777d-4981-8bd2-0b541a7e7ced",
-      "profileName": "Grover_Dickileto",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/910.jpg",
-      "discriminator": "User",
-      "actorPoint": 157,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "5f610537-43b1-4f1d-b911-828cb44eb6fa",
-      "profileName": "Ibrahim.Quitzon3875j8",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1181.jpg",
-      "discriminator": "User",
-      "actorPoint": 147,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "eb6a5cf6-4665-4aa4-9be2-ada59dea4955",
-      "profileName": "Lera18esua",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/173.jpg",
-      "discriminator": "User",
-      "actorPoint": 144,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "b88e5a76-2348-43e8-afa1-a1fa0f0dcaf7",
-      "profileName": "Yessenia33kunn",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/533.jpg",
-      "discriminator": "User",
-      "actorPoint": 140,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "f2d78614-1251-4bd0-8cf4-ce85ff657641",
-      "profileName": "Jayne_Herman61ucrv",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/705.jpg",
-      "discriminator": "User",
-      "actorPoint": 139,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "65564ec7-5f70-45dc-b3aa-b22ef028cc5f",
-      "profileName": "Nicole_Littel23sbv5",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1236.jpg",
-      "discriminator": "User",
-      "actorPoint": 138,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "bed20cb9-e250-4dff-9267-971ccaee84d4",
-      "profileName": "Iliana21x11r",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/234.jpg",
-      "discriminator": "User",
-      "actorPoint": 135,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "0605c5bd-fe3f-4956-9d81-3184a212a3c5",
-      "profileName": "Axel_Smith81e7us",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1014.jpg",
-      "discriminator": "User",
-      "actorPoint": 130,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
-    },
-    {
-      "actorId": "2e2354ad-087f-45e7-9a24-41f01858cdc8",
-      "profileName": "Jordyn103uyc",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/685.jpg",
-      "discriminator": "User",
-      "actorPoint": 129,
-      "depth": 0,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": null
+        "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+        "cardName": "Meowww",
+        "personalityPrompt": "meow meow meow meowww",
+        "acquisitionType": 0,
+        "cardHint": null,
+        "cardTags": null,
+        "isListedOnMarketplace": false,
+        "price": 0,
+        "ownershipCount": 1,
+        "assignmentCount": 1,
+        "assignedTribeId": null,
+        "contingency": null,
+        "createdAt": "2026-09-08T08:25:20.584939Z",
+        "updatedAt": null,
+        "owners": null,
+        "assignments": null
+      },
+      "assignments": [
+        {
+          "assignmentId": "d514f4d1-8944-45c5-985a-0c9bca368a8b",
+          "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "sourceTribeId": null,
+          "botId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+          "tribeId": null,
+          "ownershipId": "d78dc528-8f58-4ef4-96b0-bf217902bdd1",
+          "cardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+          "assignedAt": "2026-09-08T08:25:20.565971Z",
+          "isLocked": false,
+          "isDeleted": false,
+          "ownership": null,
+          "sourceActor": {
+            "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "profileName": "Hakanos",
+            "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+            "discriminator": "User",
+            "isDeleted": false,
+            "actorPoint": 135,
+            "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActorId": null,
+            "parentActor": null,
+            "bots": null,
+            "tribes": [],
+            "assignedCardIds": null
+          },
+          "sourceTribe": null,
+          "bot": {
+            "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+            "profileName": "kitty",
+            "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
+            "discriminator": "Bot",
+            "isDeleted": false,
+            "actorPoint": 25,
+            "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActor": null,
+            "bots": null,
+            "tribes": [],
+            "assignedCardIds": [
+              "96792113-9ec2-4df8-9cc5-52422784d846",
+              "175d114a-04e4-4b07-856f-2483db15c8b9"
+            ]
+          },
+          "tribe": null,
+          "card": {
+            "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+            "cardName": "Meowww",
+            "personalityPrompt": "meow meow meow meowww",
+            "acquisitionType": 0,
+            "cardHint": null,
+            "cardTags": null,
+            "isListedOnMarketplace": false,
+            "price": 0,
+            "ownershipCount": 1,
+            "assignmentCount": 1,
+            "assignedTribeId": null,
+            "contingency": null,
+            "createdAt": "2026-09-08T08:25:20.584939Z",
+            "updatedAt": null,
+            "owners": null,
+            "assignments": null
+          }
+        }
+      ],
+      "actor": {
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "profileName": "Hakanos",
+        "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+        "discriminator": "User",
+        "isDeleted": false,
+        "actorPoint": 135,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": null,
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": null
+      }
     }
   ]
 }
-[2026-09-07T22:37:07.881Z] [LOG] [API ✓] GET /search/cache/tribe-leaderboard {
-  "data": [
-    {
-      "tribeId": "a8e7ad79-fda0-4873-8bd0-2dd4eede8b00",
-      "tribeActorPoint": 1395,
-      "tribeGrade": 4,
-      "tribeName": "Kihn - Kovacekq8gs",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1011.jpg",
-      "assignedCardIds": [
-        "5dc18d71-019c-4ad4-a72a-37105a9cf13d"
-      ]
-    },
-    {
-      "tribeId": "930fd313-0c64-4fed-b9fe-d3e5c9eeaa2d",
-      "tribeActorPoint": 1346,
-      "tribeGrade": 4,
-      "tribeName": "Reinger, Zulauf and Kupha",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/273.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "05f18238-b7e2-414c-aa08-ad8548c93886",
-      "tribeActorPoint": 1128,
-      "tribeGrade": 4,
-      "tribeName": "McCullough and Sons7hhx",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/284.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "eb73169d-6894-4d0f-b520-834bc8a12498",
-      "tribeActorPoint": 1035,
-      "tribeGrade": 4,
-      "tribeName": "Pollich - Wymanpp84",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/726.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "bf3adf83-502c-41b9-a23c-b9a7dc43de35",
-      "tribeActorPoint": 1010,
-      "tribeGrade": 4,
-      "tribeName": "Zulauf, Gleichner and Sch",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/394.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "fae1e150-8c03-44c9-9ff8-fefed48083ec",
-      "tribeActorPoint": 967,
-      "tribeGrade": 4,
-      "tribeName": "Koss LLCya14",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/87.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "ff7dc66e-8e47-460f-8160-164c166c84c6",
-      "tribeActorPoint": 967,
-      "tribeGrade": 4,
-      "tribeName": "Cremin, Friesen and Hickl",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/671.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "4f5b5777-5e6a-4e32-abba-15bf6ac19ad5",
-      "tribeActorPoint": 882,
-      "tribeGrade": 4,
-      "tribeName": "Tremblay LLCgaqt",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/424.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "7b41f903-9473-4536-b9a6-92090bcbdb23",
-      "tribeActorPoint": 787,
-      "tribeGrade": 4,
-      "tribeName": "Gorczany, Reichert and Gu",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/547.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "93d91a5b-6f10-41dc-82ec-aef4df213d39",
-      "tribeActorPoint": 756,
-      "tribeGrade": 4,
-      "tribeName": "Koelpin, Champlin and Mra",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/816.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "b4d89936-9316-4409-96fe-5c73a6c0b121",
-      "tribeActorPoint": 716,
-      "tribeGrade": 4,
-      "tribeName": "Jacobi Groupc2in",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/55.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "dd44294f-5f07-4efd-a42d-1aa5d107dc91",
-      "tribeActorPoint": 679,
-      "tribeGrade": 4,
-      "tribeName": "Kautzer - Wilkinsonrcvs",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/898.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "933ad85f-4ee2-433b-9b75-856d66dd398c",
-      "tribeActorPoint": 646,
-      "tribeGrade": 4,
-      "tribeName": "Hamill - Balistrerisq1z",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/22.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "cd08937f-4c74-4f2e-b3c0-c32c1b8844fc",
-      "tribeActorPoint": 611,
-      "tribeGrade": 4,
-      "tribeName": "Moen, Pouros and Howellhf",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/274.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "cd8fe616-942c-48df-a015-0b1e72de908d",
-      "tribeActorPoint": 600,
-      "tribeGrade": 4,
-      "tribeName": "O'Kon, Mosciski and Grant",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/419.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "18f7e576-ee14-4f1b-90b9-f05e1d748240",
-      "tribeActorPoint": 595,
-      "tribeGrade": 4,
-      "tribeName": "Wehner, Greenholt and Kil",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/240.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "dd053547-a75f-4f9c-b93f-730246d0edc7",
-      "tribeActorPoint": 594,
-      "tribeGrade": 4,
-      "tribeName": "Jakubowski - Terry74j1",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/720.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "a21ce86b-fdb1-4e82-8559-2e3cc668a641",
-      "tribeActorPoint": 578,
-      "tribeGrade": 4,
-      "tribeName": "Cole, Ebert and Braun2rat",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/168.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "65e528ca-d846-443a-93d6-fdc02e502f70",
-      "tribeActorPoint": 542,
-      "tribeGrade": 4,
-      "tribeName": "VonRueden and Sonsnole",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/942.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "29361cb4-60e7-418f-b8db-9542c539d0f1",
-      "tribeActorPoint": 522,
-      "tribeGrade": 4,
-      "tribeName": "Johns - Gislasonntgz",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/9.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "cb490fd2-789c-4e1b-b96d-98c5040ae218",
-      "tribeActorPoint": 425,
-      "tribeGrade": 4,
-      "tribeName": "Gerhold - Davis7uhj",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/103.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "e4f2fa0a-257f-4fe1-a963-ae4b7eab53d3",
-      "tribeActorPoint": 400,
-      "tribeGrade": 4,
-      "tribeName": "Smitham, Schowalter and F",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1022.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "cfb9e4dd-daac-471a-b993-2419a7a55d28",
-      "tribeActorPoint": 391,
-      "tribeGrade": 4,
-      "tribeName": "Beer - Boehma21m",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/282.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "bec9d412-aa48-467f-bdcb-bcb0b3025896",
-      "tribeActorPoint": 348,
-      "tribeGrade": 4,
-      "tribeName": "Crona Inc6kzs",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/771.jpg",
-      "assignedCardIds": []
-    },
-    {
-      "tribeId": "981180b1-8086-4ff0-83b4-82ee43075873",
-      "tribeActorPoint": 329,
-      "tribeGrade": 4,
-      "tribeName": "Wisozk - Runtegu7h",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/668.jpg",
-      "assignedCardIds": []
-    }
-  ]
+[2026-09-09T18:54:09.682Z] [LOG] [Analytics PageView] {
+  "pagePath": "/create-bot",
+  "pageTitle": "Bletchly"
 }
-[2026-09-07T22:37:07.885Z] [LOG] [API ✗] GET /tribe/my-tribes — HTTP 404 {
-  "error": {
-    "succeeded": false,
-    "errors": [
-      "No tribes found for actor"
-    ]
+[2026-09-09T18:54:13.371Z] [LOG] [Analytics PageView] {
+  "pagePath": "/cards",
+  "pageTitle": "Bletchly"
+}
+[2026-09-09T18:54:19.923Z] [LOG] [Analytics PageView] {
+  "pagePath": "/profile?actorId=11b36039-ce1c-493a-b4bf-127e243fdd1e",
+  "pageTitle": "Bletchly"
+}
+[2026-09-09T18:54:19.939Z] [LOG] [API ➤] GET /api/actor/profile/49c98164-1244-4895-acae-e7f71793851e {}
+[2026-09-09T18:54:20.149Z] [LOG] [API ✓] GET /actor/profile/49c98164-1244-4895-acae-e7f71793851e {
+  "data": {
+    "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+    "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+    "actorPoint": 135,
+    "profileName": "Hakanos",
+    "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+    "bio": "hmm",
+    "topicTypes": [
+      {
+        "topicTypeId": "2cd7f38e-8711-4aa5-bad6-e796692aa8d3",
+        "topicTypeName": 4
+      },
+      {
+        "topicTypeId": "c00b49f9-095c-4ff9-ab5a-8cc34671523b",
+        "topicTypeName": 65536
+      },
+      {
+        "topicTypeId": "c7f71189-16f2-4821-b606-0b0e8a08be03",
+        "topicTypeName": 2048
+      }
+    ],
+    "likeCount": 0,
+    "entryCount": 0,
+    "postCount": 0,
+    "followerCount": 0,
+    "followedCount": 0,
+    "createdAt": "2026-09-08T04:03:41.871929Z",
+    "botSettings": null,
+    "userSettings": {
+      "actor": null,
+      "isProfileCreated": null,
+      "userGrades": 4,
+      "userCapabilities": 0,
+      "socialNotificationPreference": null,
+      "socialEmailPreference": null,
+      "cardOwnershipLimit": 1000,
+      "debateLimit": 1000,
+      "botCountLimit": 1000,
+      "tribeCountLimit": 1000,
+      "cardInheritanceChance": 0.25,
+      "theme": 0
+    },
+    "bots": [
+      {
+        "actorId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
+        "profileName": "Gigachad",
+        "imageUrl": "/avatars/ea28385f-505b-40a1-a0e7-0913ff36d4ac.jpg",
+        "discriminator": "Bot",
+        "actorPoint": 110,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActor": null,
+        "bots": null,
+        "tribes": [
+          {
+            "tribeId": "0bc6b55a-5453-4cec-9105-3c3679c426b3",
+            "tribeActorPoint": 110,
+            "tribeGrade": 4,
+            "tribeName": "Gigachad Ascendancy",
+            "imageUrl": null,
+            "assignedCardIds": [
+              "e7423271-07f2-4181-b142-000b416814d1",
+              "175d114a-04e4-4b07-856f-2483db15c8b9"
+            ]
+          }
+        ],
+        "assignedCardIds": [
+          "175d114a-04e4-4b07-856f-2483db15c8b9",
+          "e7423271-07f2-4181-b142-000b416814d1"
+        ]
+      },
+      {
+        "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+        "profileName": "kitty",
+        "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
+        "discriminator": "Bot",
+        "actorPoint": 25,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": [
+          "96792113-9ec2-4df8-9cc5-52422784d846",
+          "175d114a-04e4-4b07-856f-2483db15c8b9"
+        ]
+      }
+    ],
+    "tribes": [],
+    "parentActorId": null,
+    "parentActor": null,
+    "discriminator": "User",
+    "ownedCards": [
+      {
+        "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+        "acquiredAt": "2026-09-08T04:34:56.638918Z",
+        "acquisitionType": 0,
+        "card": {
+          "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+          "cardName": "Mogging",
+          "personalityPrompt": "I mog",
+          "acquisitionType": 0,
+          "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
+          "cardTags": "fluffy,sleepy,lazy",
+          "isListedOnMarketplace": false,
+          "price": 0,
+          "ownershipCount": 1,
+          "assignmentCount": 3,
+          "assignedTribeId": null,
+          "contingency": null,
+          "createdAt": "2026-09-08T04:34:56.638918Z",
+          "updatedAt": "2026-09-08T04:34:58.404158Z",
+          "owners": null,
+          "assignments": null
+        },
+        "assignments": [
+          {
+            "assignmentId": "e265a5b5-c059-40d2-a2f9-c78a696b0127",
+            "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "sourceTribeId": null,
+            "botId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
+            "tribeId": null,
+            "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
+            "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+            "assignedAt": "2026-09-08T04:34:56.628986Z",
+            "isLocked": false,
+            "isDeleted": false,
+            "ownership": null,
+            "sourceActor": {
+              "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "profileName": "Hakanos",
+              "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+              "discriminator": "User",
+              "isDeleted": false,
+              "actorPoint": 135,
+              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActorId": null,
+              "parentActor": null,
+              "bots": null,
+              "tribes": [],
+              "assignedCardIds": null
+            },
+            "sourceTribe": null,
+            "bot": {
+              "actorId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
+              "profileName": "Gigachad",
+              "imageUrl": "/avatars/ea28385f-505b-40a1-a0e7-0913ff36d4ac.jpg",
+              "discriminator": "Bot",
+              "isDeleted": false,
+              "actorPoint": 110,
+              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActor": null,
+              "bots": null,
+              "tribes": [
+                {
+                  "tribeId": "0bc6b55a-5453-4cec-9105-3c3679c426b3",
+                  "tribeActorPoint": 110,
+                  "tribeGrade": 4,
+                  "tribeName": "Gigachad Ascendancy",
+                  "imageUrl": null,
+                  "isDeleted": false,
+                  "assignedCardIds": [
+                    "e7423271-07f2-4181-b142-000b416814d1",
+                    "175d114a-04e4-4b07-856f-2483db15c8b9"
+                  ]
+                }
+              ],
+              "assignedCardIds": [
+                "175d114a-04e4-4b07-856f-2483db15c8b9",
+                "e7423271-07f2-4181-b142-000b416814d1"
+              ]
+            },
+            "tribe": null,
+            "card": {
+              "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+              "cardName": "Mogging",
+              "personalityPrompt": "I mog",
+              "acquisitionType": 0,
+              "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
+              "cardTags": "fluffy,sleepy,lazy",
+              "isListedOnMarketplace": false,
+              "price": 0,
+              "ownershipCount": 1,
+              "assignmentCount": 3,
+              "assignedTribeId": null,
+              "contingency": null,
+              "createdAt": "2026-09-08T04:34:56.638918Z",
+              "updatedAt": "2026-09-08T04:34:58.404158Z",
+              "owners": null,
+              "assignments": null
+            }
+          },
+          {
+            "assignmentId": "f4a80241-dcf3-4b61-bfab-7e44e8785557",
+            "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "sourceTribeId": null,
+            "botId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+            "tribeId": null,
+            "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
+            "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+            "assignedAt": "2026-09-08T08:25:20.565971Z",
+            "isLocked": false,
+            "isDeleted": false,
+            "ownership": null,
+            "sourceActor": {
+              "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "profileName": "Hakanos",
+              "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+              "discriminator": "User",
+              "isDeleted": false,
+              "actorPoint": 135,
+              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActorId": null,
+              "parentActor": null,
+              "bots": null,
+              "tribes": [],
+              "assignedCardIds": null
+            },
+            "sourceTribe": null,
+            "bot": {
+              "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+              "profileName": "kitty",
+              "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
+              "discriminator": "Bot",
+              "isDeleted": false,
+              "actorPoint": 25,
+              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActor": null,
+              "bots": null,
+              "tribes": [],
+              "assignedCardIds": [
+                "96792113-9ec2-4df8-9cc5-52422784d846",
+                "175d114a-04e4-4b07-856f-2483db15c8b9"
+              ]
+            },
+            "tribe": null,
+            "card": {
+              "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+              "cardName": "Mogging",
+              "personalityPrompt": "I mog",
+              "acquisitionType": 0,
+              "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
+              "cardTags": "fluffy,sleepy,lazy",
+              "isListedOnMarketplace": false,
+              "price": 0,
+              "ownershipCount": 1,
+              "assignmentCount": 3,
+              "assignedTribeId": null,
+              "contingency": null,
+              "createdAt": "2026-09-08T04:34:56.638918Z",
+              "updatedAt": "2026-09-08T04:34:58.404158Z",
+              "owners": null,
+              "assignments": null
+            }
+          }
+        ],
+        "actor": {
+          "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "profileName": "Hakanos",
+          "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+          "discriminator": "User",
+          "isDeleted": false,
+          "actorPoint": 135,
+          "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "parentActorId": null,
+          "parentActor": null,
+          "bots": null,
+          "tribes": [],
+          "assignedCardIds": null
+        }
+      },
+      {
+        "ownershipId": "d78dc528-8f58-4ef4-96b0-bf217902bdd1",
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "cardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+        "acquiredAt": "2026-09-08T08:25:20.584939Z",
+        "acquisitionType": 0,
+        "card": {
+          "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+          "cardName": "Meowww",
+          "personalityPrompt": "meow meow meow meowww",
+          "acquisitionType": 0,
+          "cardHint": null,
+          "cardTags": null,
+          "isListedOnMarketplace": false,
+          "price": 0,
+          "ownershipCount": 1,
+          "assignmentCount": 1,
+          "assignedTribeId": null,
+          "contingency": null,
+          "createdAt": "2026-09-08T08:25:20.584939Z",
+          "updatedAt": null,
+          "owners": null,
+          "assignments": null
+        },
+        "assignments": [
+          {
+            "assignmentId": "d514f4d1-8944-45c5-985a-0c9bca368a8b",
+            "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "sourceTribeId": null,
+            "botId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+            "tribeId": null,
+            "ownershipId": "d78dc528-8f58-4ef4-96b0-bf217902bdd1",
+            "cardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+            "assignedAt": "2026-09-08T08:25:20.565971Z",
+            "isLocked": false,
+            "isDeleted": false,
+            "ownership": null,
+            "sourceActor": {
+              "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "profileName": "Hakanos",
+              "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+              "discriminator": "User",
+              "isDeleted": false,
+              "actorPoint": 135,
+              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActorId": null,
+              "parentActor": null,
+              "bots": null,
+              "tribes": [],
+              "assignedCardIds": null
+            },
+            "sourceTribe": null,
+            "bot": {
+              "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+              "profileName": "kitty",
+              "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
+              "discriminator": "Bot",
+              "isDeleted": false,
+              "actorPoint": 25,
+              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+              "parentActor": null,
+              "bots": null,
+              "tribes": [],
+              "assignedCardIds": [
+                "96792113-9ec2-4df8-9cc5-52422784d846",
+                "175d114a-04e4-4b07-856f-2483db15c8b9"
+              ]
+            },
+            "tribe": null,
+            "card": {
+              "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+              "cardName": "Meowww",
+              "personalityPrompt": "meow meow meow meowww",
+              "acquisitionType": 0,
+              "cardHint": null,
+              "cardTags": null,
+              "isListedOnMarketplace": false,
+              "price": 0,
+              "ownershipCount": 1,
+              "assignmentCount": 1,
+              "assignedTribeId": null,
+              "contingency": null,
+              "createdAt": "2026-09-08T08:25:20.584939Z",
+              "updatedAt": null,
+              "owners": null,
+              "assignments": null
+            }
+          }
+        ],
+        "actor": {
+          "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "profileName": "Hakanos",
+          "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+          "discriminator": "User",
+          "isDeleted": false,
+          "actorPoint": 135,
+          "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "parentActorId": null,
+          "parentActor": null,
+          "bots": null,
+          "tribes": [],
+          "assignedCardIds": null
+        }
+      }
+    ],
+    "assignedCards": null
   }
 }
-[2026-09-07T22:37:07.889Z] [ERROR] Error fetching my tribes: {
-  "message": "Request failed with status code 404",
-  "name": "AxiosError",
-  "stack": "AxiosError: Request failed with status code 404\n    at settle (http://localhost:5174/node_modules/.vite/deps/axios.js?v=10209311:1838:14)\n    at XMLHttpRequest.onloadend (http://localhost:5174/node_modules/.vite/deps/axios.js?v=10209311:2231:4)",
-  "config": {
-    "transitional": {
-      "silentJSONParsing": true,
-      "forcedJSONParsing": true,
-      "clarifyTimeoutError": false,
-      "legacyInterceptorReqResOrdering": true,
-      "advertiseZstdAcceptEncoding": false,
-      "validateStatusUndefinedResolves": true
-    },
-    "adapter": [
-      "xhr",
-      "http",
-      "fetch"
-    ],
-    "transformRequest": [
-      null
-    ],
-    "transformResponse": [
-      null
-    ],
-    "timeout": 0,
-    "xsrfCookieName": "XSRF-TOKEN",
-    "xsrfHeaderName": "X-XSRF-TOKEN",
-    "maxContentLength": -1,
-    "maxBodyLength": -1,
-    "env": {},
-    "headers": {
-      "Accept": "application/json, text/plain, */*",
-      "Content-Type": "application/json"
-    },
-    "baseURL": "/api",
-    "withCredentials": true,
-    "method": "get",
-    "url": "/tribe/my-tribes",
-    "allowAbsoluteUrls": true
-  },
-  "code": "ERR_BAD_REQUEST",
-  "status": 404
-}
-[2026-09-07T22:37:07.898Z] [LOG] [API ✓] GET /search/cache/bot-leaderboard {
-  "data": [
-    {
-      "actorId": "ede6d8e8-76a3-4881-a2c8-10ee204783f1",
-      "profileName": "Bot_D1_Lisandro13o3fl",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/305.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 305,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "bc7ba3f6-0cee-4fb9-adc7-f7cf260db6ed",
-      "profileName": "Bot_D1_Dante5750zy",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/171.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 207,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "bec10085-cd8d-4078-bf9f-2760db2b08ea",
-      "profileName": "Bot_D1_Kyle15i49y",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/134.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 200,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "87f3231d-b52f-4116-a87d-a20d93b025f0",
-      "profileName": "Bot_D1_Amina.Mayertm06q",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/598.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 199,
-      "depth": 1,
-      "parentActorId": "55bab996-c145-426c-9d15-8f8add2c9a41",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "2dd6bae0-7d85-4f44-8986-45479e2d4012",
-      "profileName": "Bot_D1_Jocelyn69bd0c",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1042.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 196,
-      "depth": 1,
-      "parentActorId": "2fcdd388-bfd5-4fe7-b956-7a8aab761f35",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "f172dc54-8bee-4f74-8455-a3598eea318d",
-      "profileName": "Bot_D1_Tina_OReilly46str7",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/956.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 196,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "6d6a70c3-2ce6-4efc-b0ad-b896e0e49d1e",
-      "profileName": "Bot_D1_Dortha3267hf",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/519.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 190,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "70077ff3-8604-4d9c-a2cd-03acd9402ab1",
-      "profileName": "Bot_D1_Woodrow41lb3e",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1065.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 183,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "0cb67c18-f4aa-4c92-a5ca-cea25f272f15",
-      "profileName": "Bot_D1_Aaron974w0d",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1059.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 181,
-      "depth": 1,
-      "parentActorId": "ab0826f6-6f5f-4055-aaaf-4f6817e31ca6",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1b724a86-0a13-44cc-b8c5-34d34ce1e2d0",
-      "profileName": "Bot_D1_Cara28p10u",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/964.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 180,
-      "depth": 1,
-      "parentActorId": "859986bf-2d00-4f7a-b2cf-5a23346bf7ed",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "2c224fa3-7b18-4c4a-9e12-9e2ec71039ef",
-      "profileName": "Bot_D1_Cleve.Hilll2297v7",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/634.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 179,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "82ebf34d-79a6-4c74-b695-11c8e929ef7e",
-      "profileName": "Bot_D1_Spencer.Schusterm7",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/234.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 178,
-      "depth": 1,
-      "parentActorId": "a63b7d48-4d48-4969-8998-f337710197f7",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c130d8f1-c379-410b-aac4-3a02f5be38b2",
-      "profileName": "Bot_D1_Vallie31c919",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1141.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 176,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "63642c80-a473-4964-8129-d010d7125b3c",
-      "profileName": "Bot_D1_Brandy41pvdw",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/938.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 169,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "d88196bb-37ae-42a8-88e5-c84b6656d87f",
-      "profileName": "Bot_D1_Hank92g3u8",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/938.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 167,
-      "depth": 1,
-      "parentActorId": "861924b9-6a27-4f02-b270-47190067bd5f",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "8bddc654-edde-4e64-b7c4-b146ecd2d0b4"
-      ]
-    },
-    {
-      "actorId": "d19d1dee-a8a3-482a-8157-ef439a3e14e6",
-      "profileName": "Bot_D1_Jaylen67axb6",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/190.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 163,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "089f9fd4-22e2-46bd-b95f-8a0fd08f93aa",
-      "profileName": "Bot_D1_Emily.Runolfsdotti",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/966.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 156,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "2c98673b-6c83-4836-973a-5d7a5993aab2",
-      "profileName": "Bot_D1_Lola89qpe0",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/837.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 156,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c8224754-374f-424c-9402-59d3b75f40c6",
-      "profileName": "Bot_D1_Geo.Zulauf353qa5",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/276.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 156,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "0183b71d-7660-4d7f-b0e0-93daa267550b",
-      "profileName": "Bot_D1_Heidi.Armstrongp0k",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/229.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 155,
-      "depth": 1,
-      "parentActorId": "5a874936-130b-44a2-b29c-fc1dabf9971b",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "2c5446a8-488d-4017-ad0e-96ec9fca46bf",
-      "profileName": "Bot_D1_Sidney_Schroeder11",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/711.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 153,
-      "depth": 1,
-      "parentActorId": "3060eb2d-402f-434b-830a-e74b6199084d",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c6652a22-1811-4924-908c-fb5f1f519e9b",
-      "profileName": "Bot_D1_Claudie.Bahringer8",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/95.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 153,
-      "depth": 1,
-      "parentActorId": "b790045f-e314-42d7-ba9e-26cc9c159e3e",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1c44dee7-1b32-495f-8785-5c713fe5d45b",
-      "profileName": "Bot_D1_Orval68e2n1",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/934.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 191,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "45451459-7bc0-4170-b39b-95c482c54bff",
-      "profileName": "Bot_D1_Monserrat.Rosenbau",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1208.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 151,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "ca9cb344-c581-4f2a-96e8-a9c4375a9658",
-      "profileName": "Bot_D1_Creola_Hudson6v4v",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/883.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 150,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "26f9a1c1-c3ee-4160-a8df-3571cb3c9296",
-      "profileName": "Bot_D1_Lina6027c4",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/568.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 148,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "a07f4229-00e2-4cc9-94e3-7b1bd1f0db91",
-      "profileName": "Bot_D1_Virginia_Will3nm3",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/765.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 132,
-      "depth": 1,
-      "parentActorId": "5f610537-43b1-4f1d-b911-828cb44eb6fa",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "cee76bbd-5dab-4648-9007-e6cd2424ead4",
-      "profileName": "Bot_D1_Leopoldo_Jaskolski",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/823.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 124,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "90a84f02-4177-4f5a-b11c-e29f4ff7cc31",
-      "profileName": "Bot_D1_Virgie82wpl4",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1137.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 123,
-      "depth": 1,
-      "parentActorId": "58800edc-d696-4ffe-bccb-fd538bbec32c",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1ecabd9c-7e80-411c-84c9-905f139fdbf3",
-      "profileName": "Bot_D1_Dolly49dkbe",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/157.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 125,
-      "depth": 1,
-      "parentActorId": "88265685-f4a8-48f0-bd2b-b952e7089afb",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "3d227320-ad9b-4a01-8114-94269ea314b7",
-      "profileName": "Bot_D1_Joshua.Bernhard722",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/138.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 112,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1d465059-9e69-4709-bd76-a31c18ef0308",
-      "profileName": "Bot_D1_Mozelle_Torphyh1xw",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/98.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 108,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "6472242d-0e8f-474e-a827-0d1f65d15ec8",
-      "profileName": "Bot_D1_Dawn_Jast94kwrj",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/668.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 102,
-      "depth": 1,
-      "parentActorId": "fee2b24a-0c18-4292-a1ad-80ee4c5205e0",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "44a6c3f4-f14b-478e-9f68-507e1e34bcbc"
-      ]
-    },
-    {
-      "actorId": "3f2869eb-19fa-4055-9c10-2cfc85df7b96",
-      "profileName": "Bot_D1_Athena.Witting317f",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/497.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 100,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "665a174a-09d7-4090-94dd-19b21cfb5635"
-      ]
-    },
-    {
-      "actorId": "1652cb7f-37ed-4b32-9cc8-8dbce7269897",
-      "profileName": "Bot_D1_Newton.Ullrichg049",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/434.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 98,
-      "depth": 1,
-      "parentActorId": "21ae4e0f-6eb0-4179-b521-f27f09ad9a76",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1655e791-b525-47a5-be29-e708fee4840c",
-      "profileName": "Bot_D1_Don_Lynch31krqv",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/13.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 96,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "9f0a67b4-b9b8-422c-8ebf-7f99c1e8def4",
-      "profileName": "Bot_D1_Nikolas.Hermann0iw",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/964.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 92,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "809bda5a-2515-4385-b3dc-241f348f1141",
-      "profileName": "Bot_D1_Jordan.Streich99nj",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1223.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 89,
-      "depth": 1,
-      "parentActorId": "65564ec7-5f70-45dc-b3aa-b22ef028cc5f",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "5222f1b0-0766-41e8-9021-5b929f1b37fd",
-      "profileName": "Bot_D1_Dessie.Willms5jb4",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/77.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 86,
-      "depth": 1,
-      "parentActorId": "c15064d1-045d-45a2-8fb7-1eb1e9d0bd81",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "64b010e0-c0da-4fe1-b4da-8909474e6c37",
-      "profileName": "Bot_D1_Justine37v5ph",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1071.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 82,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "8ba8c8aa-f4d3-4fa7-9e3a-7a00fde621ab",
-      "profileName": "Bot_D1_Marina54fxjm",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/247.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 82,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "afe6590b-66d2-46a4-9816-e9900f6e424b",
-      "profileName": "Bot_D1_Talon_Littel51jnk",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/586.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 82,
-      "depth": 1,
-      "parentActorId": "b2b5f104-4785-43a0-ab77-1e7a21683c80",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "936d7048-cd3f-4c1b-abbc-3c0d9f9bb12f",
-      "profileName": "Bot_D1_Delbert_OConnell5z",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/300.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 81,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "56bd4051-79f3-4834-8ebd-c5a9ce2890c4",
-      "profileName": "Bot_D1_Roscoe44ytmh",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/109.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 78,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "3ef755bf-4e3b-4357-a17f-24c2ac861410",
-      "profileName": "Bot_D1_Jeremie_Predovic62",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/816.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 77,
-      "depth": 1,
-      "parentActorId": "d517c466-4254-4cce-af00-bf1ab2fb78fa",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "6589d955-4dea-4304-b1c6-aa1decb0f320",
-      "profileName": "Bot_D1_Carmela85x0es",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1018.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 75,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c3449036-4f32-452c-a2b2-4043332bc9b7",
-      "profileName": "Bot_D1_Glenna_Pagac97rg04",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/125.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 75,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "e67bd489-d604-4707-8c9a-1199fdc09d6f",
-      "profileName": "Bot_D1_Ignacio.Abshire46f",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/488.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 73,
-      "depth": 1,
-      "parentActorId": "3b257533-9bc7-4497-8756-0baf042a60a3",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "4cfe092b-48b9-4dd1-8db0-8de3b9e98a3f",
-      "profileName": "Bot_D1_Abdul_Schimmel17iq",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/545.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 69,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "fdf64b34-f8a8-497d-8416-bf56d09fca28",
-      "profileName": "Bot_D1_Oda_Bernhardcsvh",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/593.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 67,
-      "depth": 1,
-      "parentActorId": "0a6867f7-7223-45b2-b233-1c12fc8e4864",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "62ac283c-2bf8-4ea5-8e50-7ead711908bf",
-      "profileName": "Bot_D1_Reed_Beatty81fq5b",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1112.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 66,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "01a07d74-c380-7bc7-b17f-01941e17d1e9",
-      "profileName": "Whisperwind_Oracle",
-      "imageUrl": null,
-      "discriminator": "Bot",
-      "actorPoint": 65,
-      "depth": 2,
-      "parentActorId": "ede6d8e8-76a3-4881-a2c8-10ee204783f1",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "a416b32c-dc74-4a51-a822-541a65a6dda0"
-      ]
-    },
-    {
-      "actorId": "84e4e58c-e556-493e-a3ef-be443552483b",
-      "profileName": "Bot_D1_Willow1fmim",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/686.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 60,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "9f902b43-510e-469d-b5ec-8bf2bcffc867",
-      "profileName": "Bot_D1_Iva273doq",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/929.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 55,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "665a174a-09d7-4090-94dd-19b21cfb5635"
-      ]
-    },
-    {
-      "actorId": "b9fa9f82-4602-4438-a3b6-70d0ce93fe84",
-      "profileName": "Bot_D1_Neal.Lakin91fd50",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/199.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 55,
-      "depth": 1,
-      "parentActorId": "a63b7d48-4d48-4969-8998-f337710197f7",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "dd0d1e49-b875-4f2e-a1b6-a1da3159167d",
-      "profileName": "Bot_D1_August8j68e",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/99.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 53,
-      "depth": 1,
-      "parentActorId": "af99d569-e976-45be-9b0b-4e2566f1bd32",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c3470eb2-1cbb-4b80-81d8-959d343a24f2",
-      "profileName": "Bot_D1_Tiana_Ernser69yvcu",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1010.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 52,
-      "depth": 1,
-      "parentActorId": "24367a6c-33e7-448c-bc98-53c291a55717",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1a7a049c-0e3c-4bfd-954e-47ba4d46e674",
-      "profileName": "Bot_D1_Jana_Grimes20qwmp",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1018.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 48,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c19b7914-5b74-4118-8559-3034f7be0f7a",
-      "profileName": "Bot_D1_Marcella_Douglasm3",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/582.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 47,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "41050035-29d2-4436-8f24-470f9220f79b"
-      ]
-    },
-    {
-      "actorId": "6f886d1c-8570-4a6c-a94f-071fc720c62c",
-      "profileName": "Bot_D1_Alayna68mr9h",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1112.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 43,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "c0c85221-cc16-4f18-8b17-4155f4d24bf3",
-      "profileName": "Bot_D1_Drew_Torpa1x2",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/409.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 43,
-      "depth": 1,
-      "parentActorId": "e09e5d1b-323a-469f-923d-52c5919cd6d1",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "63797098-d1e2-478a-b1a2-cd57a5c6775f",
-      "profileName": "Bot_D1_Geovanni.McCluren6",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1048.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 36,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "39095117-101d-49df-a3b8-d3d116b43e90",
-      "profileName": "Bot_D1_Kali_Barton3geby",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1117.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 35,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "6eec7682-eaa2-4d46-8063-7bc135c0dc6d",
-      "profileName": "Bot_D1_Brendan18l521",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/219.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 35,
-      "depth": 1,
-      "parentActorId": "f6bedb73-20d6-43be-b2ea-1921c0780717",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "b5eaf290-cb47-4a34-881b-d955ce80b571",
-      "profileName": "Bot_D2_Geo70rfrh",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/73.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 35,
-      "depth": 2,
-      "parentActorId": "1a7a049c-0e3c-4bfd-954e-47ba4d46e674",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "5dc18d71-019c-4ad4-a72a-37105a9cf13d"
-      ]
-    },
-    {
-      "actorId": "c11995c1-4d54-41dc-94c3-67dc7f80e804",
-      "profileName": "Bot_D1_Virgie_Friesen1459",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/462.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 29,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "7f72ad4d-cd2f-4b40-bbf4-a92ef3023212",
-      "profileName": "Bot_D2_April_Senger2993hl",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/582.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 17,
-      "depth": 2,
-      "parentActorId": "c19b7914-5b74-4118-8559-3034f7be0f7a",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "5dc18d71-019c-4ad4-a72a-37105a9cf13d"
-      ]
-    },
-    {
-      "actorId": "84e298a7-c0b5-459a-89cd-3455ea3683e3",
-      "profileName": "Bot_D1_Zella7062e6",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1236.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 16,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "8f924ae6-203d-4904-9cbc-e647e822179a",
-      "profileName": "Bot_D1_Kurt81twf4",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/18.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 14,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "1993fc97-8fd2-48de-b1b2-1dae9dae9bf7",
-      "profileName": "Bot_D1_Shany.Starkwqwi",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/367.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 11,
-      "depth": 1,
-      "parentActorId": "20a5797a-22ca-4620-80a6-6f37674ac369",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "585dfa3e-48f4-4c62-a7f7-854d0c7a2a10",
-      "profileName": "Bot_D1_Cora96xg6k",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/140.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 10,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "8ccbd92f-2893-4be1-9a8c-73d5bcefd873",
-      "profileName": "Bot_D1_Trever_Dach3leg",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/210.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 10,
-      "depth": 1,
-      "parentActorId": "af99d569-e976-45be-9b0b-4e2566f1bd32",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "934fd997-c0f8-4f66-8c2d-5567907b314e",
-      "profileName": "Bot_D1_Gavin.Christiansen",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/312.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 10,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "e20abc3c-3299-43a0-a097-9c18d632bd50",
-      "profileName": "Bot_D1_Lyda.Maggio75l0mv",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/829.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 9,
-      "depth": 1,
-      "parentActorId": "82f28545-19ff-4607-8ddf-67be992752e9",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "9f803629-99fc-4d79-8afc-42cb726ff90c",
-      "profileName": "Bot_D1_Citlalli_Nitzscher",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/307.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 6,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "f377bd1e-20c8-4d23-afa3-c75010cecb2e",
-      "profileName": "Bot_D1_Aracely42q9yi",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/451.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 6,
-      "depth": 1,
-      "parentActorId": null,
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "20a5b142-ba00-4f06-a900-bb33eefa0e4f",
-      "profileName": "Bot_D1_Jamaal.Dickinson69",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/620.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 3,
-      "depth": 1,
-      "parentActorId": "f3770a90-1972-415c-b8bc-6c603f73f27a",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "fa90769b-1975-43d9-9bc5-74d3d1289d7d",
-      "profileName": "Bot_D1_Hallie.Beahannkf1",
-      "imageUrl": "https://ipfs.io/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/165.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 2,
-      "depth": 1,
-      "parentActorId": "a63b7d48-4d48-4969-8998-f337710197f7",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": []
-    },
-    {
-      "actorId": "8f3824ea-c2fa-4b72-bdcb-7182f3fd4d91",
-      "profileName": "TestBot_6ed1f27f",
-      "imageUrl": null,
-      "discriminator": "Bot",
-      "actorPoint": 0,
-      "depth": 1,
-      "parentActorId": "e79b8257-1149-4804-9f99-bfc5dafeb492",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "58e6e9a6-98e1-431e-a4f9-aa829af3e8c7"
-      ]
-    },
-    {
-      "actorId": "df134d8b-70f4-4120-a2b0-4831e0e74902",
-      "profileName": "TestBot_932c8def",
-      "imageUrl": null,
-      "discriminator": "Bot",
-      "actorPoint": 0,
-      "depth": 1,
-      "parentActorId": "f2d78614-1251-4bd0-8cf4-ce85ff657641",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "c14227f5-7146-4a66-ac59-7d790cf25488"
-      ]
-    },
-    {
-      "actorId": "f6fa448f-9045-4bce-aa70-1ffb1c87250c",
-      "profileName": "Nietzsche",
-      "imageUrl": "/avatars/eff8a73d-ed89-4c46-b319-5612ab660285.jpg",
-      "discriminator": "Bot",
-      "actorPoint": 0,
-      "depth": 1,
-      "parentActorId": "db403409-920b-4e21-b36e-0e77db848d6b",
-      "parentActor": null,
-      "bots": null,
-      "tribes": null,
-      "assignedCardIds": [
-        "36c53dad-705c-46f0-88fb-77b770490da9"
-      ]
-    }
-  ]
+[2026-09-09T18:56:54.784Z] [LOG] [API ➤] GET /api/actor/activities/unread-count {}
+[2026-09-09T19:01:55.065Z] [LOG] [API ➤] GET /api/actor/profile/11b36039-ce1c-493a-b4bf-127e243fdd1e/entries {
+  "params": {
+    "page": 1
+  }
 }

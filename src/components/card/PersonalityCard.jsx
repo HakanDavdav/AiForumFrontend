@@ -213,7 +213,7 @@ export default function PersonalityCard({
         {editorConfirmed && (
           <div className="personality-card__stats personality-card-editor__confirmed-stats">
             <span className="personality-card__stat" title={t('card.owners', 'Sahipler')}>
-              <Users size={12} />0
+              <Crown size={12} />0
             </span>
             <span className="personality-card__stat" title={t('card.assignees', 'Atanmış Botlar')}>
               <Bot size={12} />0
@@ -288,12 +288,16 @@ export default function PersonalityCard({
     card?.card?.ownershipCount ??
     card?.ownership?.ownershipCount ??
     card?.ownership?.originalCard?.ownershipCount ??
+    card?.owners?.length ??
+    card?.card?.owners?.length ??
     0
   const assignmentCount =
     card?.assignmentCount ??
     card?.card?.assignmentCount ??
     card?.ownership?.assignmentCount ??
     card?.ownership?.originalCard?.assignmentCount ??
+    card?.assignments?.length ??
+    card?.card?.assignments?.length ??
     0
   const personalityCardId =
     card?.personalityCardId ??
@@ -305,7 +309,6 @@ export default function PersonalityCard({
   const innerCard = card?.card ?? card?.ownership?.originalCard ?? card
   const currentAcqType = innerCard?.acquisitionType ?? null
 
-  const isTribeAssigned = Boolean(card?.tribeId || card?.assignedTribeId || tribeAssigned)
   const isAssignedCard = Boolean(
     card?.assignmentId || card?.botId || card?.tribeId || card?.assignedTribeId || tribeAssigned
   )
@@ -322,28 +325,6 @@ export default function PersonalityCard({
     ownerActor?.actorId ||
     null
 
-  const sourceActor = card?.sourceActor || null
-  const sourceActorId = card?.sourceActorId || sourceActor?.actorId || null
-  const sourceTribe =
-    card?.sourceTribe ||
-    (isTribeAssigned && !card?.tribeId && card?.tribe ? card.tribe : null)
-
-  const isSourceSameAsOwner = Boolean(
-    sourceActorId &&
-      ownerActorId &&
-      String(sourceActorId).toLowerCase() === String(ownerActorId).toLowerCase()
-  )
-
-  const intermediateSource = sourceTribe
-    ? { type: 'tribe', data: sourceTribe }
-    : sourceActor && !isSourceSameAsOwner
-      ? { type: 'actor', data: sourceActor }
-      : null
-
-  const targetBot = card?.bot || (card?.botId ? card?.actor || actor : null)
-  const targetTribe = card?.tribeId ? card?.tribe || null : null
-  const hasTarget = Boolean(targetBot || targetTribe)
-
   const rawAssignments = Array.isArray(card?.assignments) ? card.assignments : []
   const assignedBots =
     card?.assignedBots && card.assignedBots.length > 0
@@ -354,6 +335,57 @@ export default function PersonalityCard({
       ? card.assignedTribes
       : rawAssignments.map((a) => a.tribe).filter(Boolean)
   const hasAssigned = Boolean(assignedBots.length > 0 || assignedTribes.length > 0)
+
+  // Assignment-merkezli mod için tüm assignment'ları normalize et:
+  // her öğe kaynak (SourceActor / SourceTribe) + hedef (Bot / Tribe) taşıyabilir.
+  const assignmentItems =
+    rawAssignments.length > 0
+      ? rawAssignments.filter((a) => !a.isDeleted)
+      : isAssignedCard
+        ? [card]
+        : []
+
+  const resolveSourceNode = (item) => {
+    if (item?.sourceTribe) return { type: 'tribe', data: item.sourceTribe }
+    const src = item?.sourceActor || null
+    if (!src) return null
+    const srcId = String(src.actorId || src.id || '').toLowerCase()
+    const ownId = String(ownerActorId || '').toLowerCase()
+    if (ownId && srcId && srcId === ownId) return null
+    return { type: 'actor', data: src }
+  }
+
+  const resolveTargetNode = (item) => {
+    if (item?.bot) return { type: 'actor', data: item.bot }
+    if (item?.botId) {
+      const fallback = item?.actor || actor || null
+      if (fallback) return { type: 'actor', data: fallback }
+      return { type: 'actor', data: { actorId: item.botId } }
+    }
+    if (item?.tribe) return { type: 'tribe', data: item.tribe }
+    if (item?.tribeId) return { type: 'tribe', data: { tribeId: item.tribeId } }
+    return null
+  }
+
+  const collectAssignmentNodes = (resolver) => {
+    const nodes = []
+    const seen = new Set()
+    for (const item of assignmentItems) {
+      const node = resolver(item)
+      if (!node) continue
+      const key = `${node.type}:${String(
+        node.data?.actorId || node.data?.tribeId || node.data?.id || ''
+      ).toLowerCase()}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      nodes.push(node)
+    }
+    return nodes
+  }
+
+  const assignmentSources = collectAssignmentNodes(resolveSourceNode)
+  const assignmentTargets = collectAssignmentNodes(resolveTargetNode)
+  const hasAssignmentFlow = assignmentSources.length > 0 || assignmentTargets.length > 0
   const isSelectionDisabled =
     disabled ||
     locked ||
@@ -565,7 +597,7 @@ export default function PersonalityCard({
           }}
         >
           {(isAssignedCard
-            ? ownerActor || intermediateSource || hasTarget
+            ? ownerActor || hasAssignmentFlow
             : ownerActor || hasAssigned) && (
             <div className="personality-card__assignment-sources" style={{ margin: 0 }}>
               {/* 1. Top Row: Owner */}
@@ -588,65 +620,112 @@ export default function PersonalityCard({
 
               {isAssignedCard ? (
                 <>
-                  {/* 2. Middle Row: Intermediate Source (SourceTribe or SourceActor != Owner) */}
-                  {intermediateSource && (
+                  {/* 2. Assigned bloğu (1. katman - Kaynaklar):
+                      "Assigned:" etiketi; sağında kaynak (SourceActor/SourceTribe) ögeleri
+                      bitişik (flush) alt alta dizilir. */}
+                  {assignmentSources.length > 0 && (
                     <div
-                      className={`personality-card__assignment-row${ownerActor ? ' personality-card__assignment-row--branch' : ''} personality-card__assignment-row--assigned${hasTarget ? ' has-next-sibling' : ''}`}
+                      className={`personality-card__assignment-row personality-card__assignment-row--branch personality-card__assignment-row--assigned personality-card__assignment-row--source-layer${assignmentTargets.length > 0 ? ' personality-card__assignment-row--has-target-layer' : ''}`}
+                      style={{ alignItems: 'flex-start' }}
                     >
-                      <span className="personality-card__assignment-label personality-card__assignment-label--assigned">
+                      <span
+                        className="personality-card__assignment-label personality-card__assignment-label--assigned"
+                        style={{ marginTop: '5px' }}
+                      >
                         {t('card.assigned_label', 'Assigned')}:
                       </span>
-                      {intermediateSource.type === 'tribe' ? (
-                        <TribeMinimalCard
-                          tribeId={intermediateSource.data.tribeId}
-                          tribeName={intermediateSource.data.tribeName}
-                          tribePoint={intermediateSource.data.tribePoint}
-                          imageUrl={intermediateSource.data.imageUrl}
-                          clickable={true}
-                          variant="compact"
-                        />
-                      ) : (
-                        <ActorMinimalCard
-                          actor={intermediateSource.data}
-                          showHierarchyBtn={false}
-                          showMindBtn={false}
-                          showEditBtn={false}
-                          showPoint={false}
-                          clickable={true}
-                          variant="compact"
-                        />
-                      )}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: 2,
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        {assignmentSources.map((node) =>
+                          node.type === 'tribe' ? (
+                            <TribeMinimalCard
+                              key={`src-tribe-${node.data.tribeId}`}
+                              tribeId={node.data.tribeId}
+                              tribeName={node.data.tribeName}
+                              tribePoint={node.data.tribePoint}
+                              imageUrl={node.data.imageUrl}
+                              variant="compact"
+                              clickable={true}
+                              showMindBtn={false}
+                              showEditBtn={false}
+                              showPoint={false}
+                            />
+                          ) : (
+                            <ActorMinimalCard
+                              key={`src-actor-${node.data.actorId}`}
+                              actor={node.data}
+                              showHierarchyBtn={false}
+                              showMindBtn={false}
+                              showEditBtn={false}
+                              showPoint={false}
+                              clickable={true}
+                              variant="compact"
+                            />
+                          )
+                        )}
+                      </div>
                     </div>
                   )}
 
-                  {/* 3. Bottom Row: Target (Bot or Tribe) */}
-                  {hasTarget && (
+                  {/* 3. Assigned bloğu (2. katman - Hedefler):
+                      kaynak katmanından inen dal; sağında Bot/Tribe ögeleri bitişik (flush) dizilir. */}
+                  {assignmentTargets.length > 0 && (
                     <div
-                      className={`personality-card__assignment-row${ownerActor || intermediateSource ? ' personality-card__assignment-row--branch' : ''} personality-card__assignment-row--assigned`}
+                      className={`personality-card__assignment-row personality-card__assignment-row--branch personality-card__assignment-row--assigned personality-card__assignment-row--target-layer${assignmentSources.length > 0 ? ' personality-card__assignment-row--has-source-layer' : ''}`}
+                      style={{ alignItems: 'flex-start' }}
                     >
-                      <span className="personality-card__assignment-label personality-card__assignment-label--assigned">
+                      <span
+                        className="personality-card__assignment-label personality-card__assignment-label--assigned"
+                        style={{ marginTop: '5px' }}
+                      >
                         {t('card.assigned_label', 'Assigned')}:
                       </span>
-                      {targetBot ? (
-                        <ActorMinimalCard
-                          actor={targetBot}
-                          showHierarchyBtn={false}
-                          showMindBtn={false}
-                          showEditBtn={false}
-                          showPoint={false}
-                          clickable={true}
-                          variant="compact"
-                        />
-                      ) : targetTribe ? (
-                        <TribeMinimalCard
-                          tribeId={targetTribe.tribeId}
-                          tribeName={targetTribe.tribeName}
-                          tribePoint={targetTribe.tribePoint}
-                          imageUrl={targetTribe.imageUrl}
-                          clickable={true}
-                          variant="compact"
-                        />
-                      ) : null}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          gap: 2,
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        {assignmentTargets.map((node) =>
+                          node.type === 'tribe' ? (
+                            <TribeMinimalCard
+                              key={`tgt-tribe-${node.data.tribeId}`}
+                              tribeId={node.data.tribeId}
+                              tribeName={node.data.tribeName}
+                              tribePoint={node.data.tribePoint}
+                              imageUrl={node.data.imageUrl}
+                              variant="compact"
+                              clickable={true}
+                              showMindBtn={false}
+                              showEditBtn={false}
+                              showPoint={false}
+                            />
+                          ) : (
+                            <ActorMinimalCard
+                              key={`tgt-actor-${node.data.actorId}`}
+                              actor={node.data}
+                              showHierarchyBtn={false}
+                              showMindBtn={false}
+                              showEditBtn={false}
+                              showPoint={false}
+                              clickable={true}
+                              variant="compact"
+                            />
+                          )
+                        )}
+                      </div>
                     </div>
                   )}
                 </>
@@ -731,7 +810,7 @@ export default function PersonalityCard({
               className="personality-card__stat"
               title={t('card.owners', 'Sahipler')}
             >
-              <Users size={12} />
+              <Crown size={12} />
               {ownershipCount}
             </button>
             <button
@@ -757,34 +836,8 @@ export default function PersonalityCard({
                 navigate(`/card-hierarchy?cardId=${personalityCardId}`)
               }}
               title={t('card.view_hierarchy', 'Kart Hiyerarşisi')}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-                padding: '6px 12px',
-                marginTop: 6,
-                background: 'rgba(var(--color-primary-rgb, 99, 102, 241), 0.08)',
-                border: '1px solid rgba(var(--color-primary-rgb, 99, 102, 241), 0.22)',
-                borderRadius: 8,
-                color: 'var(--color-primary)',
-                cursor: 'pointer',
-                fontSize: 12,
-                fontWeight: 600,
-                transition: 'all 0.18s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(var(--color-primary-rgb, 99, 102, 241), 0.16)'
-                e.currentTarget.style.borderColor = 'var(--color-primary)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(var(--color-primary-rgb, 99, 102, 241), 0.08)'
-                e.currentTarget.style.borderColor = 'rgba(var(--color-primary-rgb, 99, 102, 241), 0.22)'
-              }}
             >
-              <Network size={16} strokeWidth={2.2} />
-              <span>{t('card.hierarchy', 'Kart Hiyerarşisi')}</span>
+              <Network size={18} strokeWidth={2} />
             </button>
           )}
         </div>

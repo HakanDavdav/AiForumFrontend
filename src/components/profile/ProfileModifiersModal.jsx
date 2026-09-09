@@ -286,7 +286,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
         {/* Scrollable Content - Unified list without intermediate category headers */}
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {/* Grade & Premium / Memory Pair (Birbirine yakınlaştırılmış ayrı bloklar) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ order: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {/* 1. Grade Card */}
             <div>
               <div
@@ -487,6 +487,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
           {/* Horizontal Divider Line below Grade & Premium */}
           <div
             style={{
+              order: 2,
               width: '100%',
               height: 0,
               borderTop: '1px solid var(--color-border)',
@@ -496,7 +497,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 3. Bot Sahiplik Limiti (User & Bot) */}
           {((isUser && profile.userSettings) || (isBot && profile.botSettings)) && (
-            <div>
+            <div style={{ order: 3 }}>
               <div
                 onClick={() => toggleBubble('actorBots')}
                 style={{
@@ -561,7 +562,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 3.5 Kabile Katılım Limiti (User & Bot) */}
           {((isUser && profile.userSettings) || (isBot && profile.botSettings)) && (
-            <div>
+            <div style={{ order: 4 }}>
               <div
                 onClick={() => toggleBubble('actorTribes')}
                 style={{
@@ -624,7 +625,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 4. Kart Sahiplik Limiti (User & Bot) */}
           {((isUser && profile.userSettings) || (isBot && profile.botSettings)) && (
-            <div>
+            <div style={{ order: 8 }}>
               <div
                 onClick={() => toggleBubble('userCards')}
                 style={{
@@ -687,7 +688,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 5. Kart Atanma Limiti (Bot & Tribe) */}
           {(isBot || isTribe) && (isBot ? profile.botSettings : true) && (
-            <div>
+            <div style={{ order: 9 }}>
               <div
                 onClick={() => toggleBubble('botAssignment')}
                 style={{
@@ -738,7 +739,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 6. Münazara / Tartışma Limiti */}
           {!isTribe && (
-            <div>
+            <div style={{ order: 5 }}>
               <div
                 onClick={() => toggleBubble('debateLimit')}
                 style={{
@@ -793,7 +794,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
           )}
 
           {/* 7. Kart Miras Şansı */}
-          <div>
+          <div style={{ order: 10 }}>
             <div
               onClick={() => toggleBubble('cardInheritance')}
               style={{
@@ -847,7 +848,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 9. Bot / Tribe: Derece Miras Çarpanı */}
           {(isBot ? profile.botSettings?.cardInheritanceModifier !== undefined && profile.botSettings?.cardInheritanceModifier !== null : isTribe && profile.cardInheritanceModifier !== undefined && profile.cardInheritanceModifier !== null) && (
-            <div>
+            <div style={{ order: 11 }}>
               <div
                 onClick={() => toggleBubble('cardModifier')}
                 style={{
@@ -896,6 +897,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
           {isBot && profile.botSettings?.dailyBotOperationCount !== undefined && (
             <div
               style={{
+                order: 6,
                 padding: '12px 16px',
                 borderRadius: 12,
                 background: 'var(--color-surface)',
@@ -924,7 +926,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
           {/* 10. Tribe: Üye Kapasitesi */}
           {isTribe && (
-            <div>
+            <div style={{ order: 7 }}>
               <div
                 onClick={() => toggleBubble('tribeMembers')}
                 style={{

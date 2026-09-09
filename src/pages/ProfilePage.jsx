@@ -156,6 +156,8 @@ export default function ProfilePage() {
   const [entriesPage, setEntriesPage] = useState(1)
   const inferredPerPage = 5
   const { t } = useTranslation()
+  // Limitler & Miras paneli açma/kapama durumu (TribePage ile ORTAK global state)
+  const { isLimitsExpanded, toggleLimits } = useUIStore()
 
   // Follow State & Debounce
   const myFollowData = useMyEntitiesStore((state) => state.myFollowData)
@@ -652,7 +654,7 @@ export default function ProfilePage() {
       ? [
           {
             key: 'memory',
-            label: t('bot.capability_memory', 'Hafıza'),
+            label: t('bot.capability_extended_memory', 'Uzatılmış Hafıza'),
             Icon: Brain,
             tone: 'memory',
             size: 25,
@@ -1210,23 +1212,36 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* ─── LIMITS TOP DIVIDER ─── */}
+          {/* ─── LİMİTLER & MİRAS AÇILIR PANELİ (uiStore.isLimitsExpanded — Profil & Tribe ortak) ─── */}
           {((profile.discriminator === 'User' && profile.userSettings) ||
             (profile.discriminator === 'Bot' && profile.botSettings)) && (
-            <div
-              style={{
-                width: '100%',
-                height: 0,
-                borderTop: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
-                margin: '16px 0 12px 0',
-              }}
-            />
+            <button
+              type="button"
+              className="profile-limits-toggle"
+              onClick={toggleLimits}
+              aria-expanded={isLimitsExpanded}
+              title={t(
+                'profile.limits_header_desc',
+                isLimitsExpanded
+                  ? 'Limitler ve miras detaylarını gizle'
+                  : 'Limitler ve miras detaylarını göster'
+              )}
+            >
+            <span
+              aria-hidden="true"
+              className={`profile-limits-toggle__chevron ${isLimitsExpanded ? 'expanded' : ''}`}
+            >
+              ▼
+            </span>
+            </button>
           )}
 
+          {isLimitsExpanded && (
+            <>
           {profile.discriminator === 'User' && profile.userSettings && (
             <div
               className="profile-limits-row"
-              style={{ marginTop: 0, paddingLeft: 4, paddingRight: 4 }}
+              style={{ marginTop: 10, paddingLeft: 4, paddingRight: 4 }}
             >
               <div
                 className="profile-limit-chip"
@@ -1245,16 +1260,12 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.tribe_limit_desc',
-                  'Dahil olunabilecek maksimum kabile sayısı'
-                )}
+                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum kabile sayısı')}
               >
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.tribe_limit', 'Kabile Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.tribes?.length || 0} /{' '}
-                  {profile.userSettings.tribeCountLimit || 3}
+                  {profile.tribes?.length || 0} / {profile.userSettings.tribeCountLimit || 3}
                 </span>
               </div>
               <span className="profile-limit-divider">•</span>
@@ -1280,7 +1291,7 @@ export default function ProfilePage() {
           {profile.discriminator === 'Bot' && profile.botSettings && (
             <div
               className="profile-limits-row"
-              style={{ marginTop: 0, paddingLeft: 4, paddingRight: 4 }}
+              style={{ marginTop: 10, paddingLeft: 4, paddingRight: 4 }}
             >
               <div
                 className="profile-limit-chip"
@@ -1299,16 +1310,12 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.tribe_limit_desc',
-                  'Dahil olunabilecek maksimum kabile sayısı'
-                )}
+                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum kabile sayısı')}
               >
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.tribe_limit', 'Kabile Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.tribes?.length || 0} /{' '}
-                  {profile.botSettings.tribeCountLimit || 3}
+                  {profile.tribes?.length || 0} / {profile.botSettings.tribeCountLimit || 3}
                 </span>
               </div>
               <span className="profile-limit-divider">•</span>
@@ -1430,6 +1437,8 @@ export default function ProfilePage() {
                   </>
                 )}
             </div>
+          )}
+            </>
           )}
 
           {profile.discriminator === 'Bot' && (

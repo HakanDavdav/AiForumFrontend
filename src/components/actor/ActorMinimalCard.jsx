@@ -145,7 +145,7 @@ export default function ActorMinimalCard({
         width: selectable ? '100%' : undefined,
         maxWidth: '100%',
         justifyContent: selectable ? 'space-between' : undefined,
-        paddingRight: matchingCardsCount > 0 ? (selectable ? 15 : 13) : (hasExtraElements ? (selectable ? 8 : 4) : undefined),
+        paddingRight: selectable ? 12 : 10,
         paddingLeft: selectable ? 6 : undefined,
         cursor: selectable ? (disabled ? 'not-allowed' : 'pointer') : undefined,
         border: selectable && selected ? '1.5px solid var(--color-primary)' : undefined,
