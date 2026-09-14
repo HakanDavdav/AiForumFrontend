@@ -1,9 +1,10 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useCallback } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { mediaApi } from '../../api/mediaApi'
 import { Loader2, UploadCloud, Camera, Trash2, ImagePlus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import AvatarCropModal from './AvatarCropModal'
 
 export default function AvatarUpload({
   imageUrl,
@@ -17,6 +18,10 @@ export default function AvatarUpload({
   const fileInputRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+
+  // Crop modal state
+  const [cropSrc, setCropSrc] = useState(null)
+  const [showCrop, setShowCrop] = useState(false)
 
   const uploadMutation = useMutation({
     mutationFn: (file) => mediaApi.uploadAvatar(file),
@@ -63,8 +68,33 @@ export default function AvatarUpload({
       return
     }
 
-    uploadMutation.mutate(file)
+    // Dosyayı data URL'e çevirip crop modal'ı aç
+    const reader = new FileReader()
+    reader.onload = () => {
+      setCropSrc(reader.result)
+      setShowCrop(true)
+    }
+    reader.readAsDataURL(file)
   }
+
+  const handleCropConfirm = useCallback(
+    (blob) => {
+      setShowCrop(false)
+      setCropSrc(null)
+      // Blob'u File'a çevirip upload et
+      const croppedFile = new File([blob], 'avatar-cropped.jpg', { type: 'image/jpeg' })
+      uploadMutation.mutate(croppedFile)
+    },
+    [uploadMutation]
+  )
+
+  const handleCropCancel = useCallback(() => {
+    setShowCrop(false)
+    setCropSrc(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }, [])
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
@@ -102,6 +132,7 @@ export default function AvatarUpload({
   }
 
   const borderRadius = shape === 'circle' ? '50%' : '16px'
+  const cropShape = shape === 'circle' ? 'round' : 'rect'
 
   const previewBox = (
     <div
@@ -226,6 +257,16 @@ export default function AvatarUpload({
     />
   )
 
+  const cropModal = (
+    <AvatarCropModal
+      imageSrc={cropSrc}
+      open={showCrop}
+      cropShape={cropShape}
+      onConfirm={handleCropConfirm}
+      onCancel={handleCropCancel}
+    />
+  )
+
   if (compact) {
     return (
       <div
@@ -262,6 +303,8 @@ export default function AvatarUpload({
             </button>
           </div>
         )}
+
+        {cropModal}
       </div>
     )
   }
@@ -330,7 +373,8 @@ export default function AvatarUpload({
           </div>
         </div>
       </div>
+
+      {cropModal}
     </div>
   )
 }
-

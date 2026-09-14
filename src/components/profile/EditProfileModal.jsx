@@ -129,7 +129,9 @@ export default function EditProfileModal({ isOpen, onClose }) {
         </div>
 
         {isLoadingProfile ? (
-          <div className="text-center text-muted">{t('common.loading')}</div>
+          <div className="flex justify-center" style={{ padding: 40 }}>
+            <div className="spinner spinner-md" />
+          </div>
         ) : (
           <form noValidate onSubmit={handleSubmit} className="flex-col gap-4">
             <div className="form-group">

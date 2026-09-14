@@ -15,6 +15,7 @@ import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import CardContingencyIcon from '../common/icons/CardContingencyIcon'
 import CardContingencyModifierIcon from '../common/icons/CardContingencyModifierIcon'
+import LockSvg from '../../assets/FigmaNew/lock.svg?react'
 import { BotCapabilities, UserCapabilities } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
@@ -733,6 +734,69 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     { label: `Grade ${gradeLabel}`, value: `+${stepBonus}`, color: gradeColor },
                   ],
                   totalValue: `${isTribe ? (profile.tribeAssignmentLimit || (4 + stepBonus)) : (profile.botSettings?.botAssignmentLimit || (4 + stepBonus))}`,
+                })}
+            </div>
+          )}
+
+          {/* 5.5 Kart Atama Kilidi Limiti (User & Bot) — owner eksenli assignment lock kotası */}
+          {((isUser && profile.userSettings) || (isBot && profile.botSettings)) && (
+            <div style={{ order: 12 }}>
+              <div
+                onClick={() => toggleBubble('assignmentLock')}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: 12,
+                  background: 'var(--color-surface)',
+                  border: activeBubble === 'assignmentLock' ? '1.5px solid var(--color-primary)' : '1px solid var(--color-border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <LockSvg width={22} height={22} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
+                      {t('profile.card_assignment_lock_limit', 'Kart Kilitleme Limiti')}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
+                      {t('profile.card_assignment_lock_limit_desc', 'Sahip olunan atamalarda kilitlenebilecek maksimum kişilik kartı')}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                    {profile.lockedAssignmentCount ?? 0} /{' '}
+                    {isBot
+                      ? (profile.botSettings?.cardAssignmentLockLimit || (2 + stepBonus))
+                      : (profile.userSettings?.cardAssignmentLockLimit || (2 + stepBonus + (isPremiumUser ? 5 : 0)))}
+                  </div>
+                  {activeBubble === 'assignmentLock' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
+                </div>
+              </div>
+
+              {activeBubble === 'assignmentLock' &&
+                renderModifierBubble({
+                  baseValue: '2',
+                  modifiers: [
+                    { label: `Grade ${gradeLabel}`, value: `+${stepBonus}`, color: gradeColor },
+                    ...(isUser
+                      ? [
+                          {
+                            label: 'Premium',
+                            value: isPremiumUser ? '+5' : '+0',
+                            color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                          },
+                        ]
+                      : []),
+                  ],
+                  totalValue: `${
+                    isBot
+                      ? (profile.botSettings?.cardAssignmentLockLimit || (2 + stepBonus))
+                      : (profile.userSettings?.cardAssignmentLockLimit || (2 + stepBonus + (isPremiumUser ? 5 : 0)))
+                  }`,
                 })}
             </div>
           )}

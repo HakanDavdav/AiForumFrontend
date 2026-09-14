@@ -29,4 +29,8 @@ export const personalityCardApi = {
     if (endDate) params.endDate = endDate
     return axiosInstance.get(`/PersonalityCard/marketplace`, { params })
   },
+  lockAssignment: (assignmentId) =>
+    axiosInstance.post(`/PersonalityCard/lock-assignment/${assignmentId}`),
+  unlockAssignment: (assignmentId) =>
+    axiosInstance.post(`/PersonalityCard/unlock-assignment/${assignmentId}`),
 }

@@ -259,6 +259,15 @@
   opacity: 0.58;
 }
 
+.personality-card--selection-readonly {
+  cursor: default;
+}
+
+.personality-card--selection-readonly .selection-marker.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* General Filled card color adjustments - Richer */
 .personality-card--filled {
   background: linear-gradient(135deg, #93c5fd 0%, #e0f2fe 100%) !important;
@@ -439,10 +448,14 @@
 
 .personality-card--editor .personality-card__topline {
   position: absolute;
-  top: 30px;
+  top: 24px;
   right: 24px;
-  z-index: 1;
+  z-index: 2;
+  width: auto;
   min-height: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .personality-card-editor__body {
@@ -465,7 +478,7 @@
 }
 
 .personality-card--editor .personality-card-editor__name {
-  width: calc(100% - 48px);
+  width: calc(100% - 168px);
   margin-inline: auto;
   font-weight: 400;
   text-align: center;
@@ -879,8 +892,12 @@
   }
 
   .personality-card--editor .personality-card__topline {
-    top: 28px;
+    top: 22px;
     right: 18px;
+  }
+
+  .personality-card--editor .personality-card-editor__name {
+    width: calc(100% - 152px);
   }
 }
 
@@ -1728,12 +1745,14 @@ select {
   animation: spin 1s linear infinite;
 }
 
-.spinner {
+/* `.spinner`, `.spinner-sm/md/lg` ve `.spin` ortak: 1s, border-top primary */
+.spinner,
+.spin {
   display: inline-block;
   border-radius: var(--radius-full);
   border: 2px solid var(--color-border);
   border-top-color: var(--color-primary);
-  animation: spin 0.7s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 .spinner-sm {
@@ -3360,4 +3379,15 @@ textarea {
   stroke: currentColor;
   stroke-width: 12;
   transition: stroke 0.2s ease;
+}
+
+/* ─── Avatar Crop Modal Animations ─────────────────────────────────────── */
+@keyframes avatarCropFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes avatarCropSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }

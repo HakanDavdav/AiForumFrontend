@@ -924,9 +924,6 @@ export default function PersonalityCardHierarchyPage() {
             }}
           >
             <div className="spinner spinner-lg" />
-            <span style={{ color: 'var(--color-text-secondary)', fontSize: 14 }}>
-              {t('card.loading_hierarchy', 'Kart hiyerarşisi yükleniyor...')}
-            </span>
           </div>
         ) : error ? (
           <div

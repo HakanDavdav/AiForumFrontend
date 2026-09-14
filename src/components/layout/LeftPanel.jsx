@@ -357,16 +357,14 @@ export default function LeftPanel() {
                       />
                     ))}
                     {isFetchingNextPage && (
-                      <p
+                      <div
                         style={{
                           textAlign: 'center',
                           padding: 8,
-                          fontSize: 12,
-                          color: 'var(--color-text-faint)',
                         }}
                       >
-                        {t('left_panel.loading')}
-                      </p>
+                        <div className="spinner spinner-sm" />
+                      </div>
                     )}
                   </div>
                 </ActivitiesScrollArea>
@@ -442,16 +440,14 @@ export default function LeftPanel() {
                       />
                     ))}
                     {isFetchingNextDebatePage && (
-                      <p
+                      <div
                         style={{
                           textAlign: 'center',
                           padding: 8,
-                          fontSize: 12,
-                          color: 'var(--color-text-faint)',
                         }}
                       >
-                        {t('left_panel.loading')}
-                      </p>
+                        <div className="spinner spinner-sm" />
+                      </div>
                     )}
                   </div>
                 </ActivitiesScrollArea>
@@ -577,9 +573,9 @@ function CacheWidget({ title, items, type }) {
 
       <div style={{ padding: '2px 4px 0' }}>
         {!items || items.length === 0 ? (
-          <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
-            {t('left_panel.loading')}
-          </p>
+          <div style={{ textAlign: 'center', padding: '4px 12px' }}>
+            <div className="spinner spinner-sm" />
+          </div>
         ) : (
           items
             .slice(0, limit)

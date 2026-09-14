@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { actorApi } from '../../api/actorApi'
 import { personalityCardApi } from '../../api/personalityCardApi'
@@ -17,6 +17,7 @@ import PersonalityCard from '../../components/card/PersonalityCard'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import AvatarUpload from '../../components/common/AvatarUpload'
+import { buildOwnedCardIdSet, normalizeCardId } from '../../utils/cardOwnership'
 import { trackCreateBot } from '../../utils/analytics'
 
 const RANDOM_BOT_NAMES = ['GigaChad', 'Nietzsche', 'Doge', 'Kitty']
@@ -46,10 +47,12 @@ export default function CreateEditBotPage() {
     personalityCardName: '',
     personalityCardPrompt: '',
     personalityCardConfirmed: false,
+    personalityCardLocked: false,
     autoInterests: false,
     autoBio: false,
     topicTypes: [],
     selectedCardIds: [],
+    lockedCardIds: [],
   })
 
   const { data: myCards = [] } = useQuery({
@@ -58,6 +61,13 @@ export default function CreateEditBotPage() {
     enabled: Boolean(actorId),
     meta: { showErrorToast: true },
   })
+
+  const storeMyCards = useMyEntitiesStore((state) => state.myCards)
+  const ownedCardIdSet = useMemo(
+    () => buildOwnedCardIdSet([...(myCards || []), ...(storeMyCards || [])]),
+    [myCards, storeMyCards]
+  )
+  const isOwnedCardId = (id) => ownedCardIdSet.size === 0 || ownedCardIdSet.has(normalizeCardId(id))
 
   const { data: myBots = [] } = useQuery({
     queryKey: ['myBots', actorId],
@@ -91,10 +101,12 @@ export default function CreateEditBotPage() {
     personalityCardName: '',
     personalityCardPrompt: '',
     personalityCardConfirmed: false,
+    personalityCardLocked: false,
     autoInterests: false,
     autoBio: false,
     topicTypes: [],
     selectedCardIds: [],
+    lockedCardIds: [],
   }
 
   useEffect(() => {
@@ -141,6 +153,12 @@ export default function CreateEditBotPage() {
         })
         .filter((v) => v != null)
 
+      const personalAssignedIds = personalAssignedCards.map(normalizeCardId).filter(Boolean)
+      const existingLockedIds = personalAssignedCards
+        .filter((card) => Boolean(card.isLocked || card.assignment?.isLocked))
+        .map(normalizeCardId)
+        .filter(Boolean)
+
       setFormData({
         profileName: existingBot.profileName || '',
         imageUrl: existingBot.imageUrl || '',
@@ -149,12 +167,12 @@ export default function CreateEditBotPage() {
         personalityCardName: '',
         personalityCardPrompt: '',
         personalityCardConfirmed: false,
+        personalityCardLocked: false,
         autoInterests: existingBot.botSettings?.autoInterests || false,
         autoBio: existingBot.botSettings?.autoBio || false,
         topicTypes: mappedTopicTypes,
-        selectedCardIds: personalAssignedCards
-          .map((card) => card.cardId || card.card?.personalityCardId || card.personalityCardId)
-          .filter(Boolean),
+        selectedCardIds: personalAssignedIds,
+        lockedCardIds: existingLockedIds,
       })
     }
   }, [isEditMode, existingBot, botId])
@@ -230,12 +248,21 @@ export default function CreateEditBotPage() {
 
     const {
       selectedCardIds,
+      lockedCardIds,
       personalityCardName,
       personalityCardPrompt,
       personalityCardConfirmed,
+      personalityCardLocked,
       ...payload
     } = formData
-    payload.assignedCardIds = selectedCardIds
+    const ownedSelectedCardIds = selectedCardIds.filter((id) => isOwnedCardId(id))
+    payload.assignedCardIds = ownedSelectedCardIds
+    payload.lockedCardIds = lockedCardIds.filter(
+      (id) =>
+        isOwnedCardId(id) &&
+        ownedSelectedCardIds.some((selectedId) => selectedId.toLowerCase() === id.toLowerCase())
+    )
+    payload.lockPersonalityCard = personalityCardConfirmed ? Boolean(personalityCardLocked) : false
     if (payload.autoBio) {
       payload.bio = ''
     }
@@ -254,14 +281,29 @@ export default function CreateEditBotPage() {
   }
 
   const toggleCardId = (cardId) => {
-    const lowerId = cardId?.toLowerCase()
+    const lowerId = normalizeCardId(cardId)
+    if (!lowerId) return
     setFormData((current) => {
-      const exists = current.selectedCardIds.map((id) => id.toLowerCase()).includes(lowerId)
+      const exists = current.selectedCardIds.includes(lowerId)
       return {
         ...current,
         selectedCardIds: exists
-          ? current.selectedCardIds.filter((selectedId) => selectedId.toLowerCase() !== lowerId)
+          ? current.selectedCardIds.filter((selectedId) => selectedId !== lowerId)
           : [...current.selectedCardIds, lowerId],
+      }
+    })
+  }
+
+  const toggleLockCardId = (cardId) => {
+    const lowerId = normalizeCardId(cardId)
+    if (!lowerId) return
+    setFormData((current) => {
+      const exists = current.lockedCardIds.includes(lowerId)
+      return {
+        ...current,
+        lockedCardIds: exists
+          ? current.lockedCardIds.filter((lockedId) => lockedId !== lowerId)
+          : [...current.lockedCardIds, lowerId],
       }
     })
   }
@@ -304,11 +346,9 @@ export default function CreateEditBotPage() {
     formData.personalityCardName.trim() !== '' || formData.personalityCardPrompt.trim() !== ''
   )
 
+  const existingCardId = normalizeCardId(existingCard)
   const isExistingCardSelected =
-    !!existingCard &&
-    formData.selectedCardIds.some(
-      (id) => id.toLowerCase() === existingCard.personalityCardId?.toLowerCase()
-    )
+    !!existingCardId && formData.selectedCardIds.some((id) => id === existingCardId)
 
   const primaryCardCount = hasNewCard
     ? formData.personalityCardConfirmed
@@ -317,14 +357,17 @@ export default function CreateEditBotPage() {
     : isExistingCardSelected
       ? 1
       : 0
-  const selectedPrimaryCardId = (hasNewCard ? null : existingCard?.personalityCardId)?.toLowerCase()
+  const selectedPrimaryCardId = hasNewCard ? null : existingCardId
   const secondarySelectedCount = formData.selectedCardIds.filter(
-    (id) => id.toLowerCase() !== selectedPrimaryCardId
+    (id) => id !== selectedPrimaryCardId
   ).length
   const totalSelectedCount = primaryCardCount + secondarySelectedCount
 
   const assignedCards = existingBot?.assignedCards || []
   const sortedAssignedCards = [...assignedCards].sort((a, b) => {
+    const aOwned = ownedCardIdSet.size === 0 || ownedCardIdSet.has(normalizeCardId(a)) ? 0 : 1
+    const bOwned = ownedCardIdSet.size === 0 || ownedCardIdSet.has(normalizeCardId(b)) ? 0 : 1
+    if (aOwned !== bOwned) return aOwned - bOwned
     const aIsTribe = Boolean(a.tribeId || a.assignedTribeId)
     const bIsTribe = Boolean(b.tribeId || b.assignedTribeId)
     return aIsTribe - bIsTribe
@@ -504,19 +547,6 @@ export default function CreateEditBotPage() {
         </div>
 
         <div>
-          <label
-            style={{
-              display: 'block',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--color-text-secondary)',
-              marginBottom: 8,
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('bot.profile_image')}
-          </label>
           <AvatarUpload
             imageUrl={formData.imageUrl}
             onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
@@ -543,8 +573,12 @@ export default function CreateEditBotPage() {
             editorCardName={formData.personalityCardName}
             editorPrompt={formData.personalityCardPrompt}
             editorConfirmed={formData.personalityCardConfirmed}
+            editorLocked={formData.personalityCardLocked}
             disabled={mutation.isPending || mutation.isSuccess}
             onEditorChange={handlePersonalityCardChange}
+            onToggleEditorLock={(locked) =>
+              setFormData((current) => ({ ...current, personalityCardLocked: locked }))
+            }
             onEditorConfirm={() =>
               setFormData((current) => ({ ...current, personalityCardConfirmed: true }))
             }
@@ -592,21 +626,23 @@ export default function CreateEditBotPage() {
                   )
                 }
                 const isTribeCard = Boolean(card.tribeId || card.assignedTribeId)
-                const cardId = (
-                  card.cardId ||
-                  card.card?.personalityCardId ||
-                  card.personalityCardId
-                )?.toLowerCase()
+                const isLockedCard = Boolean(card.isLocked || card.assignment?.isLocked)
+                const cardId = normalizeCardId(card)
+                const owned = isOwnedCardId(cardId)
+                const cardBaseLocked = isTribeCard || isLockedCard
                 const isSelected = formData.selectedCardIds.includes(cardId)
                 return (
                   <div key={cardId} className="personality-card-slot" style={slotStyle}>
                     <PersonalityCard
                       slotNumber={i + 1}
                       card={card}
-                      selectable={!isTribeCard}
-                      selected={!isTribeCard && isSelected}
-                      locked={isTribeCard}
-                      onSelect={isTribeCard ? undefined : () => toggleCardId(cardId)}
+                      selectable={owned && !cardBaseLocked}
+                      selected={owned ? !cardBaseLocked && isSelected : true}
+                      locked={owned && cardBaseLocked}
+                      selectionReadOnly={!owned}
+                      onSelect={
+                        owned && !cardBaseLocked ? () => toggleCardId(cardId) : undefined
+                      }
                       showOwnersBtn={false}
                       showAssigneesBtn={false}
                     />
@@ -647,6 +683,8 @@ export default function CreateEditBotPage() {
             disabled={mutation.isPending || mutation.isSuccess}
             showHeader={false}
             slotCount={10}
+            assignLockedCardIds={formData.lockedCardIds}
+            onToggleAssignLock={toggleLockCardId}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('bot.additional_personality_cards_desc')}

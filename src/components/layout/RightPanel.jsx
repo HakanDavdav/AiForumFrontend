@@ -251,9 +251,9 @@ function CacheWidget({ title, items, type, onViewAll }) {
           >
             <div style={{ padding: '4px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
               {!items || items.length === 0 ? (
-                <p style={{ fontSize: 12, color: 'var(--color-text-faint)', padding: '4px 12px' }}>
-                  {t('common.loading', 'Yükleniyor...')}
-                </p>
+                <div style={{ textAlign: 'center', padding: '4px 12px' }}>
+                  <div className="spinner spinner-sm" />
+                </div>
               ) : (
                 items.slice(0, 3).map((item, index) => {
                   const rank = index + 1

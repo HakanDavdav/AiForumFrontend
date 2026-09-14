@@ -173,7 +173,6 @@ export default function DebateTranscriptPage() {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', gap: '10px' }}>
         <Loader2 size={28} className="spin" style={{ color: 'var(--color-primary)' }} />
-        <span>{t('common.loading', 'Yükleniyor...')}</span>
       </div>
     )
   }

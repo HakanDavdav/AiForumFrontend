@@ -189,19 +189,6 @@ export default function InitProfilePage() {
 
         {/* Avatar */}
         <div>
-          <label
-            style={{
-              display: 'block',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--color-text-secondary)',
-              marginBottom: 8,
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('auth.profile_image', 'Profil Resmi')}
-          </label>
           <AvatarUpload
             imageUrl={imageUrl}
             onImageUploaded={setImageUrl}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   LogOut,
@@ -29,6 +29,7 @@ import useUIStore from '../store/uiStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n'
+import { buildOwnedCardIdSet, sortCardsOwnedFirst } from '../utils/cardOwnership'
 
 export default function TribePage() {
   const [searchParams] = useSearchParams()
@@ -37,6 +38,7 @@ export default function TribePage() {
   const inferredPerPage = 5
   useDevLog('TribePage', arguments[0] || {})
   const { actorId: currentUserId, isLoggedIn } = useAuthStore()
+  const myCards = useMyEntitiesStore((state) => state.myCards)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { t } = useTranslation()
@@ -50,6 +52,11 @@ export default function TribePage() {
     queryFn: () => tribeApi.getTribe(tribeId).then((r) => r.data?.data ?? null),
     enabled: !!tribeId,
   })
+
+  const sortedTribeCards = useMemo(
+    () => sortCardsOwnedFirst(tribe?.personalityCards || [], buildOwnedCardIdSet(myCards || [])),
+    [tribe, myCards]
+  )
 
   const { data: postsData, isLoading: isPostsLoading } = useQuery({
     queryKey: ['tribe-posts', tribeId, postsPage],
@@ -85,6 +92,19 @@ export default function TribePage() {
   const isLeader = tribe.tribeMemberships?.some(
     (m) => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader'
   )
+  // Backend TribeService.EditTribe allows TribeAssistantLeader and above; mirror the same
+  // hierarchy threshold here so Assistant/Co leaders can manage the tribe from the UI.
+  const TRIBE_ROLE_HIERARCHY = {
+    TribeMember: 1,
+    TribeSenior: 2,
+    TribeAssistantLeader: 3,
+    TribeCoLeader: 4,
+    TribeLeader: 5,
+  }
+  const myTribeRoleName = tribe.tribeMemberships?.find(
+    (m) => m.actor?.actorId === currentUserId
+  )?.roleName
+  const canManageTribe = (TRIBE_ROLE_HIERARCHY[myTribeRoleName] || 0) >= 3
   const isMyTribe = useMyEntitiesStore.getState().myTribes?.some((t) => t.tribeId === tribeId)
 
   const rawGrade = tribe.tribeGrade
@@ -336,7 +356,7 @@ export default function TribePage() {
                   <LogOut size={14} /> {t('tribe.leave')}
                 </button>
               )}
-              {isLoggedIn && isLeader && (
+              {isLoggedIn && canManageTribe && (
                 <button
                   className="btn btn-primary btn-sm"
                   onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)}
@@ -569,7 +589,7 @@ export default function TribePage() {
                   </span>
                 </div>
                 <CardSlots
-                  cards={tribe.personalityCards}
+                  cards={sortedTribeCards}
                   slotCount={tribe.tribeAssignmentLimit || 4}
                   showMark={false}
                   tribeBadgeLabel={t('tribe.badge_tribe', 'KLAN')}

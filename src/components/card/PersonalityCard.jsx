@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Bot, Check, Info, Edit2, Users, Crown, Pencil, Lock, Network } from 'lucide-react'
+import { Bot, Check, Info, Edit2, Users, Crown, Pencil, Lock, LockOpen, Network } from 'lucide-react'
 import CardActorListModal from './CardActorListModal'
 import CardDetailModal from './CardDetailModal'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -35,6 +35,12 @@ export default function PersonalityCard({
   onEditorConfirm,
   onEditorEdit,
   onEditClick = null,
+  lockable = false,
+  assignLocked = false,
+  onToggleLock,
+  selectionReadOnly = false,
+  editorLocked = false,
+  onToggleEditorLock,
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -167,6 +173,33 @@ export default function PersonalityCard({
             <span className="personality-card__title personality-card-editor__confirmed-title">
               {editorCardName}
             </span>
+          )}
+          {typeof onToggleEditorLock === 'function' && (
+            <IconActionButton
+              onClick={(e) => {
+                e.stopPropagation()
+                onToggleEditorLock(!editorLocked)
+              }}
+              title={
+                editorLocked
+                  ? t('card.locked_assignment', 'Bu atama kilitli')
+                  : t('card.lock_assignment', 'Bu atamayı kilitle')
+              }
+              style={{
+                width: 26,
+                height: 26,
+                borderRadius: 6,
+                zIndex: 3,
+                flexShrink: 0,
+                color: editorLocked ? 'var(--color-primary-dark)' : 'var(--color-text-muted)',
+              }}
+            >
+              {editorLocked ? (
+                <Lock size={13} strokeWidth={2.2} />
+              ) : (
+                <LockOpen size={13} strokeWidth={2.2} />
+              )}
+            </IconActionButton>
           )}
           <SelectionMarker
             checked={editorConfirmed}
@@ -386,13 +419,28 @@ export default function PersonalityCard({
   const assignmentSources = collectAssignmentNodes(resolveSourceNode)
   const assignmentTargets = collectAssignmentNodes(resolveTargetNode)
   const hasAssignmentFlow = assignmentSources.length > 0 || assignmentTargets.length > 0
+
+  // Effective lock state: either the explicit `locked` prop or the assignment data's own
+  // IsLocked flag (CardAssignmentProjectionDto.isLocked) coming from assignment-centric renders.
+  const effectiveLocked = Boolean(
+    locked ||
+      card?.isLocked ||
+      card?.assignment?.isLocked ||
+      card?.card?.isLocked ||
+      card?.ownership?.originalCard?.isLocked
+  )
+  // Pending lock intent for cards about to be assigned (not yet persisted).
+  const showLockToggle = typeof onToggleLock === 'function' && lockable !== false && !effectiveLocked
+  const lockToggleActive = Boolean(assignLocked)
+
   const isSelectionDisabled =
     disabled ||
-    locked ||
+    effectiveLocked ||
+    selectionReadOnly ||
     (selectable && !selected && maxSelections != null && selectedCount >= maxSelections)
 
   const handleCardClick = () => {
-    if (locked) return
+    if (effectiveLocked) return
 
     if (selectable) {
       if (!isSelectionDisabled) onSelect?.()
@@ -406,7 +454,7 @@ export default function PersonalityCard({
   const handleCardKeyDown = (event) => {
     if ((event.key === 'Enter' || event.key === ' ') && filled) {
       event.preventDefault()
-      if (locked) return
+      if (effectiveLocked) return
       if (selectable) {
         if (!isSelectionDisabled) onSelect?.()
       } else {
@@ -417,7 +465,7 @@ export default function PersonalityCard({
 
   return (
     <div
-      className={`personality-card ${filled ? 'personality-card--filled' : 'personality-card--empty'}${selectable ? ' personality-card--selectable' : ''}${selected ? ' personality-card--selected' : ''}${isSelectionDisabled ? ' personality-card--selection-disabled' : ''}${isAssignedCard ? ' personality-card--owner-assigned' : ''}`}
+      className={`personality-card ${filled ? 'personality-card--filled' : 'personality-card--empty'}${selectable ? ' personality-card--selectable' : ''}${selected ? ' personality-card--selected' : ''}${isSelectionDisabled ? ' personality-card--selection-disabled' : ''}${selectionReadOnly ? ' personality-card--selection-readonly' : ''}${isAssignedCard ? ' personality-card--owner-assigned' : ''}`}
       onClick={handleCardClick}
       onKeyDown={handleCardKeyDown}
       role={filled ? 'button' : undefined}
@@ -445,76 +493,78 @@ export default function PersonalityCard({
         <BotIcon size={120} />
       </div>
 
-      {currentAcqType === 0 && (
+      {(currentAcqType === 0 || currentAcqType === 1 || effectiveLocked) && (
         <span
-          title={t('card.creator_badge', 'Bu kartın yaratıcısısınız (Tüm haklar sizde)')}
+          className="personality-card__corner-badges"
           style={{
             position: 'absolute',
             top: -14,
             left: -8,
-            color: 'var(--color-warning)',
             zIndex: 3,
-            filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
-            transform: 'rotate(-25deg)',
-            pointerEvents: 'auto',
-          }}
-        >
-          <Crown size={28} strokeWidth={2.5} />
-        </span>
-      )}
-      {currentAcqType === 1 && (
-        <span
-          title={t('card.purchaser_badge', 'Bu kartı satın aldınız')}
-          style={{
-            position: 'absolute',
-            top: -14,
-            left: -8,
-            color: '#b87333',
-            zIndex: 3,
-            filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
-            transform: 'rotate(-18deg)',
-            pointerEvents: 'auto',
             display: 'inline-flex',
             alignItems: 'center',
+            gap: 2,
+            pointerEvents: 'none',
           }}
         >
-          <Crown size={24} strokeWidth={2.5} />
-          <span
-            style={{
-              marginLeft: '-4px',
-              marginTop: '4px',
-              fontSize: '25px',
-              fontWeight: '900',
-              fontFamily: '"Arial Black", Impact, system-ui, sans-serif',
-              lineHeight: 1,
-              color: '#22c55e',
-              textShadow: '0 0 3px rgba(34, 197, 94, 0.35), 0 1px 2px rgba(0,0,0,0.8)',
-              WebkitTextStroke: '0.6px #052e16',
-            }}
-          >
-            $
-          </span>
-        </span>
-      )}
-      {locked && (
-        <span
-          title={t('card.locked_assignment', 'Bu atama kilitli')}
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            color: 'var(--color-text-secondary)',
-            zIndex: 3,
-            background: 'rgba(0,0,0,0.6)',
-            padding: '4px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'auto',
-          }}
-        >
-          <Lock size={16} strokeWidth={2.5} />
+          {currentAcqType === 0 && (
+            <span
+              title={t('card.creator_badge', 'Bu kartın yaratıcısısınız (Tüm haklar sizde)')}
+              style={{
+                color: 'var(--color-warning)',
+                filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+                transform: 'rotate(-25deg)',
+                pointerEvents: 'auto',
+              }}
+            >
+              <Crown size={28} strokeWidth={2.5} />
+            </span>
+          )}
+          {currentAcqType === 1 && (
+            <span
+              title={t('card.purchaser_badge', 'Bu kartı satın aldınız')}
+              style={{
+                color: '#b87333',
+                filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
+                transform: 'rotate(-18deg)',
+                pointerEvents: 'auto',
+                display: 'inline-flex',
+                alignItems: 'center',
+              }}
+            >
+              <Crown size={24} strokeWidth={2.5} />
+              <span
+                style={{
+                  marginLeft: '-4px',
+                  marginTop: '4px',
+                  fontSize: '25px',
+                  fontWeight: '900',
+                  fontFamily: '"Arial Black", Impact, system-ui, sans-serif',
+                  lineHeight: 1,
+                  color: '#22c55e',
+                  textShadow: '0 0 3px rgba(34, 197, 94, 0.35), 0 1px 2px rgba(0,0,0,0.8)',
+                  WebkitTextStroke: '0.6px #052e16',
+                }}
+              >
+                $
+              </span>
+            </span>
+          )}
+          {effectiveLocked && (
+            <span
+              title={t('card.locked_assignment', 'Bu atama kilitli')}
+              style={{
+                color: '#ffffff',
+                filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))',
+                pointerEvents: 'auto',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Lock size={16} strokeWidth={2.5} />
+            </span>
+          )}
         </span>
       )}
       <div className="personality-card__topline">
@@ -522,6 +572,33 @@ export default function PersonalityCard({
         <span className="personality-card__title">
           {cardName.length > 40 ? cardName.substring(0, 40) + '...' : cardName}
         </span>
+        {showLockToggle && filled && (
+          <IconActionButton
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggleLock(personalityCardId ?? card)
+            }}
+            title={
+              lockToggleActive
+                ? t('card.locked_assignment', 'Bu atama kilitli')
+                : t('card.lock_assignment', 'Bu atamayı kilitle')
+            }
+            style={{
+              width: 26,
+              height: 26,
+              borderRadius: 6,
+              zIndex: 3,
+              flexShrink: 0,
+              color: lockToggleActive ? 'var(--color-primary-dark)' : 'var(--color-text-muted)',
+            }}
+          >
+            {lockToggleActive ? (
+              <Lock size={13} strokeWidth={2.2} />
+            ) : (
+              <LockOpen size={13} strokeWidth={2.2} />
+            )}
+          </IconActionButton>
+        )}
         {onEditClick && filled && (currentAcqType === 0 || currentAcqType === 1) ? (
           <IconActionButton
             onClick={(e) => {
@@ -543,9 +620,10 @@ export default function PersonalityCard({
         ) : showMark ? (
           <span className="personality-card__mark">
             <SelectionMarker
-              checked={selectable ? selected : filled}
+              checked={selectionReadOnly ? true : selectable ? selected : filled}
               size="sm"
-              locked={locked}
+              locked={!selectionReadOnly && effectiveLocked}
+              disabled={selectionReadOnly}
               label={
                 selectable
                   ? selected

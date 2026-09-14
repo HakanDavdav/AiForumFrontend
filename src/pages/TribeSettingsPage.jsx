@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Trash2, Shield, UserMinus, Users, Loader2 } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
@@ -15,6 +15,7 @@ import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
+import { buildOwnedCardIdSet, normalizeCardId, sortCardsOwnedFirst } from '../utils/cardOwnership'
 
 export default function TribeSettingsPage() {
   const [searchParams] = useSearchParams()
@@ -33,8 +34,10 @@ export default function TribeSettingsPage() {
     personalityCardName: '',
     personalityCardPrompt: '',
     personalityCardConfirmed: false,
+    personalityCardLocked: false,
   })
   const [selectedCardIds, setSelectedCardIds] = useState([])
+  const [lockedCardIds, setLockedCardIds] = useState([])
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const [focused, setFocused] = useState(null)
 
@@ -53,6 +56,17 @@ export default function TribeSettingsPage() {
     meta: { showErrorToast: true },
   })
 
+  const storeMyCards = useMyEntitiesStore((state) => state.myCards)
+  const ownedCardIdSet = useMemo(
+    () => buildOwnedCardIdSet([...(myCards || []), ...(storeMyCards || [])]),
+    [myCards, storeMyCards]
+  )
+  const isOwnedCardId = (id) => ownedCardIdSet.size === 0 || ownedCardIdSet.has(normalizeCardId(id))
+  const sortedTribeAssignedCards = useMemo(
+    () => sortCardsOwnedFirst(tribe?.personalityCards || [], ownedCardIdSet),
+    [tribe, ownedCardIdSet]
+  )
+
   // Populate form
   useEffect(() => {
     if (tribe) {
@@ -61,8 +75,15 @@ export default function TribeSettingsPage() {
         imageUrl: tribe.imageUrl || '',
         mission: tribe.mission || '',
       })
-      setSelectedCardIds(
-        (tribe.personalityCards || []).map((card) => card.cardId || card.card?.personalityCardId || card.personalityCardId).filter(Boolean)
+      const assignedCards = tribe.personalityCards || []
+      setSelectedCardIds(assignedCards.map(normalizeCardId).filter(Boolean))
+      // Cards already locked on the tribe (IsLocked) stay locked: prefill them so the save
+      // request re-sends their lock intent (backend full-set sync never drops locked rows).
+      setLockedCardIds(
+        assignedCards
+          .filter((card) => Boolean(card.isLocked || card.assignment?.isLocked))
+          .map(normalizeCardId)
+          .filter(Boolean)
       )
     }
   }, [tribe])
@@ -114,10 +135,23 @@ export default function TribeSettingsPage() {
     )
   if (!tribe) return <div className="empty-state">{t('tribe_settings.not_found')}</div>
 
-  const isLeader = tribe.tribeMemberships?.some(
-    (m) => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader'
+  const TRIBE_ROLE_HIERARCHY = {
+    TribeMember: 1,
+    TribeSenior: 2,
+    TribeAssistantLeader: 3,
+    TribeCoLeader: 4,
+    TribeLeader: 5,
+  }
+  const myTribeMembership = tribe.tribeMemberships?.find(
+    (m) => m.actor?.actorId === currentUserId
   )
-  if (!isLeader) {
+  const myRoleName = myTribeMembership?.roleName
+  const myHierarchy = TRIBE_ROLE_HIERARCHY[myRoleName] || 0
+  // Backend TribeService.EditTribe allows TribeAssistantLeader and above; CoLeader/Leader rank
+  // higher. This UI gate mirrors that (previously locked to TribeLeader only — legacy bug).
+  const canManageTribe = myHierarchy >= TRIBE_ROLE_HIERARCHY.TribeAssistantLeader
+  const isLeader = myRoleName === 'TribeLeader'
+  if (!canManageTribe) {
     return (
       <div className="empty-state">
         <h2 style={{ color: 'var(--color-error)' }}>{t('tribe_settings.unauthorized')}</h2>
@@ -147,10 +181,21 @@ export default function TribeSettingsPage() {
   }
 
   const toggleCard = (cardId) => {
-    const lowerId = cardId?.toLowerCase()
+    const lowerId = normalizeCardId(cardId)
+    if (!lowerId) return
     setSelectedCardIds((current) =>
-      current.map((id) => id.toLowerCase()).includes(lowerId)
-        ? current.filter((selectedId) => selectedId.toLowerCase() !== lowerId)
+      current.includes(lowerId)
+        ? current.filter((selectedId) => selectedId !== lowerId)
+        : [...current, lowerId]
+    )
+  }
+
+  const toggleLockCard = (cardId) => {
+    const lowerId = normalizeCardId(cardId)
+    if (!lowerId) return
+    setLockedCardIds((current) =>
+      current.includes(lowerId)
+        ? current.filter((lockedId) => lockedId !== lowerId)
         : [...current, lowerId]
     )
   }
@@ -175,14 +220,26 @@ export default function TribeSettingsPage() {
       return
     }
 
-    const { personalityCardName, personalityCardPrompt, personalityCardConfirmed, ...base } =
-      formData
+    const {
+      personalityCardName,
+      personalityCardPrompt,
+      personalityCardConfirmed,
+      personalityCardLocked,
+      ...base
+    } = formData
 
+    const ownedSelectedCardIds = selectedCardIds.filter((id) => isOwnedCardId(id))
     editMutation.mutate({
       ...base,
-      assignedCardIds: selectedCardIds,
+      assignedCardIds: ownedSelectedCardIds,
+      lockedCardIds: lockedCardIds.filter(
+        (id) =>
+          isOwnedCardId(id) &&
+          ownedSelectedCardIds.some((selectedId) => selectedId === normalizeCardId(id))
+      ),
       personalityCardName: personalityCardConfirmed ? personalityCardName : null,
       personalityCardPrompt: personalityCardConfirmed ? personalityCardPrompt : null,
+      lockPersonalityCard: personalityCardConfirmed ? Boolean(personalityCardLocked) : false,
     })
   }
 
@@ -261,9 +318,6 @@ export default function TribeSettingsPage() {
         style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
       >
         <div>
-          <label style={labelStyle}>
-            {t('tribe.cover_image', 'Kapak Resmi')}
-          </label>
           <AvatarUpload
             imageUrl={formData.imageUrl}
             onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
@@ -323,8 +377,12 @@ export default function TribeSettingsPage() {
             editorCardName={formData.personalityCardName}
             editorPrompt={formData.personalityCardPrompt}
             editorConfirmed={formData.personalityCardConfirmed}
+            editorLocked={formData.personalityCardLocked}
             disabled={editMutation.isPending}
             onEditorChange={handlePersonalityCardChange}
+            onToggleEditorLock={(locked) =>
+              setFormData((current) => ({ ...current, personalityCardLocked: locked }))
+            }
             onEditorConfirm={() =>
               setFormData((current) => ({ ...current, personalityCardConfirmed: true }))
             }
@@ -343,7 +401,7 @@ export default function TribeSettingsPage() {
           </label>
           {tribe.personalityCards?.length > 0 ? (
             <CardSelectionSlots
-              cards={tribe.personalityCards}
+              cards={sortedTribeAssignedCards}
               selectedCardIds={selectedCardIds}
               onToggle={toggleCard}
               maxSelections={4}
@@ -352,6 +410,10 @@ export default function TribeSettingsPage() {
               slotCount={tribe.personalityCards.length}
               tribeAssigned
               tribeBadgeLabel="KLAN"
+              lockedCardIds={lockedCardIds}
+              assignLockedCardIds={lockedCardIds}
+              onToggleAssignLock={toggleLockCard}
+              ownedCardIds={ownedCardIdSet}
             />
           ) : (
             <p className="text-muted" style={{ fontSize: 13 }}>
@@ -374,6 +436,8 @@ export default function TribeSettingsPage() {
             disabled={editMutation.isPending}
             showHeader={false}
             slotCount={10}
+            assignLockedCardIds={lockedCardIds}
+            onToggleAssignLock={toggleLockCard}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('tribe_settings.additional_personality_cards_desc')}
@@ -485,56 +549,63 @@ export default function TribeSettingsPage() {
                   >
                     {member.roleName === 'TribeLeader'
                       ? t('tribe_settings.leader')
-                      : member.roleName || t('tribe_settings.member')}
+                      : member.roleName === 'TribeAssistantLeader'
+                        ? t('tribe_settings.assistant_leader', 'Yardımcı Lider')
+                        : member.roleName === 'TribeCoLeader'
+                          ? t('tribe_settings.co_leader', 'Eş Lider')
+                          : member.roleName === 'TribeSenior'
+                            ? t('tribe_settings.senior', 'Kıdemli')
+                            : member.roleName || t('tribe_settings.member')}
                   </span>
 
-                  {member.actor.actorId !== currentUserId && (
-                    <>
-                      {member.roleName === 'Member' || !member.roleName ? (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          title={t('tribe_settings.make_moderator')}
-                          onClick={() =>
-                            rankMutation.mutate({
-                              memberActorId: member.actor.actorId,
-                              promotionType: 1,
-                            })
-                          }
-                          disabled={rankMutation.isPending}
-                        >
-                          <Shield size={14} /> {t('tribe_settings.promote')}
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          title={t('tribe_settings.demote_desc')}
-                          onClick={() =>
-                            rankMutation.mutate({
-                              memberActorId: member.actor.actorId,
-                              promotionType: 2,
-                            })
-                          }
-                          disabled={rankMutation.isPending}
-                        >
-                          <Shield size={14} /> {t('tribe_settings.demote')}
-                        </button>
-                      )}
+                  {member.actor.actorId !== currentUserId &&
+                    (TRIBE_ROLE_HIERARCHY[member.roleName] || 0) < myHierarchy && (
+                      <>
+                        {member.roleName === 'Member' || !member.roleName ? (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            title={t('tribe_settings.make_moderator')}
+                            onClick={() =>
+                              rankMutation.mutate({
+                                memberActorId: member.actor.actorId,
+                                promotionType: 1,
+                              })
+                            }
+                            disabled={rankMutation.isPending}
+                          >
+                            <Shield size={14} /> {t('tribe_settings.promote')}
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            title={t('tribe_settings.demote_desc')}
+                            onClick={() =>
+                              rankMutation.mutate({
+                                memberActorId: member.actor.actorId,
+                                promotionType: 2,
+                              })
+                            }
+                            disabled={rankMutation.isPending}
+                          >
+                            <Shield size={14} /> {t('tribe_settings.demote')}
+                          </button>
+                        )}
 
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        style={{ color: '#ef4444' }}
-                        title={t('tribe_settings.expel_desc')}
-                        onClick={() => {
-                          if (window.confirm(t('tribe_settings.confirm_expel'))) {
-                            expelMutation.mutate(member.actor.actorId)
-                          }
-                        }}
-                        disabled={expelMutation.isPending}
-                      >
-                        <UserMinus size={14} /> {t('tribe_settings.expel')}
-                      </button>
-                    </>
-                  )}
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          style={{ color: '#ef4444' }}
+                          title={t('tribe_settings.expel_desc')}
+                          onClick={() => {
+                            if (window.confirm(t('tribe_settings.confirm_expel'))) {
+                              expelMutation.mutate(member.actor.actorId)
+                            }
+                          }}
+                          disabled={expelMutation.isPending}
+                        >
+                          <UserMinus size={14} /> {t('tribe_settings.expel')}
+                        </button>
+                      </>
+                    )}
                 </div>
               </div>
             ) : null
@@ -542,16 +613,17 @@ export default function TribeSettingsPage() {
         </div>
       </div>
 
-      {/* Danger Zone */}
-      <div
-        style={{
-          marginTop: 48,
-          padding: '24px',
-          borderRadius: 16,
-          border: '1px solid rgba(239, 68, 68, 0.3)',
-          background: 'rgba(239, 68, 68, 0.04)',
-        }}
-      >
+      {/* Danger Zone — yalnızca TribeLeader (backend DeleteTribe eşiği) */}
+      {isLeader && (
+        <div
+          style={{
+            marginTop: 48,
+            padding: '24px',
+            borderRadius: 16,
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            background: 'rgba(239, 68, 68, 0.04)',
+          }}
+        >
         <h2 style={{ fontSize: 16, fontWeight: 700, color: '#ef4444', margin: '0 0 8px 0' }}>
           {t('tribe_settings.danger_zone')}
         </h2>
@@ -582,7 +654,8 @@ export default function TribeSettingsPage() {
         >
           <Trash2 size={16} /> {t('tribe_settings.delete_tribe')}
         </button>
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -113,14 +113,12 @@ export default function MarketplacePage() {
 
   const buyMutation = useMutation({
     mutationFn: (cardId) => personalityCardApi.buyCard(cardId),
+    meta: { showErrorToast: true },
     onSuccess: () => {
       toast.success(t('card.buy_success', 'Kart başarıyla satın alındı!'))
       queryClient.invalidateQueries({ queryKey: ['myPersonalityCards'] })
       useMyEntitiesStore.getState().fetchMyCards()
       refetch()
-    },
-    onError: (err) => {
-      toast.error(err.response?.data?.message || t('common.error', 'Satın alma başarısız oldu'))
     },
   })
 
@@ -451,9 +449,9 @@ export default function MarketplacePage() {
             )}
           </div>
         ) : (
-          visibleCards.map((card) => (
+          visibleCards.map((card, index) => (
             <div
-              key={card.cardId}
+              key={`${card.personalityCardId || card.card?.personalityCardId || card.cardId || 'mc'}-${index}`}
               style={{
                 background: 'var(--color-surface-1)',
                 border: '1px solid var(--color-border)',
@@ -534,13 +532,7 @@ export default function MarketplacePage() {
       </div>
 
       {/* Infinite Scroll trigger element */}
-      <div ref={loadMoreRef} style={{ height: 40, marginTop: 16 }}>
-        {isFetchingNextPage && (
-          <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-            {t('common.loading_more', 'Daha fazla yükleniyor...')}
-          </div>
-        )}
-      </div>
+      <div ref={loadMoreRef} style={{ height: 40, marginTop: 16 }} />
 
       <AnimatePresence>
         {buyModal.isOpen && (

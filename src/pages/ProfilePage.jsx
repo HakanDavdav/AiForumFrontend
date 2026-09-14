@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Network,
@@ -55,6 +55,7 @@ import { useTranslation } from 'react-i18next'
 import AvatarUpload from '../components/common/AvatarUpload'
 import PremiumModal from '../components/common/PremiumModal'
 import ModifierArrowSvg from '../assets/FigmaNew/modifierarrow.svg?react'
+import { buildOwnedCardIdSet, sortCardsOwnedFirst } from '../utils/cardOwnership'
 
 const TOPIC_TYPES = [
   { value: 1, enumName: 'Politics', label: 'Politika' },
@@ -304,12 +305,18 @@ export default function ProfilePage() {
 
   const isOwnProfile = actorId === currentUserId
   const myBots = useMyEntitiesStore((state) => state.myBots)
+  const myCards = useMyEntitiesStore((state) => state.myCards)
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['actorProfile', actorId],
     queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data ?? null),
     enabled: !!actorId,
   })
+
+  const sortedAssignedCards = useMemo(
+    () => sortCardsOwnedFirst(profile?.assignedCards || [], buildOwnedCardIdSet(myCards || [])),
+    [profile, myCards]
+  )
 
   const isMyBot =
     profile?.discriminator === 'Bot' &&
@@ -1469,7 +1476,7 @@ export default function ProfilePage() {
               </div>
 
               <CardSlots
-                cards={profile.assignedCards}
+                cards={sortedAssignedCards}
                 slotCount={profile.botSettings?.botAssignmentLimit || 4}
                 showMark={false}
               />

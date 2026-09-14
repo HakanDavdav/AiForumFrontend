@@ -16,6 +16,7 @@ import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import AvatarUpload from '../../components/common/AvatarUpload'
+import { normalizeCardId } from '../../utils/cardOwnership'
 
 const RANDOM_TRIBE_NAMES = ['Comrades', 'Femboys', 'LGBT', 'Incels', 'Doomers']
 
@@ -32,6 +33,7 @@ export default function CreateTribePage() {
   })
 
   const [selectedCardIds, setSelectedCardIds] = useState([])
+  const [lockedCardIds, setLockedCardIds] = useState([])
 
   const { data: myCards = [] } = useQuery({
     queryKey: ['myPersonalityCards', actorId],
@@ -47,6 +49,7 @@ export default function CreateTribePage() {
     personalityCardName: '',
     personalityCardPrompt: '',
     personalityCardConfirmed: false,
+    personalityCardLocked: false,
   })
 
   const mutation = useMutation({
@@ -99,21 +102,42 @@ export default function CreateTribePage() {
       firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
-    const { personalityCardName, personalityCardPrompt, personalityCardConfirmed, ...payload } =
-      formData
+    const {
+      personalityCardName,
+      personalityCardPrompt,
+      personalityCardConfirmed,
+      personalityCardLocked,
+      ...payload
+    } = formData
     mutation.mutate({
       ...payload,
       assignedCardIds: selectedCardIds,
+      lockedCardIds: lockedCardIds.filter((id) =>
+        selectedCardIds.some((selectedId) => normalizeCardId(selectedId) === normalizeCardId(id))
+      ),
       personalityCardName: personalityCardConfirmed ? personalityCardName : null,
       personalityCardPrompt: personalityCardConfirmed ? personalityCardPrompt : null,
+      lockPersonalityCard: personalityCardConfirmed ? Boolean(personalityCardLocked) : false,
     })
   }
 
   const toggleCard = (cardId) => {
+    const lowerId = normalizeCardId(cardId)
+    if (!lowerId) return
     setSelectedCardIds((current) =>
-      current.includes(cardId)
-        ? current.filter((selectedId) => selectedId !== cardId)
-        : [...current, cardId]
+      current.includes(lowerId)
+        ? current.filter((selectedId) => selectedId !== lowerId)
+        : [...current, lowerId]
+    )
+  }
+
+  const toggleLockCard = (cardId) => {
+    const lowerId = normalizeCardId(cardId)
+    if (!lowerId) return
+    setLockedCardIds((current) =>
+      current.includes(lowerId)
+        ? current.filter((id) => id !== lowerId)
+        : [...current, lowerId]
     )
   }
 
@@ -276,19 +300,6 @@ export default function CreateTribePage() {
         </div>
 
         <div>
-          <label
-            style={{
-              display: 'block',
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--color-text-secondary)',
-              marginBottom: 8,
-              letterSpacing: '0.02em',
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('tribe.cover_image', 'Kapak Resmi')}
-          </label>
           <AvatarUpload
             imageUrl={formData.imageUrl}
             onImageUploaded={(url) => setFormData({ ...formData, imageUrl: url })}
@@ -315,8 +326,12 @@ export default function CreateTribePage() {
             editorCardName={formData.personalityCardName}
             editorPrompt={formData.personalityCardPrompt}
             editorConfirmed={formData.personalityCardConfirmed}
+            editorLocked={formData.personalityCardLocked}
             disabled={mutation.isPending || mutation.isSuccess}
             onEditorChange={handlePersonalityCardChange}
+            onToggleEditorLock={(locked) =>
+              setFormData((current) => ({ ...current, personalityCardLocked: locked }))
+            }
             onEditorConfirm={() =>
               setFormData((current) => ({ ...current, personalityCardConfirmed: true }))
             }
@@ -359,6 +374,8 @@ export default function CreateTribePage() {
             disabled={mutation.isPending || mutation.isSuccess}
             showHeader={false}
             slotCount={10}
+            assignLockedCardIds={lockedCardIds}
+            onToggleAssignLock={toggleLockCard}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('tribe_settings.additional_personality_cards_desc')}

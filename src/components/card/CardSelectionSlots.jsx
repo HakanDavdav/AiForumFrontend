@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import PersonalityCard from './PersonalityCard'
+import { buildOwnedCardIdSet, isCardOwned, normalizeCardId } from '../../utils/cardOwnership'
 
 function getCardId(item) {
   return item?.cardId || item?.personalityCardId || item?.card?.personalityCardId || null
@@ -25,13 +26,30 @@ export default function CardSelectionSlots({
   lockedCardIds = [],
   tribeAssigned = false,
   tribeBadgeLabel = null,
+  assignLockedCardIds = [],
+  onToggleAssignLock,
+  ownedCardIds = null,
 }) {
   const { t } = useTranslation()
-  const selectableCards = cards
+  const ownedSet = ownedCardIds ? buildOwnedCardIdSet(ownedCardIds) : null
+  const isOwned = (item) => (ownedSet ? isCardOwned(item, ownedSet) : true)
+
+  const baseSelectableCards = cards
     .map((item) => ({ id: getCardId(item), card: getCard(item) }))
     .filter((item) => item.id && item.card)
-  const isLockedCard = (item) => lockedCardIds.includes(item.id)
-  const selectedCount = selectableCards.filter((item) => selectedCardIds.includes(item.id)).length
+  const selectableCards = ownedSet
+    ? [...baseSelectableCards].sort(
+        (a, b) =>
+          (ownedSet.has(normalizeCardId(a.id)) ? 0 : 1) -
+          (ownedSet.has(normalizeCardId(b.id)) ? 0 : 1)
+      )
+    : baseSelectableCards
+
+  const lockedSet = new Set((lockedCardIds || []).map(normalizeCardId))
+  const selectedSet = new Set((selectedCardIds || []).map(normalizeCardId))
+  const assignLockedSet = new Set((assignLockedCardIds || []).map(normalizeCardId))
+  const isLockedCard = (item) => lockedSet.has(normalizeCardId(item.id))
+  const selectedCount = selectableCards.filter((item) => selectedSet.has(normalizeCardId(item.id))).length
   const totalSlotCount = Math.max(selectableCards.length, slotCount)
 
   if (selectableCards.length === 0) {
@@ -76,6 +94,7 @@ export default function CardSelectionSlots({
       <div className="personality-card-slots" style={{ '--card-count': totalSlotCount }}>
         {selectableCards.map(({ id, card }, index) => {
           const locked = isLockedCard({ id })
+          const owned = isOwned(card)
           return (
             <div
               key={id}
@@ -90,15 +109,19 @@ export default function CardSelectionSlots({
               <PersonalityCard
                 slotNumber={index + 1}
                 card={card}
-                selectable={!locked}
-                selected={selectedCardIds.includes(id)}
-                locked={locked}
+                selectable={owned && !locked}
+                selected={owned ? selectedSet.has(normalizeCardId(id)) : true}
+                locked={owned && locked}
+                selectionReadOnly={!owned}
                 tribeAssigned={tribeAssigned}
                 tribeBadgeLabel={tribeBadgeLabel}
                 disabled={disabled}
-                onSelect={() => onToggle(id)}
+                onSelect={owned && !locked ? () => onToggle(id) : undefined}
                 maxSelections={maxSelections}
                 selectedCount={selectedCount}
+                lockable={owned && !!onToggleAssignLock && !locked}
+                assignLocked={assignLockedSet.has(normalizeCardId(id))}
+                onToggleLock={owned ? () => onToggleAssignLock?.(id) : undefined}
               />
             </div>
           )

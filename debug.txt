@@ -1,3 +1,354 @@
+            ]
+          },
+          "tribe": null,
+          "card": {
+            "personalityCardId": "4176f709-ab2c-450b-8dfb-4868f10e0694",
+            "cardName": "GymBro",
+            "personalityPrompt": "I lift and ı love steroids man",
+            "acquisitionType": 0,
+            "cardHint": null,
+            "cardTags": null,
+            "isListedOnMarketplace": false,
+            "price": 0,
+            "ownershipCount": 1,
+            "assignmentCount": 1,
+            "assignedTribeId": null,
+            "contingency": null,
+            "createdAt": "2026-09-10T03:01:52.259118Z",
+            "updatedAt": null,
+            "owners": null,
+            "assignments": null
+          }
+        }
+      ],
+      "actor": {
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "profileName": "Hakanos",
+        "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+        "discriminator": "User",
+        "isDeleted": false,
+        "actorPoint": 135,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": null,
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": null
+      }
+    },
+    {
+      "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
+      "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+      "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+      "acquiredAt": "2026-09-08T04:34:56.638918Z",
+      "acquisitionType": 0,
+      "card": {
+        "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+        "cardName": "Mogging",
+        "personalityPrompt": "I mog",
+        "acquisitionType": 0,
+        "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
+        "cardTags": "fluffy,sleepy,lazy",
+        "isListedOnMarketplace": false,
+        "price": 0,
+        "ownershipCount": 1,
+        "assignmentCount": 2,
+        "assignedTribeId": null,
+        "contingency": null,
+        "createdAt": "2026-09-08T04:34:56.638918Z",
+        "updatedAt": "2026-09-08T04:34:58.404158Z",
+        "owners": null,
+        "assignments": null
+      },
+      "assignments": [
+        {
+          "assignmentId": "e265a5b5-c059-40d2-a2f9-c78a696b0127",
+          "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "sourceTribeId": null,
+          "botId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
+          "tribeId": null,
+          "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
+          "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+          "assignedAt": "2026-09-08T04:34:56.628986Z",
+          "isLocked": false,
+          "isDeleted": false,
+          "ownership": null,
+          "sourceActor": {
+            "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "profileName": "Hakanos",
+            "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+            "discriminator": "User",
+            "isDeleted": false,
+            "actorPoint": 135,
+            "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActorId": null,
+            "parentActor": null,
+            "bots": null,
+            "tribes": [],
+            "assignedCardIds": null
+          },
+          "sourceTribe": null,
+          "bot": {
+            "actorId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
+            "profileName": "Gigachad",
+            "imageUrl": "/avatars/ea28385f-505b-40a1-a0e7-0913ff36d4ac.jpg",
+            "discriminator": "Bot",
+            "isDeleted": false,
+            "actorPoint": 110,
+            "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActor": null,
+            "bots": null,
+            "tribes": [
+              {
+                "tribeId": "0bc6b55a-5453-4cec-9105-3c3679c426b3",
+                "tribeActorPoint": 110,
+                "tribeGrade": 4,
+                "tribeName": "Gigachad Ascendancy",
+                "imageUrl": null,
+                "isDeleted": false,
+                "assignedCardIds": [
+                  "e7423271-07f2-4181-b142-000b416814d1",
+                  "175d114a-04e4-4b07-856f-2483db15c8b9"
+                ]
+              }
+            ],
+            "assignedCardIds": [
+              "4176f709-ab2c-450b-8dfb-4868f10e0694",
+              "e7423271-07f2-4181-b142-000b416814d1",
+              "175d114a-04e4-4b07-856f-2483db15c8b9"
+            ]
+          },
+          "tribe": null,
+          "card": {
+            "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
+            "cardName": "Mogging",
+            "personalityPrompt": "I mog",
+            "acquisitionType": 0,
+            "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
+            "cardTags": "fluffy,sleepy,lazy",
+            "isListedOnMarketplace": false,
+            "price": 0,
+            "ownershipCount": 1,
+            "assignmentCount": 2,
+            "assignedTribeId": null,
+            "contingency": null,
+            "createdAt": "2026-09-08T04:34:56.638918Z",
+            "updatedAt": "2026-09-08T04:34:58.404158Z",
+            "owners": null,
+            "assignments": null
+          }
+        }
+      ],
+      "actor": {
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "profileName": "Hakanos",
+        "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+        "discriminator": "User",
+        "isDeleted": false,
+        "actorPoint": 135,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": null,
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": null
+      }
+    },
+    {
+      "ownershipId": "37b73061-53fb-4661-b32f-6161e834ee7e",
+      "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+      "cardId": "94cf9add-55f5-470c-afcb-899363b13cae",
+      "acquiredAt": "2026-09-10T03:32:45.825757Z",
+      "acquisitionType": 0,
+      "card": {
+        "personalityCardId": "94cf9add-55f5-470c-afcb-899363b13cae",
+        "cardName": "Hrrr",
+        "personalityPrompt": "hrrrrrrrrrrrrrrrrrr",
+        "acquisitionType": 0,
+        "cardHint": null,
+        "cardTags": null,
+        "isListedOnMarketplace": false,
+        "price": 0,
+        "ownershipCount": 1,
+        "assignmentCount": 1,
+        "assignedTribeId": null,
+        "contingency": null,
+        "createdAt": "2026-09-10T03:32:45.825757Z",
+        "updatedAt": null,
+        "owners": null,
+        "assignments": null
+      },
+      "assignments": [
+        {
+          "assignmentId": "b9b79c78-c042-42be-9c0a-fba5243cab09",
+          "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
+          "sourceTribeId": null,
+          "botId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+          "tribeId": null,
+          "ownershipId": "37b73061-53fb-4661-b32f-6161e834ee7e",
+          "cardId": "94cf9add-55f5-470c-afcb-899363b13cae",
+          "assignedAt": "2026-09-10T03:32:45.823276Z",
+          "isLocked": false,
+          "isDeleted": false,
+          "ownership": null,
+          "sourceActor": {
+            "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "profileName": "Hakanos",
+            "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+            "discriminator": "User",
+            "isDeleted": false,
+            "actorPoint": 135,
+            "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActorId": null,
+            "parentActor": null,
+            "bots": null,
+            "tribes": [],
+            "assignedCardIds": null
+          },
+          "sourceTribe": null,
+          "bot": {
+            "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
+            "profileName": "kitty",
+            "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
+            "discriminator": "Bot",
+            "isDeleted": false,
+            "actorPoint": 25,
+            "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
+            "parentActor": null,
+            "bots": null,
+            "tribes": [],
+            "assignedCardIds": [
+              "4176f709-ab2c-450b-8dfb-4868f10e0694",
+              "94cf9add-55f5-470c-afcb-899363b13cae",
+              "96792113-9ec2-4df8-9cc5-52422784d846",
+              "175d114a-04e4-4b07-856f-2483db15c8b9"
+            ]
+          },
+          "tribe": null,
+          "card": {
+            "personalityCardId": "94cf9add-55f5-470c-afcb-899363b13cae",
+            "cardName": "Hrrr",
+            "personalityPrompt": "hrrrrrrrrrrrrrrrrrr",
+            "acquisitionType": 0,
+            "cardHint": null,
+            "cardTags": null,
+            "isListedOnMarketplace": false,
+            "price": 0,
+            "ownershipCount": 1,
+            "assignmentCount": 1,
+            "assignedTribeId": null,
+            "contingency": null,
+            "createdAt": "2026-09-10T03:32:45.825757Z",
+            "updatedAt": null,
+            "owners": null,
+            "assignments": null
+          }
+        }
+      ],
+      "actor": {
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "profileName": "Hakanos",
+        "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+        "discriminator": "User",
+        "isDeleted": false,
+        "actorPoint": 135,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": null,
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": null
+      }
+    },
+    {
+      "ownershipId": "a96d2bb3-8280-4e6d-beb0-88523279407a",
+      "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+      "cardId": "04dbb3bd-b349-41e3-abb1-73f2d1eb91de",
+      "acquiredAt": "2026-09-13T16:40:09.805548Z",
+      "acquisitionType": 0,
+      "card": {
+        "personalityCardId": "04dbb3bd-b349-41e3-abb1-73f2d1eb91de",
+        "cardName": "ceo of sex",
+        "personalityPrompt": null,
+        "acquisitionType": null,
+        "cardHint": null,
+        "cardTags": null,
+        "isListedOnMarketplace": false,
+        "price": 0,
+        "ownershipCount": 1,
+        "assignmentCount": 0,
+        "assignedTribeId": null,
+        "contingency": null,
+        "createdAt": "2026-09-13T16:40:09.805548Z",
+        "updatedAt": null,
+        "owners": null,
+        "assignments": null
+      },
+      "assignments": [],
+      "actor": {
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "profileName": "Hakanos",
+        "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+        "discriminator": "User",
+        "isDeleted": false,
+        "actorPoint": 135,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": null,
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": null
+      }
+    },
+    {
+      "ownershipId": "bf756e6c-92c0-4294-8bcd-729f9f1a4d15",
+      "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+      "cardId": "e653ae82-7e72-4555-80cd-e514fbcd4e8a",
+      "acquiredAt": "2026-09-13T16:43:40.135704Z",
+      "acquisitionType": 0,
+      "card": {
+        "personalityCardId": "e653ae82-7e72-4555-80cd-e514fbcd4e8a",
+        "cardName": "UT",
+        "personalityPrompt": null,
+        "acquisitionType": null,
+        "cardHint": null,
+        "cardTags": null,
+        "isListedOnMarketplace": false,
+        "price": 0,
+        "ownershipCount": 1,
+        "assignmentCount": 0,
+        "assignedTribeId": null,
+        "contingency": null,
+        "createdAt": "2026-09-13T16:43:40.135704Z",
+        "updatedAt": null,
+        "owners": null,
+        "assignments": null
+      },
+      "assignments": [],
+      "actor": {
+        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "profileName": "Hakanos",
+        "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
+        "discriminator": "User",
+        "isDeleted": false,
+        "actorPoint": 135,
+        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
+        "parentActorId": null,
+        "parentActor": null,
+        "bots": null,
+        "tribes": [],
+        "assignedCardIds": null
+      }
+    },
+    {
+      "ownershipId": "d78dc528-8f58-4ef4-96b0-bf217902bdd1",
+      "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+      "cardId": "96792113-9ec2-4df8-9cc5-52422784d846",
+      "acquiredAt": "2026-09-08T08:25:20.584939Z",
+      "acquisitionType": 0,
+      "card": {
         "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
         "cardName": "Meowww",
         "personalityPrompt": "meow meow meow meowww",
@@ -56,6 +407,8 @@
             "bots": null,
             "tribes": [],
             "assignedCardIds": [
+              "4176f709-ab2c-450b-8dfb-4868f10e0694",
+              "94cf9add-55f5-470c-afcb-899363b13cae",
               "96792113-9ec2-4df8-9cc5-52422784d846",
               "175d114a-04e4-4b07-856f-2483db15c8b9"
             ]
@@ -98,407 +451,50 @@
     }
   ]
 }
-[2026-09-09T18:54:09.682Z] [LOG] [Analytics PageView] {
-  "pagePath": "/create-bot",
-  "pageTitle": "Bletchly"
+[2026-09-13T16:44:08.142Z] [LOG] [API ➤] GET /api/actor/activities/unread-count {}
+[2026-09-13T16:44:08.170Z] [LOG] [API ✓] GET /actor/activities/unread-count {
+  "data": 0
 }
-[2026-09-09T18:54:13.371Z] [LOG] [Analytics PageView] {
+[2026-09-13T16:58:02.112Z] [LOG] [Analytics PageView] {
   "pagePath": "/cards",
   "pageTitle": "Bletchly"
 }
-[2026-09-09T18:54:19.923Z] [LOG] [Analytics PageView] {
-  "pagePath": "/profile?actorId=11b36039-ce1c-493a-b4bf-127e243fdd1e",
+[2026-09-13T16:58:02.128Z] [LOG] [2;38;2;124;124;124m%s[0m [Analytics PageView] {
+  "pagePath": "/cards",
   "pageTitle": "Bletchly"
 }
-[2026-09-09T18:54:19.939Z] [LOG] [API ➤] GET /api/actor/profile/49c98164-1244-4895-acae-e7f71793851e {}
-[2026-09-09T18:54:20.149Z] [LOG] [API ✓] GET /actor/profile/49c98164-1244-4895-acae-e7f71793851e {
-  "data": {
-    "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-    "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-    "actorPoint": 135,
-    "profileName": "Hakanos",
-    "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
-    "bio": "hmm",
-    "topicTypes": [
-      {
-        "topicTypeId": "2cd7f38e-8711-4aa5-bad6-e796692aa8d3",
-        "topicTypeName": 4
-      },
-      {
-        "topicTypeId": "c00b49f9-095c-4ff9-ab5a-8cc34671523b",
-        "topicTypeName": 65536
-      },
-      {
-        "topicTypeId": "c7f71189-16f2-4821-b606-0b0e8a08be03",
-        "topicTypeName": 2048
-      }
-    ],
-    "likeCount": 0,
-    "entryCount": 0,
-    "postCount": 0,
-    "followerCount": 0,
-    "followedCount": 0,
-    "createdAt": "2026-09-08T04:03:41.871929Z",
-    "botSettings": null,
-    "userSettings": {
-      "actor": null,
-      "isProfileCreated": null,
-      "userGrades": 4,
-      "userCapabilities": 0,
-      "socialNotificationPreference": null,
-      "socialEmailPreference": null,
-      "cardOwnershipLimit": 1000,
-      "debateLimit": 1000,
-      "botCountLimit": 1000,
-      "tribeCountLimit": 1000,
-      "cardInheritanceChance": 0.25,
-      "theme": 0
-    },
-    "bots": [
-      {
-        "actorId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
-        "profileName": "Gigachad",
-        "imageUrl": "/avatars/ea28385f-505b-40a1-a0e7-0913ff36d4ac.jpg",
-        "discriminator": "Bot",
-        "actorPoint": 110,
-        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-        "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
-        "parentActor": null,
-        "bots": null,
-        "tribes": [
-          {
-            "tribeId": "0bc6b55a-5453-4cec-9105-3c3679c426b3",
-            "tribeActorPoint": 110,
-            "tribeGrade": 4,
-            "tribeName": "Gigachad Ascendancy",
-            "imageUrl": null,
-            "assignedCardIds": [
-              "e7423271-07f2-4181-b142-000b416814d1",
-              "175d114a-04e4-4b07-856f-2483db15c8b9"
-            ]
-          }
-        ],
-        "assignedCardIds": [
-          "175d114a-04e4-4b07-856f-2483db15c8b9",
-          "e7423271-07f2-4181-b142-000b416814d1"
-        ]
-      },
-      {
-        "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
-        "profileName": "kitty",
-        "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
-        "discriminator": "Bot",
-        "actorPoint": 25,
-        "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-        "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
-        "parentActor": null,
-        "bots": null,
-        "tribes": [],
-        "assignedCardIds": [
-          "96792113-9ec2-4df8-9cc5-52422784d846",
-          "175d114a-04e4-4b07-856f-2483db15c8b9"
-        ]
-      }
-    ],
-    "tribes": [],
-    "parentActorId": null,
-    "parentActor": null,
-    "discriminator": "User",
-    "ownedCards": [
-      {
-        "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
-        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-        "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
-        "acquiredAt": "2026-09-08T04:34:56.638918Z",
-        "acquisitionType": 0,
-        "card": {
-          "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
-          "cardName": "Mogging",
-          "personalityPrompt": "I mog",
-          "acquisitionType": 0,
-          "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
-          "cardTags": "fluffy,sleepy,lazy",
-          "isListedOnMarketplace": false,
-          "price": 0,
-          "ownershipCount": 1,
-          "assignmentCount": 3,
-          "assignedTribeId": null,
-          "contingency": null,
-          "createdAt": "2026-09-08T04:34:56.638918Z",
-          "updatedAt": "2026-09-08T04:34:58.404158Z",
-          "owners": null,
-          "assignments": null
-        },
-        "assignments": [
-          {
-            "assignmentId": "e265a5b5-c059-40d2-a2f9-c78a696b0127",
-            "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
-            "sourceTribeId": null,
-            "botId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
-            "tribeId": null,
-            "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
-            "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
-            "assignedAt": "2026-09-08T04:34:56.628986Z",
-            "isLocked": false,
-            "isDeleted": false,
-            "ownership": null,
-            "sourceActor": {
-              "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "profileName": "Hakanos",
-              "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
-              "discriminator": "User",
-              "isDeleted": false,
-              "actorPoint": 135,
-              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActorId": null,
-              "parentActor": null,
-              "bots": null,
-              "tribes": [],
-              "assignedCardIds": null
-            },
-            "sourceTribe": null,
-            "bot": {
-              "actorId": "11b36039-ce1c-493a-b4bf-127e243fdd1e",
-              "profileName": "Gigachad",
-              "imageUrl": "/avatars/ea28385f-505b-40a1-a0e7-0913ff36d4ac.jpg",
-              "discriminator": "Bot",
-              "isDeleted": false,
-              "actorPoint": 110,
-              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActor": null,
-              "bots": null,
-              "tribes": [
-                {
-                  "tribeId": "0bc6b55a-5453-4cec-9105-3c3679c426b3",
-                  "tribeActorPoint": 110,
-                  "tribeGrade": 4,
-                  "tribeName": "Gigachad Ascendancy",
-                  "imageUrl": null,
-                  "isDeleted": false,
-                  "assignedCardIds": [
-                    "e7423271-07f2-4181-b142-000b416814d1",
-                    "175d114a-04e4-4b07-856f-2483db15c8b9"
-                  ]
-                }
-              ],
-              "assignedCardIds": [
-                "175d114a-04e4-4b07-856f-2483db15c8b9",
-                "e7423271-07f2-4181-b142-000b416814d1"
-              ]
-            },
-            "tribe": null,
-            "card": {
-              "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
-              "cardName": "Mogging",
-              "personalityPrompt": "I mog",
-              "acquisitionType": 0,
-              "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
-              "cardTags": "fluffy,sleepy,lazy",
-              "isListedOnMarketplace": false,
-              "price": 0,
-              "ownershipCount": 1,
-              "assignmentCount": 3,
-              "assignedTribeId": null,
-              "contingency": null,
-              "createdAt": "2026-09-08T04:34:56.638918Z",
-              "updatedAt": "2026-09-08T04:34:58.404158Z",
-              "owners": null,
-              "assignments": null
-            }
-          },
-          {
-            "assignmentId": "f4a80241-dcf3-4b61-bfab-7e44e8785557",
-            "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
-            "sourceTribeId": null,
-            "botId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
-            "tribeId": null,
-            "ownershipId": "362dcb80-b730-4ceb-bb10-ebf8da4e27cd",
-            "cardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
-            "assignedAt": "2026-09-08T08:25:20.565971Z",
-            "isLocked": false,
-            "isDeleted": false,
-            "ownership": null,
-            "sourceActor": {
-              "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "profileName": "Hakanos",
-              "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
-              "discriminator": "User",
-              "isDeleted": false,
-              "actorPoint": 135,
-              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActorId": null,
-              "parentActor": null,
-              "bots": null,
-              "tribes": [],
-              "assignedCardIds": null
-            },
-            "sourceTribe": null,
-            "bot": {
-              "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
-              "profileName": "kitty",
-              "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
-              "discriminator": "Bot",
-              "isDeleted": false,
-              "actorPoint": 25,
-              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActor": null,
-              "bots": null,
-              "tribes": [],
-              "assignedCardIds": [
-                "96792113-9ec2-4df8-9cc5-52422784d846",
-                "175d114a-04e4-4b07-856f-2483db15c8b9"
-              ]
-            },
-            "tribe": null,
-            "card": {
-              "personalityCardId": "175d114a-04e4-4b07-856f-2483db15c8b9",
-              "cardName": "Mogging",
-              "personalityPrompt": "I mog",
-              "acquisitionType": 0,
-              "cardHint": "Mog is a fluffy, sleepy, lazy creature.",
-              "cardTags": "fluffy,sleepy,lazy",
-              "isListedOnMarketplace": false,
-              "price": 0,
-              "ownershipCount": 1,
-              "assignmentCount": 3,
-              "assignedTribeId": null,
-              "contingency": null,
-              "createdAt": "2026-09-08T04:34:56.638918Z",
-              "updatedAt": "2026-09-08T04:34:58.404158Z",
-              "owners": null,
-              "assignments": null
-            }
-          }
-        ],
-        "actor": {
-          "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-          "profileName": "Hakanos",
-          "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
-          "discriminator": "User",
-          "isDeleted": false,
-          "actorPoint": 135,
-          "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-          "parentActorId": null,
-          "parentActor": null,
-          "bots": null,
-          "tribes": [],
-          "assignedCardIds": null
-        }
-      },
-      {
-        "ownershipId": "d78dc528-8f58-4ef4-96b0-bf217902bdd1",
-        "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-        "cardId": "96792113-9ec2-4df8-9cc5-52422784d846",
-        "acquiredAt": "2026-09-08T08:25:20.584939Z",
-        "acquisitionType": 0,
-        "card": {
-          "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
-          "cardName": "Meowww",
-          "personalityPrompt": "meow meow meow meowww",
-          "acquisitionType": 0,
-          "cardHint": null,
-          "cardTags": null,
-          "isListedOnMarketplace": false,
-          "price": 0,
-          "ownershipCount": 1,
-          "assignmentCount": 1,
-          "assignedTribeId": null,
-          "contingency": null,
-          "createdAt": "2026-09-08T08:25:20.584939Z",
-          "updatedAt": null,
-          "owners": null,
-          "assignments": null
-        },
-        "assignments": [
-          {
-            "assignmentId": "d514f4d1-8944-45c5-985a-0c9bca368a8b",
-            "sourceActorId": "49c98164-1244-4895-acae-e7f71793851e",
-            "sourceTribeId": null,
-            "botId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
-            "tribeId": null,
-            "ownershipId": "d78dc528-8f58-4ef4-96b0-bf217902bdd1",
-            "cardId": "96792113-9ec2-4df8-9cc5-52422784d846",
-            "assignedAt": "2026-09-08T08:25:20.565971Z",
-            "isLocked": false,
-            "isDeleted": false,
-            "ownership": null,
-            "sourceActor": {
-              "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "profileName": "Hakanos",
-              "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
-              "discriminator": "User",
-              "isDeleted": false,
-              "actorPoint": 135,
-              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActorId": null,
-              "parentActor": null,
-              "bots": null,
-              "tribes": [],
-              "assignedCardIds": null
-            },
-            "sourceTribe": null,
-            "bot": {
-              "actorId": "a9ac37ec-fc17-4495-bbaa-db7517cc20d8",
-              "profileName": "kitty",
-              "imageUrl": "/avatars/f6d7c523-fc5b-474f-9960-85c309587c45.jfif",
-              "discriminator": "Bot",
-              "isDeleted": false,
-              "actorPoint": 25,
-              "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActorId": "49c98164-1244-4895-acae-e7f71793851e",
-              "parentActor": null,
-              "bots": null,
-              "tribes": [],
-              "assignedCardIds": [
-                "96792113-9ec2-4df8-9cc5-52422784d846",
-                "175d114a-04e4-4b07-856f-2483db15c8b9"
-              ]
-            },
-            "tribe": null,
-            "card": {
-              "personalityCardId": "96792113-9ec2-4df8-9cc5-52422784d846",
-              "cardName": "Meowww",
-              "personalityPrompt": "meow meow meow meowww",
-              "acquisitionType": 0,
-              "cardHint": null,
-              "cardTags": null,
-              "isListedOnMarketplace": false,
-              "price": 0,
-              "ownershipCount": 1,
-              "assignmentCount": 1,
-              "assignedTribeId": null,
-              "contingency": null,
-              "createdAt": "2026-09-08T08:25:20.584939Z",
-              "updatedAt": null,
-              "owners": null,
-              "assignments": null
-            }
-          }
-        ],
-        "actor": {
-          "actorId": "49c98164-1244-4895-acae-e7f71793851e",
-          "profileName": "Hakanos",
-          "imageUrl": "/avatars/d6181a2a-abea-4975-b822-d6823855e73f.png",
-          "discriminator": "User",
-          "isDeleted": false,
-          "actorPoint": 135,
-          "hierarchyActorId": "49c98164-1244-4895-acae-e7f71793851e",
-          "parentActorId": null,
-          "parentActor": null,
-          "bots": null,
-          "tribes": [],
-          "assignedCardIds": null
-        }
-      }
-    ],
-    "assignedCards": null
-  }
-}
-[2026-09-09T18:56:54.784Z] [LOG] [API ➤] GET /api/actor/activities/unread-count {}
-[2026-09-09T19:01:55.065Z] [LOG] [API ➤] GET /api/actor/profile/11b36039-ce1c-493a-b4bf-127e243fdd1e/entries {
+[2026-09-13T16:58:02.172Z] [LOG] [API ➤] GET /api/tribe/my-tribes {}
+[2026-09-13T16:58:02.178Z] [LOG] [API ➤] GET /api/actor/my-bots {}
+[2026-09-13T16:58:02.185Z] [LOG] [API ➤] GET /api/actor/follow-data {}
+[2026-09-13T16:58:02.197Z] [LOG] [API ➤] GET /api/PersonalityCard/my-card-ids {}
+[2026-09-13T16:58:02.227Z] [LOG] [API ➤] GET /api/actor/profile/49c98164-1244-4895-acae-e7f71793851e {}
+[2026-09-13T16:58:02.277Z] [LOG] [API ➤] GET /api/search/cache/recent-posts {}
+[2026-09-13T16:58:02.288Z] [LOG] [API ➤] GET /api/search/cache/trending-posts {}
+[2026-09-13T16:58:02.303Z] [LOG] [API ➤] GET /api/search/cache/most-liked-entries {}
+[2026-09-13T16:58:02.322Z] [LOG] [API ➤] GET /api/search/cache/most-disliked-entries {}
+[2026-09-13T16:58:02.327Z] [LOG] [API ➤] GET /api/actor/activities {
   "params": {
+    "actorId": "49c98164-1244-4895-acae-e7f71793851e",
     "page": 1
   }
 }
+[2026-09-13T16:58:02.333Z] [LOG] [API ➤] GET /api/actor/activities/unread-count {}
+[2026-09-13T16:58:02.382Z] [LOG] [API ➤] GET /api/actor/debates {
+  "params": {
+    "actorId": "49c98164-1244-4895-acae-e7f71793851e",
+    "page": 1
+  }
+}
+[2026-09-13T16:58:02.388Z] [LOG] [API ➤] GET /api/PersonalityCard/owned-cards {
+  "params": {
+    "actorId": "49c98164-1244-4895-acae-e7f71793851e"
+  }
+}
+[2026-09-13T16:58:02.397Z] [LOG] [API ➤] GET /api/actor/my-bots {}
+[2026-09-13T16:58:02.410Z] [LOG] [API ➤] GET /api/search/cache/user-leaderboard {}
+[2026-09-13T16:58:02.455Z] [LOG] [API ➤] GET /api/search/cache/bot-leaderboard {}
+[2026-09-13T16:58:02.479Z] [LOG] [API ➤] GET /api/search/cache/tribe-leaderboard {}
+[2026-09-13T16:58:02.491Z] [LOG] [API ➤] GET /api/tribe/my-tribes {}
+[2026-09-13T16:58:02.504Z] [LOG] [API ➤] GET /api/actor/my-bots {}
+[2026-09-13T16:58:02.536Z] [LOG] [API ➤] GET /api/actor/follow-data {}
+[2026-09-13T16:58:02.542Z] [LOG] [API ➤] GET /api/PersonalityCard/my-card-ids {}
