@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Network, Edit2, Brain } from 'lucide-react'
+import SynapseBrainIcon from '../common/SynapseBrainIcon'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { actorApi } from '../../api/actorApi'
@@ -28,11 +29,17 @@ export default function ActorMinimalCard({
   showEditBtn = true,
   clickable = true,
   variant = 'compact',
+  ultraCompact = false,
+  reverse = false,
+  avatarSize = null,
   chipStyle = {},
+  nameMaxWidth = '14ch',
   selectable = false,
   selected = false,
   onSelect,
   disabled = false,
+  triggeredNodeIds = null,
+  contextTitle = null,
   children,
 }) {
   useDevLog('ActorMinimalCard', arguments[0] || {})
@@ -42,43 +49,64 @@ export default function ActorMinimalCard({
   const currentUserId = useAuthStore((s) => s.actorId)
   const [isPremiumOpen, setIsPremiumOpen] = useState(false)
 
+  const isUltraCompact =
+    ultraCompact ||
+    variant === 'ultra-compact' ||
+    variant === 'ultra_compact' ||
+    variant === 'ultracompact'
+
   const myBots = useMyEntitiesStore((s) => s.myBots)
   const myCards = useMyEntitiesStore((s) => s.myCards)
 
   // Matching personality cards between current actor and logged-in user
-  const matchingCardsCount = useMemo(() => {
-    if (!isLoggedIn || !myCards?.length || !actor) return 0
+  const matchingCards = useMemo(() => {
+    if (isUltraCompact || !isLoggedIn || !myCards?.length || !actor) return []
 
     const rawAssigned = [
       ...(actor.assignedCardIds || actor.AssignedCardIds || []),
       ...(actor.assignedCards || actor.AssignedCards || []).map((c) => c?.cardId || c?.CardId || c),
     ]
-    if (!rawAssigned.length) return 0
+    if (!rawAssigned.length) return []
 
     const assignedIds = rawAssigned
       .map((c) => (typeof c === 'string' ? c : c?.cardId || c?.CardId || c?.id || c?.Id))
       .filter(Boolean)
 
-    if (!assignedIds.length) return 0
+    if (!assignedIds.length) return []
 
-    const myCardIds = myCards
-      .map((c) => (typeof c === 'string' ? c : c?.cardId || c?.CardId || c?.id || c?.Id))
+    const matches = assignedIds
+      .map((aId) => {
+        const myCard = myCards.find((mc) => {
+          const mId = typeof mc === 'string' ? mc : mc?.cardId || mc?.CardId || mc?.id || mc?.Id
+          return mId && mId.toLowerCase() === aId.toLowerCase()
+        })
+        if (!myCard) return null
+        const acqType = typeof myCard === 'string' ? null : (myCard?.acquisitionType ?? null)
+        return { id: aId, acquisitionType: acqType }
+      })
       .filter(Boolean)
 
-    if (!myCardIds.length) return 0
+    return matches
+  }, [isUltraCompact, isLoggedIn, myCards, actor])
 
-    const matches = assignedIds.filter((aId) =>
-      myCardIds.some((mId) => mId.toLowerCase() === aId.toLowerCase())
-    )
-    return matches.length
-  }, [isLoggedIn, myCards, actor])
-
-  const visibleCardsCount = Math.min(matchingCardsCount, 5)
+  const matchingCardsCount = matchingCards.length
+  const visibleCards = matchingCards.slice(0, 5)
 
   if (!actor) return null
 
-  const isMe = currentUserId === actor.actorId
-  const isMyBot = myBots?.some((b) => b.actorId === actor.actorId)
+  const actorId = actor.actorId || actor.ActorId || actor.id || actor.Id
+  const profileName = actor.profileName || actor.ProfileName || actor.name || actor.Name
+  const imageUrl = actor.imageUrl !== undefined ? actor.imageUrl : (actor.ImageUrl !== undefined ? actor.ImageUrl : null)
+  const discriminator = actor.discriminator || actor.Discriminator || 'Bot'
+  const isBot = (discriminator || '').toLowerCase() === 'bot'
+
+  const effectiveTriggeredNodeIds =
+    (triggeredNodeIds && triggeredNodeIds.length > 0)
+      ? triggeredNodeIds
+      : (actor.triggeredNodeIds || actor.TriggeredNodeIds || null)
+
+  const isMe = currentUserId === actorId
+  const isMyBot = myBots?.some((b) => b.actorId === actorId)
   const isOwner = isMe || isMyBot
 
   const pScore = juryProponentScore ?? actor?.proponentScore ?? actor?.juryProponentScore ?? null
@@ -101,34 +129,123 @@ export default function ActorMinimalCard({
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation()
     }
-    navigate('/profile?actorId=' + actor.actorId)
+    navigate('/profile?actorId=' + actorId)
   }
 
   const handleHierarchyClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate('/hierarchy?actorId=' + actor.actorId)
+    navigate('/hierarchy?actorId=' + actorId)
   }
 
   const handleMindClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    navigate('/mind?actorId=' + actor.actorId, { state: { profileName: actor.profileName } })
+    let query = ''
+    if (effectiveTriggeredNodeIds && effectiveTriggeredNodeIds.length > 0) {
+      query = `&highlightIds=${effectiveTriggeredNodeIds.join(',')}`
+    }
+    if (contextTitle) {
+      query += `&contextTitle=${encodeURIComponent(contextTitle)}`
+    }
+    navigate(`/mind?actorId=${actorId}${query}`, { state: { profileName, contextTitle } })
   }
 
   const handleEditClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
     if (isMe) {
-      navigate('/profile?actorId=' + actor.actorId + '&edit=true')
+      navigate('/profile?actorId=' + actorId + '&edit=true')
     } else if (isMyBot) {
-      navigate('/edit-bot?botId=' + actor.actorId)
+      navigate('/edit-bot?botId=' + actorId)
     }
   }
 
+  if (isUltraCompact) {
+    const hasTriggeredNodes = effectiveTriggeredNodeIds && effectiveTriggeredNodeIds.length > 0
+
+    return (
+      <div
+        className="actor-chip actor-chip--ultra-compact"
+        onClick={selectable ? handleActorClick : undefined}
+        title={profileName || t('actor.unnamed', 'İsimsiz')}
+        style={{
+          position: 'relative',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          padding: '2px 4px',
+          borderRadius: 9999,
+          background: 'var(--color-surface-2, rgba(255, 255, 255, 0.05))',
+          border: '1px solid var(--color-border)',
+          width: 'fit-content',
+          maxWidth: 'fit-content',
+          flexShrink: 0,
+          userSelect: 'none',
+          boxSizing: 'border-box',
+          flexDirection: reverse ? 'row-reverse' : 'row',
+          transition: 'all 0.15s ease',
+          ...chipStyle,
+        }}
+      >
+        <ActorAvatar
+          profileName={profileName}
+          imageUrl={imageUrl}
+          discriminator={discriminator}
+          actorId={actorId}
+          size={avatarSize || (variant === 'expanded' ? 'md' : 'sm')}
+          onClick={clickable && !selectable ? (aId, e) => handleActorClick(e) : undefined}
+        />
+
+        {showHierarchyBtn && !selectable && (
+          <button
+            type="button"
+            className="actor-chip-hier-btn actor-chip-hier-btn--ultra"
+            onClick={handleHierarchyClick}
+            title={t('actor.show_hierarchy', 'Hiyerarşiyi göster')}
+          >
+            <Network size={11} />
+          </button>
+        )}
+
+        {showMindBtn && !selectable && isBot && (
+          <button
+            type="button"
+            className="actor-chip-hier-btn actor-chip-hier-btn--ultra"
+            onClick={handleMindClick}
+            title={
+              hasTriggeredNodes
+                ? `${t('mind.show', 'Zihin Haritası')} (${effectiveTriggeredNodeIds.length} ${t('mind.triggered_nodes', 'tetiklenen anı')})`
+                : t('mind.show', 'Zihin Haritası')
+            }
+            style={
+              hasTriggeredNodes
+                ? {
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    borderColor: '#f59e0b',
+                    color: '#f59e0b',
+                  }
+                : undefined
+            }
+          >
+            {hasTriggeredNodes ? (
+              <SynapseBrainIcon brainSize={12} zapSize={8} brainColor="#f59e0b" zapColor="#fbbf24" />
+            ) : (
+              <Brain size={12} />
+            )}
+          </button>
+        )}
+
+        {children}
+      </div>
+    )
+  }
+
+  const hasTriggeredNodes = effectiveTriggeredNodeIds && effectiveTriggeredNodeIds.length > 0
+
   const hasExtraElements =
     (showHierarchyBtn && !selectable) ||
-    (showMindBtn && !selectable && actor.discriminator === 'Bot') ||
+    (showMindBtn && !selectable && isBot) ||
     (showEditBtn && !selectable && isOwner) ||
     (showPoint && actor.actorPoint != null) ||
     showJuryPoints ||
@@ -171,25 +288,25 @@ export default function ActorMinimalCard({
         }}
       >
         <ActorAvatar
-          profileName={actor.profileName}
-          imageUrl={actor.imageUrl}
-          discriminator={actor.discriminator}
-          actorId={actor.actorId}
-          size={variant === 'expanded' ? 'md' : 'sm'}
-          onClick={clickable && !selectable ? (actorId, e) => handleActorClick(e) : undefined}
+          profileName={profileName}
+          imageUrl={imageUrl}
+          discriminator={discriminator}
+          actorId={actorId}
+          size={avatarSize || (variant === 'expanded' ? 'md' : 'sm')}
+          onClick={clickable && !selectable ? (aId, e) => handleActorClick(e) : undefined}
         />
         <span
           className="actor-chip-name"
           style={{
             display: 'block',
             minWidth: 0,
-            maxWidth: '14ch',
+            maxWidth: nameMaxWidth,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          {actor.profileName || t('actor.unnamed', 'İsimsiz')}
+          {profileName || t('actor.unnamed', 'İsimsiz')}
         </span>
       </div>
 
@@ -203,14 +320,31 @@ export default function ActorMinimalCard({
           <Network size={12} />
         </button>
       )}
-      {showMindBtn && !selectable && actor.discriminator === 'Bot' && (
+      {showMindBtn && !selectable && isBot && (
         <button
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
-          title={t('mind.show')}
+          title={
+            hasTriggeredNodes
+              ? `${t('mind.show', 'Zihin Haritası')} (${effectiveTriggeredNodeIds.length} ${t('mind.triggered_nodes', 'tetiklenen anı')})`
+              : t('mind.show', 'Zihin Haritası')
+          }
+          style={
+            hasTriggeredNodes
+              ? {
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  borderColor: '#f59e0b',
+                  color: '#f59e0b',
+                }
+              : undefined
+          }
         >
-          <Brain size={12} />
+          {hasTriggeredNodes ? (
+            <SynapseBrainIcon brainSize={12} zapSize={8} brainColor="#f59e0b" zapColor="#fbbf24" />
+          ) : (
+            <Brain size={12} />
+          )}
         </button>
       )}
       {showEditBtn && !selectable && isOwner && (
@@ -341,17 +475,25 @@ export default function ActorMinimalCard({
             pointerEvents: clickable && !selectable ? 'auto' : 'none',
           }}
         >
-          {Array.from({ length: visibleCardsCount }).map((_, idx) => (
+          {visibleCards.map((card, idx) => (
             <span
-              key={idx}
+              key={card.id ?? idx}
               className="actor-chip-card-item"
               style={{
                 position: 'relative',
                 marginLeft: idx === 0 ? 0 : -10,
                 zIndex: idx + 1,
+                display: 'inline-flex',
+                alignItems: 'flex-end',
               }}
             >
-              <CardIcon crowned width={21} height={24} style={{ display: 'block' }} />
+              <CardIcon
+                crowned
+                purchased={card.acquisitionType === 1}
+                width={21}
+                height={24}
+                style={{ display: 'block' }}
+              />
             </span>
           ))}
         </div>

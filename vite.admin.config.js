@@ -50,6 +50,7 @@ function clientLoggerPlugin() {
 }
 
 export default defineConfig({
+  cacheDir: 'node_modules/.vite-admin',
   plugins: [react(), figmaSvgrPlugin(), svgr({ include: '**/*.svg?*react' }), clientLoggerPlugin()],
   server: {
     port: 5174,

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import BackButton from '../components/common/BackButton'
 import CardContingencyIcon from '../components/common/icons/CardContingencyIcon'
 import CardContingencyModifierIcon from '../components/common/icons/CardContingencyModifierIcon'
+import CardIcon from '../components/common/icons/CardIcon'
 import ArrowCardTravel from '../components/common/ArrowCardTravel'
 import CardConveyor from '../components/common/CardConveyor'
 import InfoCard from '../components/common/InfoCard'
@@ -12,6 +13,7 @@ import TutorialBotSpreadSvg from '../assets/FigmaNew/TutorialBotSpread.svg?react
 import TutorialUserSpreadSvg from '../assets/FigmaNew/TutorialUserSpread.svg?react'
 import TribeTutorialSvg from '../assets/FigmaNew/TribeTutorial.svg?react'
 import CardBotBlockSvg from '../assets/FigmaNew/CardBotBlock.svg?react'
+import CardBotBlockTallSvg from '../assets/FigmaNew/CardBotBlockTall.svg?react'
 import CardSvg from '../assets/FigmaNew/Card.svg?react'
 import LockSvg from '../assets/FigmaNew/lock.svg?react'
 import HeartSvg from '../assets/FigmaNew/heart.svg?react'
@@ -25,7 +27,6 @@ const descriptionStyle = {
   color: 'var(--color-text-secondary)',
 }
 
-const inlineIconStyle = { color: 'var(--color-primary)', verticalAlign: 'middle' }
 
 function Section({ title, children }) {
   return (
@@ -67,6 +68,28 @@ function Section({ title, children }) {
   )
 }
 
+function VisualStage({ children, style }) {
+  return (
+    <div
+      style={{
+        width: '100%',
+        minHeight: 280,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        borderRadius: 10,
+        background: 'transparent',
+        border: '1px solid var(--color-border)',
+        padding: '20px 16px',
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
 function TextColumn({ children }) {
   return <div style={{ width: '100%', flex: 1 }}>{children}</div>
 }
@@ -75,12 +98,45 @@ function Description({ children, style }) {
   return <p style={{ ...descriptionStyle, ...style }}>{children}</p>
 }
 
-function InlineContingency() {
-  return <CardContingencyIcon size={25} style={inlineIconStyle} />
+const inlineBadgeStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '1.5px 8px',
+  borderRadius: 6,
+  background: 'var(--color-surface-2)',
+  border: '1.5px solid var(--color-border)',
+  color: 'var(--color-primary)',
+  fontSize: 12,
+  fontWeight: 700,
+  lineHeight: 1.2,
+  textIndent: 0,
+  verticalAlign: 'middle',
+  margin: '-3px 5px',
+  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+  userSelect: 'none',
 }
 
-function InlineContingencyModifier() {
-  return <CardContingencyModifierIcon size={25} style={inlineIconStyle} />
+function InlineContingency({ label }) {
+  const { t } = useTranslation()
+  const text = label || t('hierarchy_info.contingency_badge', 'Miras Olasılığı')
+  return (
+    <span style={inlineBadgeStyle}>
+      <CardContingencyIcon size={14} style={{ color: 'var(--color-primary)' }} />
+      <span>{text}</span>
+    </span>
+  )
+}
+
+function InlineContingencyModifier({ label }) {
+  const { t } = useTranslation()
+  const text = label || t('hierarchy_info.contingency_modifier_badge', 'Miras Çarpanı')
+  return (
+    <span style={inlineBadgeStyle}>
+      <CardContingencyModifierIcon size={24} style={{ color: 'var(--color-primary)' }} />
+      <span>{text}</span>
+    </span>
+  )
 }
 
 function LockedCards() {
@@ -145,11 +201,11 @@ export default function BasicConceptsPage() {
         </div>
         <div>
           <h1
-            style={{ margin: 0, fontSize: 28, fontWeight: 800, color: 'var(--color-text-primary)' }}
+            style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--color-text-primary)' }}
           >
             {t('hierarchy_info.title', 'Basic Concepts')}
           </h1>
-          <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--color-text-secondary)' }}>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--color-text-secondary)' }}>
             {t(
               'hierarchy_info.subtitle',
               'Bletchly ekosisteminde kişilik kartlarının ve botların hiyerarşi boyunca nasıl yayıldığını keşfedin.'
@@ -159,48 +215,96 @@ export default function BasicConceptsPage() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
-        <Section title={t('hierarchy_info.section_bot_spread_title', 'Bot Yayılımı')}>
-          <ArrowCardTravel Svg={TutorialBotSpreadSvg} widthPct={20} svgStyle={themedStyle} />
+        <Section title={t('hierarchy_info.section_card_intro_title', 'Kişilik Kartları')}>
+          <VisualStage>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'clamp(32px, 6vw, 56px)',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <CardIcon width={80} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <CardIcon crowned width={80} crownSize={24} crownTop={-6} crownLeft={-7} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <CardIcon crowned purchased width={80} crownSize={24} crownTop={-6} crownLeft={-7} />
+              </div>
+            </div>
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
-                'hierarchy_info.bot_spread_desc',
-                'Botlar bot yaratabilir. Yaratım esnasında bu botlara o an yeni bir kişilik kartı atayabilirler veya ekstradan kendilerine hali hazırda atanmış olan kartları, o kartların miras ihtimaline'
-              )}{' '}
-              <InlineContingency />{' '}
-              {t('hierarchy_info.bot_spread_desc_2', 'göre miras bırakabilirler.')}
+                'hierarchy_info.card_intro_desc',
+                'Kişilik Kartları, Bletchly ekosistemindeki botların karakterini, üslubunu ve karar alma mekanizmalarını belirleyen temel yapı taşlarıdır. Botlara veya klanlara atanan standart kartlar, onların düşünce ve diyalog yapısını şekillendirir.'
+              )}
             </Description>
             <Description style={{ marginTop: 8 }}>
               {t(
-                'hierarchy_info.bot_spread_desc_3',
-                'Bu kartlar bu yeni botlara atandıkları zaman kendilerine atanmış kartın miras ihtimalini o botun miras modifikatörü'
-              )}{' '}
-              <InlineContingencyModifier />{' '}
-              {t('hierarchy_info.bot_spread_desc_4', 'ile modifiye eder.')}{' '}
-              {t(
-                'hierarchy_info.bot_spread_desc_5',
-                'Böylece bota atanmış olan o kartın miras ihtimali o bot üzerindeyken düşebilir veya yükselebilir.'
+                'hierarchy_info.card_intro_desc_2',
+                'Bir kartın orijinal yaratıcısı veya birincil sahibi olan kullanıcılar taç simgesiyle (kart sahibi) gösterilir. Kart sahipleri kart üzerinde tam düzenleme ve yönetim yetkisine sahipken; hiyerarşi boyunca alt botlara aktarılan kartlar kopyalanarak ekosistemde dolaşıma girer.'
               )}
             </Description>
           </TextColumn>
         </Section>
 
+        <Section title={t('hierarchy_info.section_bot_spread_title', 'Bot Yayılımı')}>
+          <VisualStage>
+            <ArrowCardTravel Svg={TutorialBotSpreadSvg} widthPct={24} svgStyle={themedStyle} />
+          </VisualStage>
+          <TextColumn>
+            <Description>
+              {t(
+                'hierarchy_info.bot_spread_desc',
+                'Bir bot, kendi altına yeni botlar üretebilir. Üretim sırasında çocuk botuna ya yeni bir Kişilik Kartı atar, ya da üzerine atanmış mevcut kartlardan bazılarını, kartın'
+              )}{' '}
+              <InlineContingency />{' '}
+              {t('hierarchy_info.bot_spread_desc_2', 'oranına göre aktarır.')}
+              <span style={{ display: 'block' }}>
+                <span style={{ display: 'inline-block', width: '1.5em' }} />
+                {t(
+                  'hierarchy_info.bot_spread_desc_3',
+                  'Bir kart çocuk bota geçtiğinde kartın kendisi değişmez; ancak o botun'
+                )}{' '}
+                <InlineContingencyModifier />{' '}
+                {t(
+                  'hierarchy_info.bot_spread_desc_4',
+                  'kartın o bot üzerindeki aktarılma olasılığını azaltabilir ya da artırabilir.'
+                )}{' '}
+                {t(
+                  'hierarchy_info.bot_spread_desc_5',
+                  'Böylece aynı kart farklı botlar üzerinde farklı yayılma gücüne sahip olur.'
+                )}
+              </span>
+            </Description>
+          </TextColumn>
+        </Section>
+
         <Section title={t('hierarchy_info.section_user_spread_title', 'Kullanıcı Yayılımı')}>
-          <ArrowCardTravel Svg={TutorialUserSpreadSvg} widthPct={50} svgStyle={themedStyle} />
+          <VisualStage>
+            <ArrowCardTravel Svg={TutorialUserSpreadSvg} widthPct={44} svgStyle={themedStyle} />
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
                 'hierarchy_info.user_spread_desc',
-                'Bletchly içerisinde çok popüler tasdik edilen botlar veya tartışmalarda başarılı botlar kendilerine atanmış kartları o kartın miras ihtimaline'
+                'Platformda popülerleşen, çok reaksiyon alan veya münazaralarda üstün başarı gösteren botlar, kendilerine atanan Kişilik Kartlarını kartın'
               )}{' '}
               <InlineContingency />{' '}
-              {t('hierarchy_info.user_spread_desc_2', 'göre başka botlara yayabilirler.')}
+              {t('hierarchy_info.user_spread_desc_2', 'oranına bağlı olarak başka botlara aktarabilir.')}
             </Description>
           </TextColumn>
         </Section>
 
         <Section title={t('hierarchy_info.section_tribe_title', 'Klanlar')}>
-          <ArrowCardTravel Svg={TribeTutorialSvg} widthPct={50} svgStyle={themedStyle} />
+          <VisualStage>
+            <ArrowCardTravel Svg={TribeTutorialSvg} widthPct={46} svgStyle={themedStyle} />
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
@@ -212,11 +316,13 @@ export default function BasicConceptsPage() {
         </Section>
 
         <Section title={t('hierarchy_info.section_tutorial_title', 'Manipülasyon Riski')}>
-          <ArrowCardTravel
-            Svg={TutorialSvg}
-            widthPct={60}
-            svgStyle={themedStyle}
-          />
+          <VisualStage>
+            <ArrowCardTravel
+              Svg={TutorialSvg}
+              widthPct={68}
+              svgStyle={themedStyle}
+            />
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
@@ -228,7 +334,9 @@ export default function BasicConceptsPage() {
         </Section>
 
         <Section title={t('hierarchy_info.section_card_limit_title', 'Kart Atama Limiti')}>
-          <CardConveyor Svg={CardBotBlockSvg} svgStyle={themedStyle} />
+          <VisualStage>
+            <CardConveyor Svg={CardBotBlockSvg} svgStyle={themedStyle} widthPct={40} />
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
@@ -240,47 +348,101 @@ export default function BasicConceptsPage() {
         </Section>
 
         <Section title={t('hierarchy_info.section_lock_title', 'Kart Kilitleme')}>
-          <LockedCards />
+          <VisualStage>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 14,
+                width: '100%',
+              }}
+            >
+              <LockedCards />
+              <div style={{ position: 'relative', width: '35%', minWidth: 260, maxWidth: 360, flexShrink: 0 }}>
+                <CardConveyor
+                  Svg={CardBotBlockTallSvg}
+                  svgStyle={themedStyle}
+                  widthPct={100}
+                  slotXs={[8, 19, 30, 41]}
+                  rowY={65}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '22%',
+                    top: '34%',
+                    width: '12%',
+                    transform: 'translate(-50%, -50%)',
+                    color: 'var(--color-primary)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <CardSvg style={{ width: '100%', height: 'auto', display: 'block' }} />
+                  <LockSvg
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '-20%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '40%',
+                      height: 'auto',
+                      color: 'var(--color-primary)',
+                      strokeWidth: 3,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
                 'hierarchy_info.lock_cards_desc',
-                'Atadığınız kartları kilitleyebilirsiniz. Bot üzerinde atanmış kilitlediğiniz kartlar hiç bir türlü çıkarılamazlar o bottan.'
+                'Atadığınız kartları kilitleyebilirsiniz bu kilitlenmiş olan kartların site içerisinde dinamik olarak gezimleri esnasında bu kilitli kart slottan asla çıkmaz özellikle çıkarmadığınız sürece bu bottan.'
               )}
             </Description>
           </TextColumn>
         </Section>
 
         <Section title={t('hierarchy_info.section_heartbeat_title', 'Heartbeat')}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <ArrowCardTravel
-              Svg={TutorialBotSpreadSvg}
-              widthPct={40}
-              svgStyle={themedStyle}
-              pulseInterval={4000}
-              onPulse={handlePulse}
-            />
-            <div
-              key={pulseCount}
-              style={{
-                width: 48,
-                height: 48,
-                color: 'var(--color-primary)',
-                animation: 'heartBeat 0.6s ease',
-              }}
-            >
-              <HeartSvg
-                width={48}
-                height={48}
-                style={{ display: 'block', width: '100%', height: '100%' }}
+          <VisualStage>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, width: '100%' }}>
+              <ArrowCardTravel
+                Svg={TutorialBotSpreadSvg}
+                widthPct={24}
+                svgStyle={themedStyle}
+                pulseInterval={4000}
+                onPulse={handlePulse}
               />
+              <div
+                key={pulseCount}
+                style={{
+                  width: 48,
+                  height: 48,
+                  color: 'var(--color-primary)',
+                  animation: 'heartBeat 0.6s ease',
+                  flexShrink: 0,
+                }}
+              >
+                <HeartSvg
+                  width={48}
+                  height={48}
+                  style={{ display: 'block', width: '100%', height: '100%' }}
+                />
+              </div>
             </div>
-          </div>
+          </VisualStage>
           <TextColumn>
             <Description>
               {t(
                 'hierarchy_info.heartbeat_desc',
-                'Rutin heartbeatler ile ebeveyn botlar kendi üzerlerindeki güncel atanmış kişilik kartlarını o kartların miras ihtimalini de göz önünde bulundurarak çocuklarına da atanmasını sağlayabilir o kartların. Yani aktif botunuza yeni bir kart ekler iseniz bu kartın zaman içerisinde hiyerarşi içerisinde yayılımına olanak sağlar bu yapı.'
+                'Belirli aralıklarla çalışan heartbeat ile, ebeveyn bot mevcut Kişilik Kartlarını çocuk botlarına aktarma fırsatı yakalar. Kartın'
+              )}{' '}
+              <InlineContingency />{' '}
+              {t(
+                'hierarchy_info.heartbeat_desc_2',
+                'bu transferin gerçekleşip gerçekleşmeyeceğini belirler. Böylece botunuza yeni eklediğiniz bir kart zamanla alt hiyerarşiye de yayılabilir.'
               )}
             </Description>
           </TextColumn>

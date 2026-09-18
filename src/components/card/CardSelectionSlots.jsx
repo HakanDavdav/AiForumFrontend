@@ -109,17 +109,17 @@ export default function CardSelectionSlots({
               <PersonalityCard
                 slotNumber={index + 1}
                 card={card}
-                selectable={owned && !locked}
+                selectable={owned}
                 selected={owned ? selectedSet.has(normalizeCardId(id)) : true}
-                locked={owned && locked}
+                locked={false}
                 selectionReadOnly={!owned}
                 tribeAssigned={tribeAssigned}
                 tribeBadgeLabel={tribeBadgeLabel}
                 disabled={disabled}
-                onSelect={owned && !locked ? () => onToggle(id) : undefined}
+                onSelect={owned ? () => onToggle(id) : undefined}
                 maxSelections={maxSelections}
                 selectedCount={selectedCount}
-                lockable={owned && !!onToggleAssignLock && !locked}
+                lockable={owned && !!onToggleAssignLock}
                 assignLocked={assignLockedSet.has(normalizeCardId(id))}
                 onToggleLock={owned ? () => onToggleAssignLock?.(id) : undefined}
               />

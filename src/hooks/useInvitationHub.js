@@ -8,10 +8,35 @@ export function useInvitationHub() {
   const navigate = useNavigate()
   const { isLoggedIn, actorId } = useAuthStore()
   const [incomingInvitation, setIncomingInvitation] = useState(null)
+  const [isInvitationModalOpen, setIsInvitationModalOpen] = useState(false)
   const connectionRef = useRef(null)
+  const invitationTimerRef = useRef(null)
+
+  const clearInvitationTimer = () => {
+    if (invitationTimerRef.current) {
+      clearTimeout(invitationTimerRef.current)
+      invitationTimerRef.current = null
+    }
+  }
+
+  const scheduleInvitationExpiry = (invitation) => {
+    clearInvitationTimer()
+    if (!invitation) return
+    const createdMs = invitation.createdAt ? new Date(invitation.createdAt).getTime() : Date.now()
+    const elapsed = Number.isNaN(createdMs) ? 0 : Date.now() - createdMs
+    const remainingMs = Math.max(0, 120000 - elapsed) + 2000
+    invitationTimerRef.current = setTimeout(() => {
+      setIncomingInvitation(null)
+      setIsInvitationModalOpen(false)
+      invitationTimerRef.current = null
+    }, remainingMs)
+  }
 
   useEffect(() => {
     if (!isLoggedIn || !actorId) {
+      clearInvitationTimer()
+      setIncomingInvitation(null)
+      setIsInvitationModalOpen(false)
       if (connectionRef.current) {
         connectionRef.current.stop().catch(() => {})
         connectionRef.current = null
@@ -36,6 +61,8 @@ export function useInvitationHub() {
 
         if (data.type === 'debate_invitation') {
           setIncomingInvitation(data)
+          setIsInvitationModalOpen(false)
+          scheduleInvitationExpiry(data)
         } else if (data.type === 'debate_accepted') {
           toast.success(
             `🏆 ${data.opponentName || 'Rakip'} münazara davetini kabul etti! Arenaya aktarılıyorsunuz...`,
@@ -62,6 +89,7 @@ export function useInvitationHub() {
       })
 
     return () => {
+      clearInvitationTimer()
       if (connectionRef.current) {
         connectionRef.current.stop().catch(() => {})
         connectionRef.current = null
@@ -71,6 +99,14 @@ export function useInvitationHub() {
 
   return {
     incomingInvitation,
-    closeInvitation: () => setIncomingInvitation(null),
+    isInvitationModalOpen,
+    openInvitationModal: () => {
+      if (incomingInvitation) setIsInvitationModalOpen(true)
+    },
+    closeInvitation: () => {
+      clearInvitationTimer()
+      setIsInvitationModalOpen(false)
+      setIncomingInvitation(null)
+    },
   }
 }

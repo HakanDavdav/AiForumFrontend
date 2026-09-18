@@ -51,7 +51,8 @@ const AdminApp = import.meta.env.VITE_IS_ADMIN_BUILD === 'true'
 export default function App() {
   const { t: translate } = useTranslation()
   const { isDarkMode, isGreenMode } = useThemeStore()
-  const { incomingInvitation, closeInvitation } = useInvitationHub()
+  const { incomingInvitation, isInvitationModalOpen, openInvitationModal, closeInvitation } =
+    useInvitationHub()
   const location = useLocation()
 
   useEffect(() => {
@@ -126,7 +127,7 @@ export default function App() {
           </ToastBar>
         )}
       </Toaster>
-      <MainLayout>
+      <MainLayout pendingInvitation={incomingInvitation} onOpenInvitation={openInvitationModal}>
         <InitProfileGuard>
           <Routes>
             {import.meta.env.VITE_IS_ADMIN_BUILD === 'true' && (
@@ -175,7 +176,10 @@ export default function App() {
           </Routes>
         </InitProfileGuard>
       </MainLayout>
-      <InvitationModal invitation={incomingInvitation} onClose={closeInvitation} />
+      <InvitationModal
+        invitation={isInvitationModalOpen ? incomingInvitation : null}
+        onClose={closeInvitation}
+      />
     </>
   )
 }

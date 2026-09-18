@@ -16,6 +16,7 @@ export default function CardConveyor({
   stepInterval = 4000,
   moveFraction = 0.25,
   staticCards = [],
+  style = {},
 }) {
   const containerRef = useRef(null)
   const cardElsRef = useRef([])
@@ -90,7 +91,7 @@ export default function CardConveyor({
   }, [Svg, cardWidthPct, slotXs, rowY, entryX, exitX, stepInterval, moveFraction])
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: `${widthPct}%`, flexShrink: 0 }}>
+    <div ref={containerRef} style={{ position: 'relative', width: `${widthPct}%`, flexShrink: 0, ...style }}>
       {Svg ? (
         <Svg style={{ width: '100%', height: 'auto', display: 'block', ...svgStyle }} />
       ) : null}

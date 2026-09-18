@@ -339,12 +339,12 @@ export default function DebateTranscriptPage() {
                       className={`chat-message-block ${isProponent ? 'msg-proponent' : isOpponent ? 'msg-opponent' : ''}`}
                     >
                       <div className="chat-message-header">
-                        <ActorAvatar
-                          profileName={speakerDisplayName}
-                          imageUrl={currentActor?.imageUrl}
-                          actorId={currentActor?.actorId}
-                          discriminator={currentActor?.discriminator || 'Bot'}
-                          size="sm"
+                        <ActorMinimalCard
+                          actor={currentActor}
+                          variant="ultra-compact"
+                          showHierarchyBtn={false}
+                          showMindBtn={true}
+                          contextTitle={debate.proposition}
                         />
                         <div className="chat-message-info">
                           <span className="chat-message-name">{speakerDisplayName}</span>

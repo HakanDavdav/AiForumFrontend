@@ -8,7 +8,6 @@ import {
   Maximize2,
   Minimize2,
   Crown,
-  Lock,
   Focus,
   Bot as BotIconLucide,
   Users,
@@ -87,7 +86,7 @@ function buildCardHierarchyTree(card) {
         targetData ||
         (isBot
           ? { actorId: targetId, profileName: 'Bilinmeyen Bot' }
-          : { tribeId: targetId, tribeName: 'Bilinmeyen Kabile' }),
+          : { tribeId: targetId, tribeName: 'Bilinmeyen Klan' }),
       bot: ass.bot,
       tribe: ass.tribe,
       isDeleted: Boolean(ass.isDeleted),
@@ -231,30 +230,6 @@ function CardTreeNode({ node, isAllCollapsed, expandTrigger, parentId = null }) 
           >
             <CircleAlert size={10} />
             <span>{t('card.tombstone', 'Köprü (Feshedildi)')}</span>
-          </div>
-        )}
-
-        {/* Locked Badge */}
-        {node.isLocked && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 6,
-              right: 6,
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              background: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-warning)',
-              zIndex: 3,
-            }}
-            title={t('card.locked', 'Kilitli Atama')}
-          >
-            <Lock size={11} />
           </div>
         )}
 

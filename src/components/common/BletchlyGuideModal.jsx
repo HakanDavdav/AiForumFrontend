@@ -4,7 +4,7 @@ import {
   X,
   Bot,
   Users,
-  Sparkles,
+  PackageOpen,
   Newspaper,
   ArrowRight,
   Podium,
@@ -19,6 +19,7 @@ import Logo from './icons/Logo'
 import ArrowCardTravel from './ArrowCardTravel'
 import InfoCard from './InfoCard'
 import PremiumModal from './PremiumModal'
+import ModalHeader from './ModalHeader'
 import WelcomeSvg from '../../assets/FigmaNew/Welcome.svg?react'
 import ModifierArrowSvg from '../../assets/FigmaNew/modifierarrow.svg?react'
 
@@ -48,7 +49,12 @@ export default function BletchlyGuideModal({ triggerStyle }) {
 
   const scrollToNext = () => {
     const target = getNextTarget()
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const container = scrollRef.current
+    if (!target || !container) return
+    const targetRect = target.getBoundingClientRect()
+    const containerRect = container.getBoundingClientRect()
+    const targetTop = targetRect.top - containerRect.top + container.scrollTop
+    container.scrollTo({ top: targetTop - 2, behavior: 'smooth' })
   }
 
   useEffect(() => {
@@ -118,7 +124,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
       path: '/marketplace',
     },
     {
-      icon: <Sparkles size={22} color="var(--color-primary)" />,
+      icon: <PackageOpen size={22} color="var(--color-primary)" />,
       title: t('bletchly_guide.news_title'),
       desc: t('bletchly_guide.news_desc'),
       linkText: t('bletchly_guide.news_link'),
@@ -191,7 +197,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
               maxHeight: '90vh',
               padding: 0,
               borderRadius: 16,
-              background: 'var(--color-surface)',
+              background: 'var(--color-bg)',
               border: '1px solid var(--color-border)',
               overflow: 'hidden',
               display: 'flex',
@@ -199,54 +205,12 @@ export default function BletchlyGuideModal({ triggerStyle }) {
             }}
           >
             {/* Header */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '20px 24px',
-                borderBottom: '1px solid var(--color-border-light)',
-                background: 'rgba(0,0,0,0.02)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div
-                  style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: '50%',
-                    background: 'var(--color-primary-alpha)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Logo width={32} height={32} fill="var(--color-primary)" />
-                </div>
-                <div>
-                  <h2
-                    id={titleId}
-                    style={{
-                      margin: 0,
-                      fontSize: 18,
-                      fontWeight: 700,
-                      color: 'var(--color-text-primary)',
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    {t('bletchly_guide.title')}
-                  </h2>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="btn-icon"
-                onClick={() => setIsOpen(false)}
-                aria-label={t('common.close', 'Kapat')}
-              >
-                <X size={20} />
-              </button>
-            </div>
+            <ModalHeader
+              icon={<Logo width={28} height={28} fill="var(--color-primary)" />}
+              title={t('bletchly_guide.title')}
+              titleId={titleId}
+              onClose={() => setIsOpen(false)}
+            />
 
             {/* Body */}
             <div ref={scrollRef} style={{ padding: '24px', overflowY: 'auto' }}>
@@ -328,7 +292,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                     key={idx}
                     onClick={() => (sec.onClick ? sec.onClick() : handleNavigate(sec.path))}
                     fullWidth={sec.fullWidth}
-                    className={sec.premium ? 'guide-card-premium' : ''}
+                    className={`guide-card ${sec.premium ? 'guide-card-premium' : ''}`}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div
@@ -387,6 +351,10 @@ export default function BletchlyGuideModal({ triggerStyle }) {
             </div>
 
             <style>{`
+              .guide-card {
+                padding: 16px;
+                gap: 8px;
+              }
               @keyframes guideBounce {
                 0%, 100% { transform: translateX(-50%) translateY(0); }
                 50% { transform: translateX(-50%) translateY(8px); }

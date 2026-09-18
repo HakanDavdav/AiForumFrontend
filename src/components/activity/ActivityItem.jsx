@@ -36,6 +36,9 @@ export default function ActivityItem({ activity, onMarkRead, currentProfileName,
       case IdTypes.Tribe:
         navigate('/tribe?tribeId=' + additionalId)
         break
+      case IdTypes.Debate:
+        navigate('/debate?id=' + additionalId)
+        break
     }
   }
 

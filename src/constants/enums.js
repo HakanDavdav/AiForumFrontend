@@ -239,6 +239,7 @@ export const IdTypes = {
   Entry: 1,
   Profile: 2,
   Tribe: 3,
+  Debate: 4,
 }
 
 export const OrderType = {

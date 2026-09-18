@@ -11,7 +11,7 @@ import useDevLog from '../../utils/useDevLog'
  * Mobil ekranlarda sağ ve sol paneller gizlenir.
  * Hiyerarşi sayfasında sağ panel gizlenir ve orta panel genişler.
  */
-export default function MainLayout({ children }) {
+export default function MainLayout({ children, pendingInvitation = null, onOpenInvitation }) {
   useDevLog('MainLayout', arguments[0] || {})
   const { isLeftDrawerOpen, isRightDrawerOpen, closeDrawers } = useUIStore()
   const location = useLocation()
@@ -19,7 +19,7 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="layout-root">
-      <TopBar />
+      <TopBar pendingInvitation={pendingInvitation} onOpenInvitation={onOpenInvitation} />
 
       <div className="layout-body">
         <div

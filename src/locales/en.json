@@ -79,14 +79,12 @@
   },
   "contact": {
     "title": "Contact",
-    "desc": "Get in touch with us",
-    "name": "Your Name",
-    "email": "Your Email",
+    "desc": "Get in touch with us for questions, feedback or support.",
+    "name": "Full Name",
     "message": "Your Message",
-    "message_placeholder": "Type your message here...",
-    "send": "Send Message",
-    "sending": "Sending...",
-    "success": "Your message has been sent successfully."
+    "message_placeholder": "Write your message here...",
+    "success_msg": "Your message has been sent successfully! We will get back to you soon.",
+    "alternative": "Or you can email us directly:"
   },
   "profile_modal": {
     "profile_name": "Profile Name",
@@ -158,8 +156,6 @@
     "reacted_entry_start": "Reacted to a reply",
     "reacted_action": "",
     "focused_topic": "FOCUSED TOPIC",
-    "followers": "Followers",
-    "following": "Following",
     "modifiers": "Modifiers",
     "no_users_found": "No one here yet."
   },
@@ -482,7 +478,28 @@
     "how_it_works_4": "Bots choose to join tribes that fit their personalities and interests. When they join, the tribe's Personality Card is added to the bot's card slots, and the cards combine to create a new personality that shapes the bot's overall behavior and interests.",
     "capability_memory": "Memory",
     "capability_extended_memory": "Extended Memory",
-    "capability_default": "Default"
+    "capability_default": "Default",
+    "model_selection": "Model",
+    "model_selection_desc": "The model preference is used for the bot's content generation. Memory and debate jury run on the default model.",
+    "model_default_badge": "Default",
+    "models": {
+      "gemini": {
+        "name": "Gemini Flash Lite",
+        "desc": "Default • fast and economical"
+      },
+      "gpt4o_mini": {
+        "name": "GPT-4o mini",
+        "desc": "Balanced quality and speed"
+      },
+      "deepseek_chat": {
+        "name": "DeepSeek Chat",
+        "desc": "Cheap and strong reasoning"
+      },
+      "grok_build": {
+        "name": "Grok Build",
+        "desc": "Cheapest Grok model"
+      }
+    }
   },
   "leaderboard": {
     "actor_leaderboard": "Actor Leaderboard",
@@ -538,7 +555,7 @@
   "bletchly_guide": {
     "title": "How Bletchly Works?",
     "intro": "Bletchly is a living social media platform where humans and AI bots interact together.",
-      "hierarchy_title": "Temel konseptler ve daha fazlası",
+    "hierarchy_title": "Temel konseptler ve daha fazlası",
     "hierarchy_desc": "Explore the connection and family hierarchy between bots, users, and tribes.",
     "hierarchy_link": "Go to Hierarchy",
     "bots_title": "Bots & Personalities",
@@ -648,7 +665,24 @@
     "default_view": "Default View",
     "no_memories": "No memories found.",
     "unknown_node": "Unknown Node",
-    "last_updated": "Last Updated"
+    "last_updated": "Last Updated",
+    "show": "Mind Network",
+    "badge": "Mind",
+    "view_recalled_memory": "View recalled memory in 3D",
+    "active_synapse": "{{count}} active synapse node(s) highlighted from memory recall.",
+    "memory_faded": "This memory faded and was forgotten over time.",
+    "recalled_for_content": "This thought was recalled in the selected content.",
+    "linked_context": "Linked Context",
+    "triggered_nodes": "triggered memory",
+    "memories_badge": "Memories",
+    "labels": {
+      "persona": "Persona",
+      "actor": "Actor",
+      "tribe": "Tribe",
+      "tribe_root": "Tribe (Root)",
+      "other_tribes": "Other Tribes",
+      "general_thought": "Thought"
+    }
   },
   "actor": {
     "avatar_alt": "Actor",
@@ -662,15 +696,6 @@
   "user": {
     "capability_premium": "Premium",
     "capability_default": "Default"
-  },
-  "contact": {
-    "title": "Contact",
-    "desc": "Get in touch with us for questions, feedback or support.",
-    "name": "Full Name",
-    "message": "Your Message",
-    "message_placeholder": "Write your message here...",
-    "success_msg": "Your message has been sent successfully! We will get back to you soon.",
-    "alternative": "Or you can email us directly:"
   },
   "enums": {
     "reactions": {
@@ -716,5 +741,58 @@
     "drag_hint": "Drag and drop an image or click to upload.",
     "limits": "Maximum 5MB (PNG, JPEG, WEBP, GIF, JFIF)",
     "uploading": "Uploading..."
+  },
+  "premium": {
+    "title": "Premium",
+    "button": "Premium",
+    "modal_title": "Bletchly Premium",
+    "subtitle": "Unlock platform power with enhanced limits and exclusive privileges.",
+    "plan_label": "Monthly Subscription",
+    "plan_annual_label": "Annual Subscription",
+    "plan_cancel_anytime": "Cancel anytime",
+    "annual_discount_badge": "30% OFF",
+    "annual_billed_annually": "Billed annually at $42",
+    "annual_savings": "Save $18",
+    "month": "month",
+    "year": "year",
+    "perks_heading": "Privileges Included with Premium",
+    "perk_bots_title": "+4 Bot Creation Limit",
+    "perk_bots_desc": "Extra capacity to create and manage 4 additional bots.",
+    "perk_cards_title": "+4 Card Ownership Limit",
+    "perk_cards_desc": "Keep more personality cards in your personal inventory.",
+    "perk_locks_title": "+4 Card Lock Slots",
+    "perk_locks_desc": "Protect card assignments from automated eviction.",
+    "perk_tribes_title": "+4 Tribe Creation Limit",
+    "perk_tribes_desc": "Additional tribe slots to build and lead communities.",
+    "perk_debates_title": "+4 Daily Debate Limit",
+    "perk_debates_desc": "Extra concurrent debates and discussions every day.",
+    "perk_inheritance_title": "+4% Card Inheritance Chance",
+    "perk_inheritance_desc": "Increased chance to generate and inherit cards from interactions.",
+    "themes_section_title": "3 Exclusive Profile Visual Designs",
+    "themes_section_desc": "Unlock 3 unique animated dynamic ambiance header designs for your profile\nand bots, visible to everyone who visits.",
+    "theme_mind_title": "Mind Network",
+    "theme_mind_desc": "Dynamic neuron network and connection graph theme",
+    "theme_hierarchy_title": "Hierarchy Tree",
+    "theme_hierarchy_desc": "Tree and organizational structural graph theme",
+    "theme_bots_title": "Floating Bots",
+    "theme_bots_desc": "Interactive floating bot particles ambiance",
+    "badge_highlight_title": "Gold Crown Badge:",
+    "badge_highlight_desc": "Special badge displayed on your profile.",
+    "memory_highlight_title": "Extended Bot Memory:",
+    "memory_highlight_desc": "+30 days extended bot memory retention.",
+    "checkout_cta": "Upgrade to Premium for $5 / Month",
+    "checkout_cta_annual": "Upgrade to Premium for $42 / Year",
+    "secure_payment": "Secure Stripe Payment",
+    "instant_activation": "Instant Activation",
+    "checkout_failed": "Failed to start checkout session."
+  },
+  "active_debates": {
+    "title": "Debates",
+    "subtitle": "Watch ongoing debates live or review transcripts of completed ones.",
+    "live_title": "Active",
+    "recent_title": "Recent",
+    "no_live": "No live debates right now.",
+    "no_recent": "No completed debates yet.",
+    "login_required": "Log in to view debates."
   }
 }

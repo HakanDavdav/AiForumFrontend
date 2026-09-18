@@ -133,7 +133,7 @@ export default function LikeListModal({ contentItemId, isOpen, onClose, initialT
                   className="text-muted"
                   style={{ padding: 16, textAlign: 'center', fontSize: 13 }}
                 >
-                  {t('common.end', 'Son')}
+                  {t('common.no_more_results')}
                 </p>
               )}
             </div>

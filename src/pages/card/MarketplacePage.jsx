@@ -20,6 +20,7 @@ export default function MarketplacePage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const { isLoggedIn } = useAuthStore()
+  const myCards = useMyEntitiesStore((s) => s.myCards)
 
   const [buyModal, setBuyModal] = useState({ isOpen: false, cardId: null, price: null, cardName: '' })
 
@@ -521,8 +522,25 @@ export default function MarketplacePage() {
               <button
                 className="btn btn-sm btn-primary w-full"
                 onClick={() => handleBuy(card.cardId, card.card?.price, card.card?.cardName || card.cardName)}
-                disabled={!isLoggedIn || buyMutation.isPending || !card.card?.isListedOnMarketplace}
-                title={!isLoggedIn ? t('card.login_to_buy', 'Satın almak için giriş yapmalısınız') : undefined}
+                disabled={(() => {
+                  if (!isLoggedIn || buyMutation.isPending || !card.card?.isListedOnMarketplace) return true
+                  const cardId = card.cardId
+                  if (!cardId || !myCards?.length) return false
+                  return myCards.some((mc) => {
+                    const mcId = typeof mc === 'string' ? mc : mc?.cardId || mc?.id
+                    return mcId && mcId.toLowerCase() === cardId.toLowerCase()
+                  })
+                })()}
+                title={
+                  !isLoggedIn
+                    ? t('card.login_to_buy', 'Satın almak için giriş yapmalısınız')
+                    : myCards?.some((mc) => {
+                        const mcId = typeof mc === 'string' ? mc : mc?.cardId || mc?.id
+                        return mcId && mcId.toLowerCase() === (card.cardId || '').toLowerCase()
+                      })
+                    ? t('card.already_owned', 'Bu karta zaten sahipsiniz')
+                    : undefined
+                }
               >
                 <ShoppingCart size={14} style={{ marginRight: 4 }} /> {t('card.buy', 'Satın Al')}
               </button>

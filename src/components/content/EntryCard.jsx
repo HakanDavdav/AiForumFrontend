@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Pencil, Trash2, MessageSquare, Smile, CirclePlus, CircleMinus } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Pencil, Trash2, MessageSquare, Smile, CirclePlus, CircleMinus, Brain } from 'lucide-react'
+import SynapseBrainIcon from '../common/SynapseBrainIcon'
 import { getShortTimeAgo } from '../../utils/formatTime'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
@@ -35,6 +37,8 @@ export default function EntryCard({
   childEntries,
   disableChildrenRendering = false,
   defaultExpanded = false,
+  triggeredNodeIds = null,
+  title = null,
 }) {
   useDevLog('EntryCard', arguments[0] || {})
   const [showReplyDraft, setShowReplyDraft] = useState(false)
@@ -47,6 +51,7 @@ export default function EntryCard({
   const [localContent, setLocalContent] = useState(content)
   const queryClient = useQueryClient()
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     setLocalContent(content)
@@ -89,13 +94,19 @@ export default function EntryCard({
   // Maksimum 5 seviye derinliğe kadar CSS sınıfı atanır (depth-1, depth-2, ..., depth-5)
   const depthClass = depth > 0 ? (depth >= 5 ? 'depth-5' : `depth-${depth}`) : ''
 
+  const effectiveTitle = title || localContent?.slice(0, 60) || t('entry.comment', 'Yorum')
+
   return (
     <>
       <div className={`entry-card ${depthClass}`} style={{ animation: 'fadeIn 0.2s ease' }}>
         {/* Header */}
         <div className="flex items-start" style={{ marginBottom: 8, marginLeft: -4 }}>
           {actor ? (
-            <ActorMinimalCard actor={actor} showHierarchyBtn={true} />
+            <ActorMinimalCard
+              actor={actor}
+              showHierarchyBtn={true}
+              contextTitle={effectiveTitle}
+            />
           ) : (
             <span
               className="text-muted"
@@ -171,6 +182,54 @@ export default function EntryCard({
                 setShowLikes(true)
               }}
             />
+            {actor?.discriminator === 'Bot' && (() => {
+              const effectiveNodeIds = (triggeredNodeIds && triggeredNodeIds.length > 0)
+                ? triggeredNodeIds
+                : (actor?.triggeredNodeIds || actor?.TriggeredNodeIds || [])
+              const hasTriggered = effectiveNodeIds && effectiveNodeIds.length > 0
+              return (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const highlightParam = hasTriggered
+                      ? `&highlightIds=${effectiveNodeIds.join(',')}`
+                      : ''
+                    const titleParam = effectiveTitle ? `&contextTitle=${encodeURIComponent(effectiveTitle)}` : ''
+                    navigate(`/mind?actorId=${actor.actorId}${highlightParam}${titleParam}`, {
+                      state: { profileName: actor.profileName, contextTitle: effectiveTitle }
+                    })
+                  }}
+                  title={t('mind.view_recalled_memory', 'Tetiklenen hafızayı 3D olarak görüntüle')}
+                  style={{
+                    gap: 5,
+                    ...(hasTriggered ? { color: '#f59e0b' } : {}),
+                  }}
+                >
+                  <SynapseBrainIcon
+                    brainSize={13}
+                    zapSize={9}
+                    brainColor={hasTriggered ? '#f59e0b' : 'currentColor'}
+                    zapColor={hasTriggered ? '#fbbf24' : 'currentColor'}
+                  />
+                  <span>Linked</span>
+                  {hasTriggered && (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        padding: '1px 5px',
+                        borderRadius: 8,
+                        background: 'rgba(245, 158, 11, 0.2)',
+                        color: '#f59e0b',
+                        fontWeight: 700
+                      }}
+                    >
+                      {effectiveNodeIds.length}
+                    </span>
+                  )}
+                </button>
+              )
+            })()}
             {isLoggedIn && (
               <button className="btn btn-ghost btn-sm" onClick={() => setShowReplyDraft((v) => !v)}>
                 <MessageSquare size={13} />

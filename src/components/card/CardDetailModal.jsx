@@ -6,6 +6,7 @@ import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
+import ModalHeader from '../common/ModalHeader'
 
 import i18n from '../../i18n'
 
@@ -44,7 +45,8 @@ function DetailRow({ icon: Icon, label, value, multiline = false, iconSize = 14 
       <div
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
+          alignSelf: 'start',
           gap: 7,
           color: 'var(--color-text-secondary)',
           fontSize: 12,
@@ -53,7 +55,7 @@ function DetailRow({ icon: Icon, label, value, multiline = false, iconSize = 14 
           letterSpacing: '0.04em',
         }}
       >
-        {Icon && <Icon size={iconSize} style={{ flexShrink: 0, marginTop: 1 }} />}
+        {Icon && <Icon size={iconSize} style={{ flexShrink: 0 }} />}
         <span>{label}</span>
       </div>
       <div
@@ -186,49 +188,14 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
         onClick={(event) => event.stopPropagation()}
         style={{ maxWidth: 680, maxHeight: '88vh', padding: 0, overflow: 'hidden' }}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: 16,
-            padding: '20px 24px 16px',
-            borderBottom: '1px solid var(--color-border)',
-            background: 'var(--color-surface-2)',
-          }}
-        >
-          <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 12,
-                color: 'var(--color-primary)',
-                fontSize: 13,
-                fontWeight: 900,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              <BotFlashCardsIcon size={32} />
-              {t('card.details', 'Kart Detayları')}
-            </div>
-            <h2
-              id="personality-card-detail-title"
-              style={{
-                margin: 0,
-                color: 'var(--color-text-primary)',
-                fontSize: 22,
-                lineHeight: 1.25,
-                overflowWrap: 'anywhere',
-              }}
-            >
-              {cardName}
-            </h2>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {onEditClick && isOwnerCard && (
+        <ModalHeader
+          icon={<BotFlashCardsIcon size={28} style={{ color: 'var(--color-primary)' }} />}
+          title={cardName}
+          subtitle={t('card.details', 'Kart Detayları')}
+          titleId="personality-card-detail-title"
+          onClose={onClose}
+          actions={
+            onEditClick && isOwnerCard ? (
               <IconActionButton
                 onClick={() => {
                   onClose()
@@ -240,17 +207,9 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
               >
                 <Edit2 size={17} strokeWidth={2.2} />
               </IconActionButton>
-            )}
-            <IconActionButton
-              onClick={onClose}
-              title={t('common.close', 'Kapat')}
-              aria-label={t('common.close', 'Kapat')}
-              style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)' }}
-            >
-              <X size={20} />
-            </IconActionButton>
-          </div>
-        </div>
+            ) : null
+          }
+        />
 
         <div
           style={{ maxHeight: 'calc(88vh - 92px)', overflowY: 'auto', padding: '8px 24px 24px' }}

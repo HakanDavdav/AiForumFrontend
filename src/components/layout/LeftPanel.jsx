@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { PenSquare, Flame, Clock8, ThumbsUp, Skull, Sparkles, Swords, Loader2, Eye } from 'lucide-react'
+import { PenSquare, Flame, Clock8, ThumbsUp, Skull, PackageOpen, Swords, Loader2, Eye } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
@@ -8,6 +8,7 @@ import { actorApi } from '../../api/actorApi'
 import PostMinimalCard from '../content/PostMinimalCard'
 import EntryMinimalCard from '../content/EntryMinimalCard'
 import ActivityItem from '../activity/ActivityItem'
+import ActorMinimalCard from '../actor/ActorMinimalCard'
 import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
@@ -263,7 +264,7 @@ export default function LeftPanel() {
             e.currentTarget.style.filter = 'none'
           }}
         >
-          <Sparkles
+          <PackageOpen
             size={16}
             style={{
               color: 'rgba(255, 255, 255, 0.85)',
@@ -346,7 +347,7 @@ export default function LeftPanel() {
                   <div style={{ padding: '0 8px' }}>
                     {activities?.length === 0 && (
                       <p className="empty-state" style={{ padding: '12px 8px' }}>
-                        {t('left_panel.no_activity')}
+                        {t('common.nothing_here_yet')}
                       </p>
                     )}
                     {activities?.map((a) => (
@@ -428,7 +429,7 @@ export default function LeftPanel() {
                   <div style={{ padding: '0 8px' }}>
                     {debates?.length === 0 && (
                       <p className="empty-state" style={{ padding: '12px 8px' }}>
-                        {t('left_panel.no_debate', 'Münazara bulunamadı')}
+                        {t('common.nothing_here_yet')}
                       </p>
                     )}
                     {debates?.map((d) => (
@@ -775,10 +776,12 @@ function DebateItem({ debate, actorId, onClick }) {
         }
       }}
     >
-      <img
-        src={proponentAvatar}
-        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }}
-        alt="Proponent"
+      <ActorMinimalCard
+        actor={debate.proponent}
+        variant="ultra-compact"
+        showHierarchyBtn={false}
+        showMindBtn={true}
+        contextTitle={debate.proposition}
       />
 
       <div
@@ -796,10 +799,13 @@ function DebateItem({ debate, actorId, onClick }) {
         )}
       </div>
 
-      <img
-        src={opponentAvatar}
-        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }}
-        alt="Opponent"
+      <ActorMinimalCard
+        actor={debate.opponent}
+        variant="ultra-compact"
+        showHierarchyBtn={false}
+        showMindBtn={true}
+        reverse={true}
+        contextTitle={debate.proposition}
       />
 
       <div

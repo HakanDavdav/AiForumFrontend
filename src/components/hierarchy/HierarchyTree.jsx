@@ -91,7 +91,7 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId, p
         <div className="vtree-children-container">
           <div className="vtree-stem-down" />
           <div className="vtree-children-row">
-            {/* Bağlı Kabileler (Tribes) */}
+            {/* Bağlı Klanlar (Tribes) */}
             {hasTribes &&
               node.tribes.map((tribe) => (
                 <div

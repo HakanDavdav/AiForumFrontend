@@ -41,7 +41,7 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
 
     setEditFormData({
       cardName: innerCardData.cardName || card.cardName || '',
-      personalityPrompt: innerIsCreator
+      personalityPrompt: isCreator
         ? innerCardData.personalityPrompt || card.personalityPrompt || ''
         : '',
       isListedOnMarketplace: Boolean(innerCardData.isListedOnMarketplace),

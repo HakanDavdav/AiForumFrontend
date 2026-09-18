@@ -12,7 +12,6 @@ import {
   Send,
   Crown,
   Trophy,
-  Sparkles,
   Bot as BotIcon,
   ArrowLeft,
   Check,
@@ -941,7 +940,7 @@ export default function DebatePage() {
                     </div>
 
                     <div className="ready-vs-divider">
-                      <AngryBotWithSwordsIcon size={44} className="text-primary" />
+                      <AngryBotWithSwordsIcon size={44} color="var(--color-primary)" />
                     </div>
 
                     <div className="ready-participant">

@@ -57,7 +57,7 @@ function applyFlow(points, flowMode, force) {
   const dx = end[0] - start[0]
   const dy = end[1] - start[1]
   
-  if (!force && Math.abs(dy) < Math.abs(dx)) {
+  if (!force && Math.abs(dy) * 1.25 < Math.abs(dx)) {
     return points
   }
   

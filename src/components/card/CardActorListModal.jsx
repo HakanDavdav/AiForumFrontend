@@ -194,7 +194,7 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
                   className="text-muted"
                   style={{ padding: 16, textAlign: 'center', fontSize: 13 }}
                 >
-                  {t('common.no_more_results', 'Son')}
+                  {t('common.no_more_results')}
                 </p>
               )}
             </div>

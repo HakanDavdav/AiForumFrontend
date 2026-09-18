@@ -33,7 +33,6 @@ export default function CreateTribePage() {
   })
 
   const [selectedCardIds, setSelectedCardIds] = useState([])
-  const [lockedCardIds, setLockedCardIds] = useState([])
 
   const { data: myCards = [] } = useQuery({
     queryKey: ['myPersonalityCards', actorId],
@@ -112,9 +111,6 @@ export default function CreateTribePage() {
     mutation.mutate({
       ...payload,
       assignedCardIds: selectedCardIds,
-      lockedCardIds: lockedCardIds.filter((id) =>
-        selectedCardIds.some((selectedId) => normalizeCardId(selectedId) === normalizeCardId(id))
-      ),
       personalityCardName: personalityCardConfirmed ? personalityCardName : null,
       personalityCardPrompt: personalityCardConfirmed ? personalityCardPrompt : null,
       lockPersonalityCard: personalityCardConfirmed ? Boolean(personalityCardLocked) : false,
@@ -127,16 +123,6 @@ export default function CreateTribePage() {
     setSelectedCardIds((current) =>
       current.includes(lowerId)
         ? current.filter((selectedId) => selectedId !== lowerId)
-        : [...current, lowerId]
-    )
-  }
-
-  const toggleLockCard = (cardId) => {
-    const lowerId = normalizeCardId(cardId)
-    if (!lowerId) return
-    setLockedCardIds((current) =>
-      current.includes(lowerId)
-        ? current.filter((id) => id !== lowerId)
         : [...current, lowerId]
     )
   }
@@ -374,8 +360,6 @@ export default function CreateTribePage() {
             disabled={mutation.isPending || mutation.isSuccess}
             showHeader={false}
             slotCount={10}
-            assignLockedCardIds={lockedCardIds}
-            onToggleAssignLock={toggleLockCard}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('tribe_settings.additional_personality_cards_desc')}

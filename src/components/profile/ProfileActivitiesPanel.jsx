@@ -62,13 +62,13 @@ export default function ProfileActivitiesPanel({ actorId, profileName }) {
           </div>
         )}
         {!isFetching && activities.length === 0 && (
-          <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-            {t('profile.no_activity_found')}
+          <p className="empty-state">
+            {t('common.nothing_here_yet')}
           </p>
         )}
         {!isFetching && !hasMore && activities.length > 0 && (
           <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-            {t('profile.end_of_activity')}
+            {t('common.no_more_results')}
           </p>
         )}
       </div>

@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { getShortTimeAgo } from '../../utils/formatTime'
-import { Pencil, Trash2, MessageSquare, Smile } from 'lucide-react'
+import { Pencil, Trash2, MessageSquare, Smile, Brain } from 'lucide-react'
+import SynapseBrainIcon from '../common/SynapseBrainIcon'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import ReactionButton from './ReactionButton'
@@ -33,6 +34,7 @@ export default function PostCard({
   tribe,
   userReaction,
   userLikeId,
+  triggeredNodeIds = null,
   isOwner = false,
   isSticky = false,
   onDelete,
@@ -88,7 +90,7 @@ export default function PostCard({
       <div className="flex items-start" style={{ flexWrap: 'wrap', gap: '6px' }}>
         <div className="flex items-center" style={{ gap: 6 }}>
           {actor ? (
-            <ActorMinimalCard actor={actor} />
+            <ActorMinimalCard actor={actor} contentItemId={contentItemId} contextTitle={title} />
           ) : (
             <span className="text-muted" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 500 }}>
               {t('card.deleted_user')}
@@ -138,6 +140,54 @@ export default function PostCard({
               setShowLikes(true)
             }}
           />
+          {actor?.discriminator === 'Bot' && (() => {
+            const effectiveNodeIds = (triggeredNodeIds && triggeredNodeIds.length > 0)
+              ? triggeredNodeIds
+              : (actor?.triggeredNodeIds || actor?.TriggeredNodeIds || [])
+            const hasTriggered = effectiveNodeIds && effectiveNodeIds.length > 0
+            return (
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  const highlightParam = hasTriggered
+                    ? `&highlightIds=${effectiveNodeIds.join(',')}`
+                    : ''
+                  const titleParam = title ? `&contextTitle=${encodeURIComponent(title)}` : ''
+                  navigate(`/mind?actorId=${actor.actorId}${highlightParam}${titleParam}`, {
+                    state: { profileName: actor.profileName, contextTitle: title }
+                  })
+                }}
+                title={t('mind.view_recalled_memory', 'Tetiklenen hafızayı 3D olarak görüntüle')}
+                style={{
+                  gap: 5,
+                  ...(hasTriggered ? { color: '#f59e0b' } : {}),
+                }}
+              >
+                <SynapseBrainIcon
+                  brainSize={14}
+                  zapSize={10}
+                  brainColor={hasTriggered ? '#f59e0b' : 'currentColor'}
+                  zapColor={hasTriggered ? '#fbbf24' : 'currentColor'}
+                />
+                <span>Linked</span>
+                {hasTriggered && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      padding: '1px 5px',
+                      borderRadius: 8,
+                      background: 'rgba(245, 158, 11, 0.2)',
+                      color: '#f59e0b',
+                      fontWeight: 700
+                    }}
+                  >
+                    {effectiveNodeIds.length}
+                  </span>
+                )}
+              </button>
+            )
+          })()}
           <button
             className="btn btn-ghost btn-sm"
             onClick={() => navigate('/post?postId=' + contentItemId)}

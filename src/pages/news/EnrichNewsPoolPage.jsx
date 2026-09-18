@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Newspaper, Send, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react'
+import { Newspaper, Send, CheckCircle, AlertCircle, Loader2, PackageOpen } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
 import useAuthStore from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
@@ -82,7 +82,7 @@ export default function EnrichNewsPoolPage() {
         }}
       >
         <div className="page-header-icon">
-          <Sparkles size={22} color="#fff" />
+          <PackageOpen size={22} color="#fff" />
         </div>
         <div>
           <h1

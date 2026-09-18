@@ -9,13 +9,14 @@ import {
   Brain,
   Users,
   ShieldCheck,
+  Lock,
 } from 'lucide-react'
 import KingIcon from '../common/icons/KingIcon'
 import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import CardContingencyIcon from '../common/icons/CardContingencyIcon'
 import CardContingencyModifierIcon from '../common/icons/CardContingencyModifierIcon'
-import LockSvg from '../../assets/FigmaNew/lock.svg?react'
+import ModalHeader from '../common/ModalHeader'
 import { BotCapabilities, UserCapabilities } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
@@ -232,57 +233,13 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
         }}
       >
         {/* Modal Header */}
-        <div
-          className="flex items-center justify-between"
-          style={{
-            marginBottom: 20,
-            paddingBottom: 14,
-            borderBottom: '1px solid var(--color-border)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 34,
-                height: 34,
-                borderRadius: 10,
-                background: 'color-mix(in srgb, var(--color-primary) 15%, transparent)',
-                color: 'var(--color-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Sliders size={18} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-                {t('profile.modifiers', 'Modifiers')}
-              </h3>
-              <p style={{ margin: 0, fontSize: 12, color: 'var(--color-text-muted)' }}>
-                {isTribe ? 'Klan' : isBot ? 'Bot' : 'Kullanıcı'}
-              </p>
-            </div>
-          </div>
-          <button
-            className="btn-icon"
-            onClick={onClose}
-            aria-label={t('common.close', 'Kapat')}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--color-text-muted)',
-              padding: 6,
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <X size={18} />
-          </button>
-        </div>
+        <ModalHeader
+          icon={<Sliders size={28} color="var(--color-primary)" />}
+          title={t('profile.modifiers', 'Modifiers')}
+          subtitle={isTribe ? 'Klan' : isBot ? 'Bot' : 'Kullanıcı'}
+          onClose={onClose}
+          style={{ padding: '0 0 14px 0', marginBottom: 20 }}
+        />
 
         {/* Scrollable Content - Unified list without intermediate category headers */}
         <div style={{ flex: 1, overflowY: 'auto', paddingRight: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -407,12 +364,12 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   renderModifierBubble({
                     baseValue: '0',
                     modifiers: [
-                      { label: 'Bot Kotası', value: isPremiumUser ? '+5' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Kart Alanı', value: isPremiumUser ? '+5' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Münazara', value: isPremiumUser ? '+5' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Miras Şansı', value: isPremiumUser ? '+%5' : '+%0', color: 'var(--color-primary)' },
+                      { label: 'Bot Kotası', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: 'Kart Alanı', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: 'Münazara', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: 'Miras Şansı', value: isPremiumUser ? '+%4' : '+%0', color: 'var(--color-primary)' },
                     ],
-                    totalValue: isPremiumUser ? '+5' : '+0',
+                    totalValue: isPremiumUser ? '+4' : '+0',
                   })}
               </div>
             )}
@@ -426,7 +383,9 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     padding: '10px 14px',
                     borderRadius: 12,
                     background: 'var(--color-surface)',
-                    border: activeBubble === 'botMemory' ? '1.5px solid var(--color-primary)' : '1px solid var(--color-border)',
+                    border: activeBubble === 'botMemory'
+                      ? (hasBotMemory ? '1.5px solid var(--color-warning)' : '1.5px solid var(--color-primary)')
+                      : '1px solid var(--color-border)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -441,14 +400,18 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                         width: 36,
                         height: 36,
                         borderRadius: 10,
-                        background: 'color-mix(in srgb, var(--color-primary) 15%, transparent)',
-                        border: '1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)',
-                        color: 'var(--color-primary)',
+                        background: hasBotMemory
+                          ? 'color-mix(in srgb, var(--color-warning) 15%, transparent)'
+                          : 'color-mix(in srgb, var(--color-primary) 15%, transparent)',
+                        border: hasBotMemory
+                          ? '1px solid color-mix(in srgb, var(--color-warning) 30%, transparent)'
+                          : '1px solid color-mix(in srgb, var(--color-primary) 30%, transparent)',
+                        color: hasBotMemory ? 'var(--color-warning)' : 'var(--color-primary)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         boxShadow: hasBotMemory
-                          ? '0 2px 10px color-mix(in srgb, var(--color-primary) 25%, transparent)'
+                          ? '0 2px 10px color-mix(in srgb, var(--color-warning) 25%, transparent)'
                           : 'none',
                         flexShrink: 0,
                       }}
@@ -456,12 +419,12 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       <Brain size={20} />
                     </div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                      {hasBotMemory ? 'Gelişmiş Hafıza' : 'Normal Hafıza'}
+                      {hasBotMemory ? t('bot.capability_extended_memory', 'Genişletilmiş Hafıza') : t('bot.capability_memory', 'Hafıza')}
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: hasBotMemory ? 'var(--color-warning)' : 'var(--color-text-primary)' }}>
                       {hasBotMemory ? '2x' : '1x'}
                     </div>
                     {activeBubble === 'botMemory' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
@@ -474,9 +437,9 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     baseValue: '30 Gün',
                     modifiers: [
                       {
-                        label: hasBotMemory ? 'Gelişmiş Hafıza' : 'Normal Hafıza',
+                        label: hasBotMemory ? t('bot.capability_extended_memory', 'Genişletilmiş Hafıza') : t('bot.capability_memory', 'Hafıza'),
                         value: hasBotMemory ? '2x' : '1x (Default)',
-                        color: 'var(--color-primary)',
+                        color: hasBotMemory ? 'var(--color-warning)' : 'var(--color-primary)',
                       },
                     ],
                     totalValue: hasBotMemory ? '60 Gün' : '30 Gün',
@@ -531,7 +494,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     {profile.botsCount ?? (profile.bots?.length || 0)} /{' '}
                     {isBot
                       ? (profile.botSettings?.botCountLimit || (4 + stepBonus))
-                      : (profile.userSettings?.botCountLimit || (4 + stepBonus + (isPremiumUser ? 5 : 0)))}
+                      : (profile.userSettings?.botCountLimit || (4 + stepBonus + (isPremiumUser ? 4 : 0)))}
                   </div>
                   {activeBubble === 'actorBots' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
                 </div>
@@ -546,7 +509,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       ? [
                           {
                             label: 'Premium',
-                            value: isPremiumUser ? '+5' : '+0',
+                            value: isPremiumUser ? '+4' : '+0',
                             color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
                           },
                         ]
@@ -555,13 +518,13 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   totalValue: `${
                     isBot
                       ? (profile.botSettings?.botCountLimit || (4 + stepBonus))
-                      : (profile.userSettings?.botCountLimit || (4 + stepBonus + (isPremiumUser ? 5 : 0)))
+                      : (profile.userSettings?.botCountLimit || (4 + stepBonus + (isPremiumUser ? 4 : 0)))
                   }`,
                 })}
             </div>
           )}
 
-          {/* 3.5 Kabile Katılım Limiti (User & Bot) */}
+          {/* 3.5 Klan Katılım Limiti (User & Bot) */}
           {((isUser && profile.userSettings) || (isBot && profile.botSettings)) && (
             <div style={{ order: 4 }}>
               <div
@@ -582,10 +545,10 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   <Users size={22} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                      {t('profile.tribe_limit', 'Kabile Limiti')}
+                      {t('profile.tribe_limit', 'Klan Limiti')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-                      {t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum kabile sayısı')}
+                      {t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum klan sayısı')}
                     </div>
                   </div>
                 </div>
@@ -594,7 +557,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     {profile.tribes?.length || 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.tribeCountLimit || (3 + stepBonus))
-                      : (profile.userSettings?.tribeCountLimit || (3 + stepBonus + (isPremiumUser ? 5 : 0)))}
+                      : (profile.userSettings?.tribeCountLimit || (3 + stepBonus + (isPremiumUser ? 4 : 0)))}
                   </div>
                   {activeBubble === 'actorTribes' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
                 </div>
@@ -609,7 +572,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       ? [
                           {
                             label: 'Premium',
-                            value: isPremiumUser ? '+5' : '+0',
+                            value: isPremiumUser ? '+4' : '+0',
                             color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
                           },
                         ]
@@ -618,7 +581,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   totalValue: `${
                     isBot
                       ? (profile.botSettings?.tribeCountLimit || (3 + stepBonus))
-                      : (profile.userSettings?.tribeCountLimit || (3 + stepBonus + (isPremiumUser ? 5 : 0)))
+                      : (profile.userSettings?.tribeCountLimit || (3 + stepBonus + (isPremiumUser ? 4 : 0)))
                   }`,
                 })}
             </div>
@@ -657,7 +620,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     {profile.ownedCards?.length || 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.cardOwnershipLimit || (10 + stepBonus))
-                      : (profile.userSettings?.cardOwnershipLimit || (10 + stepBonus + (isPremiumUser ? 5 : 0)))}
+                      : (profile.userSettings?.cardOwnershipLimit || (10 + stepBonus + (isPremiumUser ? 4 : 0)))}
                   </div>
                   {activeBubble === 'userCards' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
                 </div>
@@ -672,7 +635,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       ? [
                           {
                             label: 'Premium',
-                            value: isPremiumUser ? '+5' : '+0',
+                            value: isPremiumUser ? '+4' : '+0',
                             color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
                           },
                         ]
@@ -681,7 +644,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   totalValue: `${
                     isBot
                       ? (profile.botSettings?.cardOwnershipLimit || (10 + stepBonus))
-                      : (profile.userSettings?.cardOwnershipLimit || (10 + stepBonus + (isPremiumUser ? 5 : 0)))
+                      : (profile.userSettings?.cardOwnershipLimit || (10 + stepBonus + (isPremiumUser ? 4 : 0)))
                   }`,
                 })}
             </div>
@@ -712,7 +675,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
                       {isTribe
-                        ? t('profile.tribe_assignment_limit_desc', 'Kabilenin aktif kuşanabileceği kişilik kartı slotu')
+                        ? t('profile.tribe_assignment_limit_desc', 'Klanın aktif kuşanabileceği kişilik kartı slotu')
                         : t('profile.bot_assignment_limit_desc', 'Botun aktif kuşanabileceği kişilik kartı slotu')}
                     </div>
                   </div>
@@ -756,7 +719,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <LockSvg width={22} height={22} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                  <Lock size={22} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>
                       {t('profile.card_assignment_lock_limit', 'Kart Kilitleme Limiti')}
@@ -771,7 +734,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     {profile.lockedAssignmentCount ?? 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.cardAssignmentLockLimit || (2 + stepBonus))
-                      : (profile.userSettings?.cardAssignmentLockLimit || (2 + stepBonus + (isPremiumUser ? 5 : 0)))}
+                      : (profile.userSettings?.cardAssignmentLockLimit || (2 + stepBonus + (isPremiumUser ? 4 : 0)))}
                   </div>
                   {activeBubble === 'assignmentLock' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
                 </div>
@@ -786,7 +749,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       ? [
                           {
                             label: 'Premium',
-                            value: isPremiumUser ? '+5' : '+0',
+                            value: isPremiumUser ? '+4' : '+0',
                             color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
                           },
                         ]
@@ -795,7 +758,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   totalValue: `${
                     isBot
                       ? (profile.botSettings?.cardAssignmentLockLimit || (2 + stepBonus))
-                      : (profile.userSettings?.cardAssignmentLockLimit || (2 + stepBonus + (isPremiumUser ? 5 : 0)))
+                      : (profile.userSettings?.cardAssignmentLockLimit || (2 + stepBonus + (isPremiumUser ? 4 : 0)))
                   }`,
                 })}
             </div>
@@ -846,13 +809,13 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       ? [
                           {
                             label: 'Premium',
-                            value: isPremiumUser ? '+5' : '+0',
+                            value: isPremiumUser ? '+4' : '+0',
                             color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
                           },
                         ]
                       : []),
                   ],
-                  totalValue: `${isBot ? profile.botSettings?.debateLimit || (1 + stepBonus) : profile.userSettings?.debateLimit || (1 + stepBonus + (isPremiumUser ? 5 : 0))}`,
+                  totalValue: `${isBot ? profile.botSettings?.debateLimit || (1 + stepBonus) : profile.userSettings?.debateLimit || (1 + stepBonus + (isPremiumUser ? 4 : 0))}`,
                 })}
             </div>
           )}
@@ -886,7 +849,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  %{Math.round(((isTribe ? profile.cardInheritanceChance : (isUser ? profile.userSettings : profile.botSettings)?.cardInheritanceChance) ?? (0.25 + (isBot || isTribe ? stepBonus * 0.01 : 0))) * 100)}
+                  %{Math.round(((isTribe ? profile.cardInheritanceChance : (isUser ? profile.userSettings : profile.botSettings)?.cardInheritanceChance) ?? (0.25 + (isBot || isTribe ? stepBonus * 0.01 : (isPremiumUser ? 0.04 : 0)))) * 100)}
                 </div>
                 {activeBubble === 'cardInheritance' ? <ChevronUp size={16} color="var(--color-text-muted)" /> : <ChevronDown size={16} color="var(--color-text-muted)" />}
               </div>
@@ -901,12 +864,12 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     : [
                         {
                           label: 'Premium',
-                          value: isPremiumUser ? '+%5' : '+%0',
+                          value: isPremiumUser ? '+%4' : '+%0',
                           color: isPremiumUser ? 'var(--color-primary)' : 'var(--color-text-muted)',
                         },
                       ]),
                 ],
-                totalValue: `%${Math.round(((isTribe ? profile.cardInheritanceChance : (isUser ? profile.userSettings : profile.botSettings)?.cardInheritanceChance) ?? (0.25 + (isBot || isTribe ? stepBonus * 0.01 : (isPremiumUser ? 0.05 : 0)))) * 100)}`,
+                totalValue: `%${Math.round(((isTribe ? profile.cardInheritanceChance : (isUser ? profile.userSettings : profile.botSettings)?.cardInheritanceChance) ?? (0.25 + (isBot || isTribe ? stepBonus * 0.01 : (isPremiumUser ? 0.04 : 0)))) * 100)}`,
               })}
           </div>
 
@@ -1012,7 +975,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       {t('tribe.member_capacity', 'Üye Kapasitesi')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-                      {t('tribe.member_capacity_desc', 'Kabilenin alabileceği maksimum üye sayısı')}
+                      {t('tribe.member_capacity_desc', 'Klanın alabileceği maksimum üye sayısı')}
                     </div>
                   </div>
                 </div>

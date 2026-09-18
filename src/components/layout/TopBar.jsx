@@ -17,7 +17,6 @@ import {
   PaintbrushVertical,
   X,
   Users,
-  Sparkles,
   Brain,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -44,8 +43,27 @@ import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import BletchlyGuideModal from '../common/BletchlyGuideModal'
 import Logo from '../common/icons/Logo'
 
-export default function TopBar() {
+export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   useDevLog('TopBar', arguments[0] || {})
+  const hasPendingInvitation = Boolean(pendingInvitation)
+  const [inviteSecondsLeft, setInviteSecondsLeft] = useState(null)
+
+  useEffect(() => {
+    if (!pendingInvitation) {
+      setInviteSecondsLeft(null)
+      return
+    }
+    const computeRemaining = () => {
+      const createdMs = pendingInvitation.createdAt
+        ? new Date(pendingInvitation.createdAt).getTime()
+        : Date.now()
+      const elapsed = Number.isNaN(createdMs) ? 0 : Math.floor((Date.now() - createdMs) / 1000)
+      return Math.max(0, 120 - elapsed)
+    }
+    setInviteSecondsLeft(computeRemaining())
+    const interval = setInterval(() => setInviteSecondsLeft(computeRemaining()), 1000)
+    return () => clearInterval(interval)
+  }, [pendingInvitation])
   const { actorId, isLoggedIn, isAdmin, logout: storeLogout } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
@@ -1088,14 +1106,47 @@ export default function TopBar() {
 
           {isLoggedIn ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div
+                className={hasPendingInvitation ? 'topbar-invite-chip' : undefined}
+                style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
+                title={
+                  hasPendingInvitation
+                    ? t(
+                        'debate.pending_invitation',
+                        'Münazara daveti bekliyor — açmak için tıklayın'
+                      )
+                    : undefined
+                }
+                onClickCapture={
+                  hasPendingInvitation
+                    ? (event) => {
+                        event.preventDefault()
+                        event.stopPropagation()
+                        onOpenInvitation?.()
+                      }
+                    : undefined
+                }
+              >
                 <ActorMinimalCard
                   actor={myProfile}
                   showHierarchyBtn={false}
                   clickable={location.pathname !== '/init-profile'}
                   showEditBtn={location.pathname !== '/init-profile'}
-                  chipStyle={{ minWidth: 110, maxWidth: 205, fontSize: 12.5 }}
+                  chipStyle={{ minWidth: 110, maxWidth: 255, fontSize: 12.5 }}
                 />
+                {hasPendingInvitation && (
+                  <>
+                    <span
+                      className="topbar-invite-badge"
+                      title={t('debate.pending_invitation', 'Münazara daveti bekliyor')}
+                    >
+                      !
+                    </span>
+                    <span className="topbar-invite-counter">
+                      {inviteSecondsLeft ?? 120}
+                    </span>
+                  </>
+                )}
               </div>
 
               <button
@@ -1479,16 +1530,16 @@ export default function TopBar() {
             aria-label={t('topbar.active_debates', 'Aktif Münazaralar')}
             style={{ width: 38, height: 38, boxSizing: 'border-box' }}
           >
-            <AngryBotWithSwordsIcon size={22} />
+            <AngryBotWithSwordsIcon size={19} />
           </IconActionButton>
 
           <IconActionButton
             onClick={() => navigate('/marketplace')}
             title={t('card.marketplace', 'Kart Marketi')}
             aria-label={t('card.marketplace', 'Kart Marketi')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+            style={{ width: 36, height: 36, boxSizing: 'border-box' }}
           >
-            <BotFlashCardsIcon size={24} />
+            <BotFlashCardsIcon size={19} />
           </IconActionButton>
 
           <BletchlyGuideModal triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }} />

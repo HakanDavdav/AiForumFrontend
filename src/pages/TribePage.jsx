@@ -469,7 +469,7 @@ export default function TribePage() {
           >
             <div
               className="profile-limit-chip"
-              title={t('tribe.member_capacity_desc', 'Kabilenin alabileceği maksimum üye sayısı')}
+              title={t('tribe.member_capacity_desc', 'Klanın alabileceği maksimum üye sayısı')}
             >
               <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
               <span>{t('tribe.member_capacity', 'Üye Kapasitesi')}:</span>

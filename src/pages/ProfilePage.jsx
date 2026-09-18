@@ -19,6 +19,7 @@ import {
   Sliders,
   Users,
 } from 'lucide-react'
+import { MODEL_GLASS_ITEMS } from '../components/common/ModelGlassToggle'
 import KingIcon from '../components/common/icons/KingIcon'
 import AngryBotWithSwordsIcon from '../components/common/icons/AngryBotWithSwordsIcon'
 import AmbientBots from '../components/common/ambiances/AmbientBots'
@@ -410,7 +411,7 @@ export default function ProfilePage() {
         ) : (
           <ModifierArrowSvg width={10} height={14} style={{ display: 'block' }} />
         )}
-        {t('premium.title', 'Premium')}
+        {t('premium.button', 'Premium')}
       </button>
       <div
         style={{
@@ -649,6 +650,19 @@ export default function ProfilePage() {
   const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
   const hasBotMemory =
     (botCapabilities & BotCapabilities.ProlongedBotMemory) === BotCapabilities.ProlongedBotMemory
+
+  const preferredModel = profile.botSettings?.preferredModel ?? 0
+  const activeModelItem = MODEL_GLASS_ITEMS.find((m) => m.value === preferredModel) || MODEL_GLASS_ITEMS[0]
+  const modelEmblem = [
+    {
+      key: 'model',
+      label: activeModelItem.title,
+      Icon: activeModelItem.Icon,
+      tone: 'model',
+      size: 24,
+    },
+  ]
+
   const capabilityEmblems = [
     {
       key: 'default',
@@ -657,17 +671,22 @@ export default function ProfilePage() {
       tone: 'default',
       size: 25,
     },
-    ...(hasBotMemory
-      ? [
-          {
-            key: 'memory',
-            label: t('bot.capability_extended_memory', 'Uzatılmış Hafıza'),
-            Icon: Brain,
-            tone: 'memory',
-            size: 25,
-          },
-        ]
-      : []),
+    hasBotMemory
+      ? {
+          key: 'extended_memory',
+          label: t('bot.capability_extended_memory', 'Genişletilmiş Hafıza'),
+          Icon: Brain,
+          tone: 'extended-memory',
+          size: 25,
+        }
+      : {
+          key: 'memory',
+          label: t('bot.capability_memory', 'Hafıza'),
+          Icon: Brain,
+          tone: 'memory',
+          size: 25,
+        },
+    ...modelEmblem,
   ]
 
   const userCapabilities = profile.userSettings?.userCapabilities ?? UserCapabilities.Default
@@ -888,7 +907,7 @@ export default function ProfilePage() {
             )}
 
             {profile.parentActor && !isEditing && (
-              <div style={{ marginTop: 12, marginBottom: 12, maxWidth: 300 }}>
+              <div style={{ marginTop: 12, marginBottom: 12, maxWidth: 400 }}>
                 <span
                   style={{
                     fontSize: 12,
@@ -901,7 +920,7 @@ export default function ProfilePage() {
                 </span>
                 <div className="lb-card" style={{ padding: '8px 16px', marginTop: 4 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <ActorMinimalCard actor={profile.parentActor} />
+                    <ActorMinimalCard actor={profile.parentActor} nameMaxWidth="calc(14ch + 100px)" />
                   </div>
                 </div>
               </div>
@@ -1267,10 +1286,10 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum kabile sayısı')}
+                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum klan sayısı')}
               >
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
-                <span>{t('profile.tribe_limit', 'Kabile Limiti')}:</span>
+                <span>{t('profile.tribe_limit', 'Klan Limiti')}:</span>
                 <span className="profile-limit-chip__val">
                   {profile.tribes?.length || 0} / {profile.userSettings.tribeCountLimit || 3}
                 </span>
@@ -1317,10 +1336,10 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum kabile sayısı')}
+                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum klan sayısı')}
               >
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
-                <span>{t('profile.tribe_limit', 'Kabile Limiti')}:</span>
+                <span>{t('profile.tribe_limit', 'Klan Limiti')}:</span>
                 <span className="profile-limit-chip__val">
                   {profile.tribes?.length || 0} / {profile.botSettings.tribeCountLimit || 3}
                 </span>

@@ -77,8 +77,8 @@ export default function TribeSettingsPage() {
       })
       const assignedCards = tribe.personalityCards || []
       setSelectedCardIds(assignedCards.map(normalizeCardId).filter(Boolean))
-      // Cards already locked on the tribe (IsLocked) stay locked: prefill them so the save
-      // request re-sends their lock intent (backend full-set sync never drops locked rows).
+      // Assignments already locked on the tribe (IsLocked) start locked in the local pending set;
+      // the save payload is authoritative for the operator's own rows (backend locks AND unlocks).
       setLockedCardIds(
         assignedCards
           .filter((card) => Boolean(card.isLocked || card.assignment?.isLocked))
@@ -410,7 +410,6 @@ export default function TribeSettingsPage() {
               slotCount={tribe.personalityCards.length}
               tribeAssigned
               tribeBadgeLabel="KLAN"
-              lockedCardIds={lockedCardIds}
               assignLockedCardIds={lockedCardIds}
               onToggleAssignLock={toggleLockCard}
               ownedCardIds={ownedCardIdSet}
@@ -436,8 +435,6 @@ export default function TribeSettingsPage() {
             disabled={editMutation.isPending}
             showHeader={false}
             slotCount={10}
-            assignLockedCardIds={lockedCardIds}
-            onToggleAssignLock={toggleLockCard}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('tribe_settings.additional_personality_cards_desc')}

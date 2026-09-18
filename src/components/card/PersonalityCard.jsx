@@ -430,18 +430,16 @@ export default function PersonalityCard({
       card?.ownership?.originalCard?.isLocked
   )
   // Pending lock intent for cards about to be assigned (not yet persisted).
-  const showLockToggle = typeof onToggleLock === 'function' && lockable !== false && !effectiveLocked
+  const showLockToggle = typeof onToggleLock === 'function' && lockable !== false
   const lockToggleActive = Boolean(assignLocked)
+  const isAssignmentLocked = showLockToggle ? lockToggleActive : (effectiveLocked || lockToggleActive)
 
   const isSelectionDisabled =
     disabled ||
-    effectiveLocked ||
     selectionReadOnly ||
     (selectable && !selected && maxSelections != null && selectedCount >= maxSelections)
 
   const handleCardClick = () => {
-    if (effectiveLocked) return
-
     if (selectable) {
       if (!isSelectionDisabled) onSelect?.()
       return
@@ -454,12 +452,12 @@ export default function PersonalityCard({
   const handleCardKeyDown = (event) => {
     if ((event.key === 'Enter' || event.key === ' ') && filled) {
       event.preventDefault()
-      if (effectiveLocked) return
       if (selectable) {
         if (!isSelectionDisabled) onSelect?.()
-      } else {
-        setIsDetailOpen(true)
+        return
       }
+      onClick?.()
+      setIsDetailOpen(true)
     }
   }
 
@@ -470,6 +468,8 @@ export default function PersonalityCard({
       onKeyDown={handleCardKeyDown}
       role={filled ? 'button' : undefined}
       tabIndex={filled ? 0 : undefined}
+      aria-pressed={selectable ? selected : undefined}
+      aria-disabled={disabled || selectionReadOnly}
     >
       {/* Background Bot Watermark */}
       <div
@@ -493,7 +493,7 @@ export default function PersonalityCard({
         <BotIcon size={120} />
       </div>
 
-      {(currentAcqType === 0 || currentAcqType === 1 || effectiveLocked) && (
+      {(currentAcqType === 0 || currentAcqType === 1 || isAssignmentLocked) && (
         <span
           className="personality-card__corner-badges"
           style={{
@@ -550,9 +550,17 @@ export default function PersonalityCard({
               </span>
             </span>
           )}
-          {effectiveLocked && (
+          {isAssignmentLocked && (
             <span
               title={t('card.locked_assignment', 'Bu atama kilitli')}
+              onClick={
+                showLockToggle
+                  ? (e) => {
+                      e.stopPropagation()
+                      onToggleLock(personalityCardId ?? card)
+                    }
+                  : undefined
+              }
               style={{
                 color: '#ffffff',
                 filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))',
@@ -560,9 +568,11 @@ export default function PersonalityCard({
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                transform: 'rotate(-22deg)',
+                cursor: showLockToggle ? 'pointer' : 'default',
               }}
             >
-              <Lock size={16} strokeWidth={2.5} />
+              <Lock size={26} strokeWidth={3} />
             </span>
           )}
         </span>
@@ -622,7 +632,7 @@ export default function PersonalityCard({
             <SelectionMarker
               checked={selectionReadOnly ? true : selectable ? selected : filled}
               size="sm"
-              locked={!selectionReadOnly && effectiveLocked}
+              locked={false}
               disabled={selectionReadOnly}
               label={
                 selectable

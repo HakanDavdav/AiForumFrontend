@@ -17,6 +17,7 @@ import PersonalityCard from '../../components/card/PersonalityCard'
 import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import AvatarUpload from '../../components/common/AvatarUpload'
+import ModelGlassToggle from '../../components/common/ModelGlassToggle'
 import { buildOwnedCardIdSet, normalizeCardId } from '../../utils/cardOwnership'
 import { trackCreateBot } from '../../utils/analytics'
 
@@ -50,6 +51,7 @@ export default function CreateEditBotPage() {
     personalityCardLocked: false,
     autoInterests: false,
     autoBio: false,
+    preferredModel: 0,
     topicTypes: [],
     selectedCardIds: [],
     lockedCardIds: [],
@@ -104,6 +106,7 @@ export default function CreateEditBotPage() {
     personalityCardLocked: false,
     autoInterests: false,
     autoBio: false,
+    preferredModel: 0,
     topicTypes: [],
     selectedCardIds: [],
     lockedCardIds: [],
@@ -170,6 +173,7 @@ export default function CreateEditBotPage() {
         personalityCardLocked: false,
         autoInterests: existingBot.botSettings?.autoInterests || false,
         autoBio: existingBot.botSettings?.autoBio || false,
+        preferredModel: existingBot.botSettings?.preferredModel ?? 0,
         topicTypes: mappedTopicTypes,
         selectedCardIds: personalAssignedIds,
         lockedCardIds: existingLockedIds,
@@ -566,6 +570,31 @@ export default function CreateEditBotPage() {
               textTransform: 'uppercase',
             }}
           >
+            {t('bot.model_selection', 'Model')}
+          </label>
+          <ModelGlassToggle
+            value={formData.preferredModel}
+            onChange={(nextModel) => {
+              if (!mutation.isPending && !mutation.isSuccess) {
+                setFormData({ ...formData, preferredModel: nextModel })
+              }
+            }}
+            disabled={mutation.isPending || mutation.isSuccess}
+          />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 8,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+            }}
+          >
             {t('card.create_personality_optional', 'Kişilik kartı oluştur (Opsiyonel)')}
           </label>
           <PersonalityCard
@@ -626,23 +655,22 @@ export default function CreateEditBotPage() {
                   )
                 }
                 const isTribeCard = Boolean(card.tribeId || card.assignedTribeId)
-                const isLockedCard = Boolean(card.isLocked || card.assignment?.isLocked)
                 const cardId = normalizeCardId(card)
                 const owned = isOwnedCardId(cardId)
-                const cardBaseLocked = isTribeCard || isLockedCard
-                const isSelected = formData.selectedCardIds.includes(cardId)
+                const isSelected = (formData.selectedCardIds || []).includes(cardId)
                 return (
                   <div key={cardId} className="personality-card-slot" style={slotStyle}>
                     <PersonalityCard
                       slotNumber={i + 1}
                       card={card}
-                      selectable={owned && !cardBaseLocked}
-                      selected={owned ? !cardBaseLocked && isSelected : true}
-                      locked={owned && cardBaseLocked}
-                      selectionReadOnly={!owned}
-                      onSelect={
-                        owned && !cardBaseLocked ? () => toggleCardId(cardId) : undefined
-                      }
+                      selectable={owned && !isTribeCard}
+                      selected={owned ? isSelected : true}
+                      locked={false}
+                      selectionReadOnly={!owned || isTribeCard}
+                      onSelect={owned && !isTribeCard ? () => toggleCardId(cardId) : undefined}
+                      lockable={owned && !isTribeCard}
+                      assignLocked={(formData.lockedCardIds || []).includes(cardId)}
+                      onToggleLock={() => toggleLockCardId(cardId)}
                       showOwnersBtn={false}
                       showAssigneesBtn={false}
                     />
@@ -683,8 +711,6 @@ export default function CreateEditBotPage() {
             disabled={mutation.isPending || mutation.isSuccess}
             showHeader={false}
             slotCount={10}
-            assignLockedCardIds={formData.lockedCardIds}
-            onToggleAssignLock={toggleLockCardId}
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('bot.additional_personality_cards_desc')}

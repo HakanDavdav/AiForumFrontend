@@ -8,6 +8,29 @@ import { tribeApi } from '../api/tribeApi'
 import { ArrowLeft, Loader2, Brain, Focus, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import i18n from '../i18n'
+
+export function getNodeLabelText(label, isRoot = false, isTribeContext = false) {
+  if (label === 'Persona') {
+    return i18n.t('mind.labels.persona', 'Persona')
+  }
+  if (label === 'Tribe' && isRoot) {
+    return i18n.t('mind.labels.tribe_root', 'Tribe (Root)')
+  }
+  if (label === 'Tribe' && isTribeContext) {
+    return i18n.t('mind.labels.other_tribes', 'Other Tribes')
+  }
+  if (label === 'Tribe') {
+    return i18n.t('mind.labels.tribe', 'Tribe')
+  }
+  if (label === 'Actor' || label === 'User' || label === 'Bot') {
+    return i18n.t('mind.labels.actor', 'Actor')
+  }
+  if (label === 'GeneralThought' || label === 'Topic' || label === 'Concept' || label === 'Thought') {
+    return i18n.t('mind.labels.general_thought', 'GeneralThought')
+  }
+  return label || ''
+}
 
 // Nöron renk paleti — Koyu arka planda biyolüminesans tonlar
 // (Persona/Merkez düğüm dinamik olarak tema rengine [Yeşil/Mavi] bağlanır)
@@ -114,8 +137,9 @@ function buildNodeBlock(node, core, glow, isPersona, r) {
   if (titleText.length > 22) {
     titleText = titleText.substring(0, 22) + '...'
   }
-  const subtitleText = node.label || ''
-  const cacheKey = `${titleText}_${subtitleText}_${core}_${glow}_${isPersona}_v2`
+  const subtitleText = getNodeLabelText(node.label, isPersona, Boolean(node.isTribeContext))
+  const lang = i18n.language || 'tr'
+  const cacheKey = `${titleText}_${subtitleText}_${core}_${glow}_${isPersona}_${lang}_v3`
 
   let tex = nodeBadgeCache.get(cacheKey)
   if (!tex) {
@@ -207,11 +231,18 @@ function buildNodeBlock(node, core, glow, isPersona, r) {
 function buildNeuronObject(node) {
   const isRoot = node.label === 'Persona' || (node.label === 'Tribe' && node.isRoot)
   const isPersona = isRoot
-  const { core, glow } = getNeuronColor(node.label, isRoot)
+  const isActive = Boolean(node.isActive) // Active Synapse highlight
+
+  // Active node'lar için altın-amber rengi; diğerleri normal renk paleti
+  const { core, glow } = isActive
+    ? { core: '#fbbf24', glow: '#f59e0b' }
+    : getNeuronColor(node.label, isRoot)
+
   const group = new THREE.Group()
 
-  // MindAmbience oranları: Persona hafifçe daha büyük (22 vs 13)
-  const r = isPersona ? 22 : (node.label === 'GeneralThought' || node.label === 'Topic' ? 15 : 12)
+  // MindAmbience oranları: Persona hafifçe daha büyük (22 vs 13); Active node'lar %30 daha büyük
+  const baseR = isPersona ? 22 : (node.label === 'GeneralThought' || node.label === 'Topic' ? 15 : 12)
+  const r = isActive ? Math.round(baseR * 1.35) : baseR
 
   // Biyolüminesans süzülme için alt grup (MindAmbience mindFloatCenter)
   const visualGroup = new THREE.Group()
@@ -224,16 +255,19 @@ function buildNeuronObject(node) {
   const { haloTex, pearlTex } = getNodeVisualTextures(core, glow)
 
   // 1. Dış en yumuşak ışıma (MindAmbience r * 2.8 radyal gradyan halesi - mindPulseHalo)
-  const haloGeo = new THREE.PlaneGeometry(r * 5.6, r * 5.6)
+  // Active node'larda halo daha geniş ve opaque
+  const haloSize = isActive ? r * 7.2 : r * 5.6
+  const haloGeo = new THREE.PlaneGeometry(haloSize, haloSize)
+  const haloOpacity = isActive ? 0.65 : (isPersona ? 0.45 : 0.32)
   const haloMat = new THREE.MeshBasicMaterial({
     map: haloTex,
     transparent: true,
-    opacity: isPersona ? 0.45 : 0.32,
+    opacity: haloOpacity,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
   const haloMesh = new THREE.Mesh(haloGeo, haloMat)
-  haloMesh.userData = { isHalo: true, isPersona: isPersona, baseOpacity: isPersona ? 0.45 : 0.32 }
+  haloMesh.userData = { isHalo: true, isPersona: isPersona, baseOpacity: haloOpacity }
   haloMesh.onBeforeRender = function (renderer, scene, camera) {
     this.quaternion.copy(camera.quaternion)
   }
@@ -244,7 +278,7 @@ function buildNeuronObject(node) {
   const midHaloMat = new THREE.MeshBasicMaterial({
     color: glow,
     transparent: true,
-    opacity: isPersona ? 0.32 : 0.22,
+    opacity: isActive ? 0.5 : (isPersona ? 0.32 : 0.22),
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })
@@ -273,6 +307,25 @@ function buildNeuronObject(node) {
   // 5. Düğüm Başlık Bloğu (Orijinal 3D Canvas Kart Yapısı)
   const badgeMesh = buildNodeBlock(node, core, glow, isPersona, r)
   visualGroup.add(badgeMesh)
+
+  // 6. Active Synapse ring — extra dış ışıma halkası aktif node'larda
+  if (isActive) {
+    const ringGeo = new THREE.RingGeometry(r * 1.7, r * 2.1, 48)
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: '#fbbf24',
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    })
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat)
+    ringMesh.userData = { isHalo: true, isPersona: false, baseOpacity: 0.55 }
+    ringMesh.onBeforeRender = function (renderer, scene, camera) {
+      this.quaternion.copy(camera.quaternion)
+    }
+    visualGroup.add(ringMesh)
+  }
 
   group.add(visualGroup)
   return group
@@ -555,7 +608,7 @@ function updateCapillaryPosition(obj, { start, end }, link) {
 // TopBar yüksekliği — CSS değişkeninden okunuyor
 const TOPBAR_HEIGHT = 'var(--topbar-height)'
 
-function NodeDetailPanel({ node, onClose }) {
+function NodeDetailPanel({ node, onClose, isTribeContext = false }) {
   const { t } = useTranslation()
   const { isDarkMode } = useThemeStore()
   const isRoot = node.label === 'Persona' || (node.label === 'Tribe' && node.isRoot)
@@ -588,14 +641,14 @@ function NodeDetailPanel({ node, onClose }) {
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div
             style={{
-              width: 14,
-              height: 14,
+              width: 16,
+              height: 16,
               borderRadius: '50%',
               background: core,
-              boxShadow: `0 0 12px ${glow}`,
+              boxShadow: `0 0 16px ${glow}`,
               flexShrink: 0,
             }}
           />
@@ -637,6 +690,26 @@ function NodeDetailPanel({ node, onClose }) {
           ✕
         </button>
       </div>
+
+      {node.isActive && (
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'rgba(251, 191, 36, 0.15)',
+            border: '1px solid rgba(251, 191, 36, 0.4)',
+            color: '#f59e0b',
+            borderRadius: 12,
+            padding: '8px 14px',
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          <span>🧠</span>
+          <span>{t('mind.recalled_for_content', 'Bu düşünce seçilen içerikte tetiklendi.')}</span>
+        </div>
+      )}
 
       <div
         style={{
@@ -703,7 +776,21 @@ export default function MindPage() {
   const location = useLocation()
   const actorId = searchParams.get('actorId')
   const tribeId = searchParams.get('tribeId')
+  const focusNodeParam = searchParams.get('focusNode')
   const queryName = searchParams.get('name') || location.state?.name || location.state?.profileName || null
+  const contextTitle =
+    searchParams.get('contextTitle') ||
+    searchParams.get('title') ||
+    location.state?.contextTitle ||
+    location.state?.title ||
+    location.state?.proposition ||
+    null
+
+  // Comma-separated Neo4j node UUIDs to highlight (directly from searchParams)
+  const highlightIds = useMemo(() => {
+    const raw = searchParams.get('highlightIds') || ''
+    return new Set(raw ? raw.split(',').map((id) => id.trim()).filter(Boolean) : [])
+  }, [searchParams])
   const [rootName, setRootName] = useState(queryName)
   const navigate = useNavigate()
   const isGreenMode = useThemeStore((s) => s.isGreenMode)
@@ -890,7 +977,11 @@ export default function MindPage() {
         const nodeId = n.id || n.name || JSON.stringify(n)
         if (!nodesMap.has(nodeId)) {
           const isRoot = n.label === 'Persona' || (n.label === 'Tribe' && (n.id === tribeId || idx === 0))
-          const { core } = getNeuronColor(n.label, isRoot)
+          const isFocusMatched = focusNodeParam && n.name && n.name.toLowerCase() === focusNodeParam.toLowerCase()
+          const isActive = (highlightIds.size > 0 && nodeId && highlightIds.has(nodeId)) || Boolean(isFocusMatched)
+          const { core } = isActive
+            ? { core: '#fbbf24' }
+            : getNeuronColor(n.label, isRoot)
 
           let displayName = n.name || nodeId
           // Kök düğümde GUID yerine aktörün/grubun gerçek kullanıcı adını ver
@@ -904,7 +995,9 @@ export default function MindPage() {
             name: displayName,
             label: n.label,
             isRoot,
-            val: isRoot ? 200 : 10,
+            isActive,
+            isTribeContext: Boolean(tribeId),
+            val: isRoot ? 200 : (isActive ? 18 : 10),
             color: core,
           })
         }
@@ -923,7 +1016,7 @@ export default function MindPage() {
           const linkKey = `${sourceId}-${relType}-${targetId}`
           if (!linksSet.has(linkKey)) {
             linksSet.add(linkKey)
-            const displayName = affinity != null && affinity !== 0 
+            const displayName = affinity != null && affinity !== 0
               ? `${relType} (${affinity > 0 ? '+' : ''}${affinity})`
               : relType
 
@@ -964,7 +1057,7 @@ export default function MindPage() {
       nodes,
       links: linksArr,
     }
-  }, [rawData, tribeId, actorId, rootName])
+  }, [rawData, tribeId, actorId, rootName, highlightIds, focusNodeParam])
 
   const sortedNodes = useMemo(() => {
     return [...graphData.nodes].sort((a, b) => {
@@ -974,13 +1067,59 @@ export default function MindPage() {
     })
   }, [graphData.nodes])
 
+  // Active Synapse: highlightIds veya focusNode varsa yükleme sonrası toast + ilk aktif node'a zoom & detay paneli açma
+  const highlightedActiveNodes = useMemo(
+    () => graphData.nodes.filter((n) => n.isActive),
+    [graphData.nodes]
+  )
+  const hasHandledHighlightRef = useRef(false)
+
+  useEffect(() => {
+    if (isLoading || graphData.nodes.length === 0) return
+
+    if (highlightedActiveNodes.length > 0) {
+      if (hasHandledHighlightRef.current) return
+      hasHandledHighlightRef.current = true
+
+      const first = highlightedActiveNodes[0]
+      toast.success(
+        t('mind.active_synapse', `${highlightedActiveNodes.length} aktif sinaps düğümü hafıza çağrışımıyla vurgulandı.`, { count: highlightedActiveNodes.length }),
+        { duration: 4000, icon: '🧠' }
+      )
+      // İlk aktif node'un detay panelini aç
+      selectedNodeRef.current = first
+      setSelectedNode(first)
+
+      // 600ms sonra ilk aktif node'a zoom yap
+      const tid = setTimeout(() => {
+        if (!fgRef.current || first.x == null) return
+        fgRef.current.cameraPosition(
+          { x: first.x * 1.3, y: (first.y ?? 0) * 1.3 + 80, z: (first.z ?? 0) * 1.3 + 350 },
+          { x: first.x, y: first.y ?? 0, z: first.z ?? 0 },
+          1200
+        )
+      }, 600)
+      return () => clearTimeout(tid)
+    } else if ((highlightIds.size > 0 && highlightedActiveNodes.length === 0) || focusNodeParam) {
+      if (hasHandledHighlightRef.current) return
+      hasHandledHighlightRef.current = true
+
+      // Graceful Nostalgic Fallback: düğüm Neo4j'de zamanla silikleşti / unutuldu
+      toast(
+        t('mind.memory_faded', 'Bu anı zamanla silikleşti ve unutuldu.'),
+        { icon: '🌫️', duration: 5000 }
+      )
+    }
+  }, [highlightedActiveNodes, isLoading, highlightIds, focusNodeParam, t])
+
   const filteredNodes = useMemo(() => {
     if (!nodeSearch.trim()) return sortedNodes
     const q = nodeSearch.toLowerCase()
     return sortedNodes.filter(
       (n) =>
         (n.name && n.name.toLowerCase().includes(q)) ||
-        (n.label && n.label.toLowerCase().includes(q))
+        (n.label && n.label.toLowerCase().includes(q)) ||
+        (getNodeLabelText(n.label, n.isRoot, Boolean(tribeId)).toLowerCase().includes(q))
     )
   }, [sortedNodes, nodeSearch])
 
@@ -1149,7 +1288,7 @@ export default function MindPage() {
               borderRadius: 12,
               padding: '6px 14px',
               boxShadow: 'var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1))',
-              maxWidth: '55%',
+              maxWidth: contextTitle ? '34%' : '55%',
               minWidth: 0,
             }}
           >
@@ -1210,6 +1349,40 @@ export default function MindPage() {
             </div>
           </div>
 
+          {/* Orta: Tetiklenen Anıların Bağlantılı Olduğu Başlık (Sade, tırnak içinde, özel sarı bloksuz) */}
+          {contextTitle && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                maxWidth: '42%',
+                minWidth: 0,
+                padding: '0 12px',
+                textAlign: 'center',
+                overflow: 'hidden',
+                pointerEvents: 'auto',
+              }}
+              title={contextTitle}
+            >
+              <span
+                style={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  fontStyle: 'italic',
+                  color: 'var(--color-text-primary)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  letterSpacing: '0.01em',
+                  textShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
+                }}
+              >
+                "{contextTitle}"
+              </span>
+            </div>
+          )}
+
           {/* Sağ: Node tanımları + Varsayılan Görünüm */}
           <div
             style={{
@@ -1223,14 +1396,14 @@ export default function MindPage() {
               padding: '6px 12px',
               boxShadow: 'var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1))',
               flexShrink: 0,
-              maxWidth: '100%',
+              maxWidth: contextTitle ? '32%' : '100%',
             }}
           >
             {[
-              { color: isGreenMode ? '#10b981' : '#3b82f6', label: tribeId ? 'Tribe (Root)' : 'Persona' },
-              { color: NEURON_COLORS.Tribe.core, label: tribeId ? 'Other Tribes' : 'Tribe' },
-              { color: NEURON_COLORS.Actor.core, label: 'Actor' },
-              { color: NEURON_COLORS.GeneralThought.core, label: 'GeneralThought' },
+              { color: isGreenMode ? '#10b981' : '#3b82f6', label: tribeId ? t('mind.labels.tribe_root', 'Tribe (Root)') : t('mind.labels.persona', 'Persona') },
+              { color: NEURON_COLORS.Tribe.core, label: tribeId ? t('mind.labels.other_tribes', 'Other Tribes') : t('mind.labels.tribe', 'Tribe') },
+              { color: NEURON_COLORS.Actor.core, label: t('mind.labels.actor', 'Actor') },
+              { color: NEURON_COLORS.GeneralThought.core, label: t('mind.labels.general_thought', 'Thought') },
             ].map(({ color, label }, idx) => (
               <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 {idx > 0 && <span style={{ width: 1, height: 18, background: 'var(--color-border)', marginRight: 2 }} />}
@@ -1361,6 +1534,7 @@ export default function MindPage() {
           {selectedNode && (
             <NodeDetailPanel
               node={selectedNode}
+              isTribeContext={Boolean(tribeId)}
               onClose={() => {
                 selectedNodeRef.current = null
                 setSelectedNode(null)
@@ -1616,7 +1790,7 @@ export default function MindPage() {
                                     marginTop: 1,
                                   }}
                                 >
-                                  {node.label}
+                                  {getNodeLabelText(node.label, node.isRoot, Boolean(tribeId))}
                                 </div>
                               </div>
                             </div>

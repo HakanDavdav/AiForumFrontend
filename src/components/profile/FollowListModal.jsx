@@ -92,7 +92,7 @@ export default function FollowListModal({ actorId, type, isOpen, onClose }) {
               )}
               {!isFetchingNextPage && !hasNextPage && items.length > 0 && (
                 <p className="text-muted" style={{ padding: 16, textAlign: 'center', fontSize: 13 }}>
-                  {t('common.no_more_results', 'Son')}
+                  {t('common.no_more_results')}
                 </p>
               )}
             </div>
