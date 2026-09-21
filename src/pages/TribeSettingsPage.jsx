@@ -10,6 +10,7 @@ import CardSelectionSlots from '../components/card/CardSelectionSlots'
 import PersonalityCard from '../components/card/PersonalityCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import AvatarUpload from '../components/common/AvatarUpload'
+import ModelGlassToggle from '../components/common/ModelGlassToggle'
 import useAuthStore from '../store/authStore'
 import useMyEntitiesStore from '../store/myEntitiesStore'
 import useDevLog from '../utils/useDevLog'
@@ -31,6 +32,7 @@ export default function TribeSettingsPage() {
     tribeName: '',
     imageUrl: '',
     mission: '',
+    preferredModel: 0,
     personalityCardName: '',
     personalityCardPrompt: '',
     personalityCardConfirmed: false,
@@ -74,6 +76,7 @@ export default function TribeSettingsPage() {
         tribeName: tribe.tribeName || '',
         imageUrl: tribe.imageUrl || '',
         mission: tribe.mission || '',
+        preferredModel: tribe.preferredModel ?? 0,
       })
       const assignedCards = tribe.personalityCards || []
       setSelectedCardIds(assignedCards.map(normalizeCardId).filter(Boolean))
@@ -392,6 +395,18 @@ export default function TribeSettingsPage() {
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('tribe_settings.primary_personality_desc')}
+          </p>
+        </div>
+
+        <div>
+          <label style={labelStyle}>{t('bot.model_selection', 'Model')}</label>
+          <ModelGlassToggle
+            value={formData.preferredModel}
+            disabled={editMutation.isPending}
+            onChange={(nextModel) => setFormData((current) => ({ ...current, preferredModel: nextModel }))}
+          />
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+            {t('tribe_settings.model_selection_desc', 'Klan hafızası ve kişilik işlemlerinde kullanılır.')}
           </p>
         </div>
 

@@ -481,21 +481,17 @@
     "model_selection_desc": "Model tercihi botun içerik üretiminde kullanılır. Hafıza ve münazara jürisi varsayılan modelde çalışır.",
     "model_default_badge": "Varsayılan",
     "models": {
-      "gemini": {
-        "name": "Gemini Flash Lite",
-        "desc": "Varsayılan • hızlı ve ekonomik"
+      "qwen": {
+        "name": "Qwen3 14B",
+        "desc": "Varsayılan • canlı kişilik ve yorumlar"
       },
-      "gpt4o_mini": {
-        "name": "GPT-4o mini",
-        "desc": "Dengeli kalite ve hız"
+      "mistral": {
+        "name": "Mistral Small 3.2",
+        "desc": "Katı JSON ve mantık"
       },
-      "deepseek_chat": {
-        "name": "DeepSeek Chat",
-        "desc": "Ucuz ve güçlü akıl yürütme"
-      },
-      "grok_build": {
-        "name": "Grok Build",
-        "desc": "En ucuz Grok modeli"
+      "deepseek": {
+        "name": "DeepSeek V4.1 Flash",
+        "desc": "Hızlı ve güçlü akıl yürütme"
       }
     }
   },

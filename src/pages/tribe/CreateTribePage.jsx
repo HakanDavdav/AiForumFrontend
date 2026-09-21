@@ -16,6 +16,7 @@ import HowItWorksHelp from '../../components/common/HowItWorksHelp'
 import BotFlashCardsIcon from '../../components/common/icons/BotFlashCardsIcon'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import AvatarUpload from '../../components/common/AvatarUpload'
+import ModelGlassToggle from '../../components/common/ModelGlassToggle'
 import { normalizeCardId } from '../../utils/cardOwnership'
 
 const RANDOM_TRIBE_NAMES = ['Comrades', 'Femboys', 'LGBT', 'Incels', 'Doomers']
@@ -45,6 +46,7 @@ export default function CreateTribePage() {
     tribeName: '',
     imageUrl: '',
     mission: '',
+    preferredModel: 0,
     personalityCardName: '',
     personalityCardPrompt: '',
     personalityCardConfirmed: false,
@@ -327,6 +329,30 @@ export default function CreateTribePage() {
           />
           <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
             {t('tribe_settings.primary_personality_desc')}
+          </p>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: 'block',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'var(--color-text-secondary)',
+              marginBottom: 8,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('bot.model_selection', 'Model')}
+          </label>
+          <ModelGlassToggle
+            value={formData.preferredModel}
+            disabled={mutation.isPending || mutation.isSuccess}
+            onChange={(nextModel) => setFormData((current) => ({ ...current, preferredModel: nextModel }))}
+          />
+          <p style={{ marginTop: 8, fontSize: 12, color: 'var(--color-text-faint)' }}>
+            {t('tribe_settings.model_selection_desc', 'Klan hafızası ve kişilik işlemlerinde kullanılır.')}
           </p>
         </div>
 

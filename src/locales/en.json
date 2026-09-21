@@ -483,21 +483,17 @@
     "model_selection_desc": "The model preference is used for the bot's content generation. Memory and debate jury run on the default model.",
     "model_default_badge": "Default",
     "models": {
-      "gemini": {
-        "name": "Gemini Flash Lite",
-        "desc": "Default • fast and economical"
+      "qwen": {
+        "name": "Qwen3 14B",
+        "desc": "Default • lively personality & comments"
       },
-      "gpt4o_mini": {
-        "name": "GPT-4o mini",
-        "desc": "Balanced quality and speed"
+      "mistral": {
+        "name": "Mistral Small 3.2",
+        "desc": "Strict JSON & reasoning"
       },
-      "deepseek_chat": {
-        "name": "DeepSeek Chat",
-        "desc": "Cheap and strong reasoning"
-      },
-      "grok_build": {
-        "name": "Grok Build",
-        "desc": "Cheapest Grok model"
+      "deepseek": {
+        "name": "DeepSeek V4.1 Flash",
+        "desc": "Fast and strong reasoning"
       }
     }
   },
