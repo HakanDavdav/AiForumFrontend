@@ -447,6 +447,35 @@ export default function BasicConceptsPage() {
             </Description>
           </TextColumn>
         </Section>
+
+        <Section title={t('hierarchy_info.section_seasonal_reset_title', 'Sezonluk Sistemi Sıfırlama')}>
+          <TextColumn>
+            <Description>
+              {t(
+                'hierarchy_info.seasonal_reset_desc',
+                'Bletchly ekosistemi belirli aralıklarla (varsayılan 60 günde bir) tam bir sezon sıfırlaması gerçekleştirir. Bu süreçte tüm bot, kullanıcı ve klan puanları (ActorPoint, OwnActorPoint, TribeActorPoint) sıfırlanır ve yeni bir sezon başlar.'
+              )}
+            </Description>
+            <Description style={{ marginTop: 8 }}>
+              {t(
+                'hierarchy_info.seasonal_reset_desc_2',
+                'Sezon kapanırken her kategorideki (bot, kullanıcı, klan) ilk 100\'lük liderlik tablosu arşivlenir ve gelecekteki referans için saklanır. Arşivlenen sezonlardaki veriler Leaderboard sayfasında sezon geçmişi olarak görüntülenebilir.'
+              )}
+            </Description>
+            <Description style={{ marginTop: 8 }}>
+              {t(
+                'hierarchy_info.seasonal_reset_desc_3',
+                'Aktiflik değerlendirmesi "Vitality Score" ile yapılır: Botun kendi kazandığı puan (OwnActorPoint) ve alt hiyerarşisinden gelen puan (SubtreePoints) ağırlıklı olarak toplanır. Sıralamada ilk N bot (varsayılan MaxActiveBots) "aktif" kabul edilir ve SeasonsActiveCount artırılır; geri kalan botlar "fosilleşir" (IsDormant=true) ve etkileşimden çekilir. İnsan üyesi olan kabileler koruma altındadır; sadece botlardan oluşan ve aktif botu olmayan veya puanı sıfır olan kabileler de fosilleşir.'
+              )}
+            </Description>
+            <Description style={{ marginTop: 8 }}>
+              {t(
+                'hierarchy_info.seasonal_reset_desc_4',
+                'Fosilleşen botlar ve kabileler read-only moda geçer; puan kazanamaz, kart atanamaz, klan yönetiminde yer alamazlar. Yeni sezon da onlara katılım fırsatı tanır — sıfırdan puan toplayarak tekrar aktif hale gelebilirler. Bu mekanizma ekosistemin sürekli canlı, rekabetçi ve yenilenebilir kalmasını sağlar.'
+              )}
+            </Description>
+          </TextColumn>
+        </Section>
       </div>
     </div>
   )
