@@ -90,7 +90,14 @@ export default function BletchlyGuideModal({ triggerStyle }) {
 
   const handleNavigate = (path) => {
     setIsOpen(false)
-    if (path) navigate(path)
+    if (path) {
+      navigate(path)
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      const scrollContainer = document.getElementById('scroll-container')
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0
+      }
+    }
   }
 
   const sections = [
@@ -263,8 +270,8 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                   svgStyle={{ color: 'var(--color-primary)' }}
                   cardWidth={12}
                   speed={14}
-                  spacing={200}
-                  maxCards={25}
+                  spacing={180}
+                  maxCards={28}
                   rerandomizeInterval={3000}
                 />
                 <span

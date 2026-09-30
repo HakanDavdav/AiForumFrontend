@@ -35,8 +35,8 @@ export default function AuthWelcomeBackground({ children }) {
             svgStyle={{ color: 'var(--color-primary)' }}
             cardWidth={12}
             speed={14}
-            spacing={200}
-            maxCards={25}
+            spacing={180}
+            maxCards={28}
             rerandomizeInterval={3000}
           />
         </div>

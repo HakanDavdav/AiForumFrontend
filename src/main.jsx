@@ -8,6 +8,51 @@ import './index.css'
 import './components/layout/layout.css'
 import './i18n'
 
+// Toast hata mesajlarına traceId entegrasyonu
+const origToastError = toast.error
+toast.error = (message, options = {}) => {
+  let finalMsg = message
+  const opts = { ...options }
+
+  if (message && typeof message === 'object' && !message.$$typeof) {
+    if (message.traceId && !opts.traceId) {
+      opts.traceId = message.traceId
+    } else if (message.response?.headers?.['x-trace-id'] && !opts.traceId) {
+      opts.traceId = message.response.headers['x-trace-id']
+    }
+    finalMsg = message.message || 'Beklenmeyen bir hata oluştu.'
+  }
+
+  if (!opts.traceId && typeof window !== 'undefined' && window.__lastApiTraceId) {
+    if (Date.now() - (window.__lastApiTraceTime || 0) < 3000) {
+      opts.traceId = window.__lastApiTraceId
+    }
+  }
+
+  return origToastError(finalMsg, opts)
+}
+
+// Admin sayfası için başarılı toast bildirimlerine traceId entegrasyonu
+const origToastSuccess = toast.success
+toast.success = (message, options = {}) => {
+  let finalMsg = message
+  const opts = { ...options }
+
+  const isAdminPage =
+    typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/admin') || import.meta.env.VITE_IS_ADMIN_BUILD === 'true')
+
+  if (isAdminPage) {
+    if (!opts.traceId && typeof window !== 'undefined' && window.__lastApiSuccessTraceId) {
+      if (Date.now() - (window.__lastApiSuccessTraceTime || 0) < 3000) {
+        opts.traceId = window.__lastApiSuccessTraceId
+      }
+    }
+  }
+
+  return origToastSuccess(finalMsg, opts)
+}
+
 // React Query konfigürasyonu
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +68,7 @@ const queryClient = new QueryClient({
       // useMutation({ ..., meta: { showErrorToast: true } })
       if (!mutation.meta?.showErrorToast) return
 
+      const traceId = error.traceId || error.response?.headers?.['x-trace-id']
       let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.']
       if (error.response?.data?.errors) {
         if (Array.isArray(error.response.data.errors)) {
@@ -34,6 +80,7 @@ const queryClient = new QueryClient({
 
       errorMessages.forEach((msg) => {
         toast.error(msg, {
+          traceId,
           style: {
             borderRadius: '10px',
             background: 'var(--color-surface)',
@@ -50,6 +97,7 @@ const queryClient = new QueryClient({
       // useQuery({ ..., meta: { showErrorToast: true } })
       if (!query.meta?.showErrorToast) return
 
+      const traceId = error.traceId || error.response?.headers?.['x-trace-id']
       let errorMessages = [error.message || 'Beklenmeyen bir hata oluştu.']
       if (error.response?.data?.errors) {
         if (Array.isArray(error.response.data.errors)) {
@@ -61,6 +109,7 @@ const queryClient = new QueryClient({
 
       errorMessages.forEach((msg) => {
         toast.error(msg, {
+          traceId,
           style: {
             borderRadius: '10px',
             background: 'var(--color-surface)',

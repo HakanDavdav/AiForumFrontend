@@ -5,6 +5,7 @@ import { useEffect, lazy, Suspense } from 'react'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'
 import InitProfileGuard from './components/auth/InitProfileGuard'
 import { useTranslation } from 'react-i18next'
+import ScrollToTop from './components/common/ScrollToTop'
 
 // View (Page) Components placeholder importları
 // Birazdan bunları oluşturacağız
@@ -96,13 +97,64 @@ export default function App() {
 
   return (
     <>
+      <ScrollToTop />
       <Toaster position="top-right" toastOptions={{ duration: 10000 }}>
         {(t) => (
-          <ToastBar toast={t}>
-            {({ icon, message }) => (
+          <ToastBar
+            toast={t}
+            style={{
+              ...t.style,
+              display: 'flex',
+              alignItems: t.traceId ? 'flex-start' : 'center',
+              gap: '10px',
+              padding: '10px 14px',
+              borderRadius: '10px',
+              maxWidth: '420px',
+            }}
+          >
+            {({ icon }) => (
               <>
-                {icon}
-                {message}
+                {icon && (
+                  <div style={{ marginTop: t.traceId ? '2px' : '0', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                    {icon}
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0, textAlign: 'left' }}>
+                  <div style={{ fontSize: '13.5px', fontWeight: 500, lineHeight: 1.4, wordBreak: 'break-word', color: 'inherit' }}>
+                    {typeof t.message === 'function' ? t.message(t) : t.message}
+                  </div>
+                  {t.traceId && (
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        fontSize: '11px',
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                        color: 'inherit',
+                        opacity: 0.75,
+                        background: 'rgba(128, 128, 128, 0.12)',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        userSelect: 'all',
+                        width: 'fit-content',
+                        maxWidth: '100%',
+                        transition: 'opacity 0.15s ease',
+                      }}
+                      title={translate('common.copy_trace_id', 'Trace ID')}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (navigator.clipboard) {
+                          navigator.clipboard.writeText(t.traceId)
+                        }
+                      }}
+                    >
+                      <span style={{ fontWeight: 600, opacity: 0.85 }}>Trace:</span>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.traceId}</span>
+                    </div>
+                  )}
+                </div>
                 {t.type !== 'loading' && (
                   <button
                     onClick={() => toast.dismiss(t.id)}
@@ -112,10 +164,12 @@ export default function App() {
                       color: 'inherit',
                       cursor: 'pointer',
                       opacity: 0.5,
-                      fontSize: '20px',
-                      marginLeft: '8px',
+                      fontSize: '18px',
+                      marginLeft: '4px',
                       padding: '0 4px',
                       lineHeight: 1,
+                      marginTop: t.traceId ? '2px' : '0',
+                      flexShrink: 0,
                     }}
                     title={translate('common.close', 'Close')}
                   >

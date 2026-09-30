@@ -15,6 +15,7 @@ import {
 import BotFlashCardsIcon from '../components/common/icons/BotFlashCardsIcon'
 import CardContingencyIcon from '../components/common/icons/CardContingencyIcon'
 import CardContingencyModifierIcon from '../components/common/icons/CardContingencyModifierIcon'
+import TRexSkullIcon from '../assets/t-rex-skull-svgrepo-com.svg?react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
@@ -88,6 +89,7 @@ export default function TribePage() {
     )
   if (!tribe) return <div className="empty-state">{t('tribe.not_found')}</div>
 
+  const isDormant = Boolean(tribe.isDormant ?? tribe.IsDormant ?? false)
   const isMember = tribe.tribeMemberships?.some((m) => m.actor?.actorId === currentUserId)
   const isLeader = tribe.tribeMemberships?.some(
     (m) => m.actor?.actorId === currentUserId && m.roleName === 'TribeLeader'
@@ -140,7 +142,7 @@ export default function TribePage() {
       </div>
 
       {/* ─── Tribe Header ─── */}
-      <div className="profile-header-card">
+      <div className={`profile-header-card${isDormant ? ' profile-header-card--dormant' : ''}`}>
         <div
           className="flex justify-between"
           style={{ gap: 20, width: '100%', alignItems: 'stretch', marginBottom: -6 }}
@@ -156,13 +158,24 @@ export default function TribePage() {
             }}
           >
             <div>
-              <div className="flex items-center" style={{ gap: 16 }}>
+              <div className="flex items-center" style={{ gap: 12 }}>
                 <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{tribe.tribeName}</h1>
+                {isDormant && (
+                  <span
+                    className="badge-fossil"
+                    style={{ fontSize: 12, padding: '2px 8px', borderRadius: 6 }}
+                    title={t('common.fossil_tribe_desc', 'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.')}
+                  >
+                    <TRexSkullIcon className="badge-fossil-icon" />
+                  </span>
+                )}
               </div>
 
               <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
                 {tribe.mission || t('tribe.no_mission')}
               </p>
+
+
 
               {tribe.createdAt && (
                 <p
@@ -230,6 +243,8 @@ export default function TribePage() {
                 height: 144,
                 display: 'inline-flex',
                 flexShrink: 0,
+                overflow: 'hidden',
+                borderRadius: 24,
               }}
             >
               {isMyTribe && (
@@ -249,6 +264,11 @@ export default function TribePage() {
                 >
                   <Crown size={40} strokeWidth={2.5} />
                 </span>
+              )}
+              {isDormant && (
+                <div className="fossil-stamp">
+                  <TRexSkullIcon className="fossil-stamp-icon" />
+                </div>
               )}
               {tribe.imageUrl ? (
                 <img
@@ -319,19 +339,26 @@ export default function TribePage() {
               {isLoggedIn && !isMember && (
                 <button
                   className="btn btn-primary btn-sm"
-                  onClick={() => {
-                    setIsBouncing(true)
-                    setTimeout(() => setIsBouncing(false), 200)
-                    joinMutation.mutate()
-                  }}
-                  disabled={joinMutation.isPending}
+                  onClick={
+                    isDormant
+                      ? undefined
+                      : () => {
+                          setIsBouncing(true)
+                          setTimeout(() => setIsBouncing(false), 200)
+                          joinMutation.mutate()
+                        }
+                  }
+                  disabled={joinMutation.isPending || isDormant}
                   style={{
                     transform: isBouncing ? 'scale(1.15)' : 'scale(1)',
                     transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 6,
+                    opacity: isDormant ? 0.5 : 1,
+                    cursor: isDormant ? 'not-allowed' : 'pointer',
                   }}
+                  title={isDormant ? t('tribe.dormant_cannot_join', 'Fosil klanlara yeni üye katılamaz.') : undefined}
                 >
                   <UserPlus size={14} /> {t('tribe.join')}
                 </button>
@@ -356,7 +383,7 @@ export default function TribePage() {
                   <LogOut size={14} /> {t('tribe.leave')}
                 </button>
               )}
-              {isLoggedIn && canManageTribe && (
+              {isLoggedIn && canManageTribe && !isDormant && (
                 <button
                   className="btn btn-primary btn-sm"
                   onClick={() => navigate('/tribe/settings?tribeId=' + tribeId)}

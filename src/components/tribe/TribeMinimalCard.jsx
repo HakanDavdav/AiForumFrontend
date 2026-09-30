@@ -6,16 +6,20 @@ import useMyEntitiesStore from '../../store/myEntitiesStore'
 import { Edit2, Brain, Crown } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
+import TRexSkullIcon from '../../assets/t-rex-skull-svgrepo-com.svg?react'
 
 /**
  * TribeMinimalCard — plan.md Component #4
  * MinimalTribeDto'dan tribe kartı. Tıklanınca Center Panel'de TribeProfileView açar.
  */
 export default function TribeMinimalCard({
-  tribeId,
-  tribeName,
-  tribePoint,
-  imageUrl,
+  tribe,
+  tribeId: propTribeId,
+  tribeName: propTribeName,
+  tribePoint: propTribePoint,
+  imageUrl: propImageUrl,
+  isDormant: propIsDormant,
+  IsDormant: propIsDormantUpper,
   clickable = true,
   showPoint = true,
   showMindBtn = true,
@@ -23,6 +27,12 @@ export default function TribeMinimalCard({
   variant = 'expanded',
   style = {},
 }) {
+  const tribeId = propTribeId || tribe?.tribeId || tribe?.TribeId
+  const tribeName = propTribeName || tribe?.tribeName || tribe?.TribeName
+  const tribePoint = propTribePoint ?? tribe?.tribePoint ?? tribe?.TribePoint ?? tribe?.tribeActorPoint
+  const imageUrl = propImageUrl || tribe?.imageUrl || tribe?.ImageUrl
+  const isDormant = propIsDormant ?? tribe?.isDormant
+  const IsDormant = propIsDormantUpper ?? tribe?.IsDormant
   useDevLog('TribeMinimalCard', arguments[0] || {})
   const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
@@ -31,6 +41,7 @@ export default function TribeMinimalCard({
   const myTribes = useMyEntitiesStore((s) => s.myTribes)
   const isMyTribe = myTribes?.some((t) => t.tribeId === tribeId)
   const isCompact = variant === 'compact'
+  const isDormantTribe = Boolean(isDormant ?? IsDormant ?? false)
 
   const handleClick = (e) => {
     if (!clickable) return
@@ -54,7 +65,7 @@ export default function TribeMinimalCard({
 
   return (
     <div
-      className={`tribe-card ${isCompact ? 'tribe-card--compact' : 'tribe-card--expanded'}`}
+      className={`tribe-card ${isCompact ? 'tribe-card--compact' : 'tribe-card--expanded'}${isDormantTribe ? ' tribe-card--dormant' : ''}`}
       onClick={handleClick}
       style={{
         width: isCompact ? 'auto' : '100%',
@@ -102,8 +113,16 @@ export default function TribeMinimalCard({
           </span>
         )}
       </div>
-      <div style={{ flex: isCompact ? '0 1 auto' : 1, minWidth: 0 }}>
+      <div style={{ flex: isCompact ? '0 1 auto' : 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
         <div className="tribe-card-name truncate">{tribeName || t('tribe.unnamed_tribe', 'İsimsiz Klan')}</div>
+        {isDormantTribe && (
+          <span
+            className="badge-fossil"
+            title={t('common.fossil_tribe_desc', 'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.')}
+          >
+            <TRexSkullIcon className="badge-fossil-icon" />
+          </span>
+        )}
       </div>
       {!isCompact && showMindBtn && (
         <button
@@ -116,7 +135,7 @@ export default function TribeMinimalCard({
           <Brain size={12} />
         </button>
       )}
-      {!isCompact && isMyTribe && showEditBtn && (
+      {!isCompact && isMyTribe && showEditBtn && !isDormantTribe && (
         <button
           type="button"
           className="actor-chip-hier-btn"

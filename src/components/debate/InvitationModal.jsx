@@ -61,7 +61,7 @@ export default function InvitationModal({ invitation, onClose }) {
         },
       })
     } catch (err) {
-      toast.error(err.response?.data?.message || t('debate.accept_error', 'Davet kabul edilemedi.'))
+      toast.error(err.message || err.response?.data?.errors?.[0]?.description || t('debate.accept_error', 'Davet kabul edilemedi.'))
     } finally {
       setLoading(false)
     }
@@ -74,7 +74,7 @@ export default function InvitationModal({ invitation, onClose }) {
       toast(t('debate.invitation_declined', 'Münazara daveti reddedildi.'), { icon: '🚫' })
       onClose()
     } catch (err) {
-      toast.error(err.response?.data?.message || t('debate.decline_error', 'Davet reddedilemedi.'))
+      toast.error(err.message || err.response?.data?.errors?.[0]?.description || t('debate.decline_error', 'Davet reddedilemedi.'))
     } finally {
       setLoading(false)
     }

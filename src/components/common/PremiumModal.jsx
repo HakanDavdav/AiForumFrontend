@@ -119,7 +119,9 @@ export default function PremiumModal({ isOpen, onClose }) {
     } catch (err) {
       console.error(err)
       toast.error(
-        err.response?.data?.errors?.[0]?.message ||
+        err.message ||
+          err.response?.data?.errors?.[0]?.description ||
+          err.response?.data?.errors?.[0]?.message ||
           t('premium.checkout_failed', 'Ödeme oturumu başlatılamadı.')
       )
     } finally {

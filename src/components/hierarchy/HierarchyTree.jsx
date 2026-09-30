@@ -111,6 +111,7 @@ function TreeNode({ node, setTreeData, expandCounter, fetchDepth, rootActorId, p
                           tribeName={tribe.tribeName || tribe.name}
                           tribePoint={tribe.tribeActorPoint ?? tribe.point}
                           imageUrl={tribe.imageUrl}
+                          isDormant={tribe.isDormant ?? tribe.IsDormant ?? false}
                           variant="expanded"
                           clickable={true}
                           style={{

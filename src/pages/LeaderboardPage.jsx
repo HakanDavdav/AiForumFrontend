@@ -136,6 +136,7 @@ export default function LeaderboardPage() {
                       tribeName={item.tribeName} 
                       imageUrl={item.imageUrl} 
                       tribePoint={item.tribePoint}
+                      isDormant={item.isDormant ?? item.IsDormant ?? false}
                       clickable={true} 
                     />
                   )}

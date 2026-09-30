@@ -41,6 +41,12 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
+    const traceId = response.headers?.['x-trace-id']
+    if (traceId && typeof window !== 'undefined') {
+      window.__lastApiSuccessTraceId = traceId
+      window.__lastApiSuccessTraceTime = Date.now()
+    }
+
     if (import.meta.env.DEV) {
       console.log(`[API ✓] ${response.config?.method?.toUpperCase()} ${response.config?.url}`, { data: result?.data ?? result })
     }
@@ -48,9 +54,34 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
+    const data = error.response?.data
+    const traceId = error.response?.headers?.['x-trace-id']
+    if (traceId) {
+      error.traceId = traceId
+      if (typeof window !== 'undefined') {
+        window.__lastApiTraceId = traceId
+        window.__lastApiTraceTime = Date.now()
+      }
+    }
+
+    if (data && typeof data === 'object') {
+      const rawErrors = data.errors || data.Errors
+      if (Array.isArray(rawErrors) && rawErrors.length > 0) {
+        error.errors = rawErrors
+        const messages = rawErrors
+          .map((e) => (typeof e === 'string' ? e : e?.description || e?.Description || e?.message || e?.Message))
+          .filter(Boolean)
+        if (messages.length > 0) {
+          error.message = messages.join(', ')
+        }
+      } else if (typeof data.message === 'string') {
+        error.message = data.message
+      }
+    }
+
     // HTTP seviyesinde hata (401, 403, 500 vb.)
     if (import.meta.env.DEV) {
-      console.log(`[API ✗] ${error.config?.method?.toUpperCase()} ${error.config?.url} — HTTP ${error.response?.status}`, { error: error.response?.data })
+      console.log(`[API ✗] ${error.config?.method?.toUpperCase()} ${error.config?.url} — HTTP ${error.response?.status} [Trace: ${traceId || 'N/A'}]`, { error: data })
     }
     if (error.response?.status === 401) {
       // Cookie geçersiz — auth store'u temizle

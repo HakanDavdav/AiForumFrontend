@@ -371,6 +371,7 @@ export default function TribesPage() {
               tribeName={tr.tribeName || tr.TribeName}
               tribePoint={tr.tribePoint ?? tr.tribeActorPoint ?? tr.TribeActorPoint}
               imageUrl={tr.imageUrl || tr.ImageUrl}
+              isDormant={tr.isDormant ?? tr.IsDormant ?? false}
             />
           ))}
         </div>

@@ -13,6 +13,7 @@ import SelectionMarker from '../common/SelectionMarker'
 import PremiumModal from '../common/PremiumModal'
 import ModifierArrowSvg from '../../assets/FigmaNew/modifierarrow.svg?react'
 import CardIcon from '../common/icons/CardIcon'
+import TRexSkullIcon from '../../assets/t-rex-skull-svgrepo-com.svg?react'
 
 /**
  * ActorMinimalCard — avatar + isim, hierarchy button, selection support.
@@ -99,6 +100,7 @@ export default function ActorMinimalCard({
   const imageUrl = actor.imageUrl !== undefined ? actor.imageUrl : (actor.ImageUrl !== undefined ? actor.ImageUrl : null)
   const discriminator = actor.discriminator || actor.Discriminator || 'Bot'
   const isBot = (discriminator || '').toLowerCase() === 'bot'
+  const isDormant = Boolean(isBot && (actor.isDormant ?? actor.IsDormant ?? false))
 
   const effectiveTriggeredNodeIds =
     (triggeredNodeIds && triggeredNodeIds.length > 0)
@@ -166,7 +168,7 @@ export default function ActorMinimalCard({
 
     return (
       <div
-        className="actor-chip actor-chip--ultra-compact"
+        className={`actor-chip actor-chip--ultra-compact${isDormant ? ' actor-chip--dormant' : ''}`}
         onClick={selectable ? handleActorClick : undefined}
         title={profileName || t('actor.unnamed', 'İsimsiz')}
         style={{
@@ -254,7 +256,7 @@ export default function ActorMinimalCard({
 
   const chipContent = (
     <div
-      className={`actor-chip flex items-center gap-1${selectable ? ' actor-chip--selectable' : ''}${selected ? ' actor-chip--selected' : ''}`}
+      className={`actor-chip flex items-center gap-1${selectable ? ' actor-chip--selectable' : ''}${selected ? ' actor-chip--selected' : ''}${isDormant ? ' actor-chip--dormant' : ''}`}
       onClick={selectable ? handleActorClick : undefined}
       style={{
         position: 'relative',
@@ -308,6 +310,14 @@ export default function ActorMinimalCard({
         >
           {profileName || t('actor.unnamed', 'İsimsiz')}
         </span>
+        {isDormant && (
+          <span
+            className="badge-fossil"
+            title={t('common.fossil_bot_desc', 'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.')}
+          >
+            <TRexSkullIcon className="badge-fossil-icon" />
+          </span>
+        )}
       </div>
 
       {showHierarchyBtn && !selectable && (
@@ -357,7 +367,7 @@ export default function ActorMinimalCard({
           <Edit2 size={12} />
         </button>
       )}
-      {showEditBtn && !selectable && isOwner && (
+      {showEditBtn && !selectable && isOwner && !isDormant && (
         <button
           type="button"
           className="actor-chip-premium-btn"

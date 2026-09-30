@@ -57,7 +57,8 @@ function applyFlow(points, flowMode, force) {
   const dx = end[0] - start[0]
   const dy = end[1] - start[1]
   
-  if (!force && Math.abs(dy) * 1.25 < Math.abs(dx)) {
+  // ~15 degree threshold (tan(15°) ≈ 0.268, multiplier ≈ 3.73)
+  if (!force && Math.abs(dy) * 3.73 < Math.abs(dx)) {
     return points
   }
   
@@ -72,6 +73,17 @@ function applyFlow(points, flowMode, force) {
     reverse = start[1] > end[1]
   }
   return reverse ? [...points].reverse() : points
+}
+
+function getCardVariant(crownedChance, purchasedChance) {
+  const r = Math.random()
+  if (r < purchasedChance) {
+    return { crowned: true, purchased: true }
+  }
+  if (r < purchasedChance + crownedChance) {
+    return { crowned: true, purchased: false }
+  }
+  return { crowned: false, purchased: false }
 }
 
 export default function ArrowCardTravel({
@@ -89,7 +101,10 @@ export default function ArrowCardTravel({
   onPulse,
   maxCards = Infinity,
   rerandomizeInterval = 0,
-  crownedChance = 0.2,
+  crownedChance = 0.3,
+  purchasedChance = 0.1,
+  dormantArrowIds = [],
+  className = '',
 }) {
   const containerRef = useRef(null)
   const cardMapRef = useRef(new Map())
@@ -109,6 +124,7 @@ export default function ArrowCardTravel({
     const infos = []
     svg.querySelectorAll('g[id^="arrow"], g[id^="Arrow"]').forEach(g => {
       const id = g.getAttribute('id')
+      if (dormantArrowIds.includes(id)) return
       const path = g.querySelector('path')
       if (!path) return
       const d = path.getAttribute('d')
@@ -239,7 +255,7 @@ export default function ArrowCardTravel({
             accumLen += len
             subSegments.push({ s, e, len, accumLen })
           }
-          return subSegments.length > 0 && accumLen > 30 ? { subSegments, totalLen: accumLen } : null
+          return subSegments.length > 0 && accumLen > 15 ? { subSegments, totalLen: accumLen } : null
         })
         .filter(Boolean)
     }
@@ -270,11 +286,13 @@ export default function ArrowCardTravel({
       const out = []
       perRoute.forEach(p => {
         for (let k = 0; k < p.count; k++) {
+          const variant = getCardVariant(crownedChance, purchasedChance)
           out.push({
             id: `${p.routeIdx}-${k}-${cardGen}`,
             routeIdx: p.routeIdx,
             born: nowAbs - k * gap,
-            crowned: Math.random() < crownedChance,
+            crowned: variant.crowned,
+            purchased: variant.purchased,
           })
         }
       })
@@ -328,12 +346,16 @@ export default function ArrowCardTravel({
         let changed = false
         let spawned = false
         while (elapsed >= nextPulse) {
-          const wave = routes.map((route, routeIdx) => ({
-            id: nextId++,
-            routeIdx,
-            born: nextPulse,
-            crowned: Math.random() < crownedChance,
-          }))
+          const wave = routes.map((route, routeIdx) => {
+            const variant = getCardVariant(crownedChance, purchasedChance)
+            return {
+              id: nextId++,
+              routeIdx,
+              born: nextPulse,
+              crowned: variant.crowned,
+              purchased: variant.purchased,
+            }
+          })
           cardsRef.current = [...cardsRef.current, ...wave]
           nextPulse += pulseInterval
           changed = true
@@ -356,7 +378,7 @@ export default function ArrowCardTravel({
           const route = routes[c.routeIdx]
           if (!route) return
           const dist = ((elapsed - c.born) / 1000) * speed
-          const FADE_DIST = 15
+          const FADE_DIST = Math.min(15, route.totalLen * 0.25)
           let opacity = 1
           if (dist < FADE_DIST) {
             opacity = dist / FADE_DIST
@@ -399,12 +421,16 @@ export default function ArrowCardTravel({
             })
 
             const newRoutes = [...available].sort(() => Math.random() - 0.5).slice(0, rotateCount)
-            const newCards = newRoutes.map(routeIdx => ({
-              id: `r-${nextId++}`,
-              routeIdx,
-              born: nowAbs,
-              crowned: Math.random() < crownedChance,
-            }))
+            const newCards = newRoutes.map(routeIdx => {
+              const variant = getCardVariant(crownedChance, purchasedChance)
+              return {
+                id: `r-${nextId++}`,
+                routeIdx,
+                born: nowAbs,
+                crowned: variant.crowned,
+                purchased: variant.purchased,
+              }
+            })
             cardsRef.current = [...kept, ...newCards]
             setCards(cardsRef.current)
           }
@@ -440,7 +466,7 @@ export default function ArrowCardTravel({
 
           if (!el) continue
 
-          const FADE_DIST = 15
+          const FADE_DIST = Math.min(15, route.totalLen * 0.25)
           let opacity = 1
           if (dist < FADE_DIST) {
             opacity = dist / FADE_DIST
@@ -473,12 +499,12 @@ export default function ArrowCardTravel({
       cancelAnimationFrame(rafId)
       if (ro) ro.disconnect()
     }
-  }, [Svg, cardWidth, speed, offset, spacing, cardColor, flowMode, flowModeOverrides, pulseInterval, onPulse, maxCards, rerandomizeInterval, crownedChance])
+  }, [Svg, cardWidth, speed, offset, spacing, cardColor, flowMode, flowModeOverrides, pulseInterval, onPulse, maxCards, rerandomizeInterval, crownedChance, purchasedChance, dormantArrowIds.join(',')])
 
   const cardHeight = cardWidth * CARD_ASPECT
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: `${widthPct}%`, flexShrink: 0 }}>
+    <div ref={containerRef} className={className} style={{ position: 'relative', width: `${widthPct}%`, flexShrink: 0 }}>
       {Svg ? (
         <Svg style={{ width: '100%', height: 'auto', display: 'block', ...svgStyle }} />
       ) : null}
@@ -504,6 +530,7 @@ export default function ArrowCardTravel({
         >
           <CardIcon
             crowned={Boolean(c.crowned)}
+            purchased={Boolean(c.purchased)}
             width={cardWidth}
             height={cardHeight}
             color={cardColor}

@@ -159,9 +159,11 @@ export default function SystemEventsPanel() {
     mutationFn: (data) => adminApi.triggerSystemCustomEvent(data),
     meta: { showErrorToast: true },
     onSuccess: (res) => {
-      const traceId = res?.data?.data
-      setLastTraceId(traceId || null)
-      toast.success(t('admin.system_event_triggered', 'Sistem olayı başarıyla tetiklendi!'))
+      const traceId = res?.headers?.['x-trace-id'] || window.__lastApiSuccessTraceId || null
+      setLastTraceId(traceId)
+      toast.success(t('admin.system_event_triggered', 'Sistem olayı başarıyla tetiklendi!'), {
+        traceId,
+      })
     },
   })
 
@@ -173,9 +175,11 @@ export default function SystemEventsPanel() {
       }),
     meta: { showErrorToast: true },
     onSuccess: (res) => {
-      const traceId = res?.data?.data
-      setLastTraceId(traceId || null)
-      toast.success(t('admin.bot_event_triggered', 'Bot olayı başarıyla tetiklendi!'))
+      const traceId = res?.headers?.['x-trace-id'] || window.__lastApiSuccessTraceId || null
+      setLastTraceId(traceId)
+      toast.success(t('admin.bot_event_triggered', 'Bot olayı başarıyla tetiklendi!'), {
+        traceId,
+      })
     },
   })
 

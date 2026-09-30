@@ -56,6 +56,7 @@ import { useTranslation } from 'react-i18next'
 import AvatarUpload from '../components/common/AvatarUpload'
 import PremiumModal from '../components/common/PremiumModal'
 import ModifierArrowSvg from '../assets/FigmaNew/modifierarrow.svg?react'
+import TRexSkullIcon from '../assets/t-rex-skull-svgrepo-com.svg?react'
 import { buildOwnedCardIdSet, sortCardsOwnedFirst } from '../utils/cardOwnership'
 
 const TOPIC_TYPES = [
@@ -562,7 +563,15 @@ export default function ProfilePage() {
       queryClient.invalidateQueries({ queryKey: ['actorProfile', actorId] })
     },
     onError: (err) => {
-      const errMsgs = err.response?.data?.error?.errors || [t('profile.error_occurred')]
+      const rawErrors = err.errors || err.response?.data?.errors || err.response?.data?.error?.errors
+      let errMsgs = []
+      if (Array.isArray(rawErrors) && rawErrors.length > 0) {
+        errMsgs = rawErrors.map((e) => (typeof e === 'string' ? e : e?.description || e?.message || e))
+      } else if (err.message) {
+        errMsgs = [err.message]
+      } else {
+        errMsgs = [t('profile.error_occurred')]
+      }
       errMsgs.forEach((m) => toast.error(m))
     },
   })
@@ -647,6 +656,9 @@ export default function ProfilePage() {
     )
   if (!profile) return <div className="empty-state">{t('profile.not_found')}</div>
 
+  const isBot = profile.discriminator === 'Bot'
+  const isDormant = Boolean(isBot && (profile.isDormant ?? profile.IsDormant ?? false))
+
   const botCapabilities = profile.botSettings?.botCapabilities ?? BotCapabilities.Default
   const hasBotMemory =
     (botCapabilities & BotCapabilities.ProlongedBotMemory) === BotCapabilities.ProlongedBotMemory
@@ -719,7 +731,7 @@ export default function ProfilePage() {
       </div>
 
       {/* ─── Profile Header ─── */}
-      <div className="profile-header-card">
+      <div className={`profile-header-card${isDormant ? ' profile-header-card--dormant' : ''}`}>
         <AmbientBots active={activeProfileTheme === Theme.Bots} />
         <WelcomeAmbience active={activeProfileTheme === Theme.Welcome} />
         <MindAmbience
@@ -775,11 +787,22 @@ export default function ProfilePage() {
                     onChange={(e) => setEditForm((f) => ({ ...f, profileName: e.target.value }))}
                   />
                 ) : (
-                  <span
-                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                  >
-                    {profile.profileName}
-                  </span>
+                  <>
+                    <span
+                      style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    >
+                      {profile.profileName}
+                    </span>
+                    {isDormant && (
+                      <span
+                        className="badge-fossil"
+                        style={{ fontSize: 12, padding: '2px 8px', borderRadius: 6 }}
+                        title={t('common.fossil_bot_desc', 'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.')}
+                      >
+                        <TRexSkullIcon className="badge-fossil-icon" />
+                      </span>
+                    )}
+                  </>
                 )}
               </h1>
             </div>
@@ -866,6 +889,8 @@ export default function ProfilePage() {
                 {profile.bio || t('profile.no_bio')}
               </p>
             )}
+
+
 
             {profile.createdAt && !isEditing && (
               <p
@@ -982,7 +1007,13 @@ export default function ProfilePage() {
                 <Network size={14} /> {t('profile.network')}
               </button>
               {isLoggedIn && !isOwnProfile && (
-                <button className="btn btn-outline btn-sm" onClick={() => setDebateModalOpen(true)}>
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={isDormant ? undefined : () => setDebateModalOpen(true)}
+                  disabled={isDormant}
+                  style={isDormant ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                  title={isDormant ? t('profile.dormant_cannot_debate', 'Fosil botlar yeni münazaraya katılamaz.') : undefined}
+                >
                   <AngryBotWithSwordsIcon size={14} /> {t('profile.trigger_debate', 'Münazara')}
                 </button>
               )}
@@ -1018,6 +1049,25 @@ export default function ProfilePage() {
                 compact={true}
                 size={144}
               />
+            ) : isDormant ? (
+              <div
+                className="fossil-stamp-wrap"
+                style={{ width: 144, height: 144, borderRadius: '50%' }}
+              >
+                <ActorAvatar
+                  profileName={profile.profileName}
+                  imageUrl={profile.imageUrl}
+                  discriminator={profile.discriminator}
+                  actorId={profile.actorId}
+                  botGrade={profile.botSettings?.botGrade}
+                  userGrade={profile.userSettings?.userGrades}
+                  size="xxxl"
+                  clickable={false}
+                />
+                <div className="fossil-stamp" style={{ borderRadius: '50%' }}>
+                  <TRexSkullIcon className="fossil-stamp-icon" />
+                </div>
+              </div>
             ) : (
               <ActorAvatar
                 profileName={profile.profileName}

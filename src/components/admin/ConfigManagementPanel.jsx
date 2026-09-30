@@ -22,7 +22,7 @@ export default function ConfigManagementPanel() {
     queryKey: ['adminAppSettings'],
     queryFn: async () => {
       const res = await adminApi.getAppSettings()
-      return res.data
+      return res.data?.data ?? res.data
     },
     meta: { showErrorToast: true },
   })

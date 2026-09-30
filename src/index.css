@@ -1426,7 +1426,7 @@ select {
   display: inline-flex;
   width: max-content;
   height: max-content;
-  z-index: 2;
+  z-index: 10;
 }
 
 .actor-avatar-badge-group .actor-avatar-user-badge {
@@ -2449,6 +2449,120 @@ select {
   background: color-mix(in srgb, var(--color-primary) 16%, var(--color-surface) 84%);
 }
 
+/* ─── Dormant / Fossil Grayscale System ─────────────────────────────── */
+.actor-chip--dormant {
+  filter: grayscale(0.85);
+  opacity: 0.82;
+  border-color: var(--color-border) !important;
+}
+
+.actor-chip--dormant:hover {
+  filter: grayscale(0.35);
+  opacity: 0.95;
+}
+
+.tribe-card--dormant {
+  filter: grayscale(0.85);
+  opacity: 0.82;
+  border-color: var(--color-border) !important;
+}
+
+.tribe-card--dormant:hover {
+  filter: grayscale(0.35);
+  opacity: 0.95;
+}
+
+.profile-header-card--dormant {
+  filter: grayscale(0.75);
+  border-color: var(--color-border) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.profile-header-card--dormant:hover {
+  filter: grayscale(0.3);
+}
+
+.badge-fossil {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.badge-fossil-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* light tema: koyu */
+.badge-fossil-icon path {
+  fill: #1a1a1a;
+}
+
+/* dark temada beyaz */
+html.dark .badge-fossil-icon path {
+  fill: rgba(255, 255, 255, 0.85);
+}
+
+/* ─── Fossil Stamp Overlay (avatar üzeri damga) ─────────────────────── */
+.fossil-stamp-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* .fossil-stamp works inside any position:relative parent (fossil-stamp-wrap OR actor-avatar-wrap) */
+.fossil-stamp {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* light tema: beyazımsı overlay */
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(1px);
+  z-index: 5;
+  pointer-events: none;
+}
+
+html.dark .fossil-stamp {
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.fossil-stamp-icon {
+  width: 80px;
+  height: 80px;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  transform: rotate(-22deg);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* light temada koyu ikon */
+.fossil-stamp-icon path {
+  fill: rgba(30, 30, 30, 0.85);
+}
+
+/* dark temada beyaz ikon */
+html.dark .fossil-stamp-icon path {
+  fill: rgba(255, 255, 255, 0.88);
+}
+
+/* Smaller variant for minimal cards */
+.fossil-stamp--sm .fossil-stamp-icon,
+.fossil-stamp.fossil-stamp--sm .fossil-stamp-icon {
+  width: 40px;
+  height: 40px;
+}
+
 .actor-chip-hier-btn {
   display: inline-flex;
   align-items: center;
@@ -2504,7 +2618,6 @@ select {
   box-shadow: none !important;
   border-radius: var(--radius-full, 9999px) !important;
 }
-
 
 /* â”€â”€â”€ Reaction Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .reaction-group {
@@ -3582,11 +3695,21 @@ textarea {
 
 /* ─── Avatar Crop Modal Animations ─────────────────────────────────────── */
 @keyframes avatarCropFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes avatarCropSlideUp {
-  from { opacity: 0; transform: translateY(24px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
