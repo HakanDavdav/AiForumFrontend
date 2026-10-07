@@ -35,7 +35,7 @@ export default function HierarchyConnectionsOverlay({
   data,
   rootActorId,
   expandCounter,
-  zoomLevel = 0.82,
+  structureVersion = 0,
   cardWidth = 28,
   speed = 54,
   pulseInterval = 2000,
@@ -67,7 +67,12 @@ export default function HierarchyConnectionsOverlay({
     if (!container) return
 
     const containerRect = container.getBoundingClientRect()
-    const zoom = zoomLevel || 1
+    // Efektif ölçek: getBoundingClientRect (zoom uygulanmış) / offsetWidth (layout).
+    // Hem CSS zoom hem transform fallback'inde doğru çalışır ve zoom değişince
+    // ölçümü yeniden tetiklemeye gerek kalmaz (yerel koordinatlar zoom-invariant).
+    const zoom = container.offsetWidth > 0
+      ? containerRect.width / container.offsetWidth
+      : 1
     const width = Math.max(container.scrollWidth, container.offsetWidth, 100)
     const height = Math.max(container.scrollHeight, container.offsetHeight, 100)
 
@@ -75,13 +80,24 @@ export default function HierarchyConnectionsOverlay({
     const newPaths = []
     const newRoutes = []
 
+    // İlk geçiş: tüm çocukları ölç ve ebeveyn bazında topla.
+    // Katmanlı görünüm için aynı ebeveynin çocukları ortak bir yatay kırım
+    // (dirsek) Y'si kullanır. Pill'li kartların kart üstü daha aşağıda olduğu
+    // için kendi midY'leri ile çizilirse devasa yatay hattan kopuyordu.
+    const parentRects = new Map()
+    const entries = []
     childEls.forEach((childEl, index) => {
       const parentId = childEl.getAttribute('data-parent-id')
       if (!parentId) return
-      const parentEl = container.querySelector(`[data-node-id="${parentId}"]`)
-      if (!parentEl) return
 
-      const pRect = parentEl.getBoundingClientRect()
+      let pRect = parentRects.get(parentId)
+      if (!pRect) {
+        const parentEl = container.querySelector(`[data-node-id="${parentId}"]`)
+        if (!parentEl) return
+        pRect = parentEl.getBoundingClientRect()
+        parentRects.set(parentId, pRect)
+      }
+
       const cRect = childEl.getBoundingClientRect()
 
       // Zoom etkisini kompanse ederek unzoomed container koordinatlarını bul
@@ -90,8 +106,25 @@ export default function HierarchyConnectionsOverlay({
       const endX = (cRect.left + cRect.width / 2 - containerRect.left) / zoom
       const endY = (cRect.top - containerRect.top) / zoom
 
-      // Dikey orta nokta (kırım seviyesi)
-      const midY = startY + (endY - startY) / 2
+      entries.push({ childEl, index, parentId, startX, startY, endX, endY })
+    })
+
+    // Ebeveyn başına ortak dirsek Y'si = çocukların en üstteki midY'si.
+    // Böylece her derinlikte yatay hat tek ve aynı hizada kalır; pill'li
+    // kartın bağlantısı bu hattan aşağı iner.
+    const groupMidY = new Map()
+    for (const entry of entries) {
+      const m = entry.startY + (entry.endY - entry.startY) / 2
+      const current = groupMidY.get(entry.parentId)
+      if (current === undefined || m < current) {
+        groupMidY.set(entry.parentId, m)
+      }
+    }
+
+    // İkinci geçiş: ortak dirsek Y'si ile çiz.
+    for (const entry of entries) {
+      const { childEl, index, parentId, startX, startY, endX, endY } = entry
+      const midY = groupMidY.get(parentId) ?? startY + (endY - startY) / 2
 
       let d
       let pts
@@ -143,12 +176,12 @@ export default function HierarchyConnectionsOverlay({
           totalLen: accumLen,
         })
       }
-    })
+    }
 
     routesRef.current = newRoutes
     setPaths(newPaths)
     setDimensions({ width, height })
-  }, [containerRef, zoomLevel, rootActorId, data])
+  }, [containerRef, rootActorId, data])
 
   // Ağaç verisi, genişletme sayacı veya zoom değiştiğinde ölçümü tetikle
   useEffect(() => {
@@ -184,7 +217,7 @@ export default function HierarchyConnectionsOverlay({
       if (ro) ro.disconnect()
       if (mo) mo.disconnect()
     }
-  }, [updateConnections, data, expandCounter, zoomLevel])
+  }, [updateConnections, data, expandCounter, structureVersion])
 
   // Heartbeat ile senkronize dalga (pulse) animasyon döngüsü
   useEffect(() => {

@@ -159,27 +159,24 @@ export default function PostCard({
                   })
                 }}
                 title={t('mind.view_recalled_memory', 'Tetiklenen hafızayı 3D olarak görüntüle')}
-                style={{
-                  gap: 5,
-                  ...(hasTriggered ? { color: '#f59e0b' } : {}),
-                }}
+                style={{ gap: 5 }}
               >
                 <SynapseBrainIcon
                   brainSize={14}
                   zapSize={10}
-                  brainColor={hasTriggered ? '#f59e0b' : 'currentColor'}
-                  zapColor={hasTriggered ? '#fbbf24' : 'currentColor'}
+                  brainColor="currentColor"
+                  zapColor={hasTriggered ? 'var(--color-synapse-zap, var(--color-primary))' : 'currentColor'}
                 />
-                <span>Linked</span>
+                <span>Recalled</span>
                 {hasTriggered && (
                   <span
                     style={{
                       fontSize: 10,
                       padding: '1px 5px',
                       borderRadius: 8,
-                      background: 'rgba(245, 158, 11, 0.2)',
-                      color: '#f59e0b',
-                      fontWeight: 700
+                      background: 'var(--color-surface-2)',
+                      color: 'var(--color-text-muted)',
+                      fontWeight: 600
                     }}
                   >
                     {effectiveNodeIds.length}

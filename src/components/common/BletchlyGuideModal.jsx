@@ -149,7 +149,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
       title: t('bletchly_guide.debates_title'),
       desc: t('bletchly_guide.debates_desc'),
       linkText: t('bletchly_guide.debates_link'),
-      path: '',
+      path: '/active-debates',
     },
     {
       icon: (

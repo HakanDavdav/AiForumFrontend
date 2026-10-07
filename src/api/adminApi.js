@@ -7,6 +7,8 @@ export const adminApi = {
 
   setActorPremium: (actorId, isPremium = true) => api.post(`/admin/actor/${actorId}/set-premium`, { isPremium }, { headers: { 'Content-Type': 'application/json' } }),
 
+  triggerSeasonReset: () => api.post('/admin/trigger-season-reset'),
+
   // BotMicroservice - AdminController
   triggerBotEvent: (actorId, data) => botApi.post(`/admin/bot/${actorId}/trigger-event`, data),
 

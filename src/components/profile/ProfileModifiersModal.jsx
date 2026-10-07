@@ -307,7 +307,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   baseValue: '0',
                   modifiers: [
                     { label: 'Slot/Kart', value: `+${stepBonus}`, color: gradeColor },
-                    ...(!isTribe ? [{ label: 'Münazara', value: `+${stepBonus}`, color: 'var(--color-primary)' }] : []),
+                    ...(!isTribe ? [{ label: 'Meydan Okuma', value: `+${stepBonus}`, color: 'var(--color-primary)' }] : []),
                     { label: 'Miras', value: `+%${stepBonus}`, color: 'var(--color-primary)' },
                     ...(isBot || isTribe ? [{ label: 'Miras Çarpanı', value: `+%${gradeContingencyMod}`, color: '#f59e0b' }] : []),
                   ],
@@ -366,7 +366,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                     modifiers: [
                       { label: 'Bot Kotası', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
                       { label: 'Kart Alanı', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Münazara', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: 'Meydan Okuma', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
                       { label: 'Miras Şansı', value: isPremiumUser ? '+%4' : '+%0', color: 'var(--color-primary)' },
                     ],
                     totalValue: isPremiumUser ? '+4' : '+0',
@@ -491,7 +491,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    {profile.botsCount ?? (profile.bots?.length || 0)} /{' '}
+                    {profile.botsCount ?? (profile.bots?.filter(b => !b.isDormant)?.length || 0)} /{' '}
                     {isBot
                       ? (profile.botSettings?.botCountLimit || (4 + stepBonus))
                       : (profile.userSettings?.botCountLimit || (4 + stepBonus + (isPremiumUser ? 4 : 0)))}
@@ -554,7 +554,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    {profile.tribes?.length || 0} /{' '}
+                    {profile.tribes?.filter(t => !t.isDormant)?.length || 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.tribeCountLimit || (3 + stepBonus))
                       : (profile.userSettings?.tribeCountLimit || (3 + stepBonus + (isPremiumUser ? 4 : 0)))}
@@ -764,7 +764,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
             </div>
           )}
 
-          {/* 6. Münazara / Tartışma Limiti */}
+          {/* 6. Meydan Okuma / Tartışma Limiti */}
           {!isTribe && (
             <div style={{ order: 5 }}>
               <div
@@ -788,7 +788,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                       {t('profile.daily_debate_limit', 'Günlük Tartışma Limiti')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-                      {t('profile.daily_debate_limit_desc', 'Eşzamanlı aktif münazara ve tartışma hakkı')}
+                      {t('profile.daily_debate_limit_desc', 'Eşzamanlı aktif meydan okuma ve tartışma hakkı')}
                     </div>
                   </div>
                 </div>
@@ -946,7 +946,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                 </div>
               </div>
               <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                {profile.botSettings.dailyBotOperationCount}
+                {5}
               </div>
             </div>
           )}

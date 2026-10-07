@@ -101,8 +101,18 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
   const actorId = card.actorId
   const acquisitionType =
     card.acquisitionType === 0 ? t('card.created', 'Oluşturuldu') : card.acquisitionType === 1 ? t('card.purchased', 'Satın Alındı') : null
-  const assignedBots = card.assignedBots || cardData.assignedBots || []
-  const assignedTribes = card.assignedTribes || cardData.assignedTribes || []
+  const rawAssignedBots = card.assignedBots || cardData.assignedBots || []
+  const rawAssignedTribes = card.assignedTribes || cardData.assignedTribes || []
+
+  const assignedNodes = [
+    ...rawAssignedBots.map((b) => ({ type: 'actor', data: b })),
+    ...rawAssignedTribes.map((tr) => ({ type: 'tribe', data: tr })),
+  ].sort((a, b) => {
+    const aDormant = Boolean(a.data?.isDormant ?? a.data?.IsDormant ?? false) ? 1 : 0
+    const bDormant = Boolean(b.data?.isDormant ?? b.data?.IsDormant ?? false) ? 1 : 0
+    return aDormant - bDormant
+  })
+
   const ownershipCount = cardData.ownershipCount ?? card.ownershipCount
   const assignmentCount = cardData.assignmentCount ?? card.assignmentCount
 
@@ -220,7 +230,7 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
             ))}
           </div>
 
-          {(assignedBots.length > 0 || assignedTribes.length > 0) && (
+          {assignedNodes.length > 0 && (
             <div style={{ paddingTop: 20 }}>
               <h3
                 style={{
@@ -236,26 +246,28 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
                 {t('card.assignments', 'Atamalar')}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {assignedBots.map((assignedBot) => (
-                  <ActorMinimalCard
-                    key={assignedBot.actorId}
-                    actor={assignedBot}
-                    showHierarchyBtn={false}
-                    showMindBtn={false}
-                    showEditBtn={false}
-                    clickable={true}
-                  />
-                ))}
-                {assignedTribes.map((assignedTribe) => (
-                  <TribeMinimalCard
-                    key={assignedTribe.tribeId}
-                    {...assignedTribe}
-                    showPoint={false}
-                    showMindBtn={false}
-                    showEditBtn={false}
-                    clickable={true}
-                  />
-                ))}
+                {assignedNodes.map((node) =>
+                  node.type === 'tribe' ? (
+                    <TribeMinimalCard
+                      key={`assigned-tribe-${node.data.tribeId}`}
+                      {...node.data}
+                      isDormant={node.data.isDormant ?? node.data.IsDormant}
+                      showPoint={false}
+                      showMindBtn={false}
+                      showEditBtn={false}
+                      clickable={true}
+                    />
+                  ) : (
+                    <ActorMinimalCard
+                      key={`assigned-actor-${node.data.actorId}`}
+                      actor={node.data}
+                      showHierarchyBtn={false}
+                      showMindBtn={false}
+                      showEditBtn={false}
+                      clickable={true}
+                    />
+                  )
+                )}
               </div>
             </div>
           )}

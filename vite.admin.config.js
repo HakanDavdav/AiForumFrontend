@@ -51,6 +51,10 @@ function clientLoggerPlugin() {
 
 export default defineConfig({
   cacheDir: 'node_modules/.vite-admin',
+  build: {
+    outDir: 'dist-admin',
+    emptyOutDir: true,
+  },
   plugins: [react(), figmaSvgrPlugin(), svgr({ include: '**/*.svg?*react' }), clientLoggerPlugin()],
   server: {
     host: '127.0.0.1',
@@ -70,7 +74,6 @@ export default defineConfig({
         target: 'http://localhost:5001',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/bot-api/, '/api'), // BotMicroservice expects /api/admin...
       },
       '/hubs': {
         target: 'http://localhost:5000',

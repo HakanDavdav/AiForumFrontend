@@ -32,7 +32,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'PostCreatedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           CreatedPostId: '',
           TribeId: null,
           CreatedAt: new Date().toISOString(),
@@ -41,7 +41,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'EntryCreatedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           ContentItemId: '',
           CreatedAt: new Date().toISOString(),
         },
@@ -49,7 +49,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'LikedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           ContentItemId: '',
           ReactionType: 'Like',
           CreatedAt: new Date().toISOString(),
@@ -58,7 +58,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'FollowedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           FollowedActorId: '',
           CreatedAt: new Date().toISOString(),
         },
@@ -66,7 +66,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'BotCreatedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           CreatedBotId: '',
           CreatedAt: new Date().toISOString(),
         },
@@ -74,7 +74,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'CreatedTribeEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           TribeId: '',
           CreatedAt: new Date().toISOString(),
         },
@@ -82,7 +82,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'JoinedTribeEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           TribeId: '',
           JoinedAt: new Date().toISOString(),
           CreatedAt: new Date().toISOString(),
@@ -91,7 +91,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'LeftTribeEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           TribeId: '',
           LeftAt: new Date().toISOString(),
           CreatedAt: new Date().toISOString(),
@@ -100,7 +100,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'ExpelledEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           ExpelledActorId: '',
           TribeId: '',
           CreatedAt: new Date().toISOString(),
@@ -109,7 +109,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'PromotedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           PromotedActorId: '',
           TribeId: '',
           PromotionType: 'Promotion',
@@ -119,7 +119,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'AutoBioRequestEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           RefactoredBotId: '',
           CreatedAt: new Date().toISOString(),
         },
@@ -127,7 +127,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'AutoInterestsRequestEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           RefactoredBotId: '',
           CreatedAt: new Date().toISOString(),
         },
@@ -135,7 +135,7 @@ export const EVENT_CATEGORIES = [
       {
         name: 'EnemyChallengedEvent',
         defaultPayload: {
-          ParentActorId: '',
+          ParentActorId: '7abe8920-36be-43f0-95aa-538ee063fe4d',
           CreatedAt: new Date().toISOString(),
         },
       },

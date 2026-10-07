@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:admin": "vite --config vite.admin.config.js",
     "build": "vite build",
+    "build:admin": "vite build --config vite.admin.config.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },

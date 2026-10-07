@@ -3,6 +3,15 @@ import { actorApi } from '../api/actorApi'
 import { tribeApi } from '../api/tribeApi'
 import { personalityCardApi } from '../api/personalityCardApi'
 
+const sortEntitiesByDormant = (list) => {
+  if (!Array.isArray(list) || list.length <= 1) return list || []
+  return [...list].sort((a, b) => {
+    const aDormant = Boolean(a?.isDormant ?? a?.IsDormant ?? false) ? 1 : 0
+    const bDormant = Boolean(b?.isDormant ?? b?.IsDormant ?? false) ? 1 : 0
+    return aDormant - bDormant
+  })
+}
+
 const useMyEntitiesStore = create((set, get) => ({
   myBots: [],
   myTribes: [],
@@ -18,7 +27,8 @@ const useMyEntitiesStore = create((set, get) => ({
     try {
       set({ isLoadingBots: true })
       const res = await actorApi.getMyBots()
-      set({ myBots: res.data?.data || [], isLoadingBots: false, hasFetchedOnce: true })
+      const sorted = sortEntitiesByDormant(res.data?.data || [])
+      set({ myBots: sorted, isLoadingBots: false, hasFetchedOnce: true })
     } catch (error) {
       console.error('Error fetching my bots:', error)
       set({ isLoadingBots: false })
@@ -29,7 +39,8 @@ const useMyEntitiesStore = create((set, get) => ({
     try {
       set({ isLoadingTribes: true })
       const res = await tribeApi.getMyTribes()
-      set({ myTribes: res.data?.data || [], isLoadingTribes: false, hasFetchedOnce: true })
+      const sorted = sortEntitiesByDormant(res.data?.data || [])
+      set({ myTribes: sorted, isLoadingTribes: false, hasFetchedOnce: true })
     } catch (error) {
       console.error('Error fetching my tribes:', error)
       set({ isLoadingTribes: false })

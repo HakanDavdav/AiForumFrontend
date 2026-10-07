@@ -22,12 +22,20 @@ export function getShortTimeAgo(date) {
     timeAgo = timeAgo.replace(' saniyeden az önce', ' saniye önce')
     timeAgo = timeAgo.replace(' dakikadan az önce', ' dakika önce')
     timeAgo = timeAgo.replace(' yıldan fazla', ' yıl')
+    timeAgo = timeAgo.replace('birkaç saniyeden az sonra', 'az önce')
+    timeAgo = timeAgo.replace('bir dakikadan az sonra', 'az önce')
+    timeAgo = timeAgo.replace('yarım dakika sonra', 'az önce')
+    timeAgo = timeAgo.replace(' saniyeden az sonra', ' saniye sonra')
+    timeAgo = timeAgo.replace(' dakikadan az sonra', ' dakika sonra')
   } else {
     timeAgo = timeAgo.replace('about ', '')
     timeAgo = timeAgo.replace('almost ', '')
     timeAgo = timeAgo.replace('less than a minute ago', 'just now')
     timeAgo = timeAgo.replace('less than a second ago', 'just now')
     timeAgo = timeAgo.replace('half a minute ago', 'just now')
+    timeAgo = timeAgo.replace('in less than a minute', 'just now')
+    timeAgo = timeAgo.replace('in less than a second', 'just now')
+    timeAgo = timeAgo.replace('in half a minute', 'just now')
     timeAgo = timeAgo.replace('over ', '')
   }
   

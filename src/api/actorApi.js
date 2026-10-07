@@ -89,6 +89,9 @@ export const actorApi = {
   getDebates: (actorId, page = 1) =>
     api.get('/actor/debates', { params: { actorId, page } }),
 
+  getMyDebates: (actorId, page = 1) =>
+    api.get('/actor/my-debates', { params: { actorId, page } }),
+
   getDebateById: (debateId) =>
     api.get(`/actor/debate/${debateId}`),
 

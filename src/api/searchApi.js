@@ -41,6 +41,22 @@ export const searchApi = {
 
   getTribeLeaderboard: () =>
     api.get('/search/cache/tribe-leaderboard'),
+
+  getCardLeaderboard: () =>
+    api.get('/search/cache/card-leaderboard'),
+
+  // ─── Season & Archive Endpoints ──────────────────────────────────────────
+  getSeasonStatus: () =>
+    api.get('/search/season-status'),
+
+  getAvailableSeasons: () =>
+    api.get('/search/seasons'),
+
+  getSeasonLeaderboard: (seasonNumber, category) => {
+    const categoryMap = { bot: 0, user: 1, tribe: 2, Bot: 0, User: 1, Tribe: 2 }
+    const cat = typeof category === 'number' ? category : (categoryMap[category] ?? 0)
+    return api.get(`/search/season-leaderboard/${seasonNumber}`, { params: { category: cat } })
+  },
 }
 
 /**
@@ -75,7 +91,7 @@ export function parseCacheResponse(response) {
       const seen = new Set()
       result = result.filter(item => {
         if (!item || typeof item !== 'object') return true
-        const id = item.contentItemId || item.actorId || item.tribeId
+        const id = item.contentItemId || item.actorId || item.tribeId || item.ownershipId || item.personalityCardId || item.cardId
         if (!id) return true
         if (seen.has(id)) return false
         seen.add(id)

@@ -13,7 +13,9 @@ import SelectionMarker from '../common/SelectionMarker'
 import PremiumModal from '../common/PremiumModal'
 import ModifierArrowSvg from '../../assets/FigmaNew/modifierarrow.svg?react'
 import CardIcon from '../common/icons/CardIcon'
+import KingIcon from '../common/icons/KingIcon'
 import TRexSkullIcon from '../../assets/t-rex-skull-svgrepo-com.svg?react'
+import { UserCapabilities } from '../../constants/enums'
 
 /**
  * ActorMinimalCard — avatar + isim, hierarchy button, selection support.
@@ -92,6 +94,17 @@ export default function ActorMinimalCard({
 
   const matchingCardsCount = matchingCards.length
   const visibleCards = matchingCards.slice(0, 5)
+
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ['actorProfile', currentUserId],
+    queryFn: () => actorApi.getProfile(currentUserId).then((r) => r.data?.data ?? null),
+    enabled: isLoggedIn && !!currentUserId,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const isPremiumOwner =
+    ((currentUserProfile?.userSettings?.userCapabilities ?? UserCapabilities.Default) &
+      UserCapabilities.Premium) === UserCapabilities.Premium
 
   if (!actor) return null
 
@@ -220,18 +233,9 @@ export default function ActorMinimalCard({
                 ? `${t('mind.show', 'Zihin Haritası')} (${effectiveTriggeredNodeIds.length} ${t('mind.triggered_nodes', 'tetiklenen anı')})`
                 : t('mind.show', 'Zihin Haritası')
             }
-            style={
-              hasTriggeredNodes
-                ? {
-                    background: 'rgba(245, 158, 11, 0.15)',
-                    borderColor: '#f59e0b',
-                    color: '#f59e0b',
-                  }
-                : undefined
-            }
           >
             {hasTriggeredNodes ? (
-              <SynapseBrainIcon brainSize={12} zapSize={8} brainColor="#f59e0b" zapColor="#fbbf24" />
+              <SynapseBrainIcon brainSize={12} zapSize={8} brainColor="currentColor" zapColor="var(--color-synapse-zap, var(--color-primary))" />
             ) : (
               <Brain size={12} />
             )}
@@ -246,6 +250,7 @@ export default function ActorMinimalCard({
   const hasTriggeredNodes = effectiveTriggeredNodeIds && effectiveTriggeredNodeIds.length > 0
 
   const hasExtraElements =
+    isDormant ||
     (showHierarchyBtn && !selectable) ||
     (showMindBtn && !selectable && isBot) ||
     (showEditBtn && !selectable && isOwner) ||
@@ -310,15 +315,56 @@ export default function ActorMinimalCard({
         >
           {profileName || t('actor.unnamed', 'İsimsiz')}
         </span>
-        {isDormant && (
-          <span
-            className="badge-fossil"
-            title={t('common.fossil_bot_desc', 'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.')}
-          >
-            <TRexSkullIcon className="badge-fossil-icon" />
-          </span>
-        )}
       </div>
+
+      {matchingCardsCount > 0 && (
+        <div
+          className="actor-chip-card-stack"
+          title={t('card.matching_cards_assigned', {
+            count: matchingCardsCount,
+            defaultValue: `${matchingCardsCount} adet kişisel kartınız bu botta takılı`,
+          })}
+          onClick={clickable && !selectable ? handleActorClick : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            flexShrink: 0,
+            cursor: clickable && !selectable ? 'pointer' : 'default',
+            pointerEvents: clickable && !selectable ? 'auto' : 'none',
+          }}
+        >
+          {visibleCards.map((card, idx) => (
+            <span
+              key={card.id ?? idx}
+              className="actor-chip-card-item"
+              style={{
+                position: 'relative',
+                marginLeft: idx === 0 ? 0 : -10,
+                zIndex: idx + 1,
+                display: 'inline-flex',
+                alignItems: 'flex-end',
+              }}
+            >
+              <CardIcon
+                crowned
+                purchased={card.acquisitionType === 1}
+                width={21}
+                height={24}
+                style={{ display: 'block' }}
+              />
+            </span>
+          ))}
+        </div>
+      )}
+
+      {isDormant && (
+        <span
+          className="badge-fossil badge-fossil--plain"
+          title={t('common.fossil_bot_desc', 'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.')}
+        >
+          <TRexSkullIcon className="badge-fossil-icon" />
+        </span>
+      )}
 
       {showHierarchyBtn && !selectable && (
         <button
@@ -340,24 +386,15 @@ export default function ActorMinimalCard({
               ? `${t('mind.show', 'Zihin Haritası')} (${effectiveTriggeredNodeIds.length} ${t('mind.triggered_nodes', 'tetiklenen anı')})`
               : t('mind.show', 'Zihin Haritası')
           }
-          style={
-            hasTriggeredNodes
-              ? {
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  borderColor: '#f59e0b',
-                  color: '#f59e0b',
-                }
-              : undefined
-          }
         >
           {hasTriggeredNodes ? (
-            <SynapseBrainIcon brainSize={12} zapSize={8} brainColor="#f59e0b" zapColor="#fbbf24" />
+            <SynapseBrainIcon brainSize={12} zapSize={8} brainColor="currentColor" zapColor="var(--color-synapse-zap, var(--color-primary))" />
           ) : (
             <Brain size={12} />
           )}
         </button>
       )}
-      {showEditBtn && !selectable && isOwner && (
+      {showEditBtn && !selectable && isOwner && !isDormant && (
         <button
           type="button"
           className="actor-chip-hier-btn"
@@ -376,13 +413,18 @@ export default function ActorMinimalCard({
             e.stopPropagation()
             setIsPremiumOpen(true)
           }}
-          title={t('premium.title', 'Premium')}
+          title={isPremiumOwner ? t('premium.active', 'Premium Aktif') : t('premium.title', 'Premium')}
         >
-          <ModifierArrowSvg
-            width={16}
-            height={22}
-            style={{ display: 'block' }}
-          />
+          {isPremiumOwner ? (
+            <KingIcon size={16} />
+          ) : (
+            <ModifierArrowSvg
+              width={16}
+              height={22}
+              className="modifier-arrow"
+              style={{ display: 'block' }}
+            />
+          )}
         </button>
       )}
       {showPoint && actor.actorPoint != null && (
@@ -468,71 +510,12 @@ export default function ActorMinimalCard({
         </div>
       )}
       {children}
-      {matchingCardsCount > 0 && (
-        <div
-          className="actor-chip-card-stack"
-          title={t('card.matching_cards_assigned', {
-            count: matchingCardsCount,
-            defaultValue: `${matchingCardsCount} adet kişisel kartınız bu botta takılı`,
-          })}
-          onClick={clickable && !selectable ? handleActorClick : undefined}
-          style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            flexShrink: 0,
-            marginLeft: 8,
-            cursor: clickable && !selectable ? 'pointer' : 'default',
-            pointerEvents: clickable && !selectable ? 'auto' : 'none',
-          }}
-        >
-          {visibleCards.map((card, idx) => (
-            <span
-              key={card.id ?? idx}
-              className="actor-chip-card-item"
-              style={{
-                position: 'relative',
-                marginLeft: idx === 0 ? 0 : -10,
-                zIndex: idx + 1,
-                display: 'inline-flex',
-                alignItems: 'flex-end',
-              }}
-            >
-              <CardIcon
-                crowned
-                purchased={card.acquisitionType === 1}
-                width={21}
-                height={24}
-                style={{ display: 'block' }}
-              />
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   )
 
   return (
     <>
-      {matchingCardsCount > 0 ? (
-        <div
-          className={`actor-chip-wrapper${selectable ? ' actor-chip-wrapper--selectable' : ''}`}
-          style={{
-            position: 'relative',
-            display: selectable || chipStyle?.width === '100%' ? 'flex' : 'inline-flex',
-            alignItems: 'center',
-            verticalAlign: 'middle',
-            maxWidth: chipStyle?.maxWidth || '100%',
-            width: selectable || chipStyle?.width === '100%' ? '100%' : (chipStyle?.width || undefined),
-            minWidth: chipStyle?.minWidth || undefined,
-            flexShrink: chipStyle?.flexShrink !== undefined ? chipStyle.flexShrink : undefined,
-            flex: chipStyle?.flex !== undefined ? chipStyle.flex : undefined,
-          }}
-        >
-          {chipContent}
-        </div>
-      ) : (
-        chipContent
-      )}
+      {chipContent}
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </>
   )

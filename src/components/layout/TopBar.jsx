@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import {
   Search,
   Settings,
@@ -42,6 +42,7 @@ import IconActionButton from '../common/IconActionButton'
 import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import BletchlyGuideModal from '../common/BletchlyGuideModal'
 import Logo from '../common/icons/Logo'
+import FossilTogglePill from '../common/FossilTogglePill'
 
 export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   useDevLog('TopBar', arguments[0] || {})
@@ -67,6 +68,20 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   const { actorId, isLoggedIn, isAdmin, logout: storeLogout } = useAuthStore()
   const navigate = useNavigate()
   const location = useLocation()
+
+  const { data: seasonStatus } = useQuery({
+    queryKey: ['seasonStatus'],
+    queryFn: async () => {
+      try {
+        const res = await searchApi.getSeasonStatus()
+        return res.data?.data || null
+      } catch (err) {
+        return null
+      }
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  })
   const {
     setSearchMode,
     searchMode,
@@ -100,6 +115,10 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   const [isMyTribesOpen, setIsMyTribesOpen] = useState(false)
   const [searchModeDropdown, setSearchModeDropdown] = useState(false)
   const [isMyBotsOpen, setIsMyBotsOpen] = useState(false)
+  // Fosil (dormant) klan/botlar varsayılan olarak dropdownlarda gizli;
+  // butonla açılınca listelenir.
+  const [showFossilTribes, setShowFossilTribes] = useState(false)
+  const [showFossilBots, setShowFossilBots] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [tribesDropdownPos, setTribesDropdownPos] = useState(null)
   const [botsDropdownPos, setBotsDropdownPos] = useState(null)
@@ -142,6 +161,51 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
     hasFetchedOnce,
     clear: clearEntities,
   } = useMyEntitiesStore()
+
+  const sortedMyTribes = useMemo(() => {
+    if (!myTribes || !myTribes.length) return []
+    return [...myTribes].sort((a, b) => {
+      const aDormant = Boolean(a?.isDormant ?? a?.IsDormant ?? false) ? 1 : 0
+      const bDormant = Boolean(b?.isDormant ?? b?.IsDormant ?? false) ? 1 : 0
+      return aDormant - bDormant
+    })
+  }, [myTribes])
+
+  const sortedMyBots = useMemo(() => {
+    if (!myBots || !myBots.length) return []
+    return [...myBots].sort((a, b) => {
+      const aDormant = Boolean(a?.isDormant ?? a?.IsDormant ?? false) ? 1 : 0
+      const bDormant = Boolean(b?.isDormant ?? b?.IsDormant ?? false) ? 1 : 0
+      return aDormant - bDormant
+    })
+  }, [myBots])
+
+  // Varsayılan: fosil klan/botlar gizli. Buton açıkken tümü listelenir.
+  const visibleMyTribes = useMemo(
+    () =>
+      showFossilTribes
+        ? sortedMyTribes
+        : sortedMyTribes.filter((t) => !(t?.isDormant ?? t?.IsDormant ?? false)),
+    [sortedMyTribes, showFossilTribes]
+  )
+
+  const visibleMyBots = useMemo(
+    () =>
+      showFossilBots
+        ? sortedMyBots
+        : sortedMyBots.filter((b) => !(b?.isDormant ?? b?.IsDormant ?? false)),
+    [sortedMyBots, showFossilBots]
+  )
+
+  const fossilTribeCount = useMemo(
+    () => sortedMyTribes.filter((t) => t?.isDormant ?? t?.IsDormant ?? false).length,
+    [sortedMyTribes]
+  )
+
+  const fossilBotCount = useMemo(
+    () => sortedMyBots.filter((b) => b?.isDormant ?? b?.IsDormant ?? false).length,
+    [sortedMyBots]
+  )
 
   useEffect(() => {
     if (isLoggedIn && !hasFetchedOnce) {
@@ -338,31 +402,61 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           <Menu size={20} />
         </button>
 
-        {/* Bletchly Logo Resized */}
+        {/* Bletchly Logo Resized & Season Countdown */}
         <div
           style={{
-            display: 'flex',
+            position: 'relative',
+            display: 'inline-flex',
             alignItems: 'center',
-            gap: 0, // Sıfır boşluk
-            cursor: 'pointer',
             flexShrink: 0,
-            transform: 'scale(0.85)',
-            transformOrigin: 'left center',
           }}
-          onClick={() => navigate('/')}
         >
-          <Logo width={36} height={48} fill="var(--color-primary)" />
-          <span
+          <div
             style={{
-              fontWeight: 800,
-              fontSize: 26,
-              color: 'var(--color-primary)',
-              marginTop: 4,
-              marginLeft: -2,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0, // Sıfır boşluk
+              cursor: 'pointer',
+              flexShrink: 0,
+              position: 'relative',
+              zIndex: 3,
+              transform: 'scale(0.85)',
+              transformOrigin: 'left center',
             }}
+            onClick={() => navigate('/')}
           >
-            letchly
-          </span>
+            <Logo width={36} height={48} fill="var(--color-primary)" />
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: 26,
+                color: 'var(--color-primary)',
+                marginTop: 4,
+                marginLeft: -2,
+              }}
+            >
+              letchly
+            </span>
+          </div>
+
+          {seasonStatus && typeof seasonStatus.daysRemaining === 'number' && (
+            <button
+              type="button"
+              className="season-remaining-badge season-remaining-badge--floating"
+              onClick={() => navigate('/leaderboard')}
+              title={t('leaderboard.season_remaining_tooltip', {
+                season: seasonStatus.currentSeason ?? 1,
+                days: seasonStatus.daysRemaining,
+                defaultValue: `Sezon ${seasonStatus.currentSeason ?? 1} • ${seasonStatus.daysRemaining} gün kaldı`,
+              })}
+            >
+              <span>
+                {seasonStatus.daysRemaining > 0
+                  ? `${seasonStatus.daysRemaining} GÜN!`
+                  : `${seasonStatus.hoursRemaining ?? 0} SAAT!`}
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Search Bar */}
@@ -1113,7 +1207,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                   hasPendingInvitation
                     ? t(
                         'debate.pending_invitation',
-                        'Münazara daveti bekliyor — açmak için tıklayın'
+                        'Meydan okuma daveti bekliyor — açmak için tıklayın'
                       )
                     : undefined
                 }
@@ -1138,12 +1232,15 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                   <>
                     <span
                       className="topbar-invite-badge"
-                      title={t('debate.pending_invitation', 'Münazara daveti bekliyor')}
+                      title={t('debate.pending_invitation', 'Meydan okuma daveti bekliyor')}
                     >
                       !
                     </span>
-                    <span className="topbar-invite-counter">
-                      {inviteSecondsLeft ?? 120}
+                    <span
+                      className="season-remaining-badge season-remaining-badge--subtle topbar-invite-counter"
+                      title={t('debate.pending_invitation', 'Meydan okuma daveti bekliyor')}
+                    >
+                      <span>{inviteSecondsLeft ?? 120}s</span>
                     </span>
                   </>
                 )}
@@ -1270,7 +1367,8 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       onMouseDown={(e) => e.stopPropagation()}
-                      onClickCapture={() => {
+                      onClickCapture={(e) => {
+                        if (e.target.closest('[data-keep-dropdown-open]')) return
                         setIsMyTribesOpen(false)
                         setTribesDropdownPos(null)
                       }}
@@ -1291,7 +1389,14 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                         padding: 8,
                       }}
                     >
-                      {myTribes?.map((tData) => (
+                      <FossilTogglePill
+                        count={fossilTribeCount}
+                        open={showFossilTribes}
+                        onToggle={() => setShowFossilTribes((v) => !v)}
+                        keepDropdownOpen
+                        wrapperStyle={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}
+                      />
+                      {visibleMyTribes.map((tData) => (
                         <div
                           key={tData.tribeId}
                           style={{
@@ -1382,7 +1487,8 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
                       onMouseDown={(e) => e.stopPropagation()}
-                      onClickCapture={() => {
+                      onClickCapture={(e) => {
+                        if (e.target.closest('[data-keep-dropdown-open]')) return
                         setIsMyBotsOpen(false)
                         setBotsDropdownPos(null)
                       }}
@@ -1403,7 +1509,14 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                         padding: 8,
                       }}
                     >
-                      {myBots?.map((b) => (
+                      <FossilTogglePill
+                        count={fossilBotCount}
+                        open={showFossilBots}
+                        onToggle={() => setShowFossilBots((v) => !v)}
+                        keepDropdownOpen
+                        wrapperStyle={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}
+                      />
+                      {visibleMyBots.map((b) => (
                         <div
                           key={b.actorId}
                           style={{
@@ -1526,8 +1639,8 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
 
           <IconActionButton
             onClick={() => navigate('/active-debates')}
-            title={t('topbar.active_debates', 'Aktif Münazaralar')}
-            aria-label={t('topbar.active_debates', 'Aktif Münazaralar')}
+            title={t('topbar.active_debates', 'Aktif Meydan Okumalar')}
+            aria-label={t('topbar.active_debates', 'Aktif Meydan Okumalar')}
             style={{ width: 38, height: 38, boxSizing: 'border-box' }}
           >
             <AngryBotWithSwordsIcon size={19} />

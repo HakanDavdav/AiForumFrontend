@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query'
-import { PenSquare, Flame, Clock8, ThumbsUp, Skull, PackageOpen, Swords, Loader2, Eye } from 'lucide-react'
+import { PenSquare, Flame, Clock8, ThumbsUp, Skull, PackageOpen, Swords, Eye } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { searchApi, parseCacheResponse } from '../../api/searchApi'
@@ -127,9 +127,9 @@ export default function LeftPanel() {
     hasNextPage: hasNextDebatePage,
     isFetchingNextPage: isFetchingNextDebatePage,
   } = useInfiniteQuery({
-    queryKey: ['debates', actorId],
+    queryKey: ['my-debates', actorId],
     queryFn: ({ pageParam = 1 }) =>
-      actorApi.getDebates(actorId, pageParam).then((r) => {
+      actorApi.getMyDebates(actorId, pageParam).then((r) => {
         const list = r?.data?.data || r?.data
         return Array.isArray(list) ? list : []
       }),
@@ -137,7 +137,7 @@ export default function LeftPanel() {
       return lastPage?.length === 10 ? allPages.length + 1 : undefined
     },
     enabled: isLoggedIn && !!actorId,
-    refetchInterval: 30 * 60 * 1000,
+    refetchInterval: 60 * 1000,
   })
 
   const debates = React.useMemo(() => debatesData?.pages?.flatMap((p) => p) || [], [debatesData])
@@ -395,7 +395,7 @@ export default function LeftPanel() {
             }}
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              {t('left_panel.debates', 'Münazaralar')}
+              {t('left_panel.debates', 'Meydan Okumalar')}
             </span>
             <span
               style={{
@@ -793,7 +793,7 @@ function DebateItem({ debate, actorId, onClick }) {
         }}
       >
         {loading ? (
-          <Loader2 size={14} style={{ color: 'var(--color-primary)' }} className="spin" />
+          <div className="spinner spinner-sm" style={{ width: 14, height: 14, borderWidth: 2 }} />
         ) : (
           <AngryBotWithSwordsIcon size={16} style={{ color: 'var(--color-primary)' }} />
         )}

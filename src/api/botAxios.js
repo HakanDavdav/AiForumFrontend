@@ -6,8 +6,9 @@ import axios from 'axios'
  * - withCredentials: ASP.NET Core Identity cookie auth için zorunlu
  */
 const botApi = axios.create({
-  baseURL: '/bot-api',
+  baseURL: '/bot-api/api',
   withCredentials: true,
+  timeout: 90000,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -8,7 +8,6 @@ import {
   Crown,
   Trophy,
   MessageSquare,
-  Loader2,
   Bot as BotIcon,
 } from 'lucide-react'
 import { actorApi } from '../../api/actorApi'
@@ -171,8 +170,8 @@ export default function DebateTranscriptPage() {
 
   if (isLoading && !debate) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh', gap: '10px' }}>
-        <Loader2 size={28} className="spin" style={{ color: 'var(--color-primary)' }} />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <div className="spinner spinner-lg" />
       </div>
     )
   }
@@ -180,7 +179,7 @@ export default function DebateTranscriptPage() {
   if (isError && !debate) {
     return (
       <div style={{ padding: '32px', textAlign: 'center' }}>
-        <p style={{ color: '#ef4444', fontWeight: '600' }}>{t('debate.not_found', 'Münazara bulunamadı.')}</p>
+        <p style={{ color: '#ef4444', fontWeight: '600' }}>{t('debate.not_found', 'Meydan okuma bulunamadı.')}</p>
         <button className="btn btn-outline btn-sm" onClick={() => navigate(-1)} style={{ marginTop: '12px' }}>
           <ArrowLeft size={14} /> {t('common.back', 'Geri')}
         </button>
@@ -191,7 +190,7 @@ export default function DebateTranscriptPage() {
   if (!debate) {
     return (
       <div style={{ padding: '32px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-        <p>{t('debate.no_debate_selected', 'Görüntülenecek münazara seçilmedi.')}</p>
+        <p>{t('debate.no_debate_selected', 'Görüntülenecek meydan okuma seçilmedi.')}</p>
       </div>
     )
   }
@@ -239,7 +238,7 @@ export default function DebateTranscriptPage() {
                 letterSpacing: '0.5px',
               }}
             >
-              {t('debate.transcript_title', 'Münazara Transkripti')}
+              {t('debate.transcript_title', 'Meydan Okuma Transkripti')}
             </span>
             <div
               style={{
@@ -375,7 +374,7 @@ export default function DebateTranscriptPage() {
                   <div style={{ fontSize: '1.05rem', fontWeight: '600' }}>
                     {debate.debateTranscript
                       ? debate.debateTranscript
-                      : t('debate.no_transcript_available', 'Bu münazara için henüz kayıtlı bir transkript bulunmuyor.')}
+                      : t('debate.no_transcript_available', 'Bu meydan okuma için henüz kayıtlı bir transkript bulunmuyor.')}
                   </div>
                 </div>
               )}
@@ -391,7 +390,7 @@ export default function DebateTranscriptPage() {
                       <AngryBotWithSwordsIcon size={22} color="#fff" />
                     </div>
                     <div className="verdict-banner__text">
-                      <span className="verdict-banner__title">{t('debate.verdict_title', 'Münazara Sonucu')}</span>
+                      <span className="verdict-banner__title">{t('debate.verdict_title', 'Meydan Okuma Sonucu')}</span>
                       <span className="verdict-banner__winner">
                         {winnerName ? (
                           <>
@@ -427,7 +426,7 @@ export default function DebateTranscriptPage() {
                 <AngryBotWithSwordsIcon size={26} color="#fff" />
               </div>
               <div className="verdict-banner__text">
-                <span className="verdict-banner__title">{t('debate.concluded_title', 'Münazara Tamamlandı')}</span>
+                <span className="verdict-banner__title">{t('debate.concluded_title', 'Meydan Okuma Tamamlandı')}</span>
                 <span className="verdict-banner__winner">
                   {winnerName ? (
                     <>

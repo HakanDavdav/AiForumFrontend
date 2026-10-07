@@ -55,6 +55,35 @@ export default function ActorManagementPanel() {
   const isPointsLoading = setPointsMutation.isPending
   const isPremiumLoading = setPremiumMutation.isPending
 
+  // Season Reset Mutation
+  const triggerSeasonResetMutation = useMutation({
+    mutationFn: () => adminApi.triggerSeasonReset(),
+    meta: { showErrorToast: true },
+    onSuccess: (response) => {
+      const data = response?.data?.data || response?.data
+      const message = data?.message || t('admin.season_reset_success', 'Sezon başarıyla sıfırlandı ve arşivlendi!')
+      toast.success(message)
+      queryClient.invalidateQueries({ queryKey: ['seasonStatus'] })
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] })
+      queryClient.invalidateQueries({ queryKey: ['seasonLeaderboard'] })
+      queryClient.invalidateQueries({ queryKey: ['availableSeasons'] })
+    },
+  })
+
+  const isResetLoading = triggerSeasonResetMutation.isPending
+
+  const handleSeasonReset = () => {
+    const confirmed = window.confirm(
+      t(
+        'admin.season_reset_confirm_desc',
+        'Tüm sezonluk puanlar sıfırlanacak ve liderlik tablosu arşivlenecektir. Onaylıyor musunuz?'
+      )
+    )
+    if (confirmed) {
+      triggerSeasonResetMutation.mutate()
+    }
+  }
+
   return (
     <div
       className="card-surface"
@@ -243,6 +272,56 @@ export default function ActorManagementPanel() {
               }}
             >
               {t('admin.revoke_premium', 'Premium Kaldır')}
+            </button>
+          </div>
+        </div>
+
+        {/* ─── BLOK 3: SEZON SIFIRLAMA ─── */}
+        <div
+          style={{
+            padding: 16,
+            borderRadius: 'var(--radius-lg)',
+            background: 'var(--color-surface-2)',
+            border: '1px solid var(--color-border-light)',
+          }}
+        >
+          <div
+            style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--color-text)' }}
+          >
+            {t('admin.season_reset_title', 'Sezon Sıfırlama')}
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '10px' }}>
+            <p
+              style={{
+                fontSize: 12,
+                color: 'var(--color-text-secondary)',
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
+              {t(
+                'admin.season_reset_desc',
+                'Tüm aktör ve kabilelerin sezonluk puanlarını sıfırlar, liderlik tablosunu yeni sezon numarasıyla arşivler ve inaktif botları fosilleştirir.'
+              )}
+            </p>
+          </div>
+
+          <div className="flex">
+            <button
+              className="btn btn-primary"
+              onClick={handleSeasonReset}
+              disabled={isResetLoading}
+              style={{
+                fontSize: 11.5,
+                fontWeight: 500,
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-md)',
+              }}
+            >
+              {isResetLoading
+                ? t('admin.season_reset_in_progress', 'Sıfırlanıyor...')
+                : t('admin.trigger_season_reset_btn', 'Sezonu Sıfırla')}
             </button>
           </div>
         </div>

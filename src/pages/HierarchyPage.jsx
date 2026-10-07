@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Maximize2, Network, Plus, Minus, Focus } from 'lucide-react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { actorApi } from '../api/actorApi'
 import BackButton from '../components/common/BackButton'
 import HierarchyTree from '../components/hierarchy/HierarchyTree'
 import HeartSvg from '../assets/FigmaNew/heart.svg?react'
+import TRexSkullIcon from '../assets/t-rex-skull-svgrepo-com.svg?react'
 import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
@@ -14,18 +16,35 @@ export default function HierarchyPage() {
   const actorId = searchParams.get('actorId')
   useDevLog('HierarchyPage', arguments[0] || {})
   const navigate = useNavigate()
+
+  const { data: hierarchyData, isLoading } = useQuery({
+    queryKey: ['actorHierarchy', actorId],
+    queryFn: async () => {
+      const res = await actorApi.getChildHierarchy(actorId)
+      return res.data?.data || null
+    },
+    enabled: Boolean(actorId),
+  })
+
   const [treeData, setTreeData] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [isExpandingAll, setIsExpandingAll] = useState(false)
   const [expandCounter, setExpandCounter] = useState(0)
   const [fetchDepth, setFetchDepth] = useState(1)
   const [actorName, setActorName] = useState('')
+  const [showFossils, setShowFossils] = useState(false)
   const [zoomLevel, setZoomLevel] = useState(0.82)
   const [isViewReady, setIsViewReady] = useState(false)
   // Sınırsız pan: scroll sınırları yerine transform translate ile her yöne serbest kaydırma
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
   const [pulseCount, setPulseCount] = useState(0)
   const handlePulse = useCallback(() => setPulseCount((c) => c + 1), [])
+
+  // Wheel handler effect'i stale closure'a düşmesin diye zoom/pan'in güncel
+  // kopyalarını ref'lerde tutuyoruz (imleç-merkezli zoom hesabı için gerekli).
+  const zoomLevelRef = useRef(zoomLevel)
+  useEffect(() => { zoomLevelRef.current = zoomLevel }, [zoomLevel])
+  const panOffsetRef = useRef(panOffset)
+  useEffect(() => { panOffsetRef.current = panOffset }, [panOffset])
 
   const [isFocused, setIsFocused] = useState(false)
   const blockRef = useRef(null)
@@ -43,16 +62,21 @@ export default function HierarchyPage() {
   })
 
   const handleMouseDown = (e) => {
-    // Sadece sol tık ile sürükleme
-    if (e.button !== 0) return
-    // Buton veya form elemanına tıklandıysa sürüklemeyi başlatma
-    if (e.target.closest('button, input, textarea, a, select')) return
+    // Sol tık (0) veya orta tekerlek tuşu (1) ile sürükleme
+    if (e.button !== 0 && e.button !== 1) return
+    // Sol tıkta buton veya form elemanına tıklandıysa sürüklemeyi başlatma; orta tıkta ise her yerden sürükleme başlatılabilir
+    if (e.button === 0 && e.target.closest('button, input, textarea, a, select')) return
+
+    if (e.button === 1) {
+      e.preventDefault() // Tarayıcının orta tık auto-scroll ikonunu ve davranışını engelle
+    }
 
     const container = containerRef.current
     if (!container) return
 
     panState.current = {
       isDown: true,
+      button: e.button,
       startX: e.pageX,
       startY: e.pageY,
       startPanX: panOffset.x,
@@ -96,8 +120,8 @@ export default function HierarchyPage() {
   }, [])
 
   const handleClickCapture = (e) => {
-    // Sürükleme yapıldıysa kartların/linklerin kazara tıklanmasını önle
-    if (panState.current.hasMoved) {
+    // Sürükleme yapıldıysa veya orta tık ise kartların/linklerin kazara tıklanmasını önle
+    if (panState.current.hasMoved || e.button === 1) {
       e.stopPropagation()
       e.preventDefault()
       panState.current.hasMoved = false
@@ -120,23 +144,50 @@ export default function HierarchyPage() {
     }
   }, [])
 
-  // İçeride tekerlekle kaydırmayı engelle, ana sayfaya aktar
+  // Mouse tekerleği: Normal tekerlek ile kamerayı kaydır (pan), Ctrl + tekerlek ile zoom yap
   useEffect(() => {
     const targetEl = blockRef.current || containerRef.current
     if (!targetEl) return
 
     const handleWheel = (e) => {
-      e.preventDefault()
-      const scrollContainer = document.getElementById('scroll-container')
-      if (
-        scrollContainer &&
-        scrollContainer.scrollHeight > scrollContainer.clientHeight &&
-        getComputedStyle(scrollContainer).overflowY !== 'visible'
-      ) {
-        scrollContainer.scrollBy({ top: e.deltaY, behavior: 'auto' })
-      } else {
-        window.scrollBy({ top: e.deltaY, behavior: 'auto' })
+      // 1. Ctrl + Tekerlek veya Meta + Tekerlek (Trackpad pinch dahil) -> Kamera Yakınlaştır / Uzaklaştır (Zoom)
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        const factor = Math.abs(e.deltaY) < 20 ? -e.deltaY * 0.005 : (e.deltaY < 0 ? 0.05 : -0.05)
+        const prev = zoomLevelRef.current
+        const next = Math.min(2.5, Math.max(0.05, +(prev + factor).toFixed(2)))
+        if (next === prev) return
+
+        // İmlecin altındaki dünya noktasını sabit tut: içerik imleç lokasyonuna
+        // doğru yakınlaşsın (aksi halde top-left'e göre büyüyüp sola kayıyor).
+        const container = containerRef.current
+        if (container) {
+          const rect = container.getBoundingClientRect()
+          const cs = window.getComputedStyle(container)
+          const padLeft = parseFloat(cs.paddingLeft) || 0
+          const padTop = parseFloat(cs.paddingTop) || 0
+          const cx = e.clientX - rect.left - padLeft
+          const cy = e.clientY - rect.top - padTop
+          const ratio = next / prev
+          const pan = panOffsetRef.current
+          setPanOffset({
+            x: cx - (cx - pan.x) * ratio,
+            y: cy - (cy - pan.y) * ratio,
+          })
+        }
+        setZoomLevel(next)
+        return
       }
+
+      // 2. Normal Tekerlek -> Kamera Kaydırma (Pan)
+      e.preventDefault()
+      const dx = e.shiftKey ? -e.deltaY : -e.deltaX
+      const dy = e.shiftKey ? 0 : -e.deltaY
+
+      setPanOffset((prev) => ({
+        x: prev.x + dx,
+        y: prev.y + dy,
+      }))
     }
 
     targetEl.addEventListener('wheel', handleWheel, { passive: false })
@@ -207,57 +258,49 @@ export default function HierarchyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeData])
 
+
   useEffect(() => {
-    if (!actorId) return
+    if (!hierarchyData) {
+      setTreeData(null)
+      return
+    }
 
-    setIsLoading(true)
-    actorApi.getChildHierarchy(actorId)
-      .then((res) => {
-        const rootData = res.data?.data
-        if (rootData) {
-          setActorName(rootData.profileName)
+    const rootData = hierarchyData
+    setActorName(rootData.profileName || '')
 
-          // Build tree using Map from flat bots
-          const map = new Map()
-          const rootNode = {
-            ...rootData,
-            depth: 0,
-            bots: [],
-            tribes: rootData.tribes || [],
-            _checked: true,
-          }
-          map.set(rootNode.actorId, rootNode)
+    // Build tree using Map from flat bots
+    const map = new Map()
+    const rootNode = {
+      ...rootData,
+      depth: 0,
+      bots: [],
+      tribes: rootData.tribes || [],
+      _checked: true,
+    }
+    map.set(rootNode.actorId, rootNode)
 
-          const flatBots = rootData.bots || []
-          flatBots.forEach((bot) => {
-            map.set(bot.actorId, {
-              ...bot,
-              depth: 0,
-              bots: [],
-              tribes: bot.tribes || [],
-              _checked: true,
-            })
-          })
-
-          flatBots.forEach((bot) => {
-            const node = map.get(bot.actorId)
-            const parent = map.get(bot.parentActorId)
-            if (parent) {
-              node.depth = (parent.depth ?? 0) + 1
-              parent.bots.push(node)
-            }
-          })
-
-          setTreeData(rootNode)
-        }
+    const flatBots = rootData.bots || []
+    flatBots.forEach((bot) => {
+      map.set(bot.actorId, {
+        ...bot,
+        depth: 0,
+        bots: [],
+        tribes: bot.tribes || [],
+        _checked: true,
       })
-      .catch((err) => {
-        console.error(err)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [actorId])
+    })
+
+    flatBots.forEach((bot) => {
+      const node = map.get(bot.actorId)
+      const parent = map.get(bot.parentActorId)
+      if (parent) {
+        node.depth = (parent.depth ?? 0) + 1
+        parent.bots.push(node)
+      }
+    })
+
+    setTreeData(rootNode)
+  }, [hierarchyData])
 
   const handleExpandAll = () => {
     setIsExpandingAll(true)
@@ -489,6 +532,33 @@ export default function HierarchyPage() {
               <Focus size={13} />
               <span>Default</span>
             </button>
+
+            <div style={{ width: 1, height: 18, background: 'var(--color-border)' }} />
+
+            {/* Fosil Düğümleri Göster / Gizle Toggle */}
+            <button
+              type="button"
+              className={`btn btn-primary btn-sm btn-fossil-toggle ${showFossils ? 'btn-fossil-toggle--active' : ''}`}
+              onClick={() => setShowFossils((prev) => !prev)}
+              disabled={!treeData}
+              title={
+                showFossils
+                  ? t('hierarchy.hide_fossils_tooltip', 'Fosilleşmiş birimleri gizle')
+                  : t('hierarchy.show_fossils_tooltip', 'Fosilleşmiş birimleri göster')
+              }
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                padding: '0 16px',
+                height: 32,
+                opacity: showFossils ? 1 : 0.85,
+              }}
+            >
+              <TRexSkullIcon className="badge-fossil-icon" />
+              <span>{showFossils ? t('common.enabled', 'Enabled') : t('common.disabled', 'Disabled')}</span>
+            </button>
           </div>
 
           {/* Sağ Üst Bloğun Altında Ortalı Heartbeat (Büyük & Hızlı Nabız) */}
@@ -526,6 +596,12 @@ export default function HierarchyPage() {
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onClickCapture={handleClickCapture}
+        onAuxClick={(e) => {
+          if (e.button === 1) {
+            e.preventDefault()
+            e.stopPropagation()
+          }
+        }}
         className="hierarchy-viewport"
         style={{
           flex: 1,
@@ -558,6 +634,7 @@ export default function HierarchyPage() {
             rootActorId={actorId}
             zoomLevel={zoomLevel}
             onPulse={handlePulse}
+            showFossils={showFossils}
           />
           </div>
         ) : (

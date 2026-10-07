@@ -359,15 +359,37 @@ export default function PersonalityCard({
     null
 
   const rawAssignments = Array.isArray(card?.assignments) ? card.assignments : []
-  const assignedBots =
+  const rawAssignedBots =
     card?.assignedBots && card.assignedBots.length > 0
       ? card.assignedBots
       : rawAssignments.map((a) => a.bot).filter(Boolean)
-  const assignedTribes =
+  const rawAssignedTribes =
     card?.assignedTribes && card.assignedTribes.length > 0
       ? card.assignedTribes
       : rawAssignments.map((a) => a.tribe).filter(Boolean)
-  const hasAssigned = Boolean(assignedBots.length > 0 || assignedTribes.length > 0)
+
+  const isEntityDormant = (nodeOrEntity) => {
+    if (!nodeOrEntity) return false
+    const target = nodeOrEntity.data ? nodeOrEntity.data : nodeOrEntity
+    return Boolean(target.isDormant ?? target.IsDormant ?? false)
+  }
+
+  const sortByDormantStatus = (list) => {
+    if (!list || !list.length) return []
+    return [...list].sort((a, b) => {
+      const aDormant = isEntityDormant(a) ? 1 : 0
+      const bDormant = isEntityDormant(b) ? 1 : 0
+      return aDormant - bDormant
+    })
+  }
+
+  const assignedBots = sortByDormantStatus(rawAssignedBots)
+  const assignedTribes = sortByDormantStatus(rawAssignedTribes)
+  const assignedNodes = sortByDormantStatus([
+    ...rawAssignedBots.map((b) => ({ type: 'actor', data: b })),
+    ...rawAssignedTribes.map((tr) => ({ type: 'tribe', data: tr })),
+  ])
+  const hasAssigned = assignedNodes.length > 0
 
   // Assignment-merkezli mod için tüm assignment'ları normalize et:
   // her öğe kaynak (SourceActor / SourceTribe) + hedef (Bot / Tribe) taşıyabilir.
@@ -416,8 +438,8 @@ export default function PersonalityCard({
     return nodes
   }
 
-  const assignmentSources = collectAssignmentNodes(resolveSourceNode)
-  const assignmentTargets = collectAssignmentNodes(resolveTargetNode)
+  const assignmentSources = sortByDormantStatus(collectAssignmentNodes(resolveSourceNode))
+  const assignmentTargets = sortByDormantStatus(collectAssignmentNodes(resolveTargetNode))
   const hasAssignmentFlow = assignmentSources.length > 0 || assignmentTargets.length > 0
 
   // Effective lock state: either the explicit `locked` prop or the assignment data's own
@@ -740,6 +762,7 @@ export default function PersonalityCard({
                               tribeName={node.data.tribeName}
                               tribePoint={node.data.tribePoint}
                               imageUrl={node.data.imageUrl}
+                              isDormant={node.data.isDormant ?? node.data.IsDormant}
                               variant="compact"
                               clickable={true}
                               showMindBtn={false}
@@ -794,6 +817,7 @@ export default function PersonalityCard({
                               tribeName={node.data.tribeName}
                               tribePoint={node.data.tribePoint}
                               imageUrl={node.data.imageUrl}
+                              isDormant={node.data.isDormant ?? node.data.IsDormant}
                               variant="compact"
                               clickable={true}
                               showMindBtn={false}
@@ -840,29 +864,31 @@ export default function PersonalityCard({
                         minWidth: 0,
                       }}
                     >
-                      {assignedBots.map((b) => (
-                        <ActorMinimalCard
-                          key={b.actorId}
-                          actor={b}
-                          showHierarchyBtn={false}
-                          showMindBtn={false}
-                          showPoint={false}
-                          showEditBtn={false}
-                          clickable={true}
-                          variant="compact"
-                        />
-                      ))}
-                      {assignedTribes.map((tr) => (
-                        <TribeMinimalCard
-                          key={tr.tribeId}
-                          {...tr}
-                          variant="compact"
-                          clickable={true}
-                          showMindBtn={false}
-                          showEditBtn={false}
-                          showPoint={false}
-                        />
-                      ))}
+                      {assignedNodes.map((node) =>
+                        node.type === 'tribe' ? (
+                          <TribeMinimalCard
+                            key={`assigned-tribe-${node.data.tribeId}`}
+                            {...node.data}
+                            isDormant={node.data.isDormant ?? node.data.IsDormant}
+                            variant="compact"
+                            clickable={true}
+                            showMindBtn={false}
+                            showEditBtn={false}
+                            showPoint={false}
+                          />
+                        ) : (
+                          <ActorMinimalCard
+                            key={`assigned-actor-${node.data.actorId}`}
+                            actor={node.data}
+                            showHierarchyBtn={false}
+                            showMindBtn={false}
+                            showPoint={false}
+                            showEditBtn={false}
+                            clickable={true}
+                            variant="compact"
+                          />
+                        )
+                      )}
                     </div>
                   </div>
                 )
@@ -938,12 +964,14 @@ export default function PersonalityCard({
         onClose={() => setModalType(null)}
       />
 
-      <CardDetailModal
-        card={card}
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-        onEditClick={onEditClick}
-      />
+      {isDetailOpen && (
+        <CardDetailModal
+          card={card}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          onEditClick={onEditClick}
+        />
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import useThemeStore from '../store/themeStore'
 import ForceGraph3D from 'react-force-graph-3d'
 import * as THREE from 'three'
@@ -24,7 +25,7 @@ export function getNodeLabelText(label, isRoot = false, isTribeContext = false) 
     return i18n.t('mind.labels.tribe', 'Tribe')
   }
   if (label === 'Actor' || label === 'User' || label === 'Bot') {
-    return i18n.t('mind.labels.actor', 'Actor')
+    return i18n.t('mind.labels.actor', 'Someone')
   }
   if (label === 'GeneralThought' || label === 'Topic' || label === 'Concept' || label === 'Thought') {
     return i18n.t('mind.labels.general_thought', 'GeneralThought')
@@ -41,6 +42,13 @@ const NEURON_COLORS = {
   default: { core: '#e879f9', glow: '#d946ef' },        // Fuşya
 }
 
+function getActiveNeuronColor() {
+  const isGreen = useThemeStore.getState().isGreenMode
+  return isGreen
+    ? { core: '#34d399', glow: '#10b981' } // Canlı Neon Zümrüt Yeşili
+    : { core: '#60a5fa', glow: '#3b82f6' } // Canlı Neon Siber Mavi
+}
+
 function getNeuronColor(label, isRoot = false) {
   const isGreen = useThemeStore.getState().isGreenMode
   if (label === 'Persona' || isRoot) {
@@ -54,6 +62,15 @@ function getNeuronColor(label, isRoot = false) {
 // Nöron görsel dokuları ve rozet önbelleği (MindAmbience estetiği)
 const nodeTextureCache = new Map()
 const nodeBadgeCache = new Map()
+
+function hexToRgba(hex, alpha) {
+  if (!hex || typeof hex !== 'string') return `rgba(100, 100, 100, ${alpha})`
+  let c = hex.replace('#', '')
+  if (c.length === 3) c = c.split('').map((x) => x + x).join('')
+  const num = parseInt(c, 16)
+  if (isNaN(num)) return `rgba(100, 100, 100, ${alpha})`
+  return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`
+}
 
 function getNodeVisualTextures(coreColor, glowColor) {
   const cacheKey = `${coreColor}_${glowColor}`
@@ -70,9 +87,9 @@ function getNodeVisualTextures(coreColor, glowColor) {
   const hCenter = haloSize / 2
   const hGrad = hCtx.createRadialGradient(hCenter, hCenter, 0, hCenter, hCenter, hCenter)
   hGrad.addColorStop(0, coreColor)
-  hGrad.addColorStop(0.45, glowColor)
-  hGrad.addColorStop(0.80, glowColor)
-  hGrad.addColorStop(1, 'rgba(0,0,0,0)')
+  hGrad.addColorStop(0.40, glowColor)
+  hGrad.addColorStop(0.75, hexToRgba(glowColor, 0.35))
+  hGrad.addColorStop(1, hexToRgba(glowColor, 0.0))
   hCtx.fillStyle = hGrad
   hCtx.fillRect(0, 0, haloSize, haloSize)
   const haloTex = new THREE.CanvasTexture(haloCanvas)
@@ -139,7 +156,8 @@ function buildNodeBlock(node, core, glow, isPersona, r) {
   }
   const subtitleText = getNodeLabelText(node.label, isPersona, Boolean(node.isTribeContext))
   const lang = i18n.language || 'tr'
-  const cacheKey = `${titleText}_${subtitleText}_${core}_${glow}_${isPersona}_${lang}_v3`
+  const isDark = typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isDarkMode : true
+  const cacheKey = `${titleText}_${subtitleText}_${core}_${glow}_${isPersona}_${lang}_${isDark ? 'dark' : 'light'}_v4`
 
   let tex = nodeBadgeCache.get(cacheKey)
   if (!tex) {
@@ -158,38 +176,68 @@ function buildNodeBlock(node, core, glow, isPersona, r) {
     const cardH = 58 * scale
 
     const canvas = document.createElement('canvas')
-    canvas.width = cardW + 12
-    canvas.height = cardH + 12
+    canvas.width = cardW + 16
+    canvas.height = cardH + 16
     const ctx = canvas.getContext('2d')
 
-    const ox = 6
-    const oy = 6
+    const ox = 8
+    const oy = 8
 
-    // MindAmbience sade cam kart: fill="rgba(10, 5, 20, 0.90)" stroke={core}
-    ctx.fillStyle = isPersona ? 'rgba(8, 4, 20, 0.94)' : 'rgba(10, 5, 20, 0.90)'
-    ctx.beginPath()
-    ctx.roundRect(ox, oy, cardW, cardH, 8 * scale)
-    ctx.fill()
+    if (isDark) {
+      // MindAmbience koyu cam kart: fill="rgba(10, 5, 20, 0.90)" stroke={core}
+      ctx.fillStyle = isPersona ? 'rgba(8, 4, 20, 0.94)' : 'rgba(10, 5, 20, 0.90)'
+      ctx.beginPath()
+      ctx.roundRect(ox, oy, cardW, cardH, 8 * scale)
+      ctx.fill()
 
-    ctx.strokeStyle = core
-    ctx.lineWidth = 1.6 * scale
-    ctx.stroke()
+      ctx.strokeStyle = core
+      ctx.lineWidth = 1.6 * scale
+      ctx.stroke()
 
-    // Başlık (Beyaz, net Inter)
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    const centerX = canvas.width / 2
+      // Başlık (Beyaz, net Inter)
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      const centerX = canvas.width / 2
 
-    ctx.font = '700 28px Inter, sans-serif'
-    ctx.fillStyle = '#ffffff'
-    ctx.fillText(titleText, centerX, oy + 20 * scale)
+      ctx.font = '700 28px Inter, sans-serif'
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(titleText, centerX, oy + 20 * scale)
 
-    // Alt etiket (Tema rengi, sade, opacity: 0.90)
-    ctx.font = '600 18px Inter, sans-serif'
-    ctx.fillStyle = glow
-    ctx.globalAlpha = 0.90
-    ctx.fillText(subtitleText.toUpperCase(), centerX, oy + 42 * scale)
-    ctx.globalAlpha = 1.0
+      // Alt etiket (Tema rengi, sade, opacity: 0.90)
+      ctx.font = '600 18px Inter, sans-serif'
+      ctx.fillStyle = glow
+      ctx.globalAlpha = 0.90
+      ctx.fillText(subtitleText.toUpperCase(), centerX, oy + 42 * scale)
+      ctx.globalAlpha = 1.0
+    } else {
+      // Modern Açık Tema: Kristal beyaz cam kart, soft gölge, net koyu tipografi
+      ctx.shadowColor = 'rgba(15, 23, 42, 0.12)'
+      ctx.shadowBlur = 10 * scale
+      ctx.shadowOffsetY = 3 * scale
+      ctx.fillStyle = isPersona ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.94)'
+      ctx.beginPath()
+      ctx.roundRect(ox, oy, cardW, cardH, 8 * scale)
+      ctx.fill()
+      ctx.shadowColor = 'transparent'
+
+      ctx.strokeStyle = core
+      ctx.lineWidth = 1.8 * scale
+      ctx.stroke()
+
+      // Başlık (Net Koyu Slate)
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      const centerX = canvas.width / 2
+
+      ctx.font = '700 28px Inter, sans-serif'
+      ctx.fillStyle = '#0f172a'
+      ctx.fillText(titleText, centerX, oy + 20 * scale)
+
+      // Alt etiket (Canlı vurgulu tema rengi)
+      ctx.font = '700 18px Inter, sans-serif'
+      ctx.fillStyle = glow
+      ctx.fillText(subtitleText.toUpperCase(), centerX, oy + 42 * scale)
+    }
 
     tex = new THREE.CanvasTexture(canvas)
     tex.minFilter = THREE.LinearFilter
@@ -233,9 +281,10 @@ function buildNeuronObject(node) {
   const isPersona = isRoot
   const isActive = Boolean(node.isActive) // Active Synapse highlight
 
-  // Active node'lar için altın-amber rengi; diğerleri normal renk paleti
+  // Active node'lar için tema rengi (Neon Mavi / Neon Yeşil); diğerleri normal renk paleti
+  const activeColor = getActiveNeuronColor()
   const { core, glow } = isActive
-    ? { core: '#fbbf24', glow: '#f59e0b' }
+    ? activeColor
     : getNeuronColor(node.label, isRoot)
 
   const group = new THREE.Group()
@@ -254,16 +303,18 @@ function buildNeuronObject(node) {
 
   const { haloTex, pearlTex } = getNodeVisualTextures(core, glow)
 
+  const isDark = typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isDarkMode : true
+
   // 1. Dış en yumuşak ışıma (MindAmbience r * 2.8 radyal gradyan halesi - mindPulseHalo)
   // Active node'larda halo daha geniş ve opaque
   const haloSize = isActive ? r * 7.2 : r * 5.6
   const haloGeo = new THREE.PlaneGeometry(haloSize, haloSize)
-  const haloOpacity = isActive ? 0.65 : (isPersona ? 0.45 : 0.32)
+  const haloOpacity = isActive ? (isDark ? 0.65 : 0.45) : (isPersona ? (isDark ? 0.45 : 0.32) : (isDark ? 0.32 : 0.22))
   const haloMat = new THREE.MeshBasicMaterial({
     map: haloTex,
     transparent: true,
     opacity: haloOpacity,
-    blending: THREE.AdditiveBlending,
+    blending: isDark ? THREE.AdditiveBlending : THREE.NormalBlending,
     depthWrite: false,
   })
   const haloMesh = new THREE.Mesh(haloGeo, haloMat)
@@ -278,8 +329,8 @@ function buildNeuronObject(node) {
   const midHaloMat = new THREE.MeshBasicMaterial({
     color: glow,
     transparent: true,
-    opacity: isActive ? 0.5 : (isPersona ? 0.32 : 0.22),
-    blending: THREE.AdditiveBlending,
+    opacity: isDark ? (isActive ? 0.5 : (isPersona ? 0.32 : 0.22)) : (isActive ? 0.28 : (isPersona ? 0.18 : 0.12)),
+    blending: isDark ? THREE.AdditiveBlending : THREE.NormalBlending,
     depthWrite: false,
   })
   visualGroup.add(new THREE.Mesh(midHaloGeo, midHaloMat))
@@ -312,15 +363,15 @@ function buildNeuronObject(node) {
   if (isActive) {
     const ringGeo = new THREE.RingGeometry(r * 1.7, r * 2.1, 48)
     const ringMat = new THREE.MeshBasicMaterial({
-      color: '#fbbf24',
+      color: core,
       transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
+      opacity: isDark ? 0.55 : 0.42,
+      blending: isDark ? THREE.AdditiveBlending : THREE.NormalBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
     })
     const ringMesh = new THREE.Mesh(ringGeo, ringMat)
-    ringMesh.userData = { isHalo: true, isPersona: false, baseOpacity: 0.55 }
+    ringMesh.userData = { isHalo: true, isPersona: false, baseOpacity: isDark ? 0.55 : 0.42 }
     ringMesh.onBeforeRender = function (renderer, scene, camera) {
       this.quaternion.copy(camera.quaternion)
     }
@@ -445,6 +496,80 @@ const _orbCoronaMat = new THREE.MeshBasicMaterial({
   depthWrite: false,
 })
 
+// 5. Aktif / Recalled bağlantılar için güçlü, parıltılı nöral sinaps materyalleri
+const _activeSynapseTrackMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#059669' : '#2563eb',
+  transparent: true,
+  opacity: 0.85,
+  depthWrite: false,
+})
+
+const _activeSynapseHaloMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#34d399' : '#60a5fa',
+  transparent: true,
+  opacity: 0.65,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+})
+
+const _activeSynapseDashShaderMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: globalUniforms.uTime,
+    uColor: {
+      value: new THREE.Color(isInitialGreen ? '#6ee7b7' : '#93c5fd'),
+    },
+  },
+  vertexShader: `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    uniform vec3 uColor;
+    varying vec2 vUv;
+
+    void main() {
+      // Hızlı, güçlü ve belirgin nöral elektrik akışı
+      float speed = 4.2;
+      float segments = 16.0;
+      float stream = fract(vUv.x * segments - uTime * speed);
+
+      // Daha dolgun çizgi oranı
+      float dash = smoothstep(0.0, 0.05, stream) * (1.0 - smoothstep(0.42, 0.52, stream));
+
+      if (dash < 0.01) discard;
+
+      vec3 coreWhite = vec3(1.0, 1.0, 1.0);
+      vec3 electricColor = mix(uColor, coreWhite, pow(dash, 1.4) * 0.9);
+
+      gl_FragColor = vec4(electricColor, dash * 1.0);
+    }
+  `,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  side: THREE.DoubleSide,
+})
+
+const _activeOrbGlowMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#6ee7b7' : '#93c5fd',
+  transparent: true,
+  opacity: 0.95,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+})
+
+const _activeOrbCoronaMat = new THREE.MeshBasicMaterial({
+  color: isInitialGreen ? '#34d399' : '#60a5fa',
+  transparent: true,
+  opacity: 0.5,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+})
+
 const linkLabelCache = new Map()
 
 function buildCapillaryObject(link) {
@@ -452,30 +577,114 @@ function buildCapillaryObject(link) {
   g.userData._built = false
 
   if (link && link.name) {
-    if (!linkLabelCache.has(link.name)) {
-      const isGreen = useThemeStore.getState().isGreenMode
+    // Sadece recalled (anımsanan) nodelar arasındaki bağlantılar ve etiketleri vurgulanır
+    const isRecalled = Boolean(
+      link?.isRecalled ||
+      (link?.source?.isActive && link?.target?.isActive)
+    )
+    const isGreen = useThemeStore.getState().isGreenMode
+    const isDark = typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isDarkMode : true
+    const cacheKey = `${link.name}_${isGreen}_${isRecalled}_${isDark ? 'dark' : 'light'}`
+    if (!linkLabelCache.has(cacheKey)) {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
       ctx.font = 'bold 44px Inter, sans-serif'
       const textWidth = ctx.measureText(link.name).width
 
-      const rectWidth = Math.max(180, textWidth + 90)
-      canvas.width = rectWidth + 24
-      canvas.height = 96
+    const rectWidth = Math.max(180, textWidth + 90)
+    canvas.width = rectWidth + 24
+    canvas.height = 96
 
-      ctx.fillStyle = 'rgba(10, 15, 25, 0.9)'
-      ctx.beginPath()
-      ctx.roundRect(12, 12, rectWidth, 72, 18)
-      ctx.fill()
-      ctx.strokeStyle = isGreen ? '#10b981' : '#3b82f6'
-      ctx.lineWidth = 3
-      ctx.stroke()
+    if (isDark) {
+      if (isRecalled) {
+          // Koyu Tema Recalled: Parlayan neon hap, elektrik gradyan ve beyaz yazı
+          ctx.shadowColor = isGreen ? 'rgba(52, 211, 153, 0.7)' : 'rgba(96, 165, 250, 0.7)'
+          ctx.shadowBlur = 24
+          ctx.shadowOffsetY = 0
 
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.font = 'bold 44px Inter, sans-serif'
-      ctx.fillStyle = isGreen ? '#a7f3d0' : '#bfdbfe'
-      ctx.fillText(link.name, canvas.width / 2, 48)
+          const bgGrad = ctx.createLinearGradient(12, 12, rectWidth + 12, 84)
+          if (isGreen) {
+            bgGrad.addColorStop(0, '#064e3b')
+            bgGrad.addColorStop(1, '#065f46')
+          } else {
+            bgGrad.addColorStop(0, '#1e3a8a')
+            bgGrad.addColorStop(1, '#1d4ed8')
+          }
+          ctx.fillStyle = bgGrad
+        } else {
+          ctx.fillStyle = 'rgba(10, 15, 25, 0.9)'
+        }
+        ctx.beginPath()
+        ctx.roundRect(12, 12, rectWidth, 72, 18)
+        ctx.fill()
+        ctx.shadowColor = 'transparent'
+
+        ctx.strokeStyle = isRecalled
+          ? (isGreen ? '#34d399' : '#60a5fa')
+          : (isGreen ? '#10b981' : '#3b82f6')
+        ctx.lineWidth = isRecalled ? 4.5 : 3
+        ctx.stroke()
+
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.font = 'bold 44px Inter, sans-serif'
+        ctx.fillStyle = isRecalled
+          ? '#ffffff'
+          : (isGreen ? '#a7f3d0' : '#bfdbfe')
+        ctx.fillText(link.name, canvas.width / 2, 48)
+      } else {
+        // Modern Açık Tema
+        if (isRecalled) {
+          // Vurgulu Recalled Anı Bağlantısı: Zengin, canlı elektrik mavi/yeşil gradyan, parlak rim, saf beyaz yazı
+          ctx.shadowColor = isGreen ? 'rgba(5, 150, 105, 0.45)' : 'rgba(37, 99, 235, 0.45)'
+          ctx.shadowBlur = 22
+          ctx.shadowOffsetY = 4
+
+          const bgGrad = ctx.createLinearGradient(12, 12, rectWidth + 12, 84)
+          if (isGreen) {
+            bgGrad.addColorStop(0, '#047857')
+            bgGrad.addColorStop(1, '#059669')
+          } else {
+            bgGrad.addColorStop(0, '#1d4ed8')
+            bgGrad.addColorStop(1, '#2563eb')
+          }
+          ctx.fillStyle = bgGrad
+          ctx.beginPath()
+          ctx.roundRect(12, 12, rectWidth, 72, 18)
+          ctx.fill()
+          ctx.shadowColor = 'transparent'
+
+          ctx.strokeStyle = isGreen ? '#6ee7b7' : '#93c5fd'
+          ctx.lineWidth = 4.5
+          ctx.stroke()
+
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.font = 'bold 44px Inter, sans-serif'
+          ctx.fillStyle = '#ffffff'
+          ctx.fillText(link.name, canvas.width / 2, 48)
+        } else {
+          // Normal bağlantı: Sade, modern nötr beyaz kart, sakin tipografi
+          ctx.shadowColor = 'rgba(15, 23, 42, 0.08)'
+          ctx.shadowBlur = 10
+          ctx.shadowOffsetY = 2
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+          ctx.beginPath()
+          ctx.roundRect(12, 12, rectWidth, 72, 18)
+          ctx.fill()
+          ctx.shadowColor = 'transparent'
+
+          ctx.strokeStyle = 'rgba(203, 213, 225, 0.95)'
+          ctx.lineWidth = 2.2
+          ctx.stroke()
+
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.font = 'bold 42px Inter, sans-serif'
+          ctx.fillStyle = '#475569'
+          ctx.fillText(link.name, canvas.width / 2, 48)
+        }
+      }
 
       const tex = new THREE.CanvasTexture(canvas)
       tex.minFilter = THREE.LinearFilter
@@ -488,15 +697,15 @@ function buildCapillaryObject(link) {
       })
 
       const scaleX = (canvas.width / 400) * 44
-      linkLabelCache.set(link.name, { mat: labelMat, width: scaleX })
+      linkLabelCache.set(cacheKey, { mat: labelMat, width: scaleX })
     }
 
-    const { mat, width } = linkLabelCache.get(link.name)
-    const baseScale = 2.1 // Bağlantı blokçuğu boyutu büyütüldü
+    const { mat, width } = linkLabelCache.get(cacheKey)
+    const baseScale = isRecalled ? 2.5 : 2.05 // Recalled bağlantı blokçuğu belirgin şekilde daha büyük ve vurgulu
     const labelGeo = new THREE.PlaneGeometry(width * baseScale, 9.6 * baseScale)
     const labelMesh = new THREE.Mesh(labelGeo, mat)
 
-    labelMesh.renderOrder = 9999998
+    labelMesh.renderOrder = isRecalled ? 9999999 : 9999998
     labelMesh.userData = { isLinkLabel: true, link: link }
 
     labelMesh.onBeforeRender = function (renderer, scene, camera) {
@@ -516,10 +725,16 @@ function updateCapillaryPosition(obj, { start, end }, link) {
   const len = sv.distanceTo(ev)
   if (len < 1) return true
 
+  const isRecalled = Boolean(
+    link?.isRecalled ||
+    (link?.source?.isActive && link?.target?.isActive)
+  )
+
   // Pozisyon cache — gereksiz yeniden çizimi önle
-  const posKey = `${start.x.toFixed(0)},${start.y.toFixed(0)},${start.z?.toFixed(0) || 0},${end.x.toFixed(0)},${end.y.toFixed(0)},${end.z?.toFixed(0) || 0}`
+  const posKey = `${start.x.toFixed(0)},${start.y.toFixed(0)},${start.z?.toFixed(0) || 0},${end.x.toFixed(0)},${end.y.toFixed(0)},${end.z?.toFixed(0) || 0}_${isRecalled}`
   if (obj.userData._posKey === posKey) return true
   obj.userData._posKey = posKey
+  obj.userData.isRecalled = isRecalled
 
   // Organik kavis için yay (MindAmbience beziere eğrisi gibi dışa doğru kavisli kubbe)
   const mid = new THREE.Vector3().addVectors(sv, ev).multiplyScalar(0.5)
@@ -556,21 +771,24 @@ function updateCapillaryPosition(obj, { start, end }, link) {
   toRemove.forEach((c) => obj.remove(c))
 
   // 1. Dış yumuşak ışıma kılıfı (Halo - MindAmbience filter="url(#synapseGlow)" stili)
-  const haloGeo = new THREE.TubeGeometry(curve, 24, 1.5, 6, false)
-  const haloMesh = new THREE.Mesh(haloGeo, _synapseHaloMat)
-  haloMesh.renderOrder = -1000
+  const haloRadius = isRecalled ? 3.6 : 1.5
+  const haloGeo = new THREE.TubeGeometry(curve, 28, haloRadius, 8, false)
+  const haloMesh = new THREE.Mesh(haloGeo, isRecalled ? _activeSynapseHaloMat : _synapseHaloMat)
+  haloMesh.renderOrder = isRecalled ? -980 : -1000
   obj.add(haloMesh)
 
   // 2. Akıcı nöral kesikli çizgi tüpü (MindAmbience strokeDasharray="6 14" akışı)
-  const dashGeo = new THREE.TubeGeometry(curve, 32, 0.7, 6, false)
-  const dashMesh = new THREE.Mesh(dashGeo, _synapseDashShaderMat)
-  dashMesh.renderOrder = -999
+  const dashRadius = isRecalled ? 1.6 : 0.7
+  const dashGeo = new THREE.TubeGeometry(curve, 36, dashRadius, 8, false)
+  const dashMesh = new THREE.Mesh(dashGeo, isRecalled ? _activeSynapseDashShaderMat : _synapseDashShaderMat)
+  dashMesh.renderOrder = isRecalled ? -979 : -999
   obj.add(dashMesh)
 
   // 3. İç ana omurga yolu (Base track - MindAmbience stroke="var(--color-border)")
-  const trackGeo = new THREE.TubeGeometry(curve, 28, 0.42, 6, false)
-  const trackMesh = new THREE.Mesh(trackGeo, _synapseTrackMat)
-  trackMesh.renderOrder = -998
+  const trackRadius = isRecalled ? 0.95 : 0.42
+  const trackGeo = new THREE.TubeGeometry(curve, 28, trackRadius, 8, false)
+  const trackMesh = new THREE.Mesh(trackGeo, isRecalled ? _activeSynapseTrackMat : _synapseTrackMat)
+  trackMesh.renderOrder = isRecalled ? -978 : -998
   obj.add(trackMesh)
 
   // 4. Hat boyunca seyahat eden parıltılı enerji küresi (Pulse Orb - MindAmbience <circle> darbesi)
@@ -578,25 +796,28 @@ function updateCapillaryPosition(obj, { start, end }, link) {
   if (!pulseOrb) {
     pulseOrb = new THREE.Group()
     pulseOrb.userData = { isPulseOrb: true }
-    // Beyaz-sıcak parlak çekirdek (MindAmbience r="3.5" fill="#ffffff")
+    // Beyaz-sıcak parlak çekirdek
+    const innerRadius = isRecalled ? 2.4 : 1.6
     const inner = new THREE.Mesh(
-      new THREE.SphereGeometry(1.6, 16, 16),
+      new THREE.SphereGeometry(innerRadius, 16, 16),
       new THREE.MeshBasicMaterial({ color: '#ffffff' })
     )
-    // Renkli parıldayan yoğun neon iç hale (MindAmbience r="7" fill={personaColors.core} opacity="0.45")
+    // Renkli parıldayan yoğun neon iç hale
+    const outerRadius = isRecalled ? 6.2 : 4.2
     const outer = new THREE.Mesh(
-      new THREE.SphereGeometry(4.2, 16, 16),
-      _orbGlowMat
+      new THREE.SphereGeometry(outerRadius, 16, 16),
+      isRecalled ? _activeOrbGlowMat : _orbGlowMat
     )
     // Geniş eterik dış korona
+    const coronaRadius = isRecalled ? 10.5 : 7.2
     const corona = new THREE.Mesh(
-      new THREE.SphereGeometry(7.2, 12, 12),
-      _orbCoronaMat
+      new THREE.SphereGeometry(coronaRadius, 14, 14),
+      isRecalled ? _activeOrbCoronaMat : _orbCoronaMat
     )
     pulseOrb.add(inner)
     pulseOrb.add(outer)
     pulseOrb.add(corona)
-    pulseOrb.renderOrder = -990
+    pulseOrb.renderOrder = isRecalled ? -970 : -990
     obj.add(pulseOrb)
   }
   obj.userData.pulseOrb = pulseOrb
@@ -691,26 +912,6 @@ function NodeDetailPanel({ node, onClose, isTribeContext = false }) {
         </button>
       </div>
 
-      {node.isActive && (
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'rgba(251, 191, 36, 0.15)',
-            border: '1px solid rgba(251, 191, 36, 0.4)',
-            color: '#f59e0b',
-            borderRadius: 12,
-            padding: '8px 14px',
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          <span>🧠</span>
-          <span>{t('mind.recalled_for_content', 'Bu düşünce seçilen içerikte tetiklendi.')}</span>
-        </div>
-      )}
-
       <div
         style={{
           width: '100%',
@@ -791,28 +992,110 @@ export default function MindPage() {
     const raw = searchParams.get('highlightIds') || ''
     return new Set(raw ? raw.split(',').map((id) => id.trim()).filter(Boolean) : [])
   }, [searchParams])
-  const [rootName, setRootName] = useState(queryName)
   const navigate = useNavigate()
+
+  const { data: profileData } = useQuery({
+    queryKey: ['mindProfile', actorId ? 'actor' : 'tribe', actorId || tribeId],
+    queryFn: async () => {
+      const res = actorId ? await actorApi.getProfile(actorId) : await tribeApi.getTribe(tribeId)
+      if (res?.data?.succeeded) {
+        return res.data.data
+      }
+      return null
+    },
+    enabled: Boolean(actorId || tribeId),
+  })
+
+  const rootName =
+    profileData?.profileName ||
+    profileData?.tribeName ||
+    profileData?.name ||
+    queryName ||
+    ''
+
+  const {
+    data: rawData = [],
+    isLoading,
+    isError,
+    error: memoryError,
+  } = useQuery({
+    queryKey: ['mindMemory', actorId ? 'actor' : 'tribe', actorId || tribeId],
+    queryFn: async () => {
+      const res = actorId
+        ? await actorApi.getFullMemory(actorId)
+        : await tribeApi.getFullMemory(tribeId)
+      if (res?.data?.succeeded) {
+        if (!res.data.data) return []
+        try {
+          return JSON.parse(res.data.data)
+        } catch (e) {
+          console.error('Failed to parse neo4j output:', e)
+          throw new Error(t('mind.parse_error', 'Failed to parse memory data.'))
+        }
+      }
+      throw new Error(res?.data?.errors?.[0]?.description || t('mind.fetch_error', 'Failed to fetch memory.'))
+    },
+    enabled: Boolean(actorId || tribeId),
+  })
+
   const isGreenMode = useThemeStore((s) => s.isGreenMode)
   const isDarkMode = useThemeStore((s) => s.isDarkMode)
 
-  const bgColor = isDarkMode ? '#09090b' : '#ffffff'
-  const headerBg = isDarkMode ? 'rgba(9, 9, 11, 0.85)' : 'rgba(255, 255, 255, 0.85)'
-  const borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.1)'
+  const bgColor = isDarkMode ? '#09090b' : '#f8fafc'
+  const headerBg = isDarkMode ? 'rgba(9, 9, 11, 0.85)' : 'rgba(255, 255, 255, 0.88)'
+  const borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
 
   useEffect(() => {
     linkLabelCache.clear()
     nodeTextureCache.clear()
     nodeBadgeCache.clear()
     const green = isGreenMode
-    _synapseTrackMat.color.set(green ? '#064e3b' : '#1e293b')
+    const dark = isDarkMode
+
+    // Omurga yolu: Koyu temada koyu tonlar, Açık temada soft modern gri/zümrüt
+    _synapseTrackMat.color.set(dark ? (green ? '#064e3b' : '#1e293b') : (green ? '#a7f3d0' : '#cbd5e1'))
+    _synapseTrackMat.opacity = dark ? 0.4 : 0.65
+
+    // Dış hale materyali: Koyu temada Additive, Açık temada NormalBlending
     _synapseHaloMat.color.set(green ? '#10b981' : '#3b82f6')
-    _synapseHaloMat.opacity = green ? 0.18 : 0.15
-    _orbGlowMat.color.set(green ? '#34d399' : '#60a5fa')
+    _synapseHaloMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    _synapseHaloMat.opacity = dark ? (green ? 0.18 : 0.15) : 0.24
+    _synapseHaloMat.needsUpdate = true
+
+    // Dolaşan orblar
+    _orbGlowMat.color.set(dark ? (green ? '#34d399' : '#60a5fa') : (green ? '#059669' : '#2563eb'))
+    _orbGlowMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    _orbGlowMat.needsUpdate = true
+
     _orbCoronaMat.color.set(green ? '#10b981' : '#3b82f6')
+    _orbCoronaMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    _orbCoronaMat.needsUpdate = true
+
+    // Aktif recalled bağlantı materyalleri
+    _activeSynapseTrackMat.color.set(dark ? (green ? '#059669' : '#2563eb') : (green ? '#34d399' : '#60a5fa'))
+    _activeSynapseTrackMat.opacity = dark ? 0.6 : 0.75
+
+    _activeSynapseHaloMat.color.set(green ? '#34d399' : '#60a5fa')
+    _activeSynapseHaloMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    _activeSynapseHaloMat.needsUpdate = true
+
+    _activeOrbGlowMat.color.set(dark ? (green ? '#6ee7b7' : '#93c5fd') : (green ? '#10b981' : '#3b82f6'))
+    _activeOrbGlowMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    _activeOrbGlowMat.needsUpdate = true
+
+    _activeOrbCoronaMat.color.set(green ? '#34d399' : '#60a5fa')
+    _activeOrbCoronaMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+    _activeOrbCoronaMat.needsUpdate = true
 
     if (_synapseDashShaderMat.uniforms.uColor) {
-      _synapseDashShaderMat.uniforms.uColor.value.set(green ? '#34d399' : '#60a5fa')
+      _synapseDashShaderMat.uniforms.uColor.value.set(dark ? (green ? '#34d399' : '#60a5fa') : (green ? '#059669' : '#2563eb'))
+      _synapseDashShaderMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+      _synapseDashShaderMat.needsUpdate = true
+    }
+    if (_activeSynapseDashShaderMat.uniforms.uColor) {
+      _activeSynapseDashShaderMat.uniforms.uColor.value.set(dark ? (green ? '#6ee7b7' : '#93c5fd') : (green ? '#10b981' : '#2563eb'))
+      _activeSynapseDashShaderMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
+      _activeSynapseDashShaderMat.needsUpdate = true
     }
 
     globalUniforms.uPulseColor.value.set(
@@ -820,13 +1103,11 @@ export default function MindPage() {
       green ? 0.83 : 0.51,
       green ? 0.6 : 0.98
     )
-    if (fgRef.current) {
+    if (fgRef.current && typeof fgRef.current.refresh === 'function') {
       fgRef.current.refresh()
     }
-  }, [isGreenMode])
+  }, [isGreenMode, isDarkMode])
 
-  const [isLoading, setIsLoading] = useState(true)
-  const [rawData, setRawData] = useState([])
   const [selectedNode, setSelectedNode] = useState(null)
   const [nodeSearch, setNodeSearch] = useState('')
   const [isNodeListCollapsed, setIsNodeListCollapsed] = useState(false)
@@ -870,7 +1151,7 @@ export default function MindPage() {
             }
           }
           if (obj.userData && obj.userData.curve && obj.userData.pulseOrb) {
-            const speed = 0.38
+            const speed = obj.userData.isRecalled ? 0.62 : 0.38
             const seed = obj.userData.seed || 0
             const t = (nowSec * speed + seed) % 1
             obj.userData.pulseOrb.position.copy(obj.userData.curve.getPoint(t))
@@ -905,61 +1186,19 @@ export default function MindPage() {
     return () => observer.disconnect()
   }, [])
 
+
   useEffect(() => {
     if (!actorId && !tribeId) {
       toast.error(t('mind.id_missing', 'Actor or Tribe ID is missing.'))
       navigate('/')
-      return
     }
-
-    const fetchMemory = async () => {
-      setIsLoading(true)
-      try {
-        const [memoryRes, profileRes] = await Promise.allSettled([
-          actorId ? actorApi.getFullMemory(actorId) : tribeApi.getFullMemory(tribeId),
-          actorId ? actorApi.getProfile(actorId) : tribeApi.getTribe(tribeId),
-        ])
-
-        if (profileRes.status === 'fulfilled' && profileRes.value?.data?.succeeded) {
-          const pData = profileRes.value.data.data
-          const resolvedName = pData?.profileName || pData?.tribeName || pData?.name
-          if (resolvedName) {
-            setRootName(resolvedName)
-          }
-        }
-
-        if (memoryRes.status === 'fulfilled') {
-          const response = memoryRes.value
-          if (response.data.succeeded) {
-            if (response.data.data) {
-              try {
-                const parsedData = JSON.parse(response.data.data)
-                setRawData(parsedData)
-              } catch (e) {
-                console.error('Failed to parse neo4j output:', e)
-                toast.error(t('mind.parse_error', 'Failed to parse memory data.'))
-                setRawData([])
-              }
-            } else {
-              setRawData([])
-            }
-          } else {
-            toast.error(response.data.errors?.[0]?.description || t('mind.fetch_error', 'Failed to fetch memory.'))
-          }
-        } else {
-          console.error(memoryRes.reason)
-          toast.error(t('mind.generic_error', 'An error occurred while fetching memory.'))
-        }
-      } catch (error) {
-        console.error(error)
-        toast.error(t('mind.generic_error', 'An error occurred while fetching memory.'))
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchMemory()
   }, [actorId, tribeId, navigate, t])
+
+  useEffect(() => {
+    if (isError && memoryError) {
+      toast.error(memoryError.message || t('mind.generic_error', 'An error occurred while fetching memory.'))
+    }
+  }, [isError, memoryError, t])
 
   const graphData = useMemo(() => {
     if (!rawData || !Array.isArray(rawData)) return { nodes: [], links: [] }
@@ -979,8 +1218,9 @@ export default function MindPage() {
           const isRoot = n.label === 'Persona' || (n.label === 'Tribe' && (n.id === tribeId || idx === 0))
           const isFocusMatched = focusNodeParam && n.name && n.name.toLowerCase() === focusNodeParam.toLowerCase()
           const isActive = (highlightIds.size > 0 && nodeId && highlightIds.has(nodeId)) || Boolean(isFocusMatched)
+          const activeColor = getActiveNeuronColor()
           const { core } = isActive
-            ? { core: '#fbbf24' }
+            ? activeColor
             : getNeuronColor(n.label, isRoot)
 
           let displayName = n.name || nodeId
@@ -1020,12 +1260,17 @@ export default function MindPage() {
               ? `${relType} (${affinity > 0 ? '+' : ''}${affinity})`
               : relType
 
+            const sourceNode = nodesMap.get(sourceId)
+            const targetNode = nodesMap.get(targetId)
+            const isRecalledLink = Boolean(sourceNode?.isActive && targetNode?.isActive)
+
             linksArr.push({
               source: sourceId,
               target: targetId,
               name: displayName,
               relType,
               affinity,
+              isRecalled: isRecalledLink,
             })
           }
         }
@@ -1057,7 +1302,7 @@ export default function MindPage() {
       nodes,
       links: linksArr,
     }
-  }, [rawData, tribeId, actorId, rootName, highlightIds, focusNodeParam])
+  }, [rawData, tribeId, actorId, rootName, highlightIds, focusNodeParam, isGreenMode])
 
   const sortedNodes = useMemo(() => {
     return [...graphData.nodes].sort((a, b) => {
@@ -1074,6 +1319,12 @@ export default function MindPage() {
   )
   const hasHandledHighlightRef = useRef(false)
 
+  // Reset highlight handled state if query params change
+  const rawHighlightParam = searchParams.get('highlightIds') || ''
+  useEffect(() => {
+    hasHandledHighlightRef.current = false
+  }, [actorId, tribeId, rawHighlightParam, focusNodeParam])
+
   useEffect(() => {
     if (isLoading || graphData.nodes.length === 0) return
 
@@ -1082,15 +1333,8 @@ export default function MindPage() {
       hasHandledHighlightRef.current = true
 
       const first = highlightedActiveNodes[0]
-      toast.success(
-        t('mind.active_synapse', `${highlightedActiveNodes.length} aktif sinaps düğümü hafıza çağrışımıyla vurgulandı.`, { count: highlightedActiveNodes.length }),
-        { duration: 4000, icon: '🧠' }
-      )
-      // İlk aktif node'un detay panelini aç
-      selectedNodeRef.current = first
-      setSelectedNode(first)
 
-      // 600ms sonra ilk aktif node'a zoom yap
+      // Node pozisyonları yerleştikten sonra ilk aktif node'a hızlıca zoom yap
       const tid = setTimeout(() => {
         if (!fgRef.current || first.x == null) return
         fgRef.current.cameraPosition(
@@ -1098,7 +1342,7 @@ export default function MindPage() {
           { x: first.x, y: first.y ?? 0, z: first.z ?? 0 },
           1200
         )
-      }, 600)
+      }, 350)
       return () => clearTimeout(tid)
     } else if ((highlightIds.size > 0 && highlightedActiveNodes.length === 0) || focusNodeParam) {
       if (hasHandledHighlightRef.current) return
@@ -1151,17 +1395,18 @@ export default function MindPage() {
       const fg = fgRef.current
 
       // Kuvvetleri buradan da güvenli şekilde ayarla
-      const lf = fg.d3Force('link')
+      const lf = typeof fg.d3Force === 'function' ? fg.d3Force('link') : null
       if (lf) {
         lf.distance((link) => {
           if (link.source?.label === 'Persona' || link.target?.label === 'Persona') return 260
           return 40 // Kılcal bağlar aşırı kısaltıldı
         }).strength(0.3)
       }
-      const cf = fg.d3Force('charge')
+      const cf = typeof fg.d3Force === 'function' ? fg.d3Force('charge') : null
       if (cf) cf.strength(-900)
 
-      const internalNodes = fg.graphData().nodes
+      if (typeof fg.graphData !== 'function') return
+      const internalNodes = fg.graphData()?.nodes
       if (!internalNodes || internalNodes.length === 0) return
 
       const nonPersona = internalNodes.filter((n) => n.label !== 'Persona')
@@ -1193,7 +1438,9 @@ export default function MindPage() {
       })
 
       // Simülasyonu bu pozisyonlardan başlat
-      fg.d3ReheatSimulation()
+      if (typeof fg.d3ReheatSimulation === 'function') {
+        fg.d3ReheatSimulation()
+      }
     }, 150)
     return () => clearTimeout(tid)
   }, [graphData.nodes.length])
@@ -1375,7 +1622,7 @@ export default function MindPage() {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   letterSpacing: '0.01em',
-                  textShadow: '0 1px 4px rgba(0, 0, 0, 0.4)',
+                  textShadow: isDarkMode ? '0 1px 4px rgba(0, 0, 0, 0.4)' : 'none',
                 }}
               >
                 "{contextTitle}"
@@ -1399,10 +1646,39 @@ export default function MindPage() {
               maxWidth: contextTitle ? '32%' : '100%',
             }}
           >
+            {/* 1. Recalled (Tetiklenen Anı) - Dolu parlayan neon küre (8px, yumuşak ışık aurası ile) */}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: isGreenMode ? '#34d399' : '#60a5fa',
+                  boxShadow: `0 0 0 2.5px ${isGreenMode ? 'rgba(52, 211, 153, 0.32)' : 'rgba(96, 165, 250, 0.32)'}, 0 0 8px ${isGreenMode ? '#34d399' : '#60a5fa'}`,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: 'var(--color-text-secondary)',
+                  letterSpacing: '0.04em',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {t('mind.labels.recalled', 'Recalled')}
+              </span>
+            </span>
+
+            {/* Durum ile Düğüm Tipleri arasındaki ince ayırıcı */}
+            <span style={{ width: 1, height: 18, background: 'var(--color-border)', margin: '0 2px' }} />
+
+            {/* 2. Düğüm Tipleri (Persona, Tribe, Someone, Thought) */}
             {[
               { color: isGreenMode ? '#10b981' : '#3b82f6', label: tribeId ? t('mind.labels.tribe_root', 'Tribe (Root)') : t('mind.labels.persona', 'Persona') },
               { color: NEURON_COLORS.Tribe.core, label: tribeId ? t('mind.labels.other_tribes', 'Other Tribes') : t('mind.labels.tribe', 'Tribe') },
-              { color: NEURON_COLORS.Actor.core, label: t('mind.labels.actor', 'Actor') },
+              { color: NEURON_COLORS.Actor.core, label: t('mind.labels.actor', 'Someone') },
               { color: NEURON_COLORS.GeneralThought.core, label: t('mind.labels.general_thought', 'Thought') },
             ].map(({ color, label }, idx) => (
               <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1440,7 +1716,7 @@ export default function MindPage() {
                 selectedNodeRef.current = null
                 setSelectedNode(null)
                 selectedLinkRef.current = null
-                if (fgRef.current) {
+                if (fgRef.current && typeof fgRef.current.cameraPosition === 'function') {
                   fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
                 }
               }}
@@ -1456,7 +1732,16 @@ export default function MindPage() {
         {/* Graph Alanı */}
         <div
           ref={containerRef}
-          style={{ flex: 1, width: '100%', position: 'relative', background: bgColor }}
+          style={{
+            flex: 1,
+            width: '100%',
+            position: 'relative',
+            background: bgColor,
+            backgroundImage: isDarkMode
+              ? 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 80%)'
+              : 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 80%), radial-gradient(#cbd5e1 1.2px, transparent 1.2px)',
+            backgroundSize: isDarkMode ? 'auto' : 'auto, 28px 28px',
+          }}
         >
           {isLoading ? (
             <div
@@ -1571,7 +1856,9 @@ export default function MindPage() {
                   borderRadius: 16,
                   backdropFilter: 'blur(16px)',
                   WebkitBackdropFilter: 'blur(16px)',
-                  boxShadow: '0 12px 36px rgba(0,0,0,0.5)',
+                  boxShadow: isDarkMode
+                    ? '0 12px 36px rgba(0,0,0,0.5)'
+                    : '0 12px 32px -4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)',
                   overflow: 'hidden',
                   fontFamily: 'Inter, sans-serif',
                 }}

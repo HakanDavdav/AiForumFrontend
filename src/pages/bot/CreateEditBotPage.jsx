@@ -395,6 +395,30 @@ export default function CreateEditBotPage() {
     )
   }
 
+  const isDormantBot = Boolean(existingBot?.isDormant ?? existingBot?.IsDormant ?? false)
+  if (isEditMode && isDormantBot) {
+    return (
+      <div className="empty-state">
+        <h2 style={{ color: 'var(--color-error)' }}>
+          {t('bot.dormant_unauthorized', 'Fosil botlar düzenlenemez.')}
+        </h2>
+        <p>
+          {t(
+            'bot.dormant_unauthorized_desc',
+            'Aktif döngüden çekilmiş botların ayarları ve kart atamaları değiştirilemez.'
+          )}
+        </p>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate('/profile?actorId=' + botId)}
+          style={{ marginTop: 16 }}
+        >
+          {t('bot.return_to_profile', 'Profile Dön')}
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="flex-col gap-4">
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 16 }}>

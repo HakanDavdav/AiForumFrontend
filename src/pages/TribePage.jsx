@@ -11,16 +11,19 @@ import {
   Users,
   Crown,
   Sliders,
+  ShieldCheck,
 } from 'lucide-react'
 import BotFlashCardsIcon from '../components/common/icons/BotFlashCardsIcon'
 import CardContingencyIcon from '../components/common/icons/CardContingencyIcon'
 import CardContingencyModifierIcon from '../components/common/icons/CardContingencyModifierIcon'
+import FossilIcon from '../components/common/icons/FossilIcon'
 import TRexSkullIcon from '../assets/t-rex-skull-svgrepo-com.svg?react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { tribeApi } from '../api/tribeApi'
 import BackButton from '../components/common/BackButton'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
+import FossilTogglePill from '../components/common/FossilTogglePill'
 import PostCard from '../components/content/PostCard'
 import CardSlots from '../components/card/CardSlots'
 import ProfileModifiersModal from '../components/profile/ProfileModifiersModal'
@@ -45,6 +48,8 @@ export default function TribePage() {
   const { t } = useTranslation()
   const [isBouncing, setIsBouncing] = useState(false)
   const [modifiersModalOpen, setModifiersModalOpen] = useState(false)
+  // Fosil (dormant) üyeler varsayılan olarak gizli.
+  const [showFossilMembers, setShowFossilMembers] = useState(false)
   // Limitler & Miras paneli açma/kapama durumu (ProfilePage ile ORTAK global state)
   const { isLimitsExpanded, toggleLimits } = useUIStore()
 
@@ -57,6 +62,22 @@ export default function TribePage() {
   const sortedTribeCards = useMemo(
     () => sortCardsOwnedFirst(tribe?.personalityCards || [], buildOwnedCardIdSet(myCards || [])),
     [tribe, myCards]
+  )
+
+  const isDormantMember = (member) =>
+    Boolean(member?.actor?.isDormant ?? member?.actor?.IsDormant ?? false)
+
+  const visibleMembers = useMemo(
+    () =>
+      showFossilMembers
+        ? tribe?.tribeMemberships || []
+        : (tribe?.tribeMemberships || []).filter((m) => !isDormantMember(m)),
+    [tribe, showFossilMembers]
+  )
+
+  const fossilMemberCount = useMemo(
+    () => (tribe?.tribeMemberships || []).filter((m) => isDormantMember(m)).length,
+    [tribe]
   )
 
   const { data: postsData, isLoading: isPostsLoading } = useQuery({
@@ -135,6 +156,30 @@ export default function TribePage() {
   }
   const tribeGradeColor = gradeColorMap[tribeGradeLabel] || '#EF4444'
 
+  const capabilityEmblems = [
+    {
+      key: 'default',
+      label: t('tribe.capability_default', 'Varsayılan'),
+      Icon: ShieldCheck,
+      tone: 'default',
+      size: 25,
+    },
+    ...(isDormant
+      ? [
+          {
+            key: 'fossil',
+            label: t(
+              'common.fossil_tribe_desc',
+              'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.'
+            ),
+            Icon: FossilIcon,
+            tone: 'fossil',
+            size: 24,
+          },
+        ]
+      : []),
+  ]
+
   return (
     <div className="flex-col gap-4">
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 8 }}>
@@ -160,22 +205,11 @@ export default function TribePage() {
             <div>
               <div className="flex items-center" style={{ gap: 12 }}>
                 <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>{tribe.tribeName}</h1>
-                {isDormant && (
-                  <span
-                    className="badge-fossil"
-                    style={{ fontSize: 12, padding: '2px 8px', borderRadius: 6 }}
-                    title={t('common.fossil_tribe_desc', 'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.')}
-                  >
-                    <TRexSkullIcon className="badge-fossil-icon" />
-                  </span>
-                )}
               </div>
 
               <p className="text-muted" style={{ margin: '8px 0', lineHeight: 1.5, maxWidth: 600 }}>
                 {tribe.mission || t('tribe.no_mission')}
               </p>
-
-
 
               {tribe.createdAt && (
                 <p
@@ -197,6 +231,22 @@ export default function TribePage() {
                   </span>
                 </p>
               )}
+            </div>
+
+            <div style={{ marginTop: 12, marginBottom: 0, maxWidth: 600 }}>
+              <div className="bot-capability-emblems" style={{ marginBottom: 0 }}>
+                {capabilityEmblems.map(({ key, label, Icon, tone, size = 25 }) => (
+                  <span
+                    key={key}
+                    className={`bot-capability-emblem bot-capability-emblem--${tone}`}
+                    title={label}
+                    aria-label={label}
+                    role="img"
+                  >
+                    <Icon size={size} strokeWidth={2.2} aria-hidden="true" />
+                  </span>
+                ))}
+              </div>
             </div>
 
             <div style={{ flexGrow: 1 }} />
@@ -243,33 +293,8 @@ export default function TribePage() {
                 height: 144,
                 display: 'inline-flex',
                 flexShrink: 0,
-                overflow: 'hidden',
-                borderRadius: 24,
               }}
             >
-              {isMyTribe && (
-                <span
-                  title={t('common.your_tribe', 'Senin Klanın')}
-                  style={{
-                    position: 'absolute',
-                    top: -11,
-                    left: -5,
-                    color: 'var(--color-warning)',
-                    zIndex: 2,
-                    filter: 'drop-shadow(0px 3px 4px rgba(0,0,0,0.5))',
-                    transform: 'rotate(-15deg)',
-                    display: 'flex',
-                    pointerEvents: 'auto',
-                  }}
-                >
-                  <Crown size={40} strokeWidth={2.5} />
-                </span>
-              )}
-              {isDormant && (
-                <div className="fossil-stamp">
-                  <TRexSkullIcon className="fossil-stamp-icon" />
-                </div>
-              )}
               {tribe.imageUrl ? (
                 <img
                   src={tribe.imageUrl}
@@ -279,7 +304,6 @@ export default function TribePage() {
                     height: 144,
                     objectFit: 'cover',
                     borderRadius: 24,
-                    border: '4px solid var(--color-surface)',
                   }}
                 />
               ) : (
@@ -295,11 +319,35 @@ export default function TribePage() {
                     fontWeight: 800,
                     fontSize: 48,
                     borderRadius: 24,
-                    border: '4px solid var(--color-surface)',
                   }}
                 >
                   {tribe.tribeName?.[0] || 'T'}
                 </div>
+              )}
+
+              {isDormant && (
+                <div className="fossil-stamp" style={{ borderRadius: 24 }}>
+                  <TRexSkullIcon className="fossil-stamp-icon" />
+                </div>
+              )}
+
+              {isMyTribe && (
+                <span
+                  title={t('common.your_tribe', 'Senin Klanın')}
+                  style={{
+                    position: 'absolute',
+                    top: -11,
+                    left: -5,
+                    color: 'var(--color-warning)',
+                    zIndex: 10,
+                    filter: 'drop-shadow(0px 3px 4px rgba(0,0,0,0.5))',
+                    transform: 'rotate(-15deg)',
+                    display: 'flex',
+                    pointerEvents: 'auto',
+                  }}
+                >
+                  <Crown size={40} strokeWidth={2.5} />
+                </span>
               )}
 
               {/* Avatar Sağ Alt: Sadece Klan Grade Rozeti */}
@@ -326,7 +374,7 @@ export default function TribePage() {
                     justifyContent: 'center',
                     border: '3px solid var(--color-surface)',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
-                    zIndex: 2,
+                    zIndex: 10,
                     userSelect: 'none',
                   }}
                 >
@@ -659,17 +707,23 @@ export default function TribePage() {
                 color: 'var(--color-text-primary)',
               }}
             >
-              {t('tribe.members')} ({tribe.tribeMemberships?.length ?? 0})
+              {t('tribe.members')} ({visibleMembers.length})
             </h2>
           </div>
+          <FossilTogglePill
+            count={fossilMemberCount}
+            open={showFossilMembers}
+            onToggle={() => setShowFossilMembers((v) => !v)}
+            style={{ marginLeft: 'auto' }}
+          />
         </div>
       </div>
 
       <div className="flex-col gap-2">
-        {tribe.tribeMemberships?.length === 0 ? (
+        {visibleMembers.length === 0 && fossilMemberCount === 0 ? (
           <p className="empty-state">{t('tribe.no_members')}</p>
         ) : (
-          tribe.tribeMemberships?.map((member) =>
+          visibleMembers.map((member) =>
             member.actor ? (
               <div
                 key={member.actor.actorId}

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
@@ -7,6 +8,7 @@ import { Edit2, Brain, Crown } from 'lucide-react'
 import useDevLog from '../../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 import TRexSkullIcon from '../../assets/t-rex-skull-svgrepo-com.svg?react'
+import CardIcon from '../common/icons/CardIcon'
 
 /**
  * TribeMinimalCard — plan.md Component #4
@@ -20,11 +22,14 @@ export default function TribeMinimalCard({
   imageUrl: propImageUrl,
   isDormant: propIsDormant,
   IsDormant: propIsDormantUpper,
+  assignedCardIds: propAssignedCardIds,
+  AssignedCardIds: propAssignedCardIdsUpper,
   clickable = true,
   showPoint = true,
   showMindBtn = true,
   showEditBtn = true,
   variant = 'expanded',
+  ultraCompact = false,
   style = {},
 }) {
   const tribeId = propTribeId || tribe?.tribeId || tribe?.TribeId
@@ -39,9 +44,51 @@ export default function TribeMinimalCard({
   const { t } = useTranslation()
 
   const myTribes = useMyEntitiesStore((s) => s.myTribes)
+  const myCards = useMyEntitiesStore((s) => s.myCards)
   const isMyTribe = myTribes?.some((t) => t.tribeId === tribeId)
   const isCompact = variant === 'compact'
+  const isUltraCompact =
+    ultraCompact ||
+    variant === 'ultra-compact' ||
+    variant === 'ultra_compact' ||
+    variant === 'ultracompact'
   const isDormantTribe = Boolean(isDormant ?? IsDormant ?? false)
+
+  // Matching personality cards between current tribe and logged-in user
+  const matchingCards = useMemo(() => {
+    if (isUltraCompact || !isLoggedIn || !myCards?.length) return []
+
+    const rawAssigned = [
+      ...(propAssignedCardIds || []),
+      ...(propAssignedCardIdsUpper || []),
+      ...(tribe?.assignedCardIds || tribe?.AssignedCardIds || []),
+      ...(tribe?.assignedCards || tribe?.AssignedCards || []).map((c) => c?.cardId || c?.CardId || c),
+    ]
+    if (!rawAssigned.length) return []
+
+    const assignedIds = rawAssigned
+      .map((c) => (typeof c === 'string' ? c : c?.cardId || c?.CardId || c?.id || c?.Id))
+      .filter(Boolean)
+
+    if (!assignedIds.length) return []
+
+    const matches = assignedIds
+      .map((aId) => {
+        const myCard = myCards.find((mc) => {
+          const mId = typeof mc === 'string' ? mc : mc?.cardId || mc?.CardId || mc?.id || mc?.Id
+          return mId && mId.toLowerCase() === aId.toLowerCase()
+        })
+        if (!myCard) return null
+        const acqType = typeof myCard === 'string' ? null : (myCard?.acquisitionType ?? null)
+        return { id: aId, acquisitionType: acqType }
+      })
+      .filter(Boolean)
+
+    return matches
+  }, [isUltraCompact, isLoggedIn, myCards, propAssignedCardIds, propAssignedCardIdsUpper, tribe])
+
+  const matchingCardsCount = matchingCards.length
+  const visibleCards = matchingCards.slice(0, 5)
 
   const handleClick = (e) => {
     if (!clickable) return
@@ -115,15 +162,56 @@ export default function TribeMinimalCard({
       </div>
       <div style={{ flex: isCompact ? '0 1 auto' : 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
         <div className="tribe-card-name truncate">{tribeName || t('tribe.unnamed_tribe', 'İsimsiz Klan')}</div>
-        {isDormantTribe && (
-          <span
-            className="badge-fossil"
-            title={t('common.fossil_tribe_desc', 'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.')}
-          >
-            <TRexSkullIcon className="badge-fossil-icon" />
-          </span>
-        )}
       </div>
+
+      {matchingCardsCount > 0 && (
+        <div
+          className="actor-chip-card-stack"
+          title={t('card.matching_cards_assigned_tribe', {
+            count: matchingCardsCount,
+            defaultValue: `${matchingCardsCount} adet kişisel kartınız bu klanda takılı`,
+          })}
+          onClick={clickable ? handleClick : undefined}
+          style={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            flexShrink: 0,
+            cursor: clickable ? 'pointer' : 'default',
+            pointerEvents: clickable ? 'auto' : 'none',
+          }}
+        >
+          {visibleCards.map((card, idx) => (
+            <span
+              key={card.id ?? idx}
+              className="actor-chip-card-item"
+              style={{
+                position: 'relative',
+                marginLeft: idx === 0 ? 0 : -10,
+                zIndex: idx + 1,
+                display: 'inline-flex',
+                alignItems: 'flex-end',
+              }}
+            >
+              <CardIcon
+                crowned
+                purchased={card.acquisitionType === 1}
+                width={21}
+                height={24}
+                style={{ display: 'block' }}
+              />
+            </span>
+          ))}
+        </div>
+      )}
+
+      {isDormantTribe && (
+        <span
+          className="badge-fossil badge-fossil--plain"
+          title={t('common.fossil_tribe_desc', 'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.')}
+        >
+          <TRexSkullIcon className="badge-fossil-icon" />
+        </span>
+      )}
       {!isCompact && showMindBtn && (
         <button
           type="button"

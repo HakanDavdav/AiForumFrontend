@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { MODEL_GLASS_ITEMS } from '../components/common/ModelGlassToggle'
 import KingIcon from '../components/common/icons/KingIcon'
+import FossilIcon from '../components/common/icons/FossilIcon'
 import AngryBotWithSwordsIcon from '../components/common/icons/AngryBotWithSwordsIcon'
 import AmbientBots from '../components/common/ambiances/AmbientBots'
 import WelcomeAmbience from '../components/common/ambiances/WelcomeAmbience'
@@ -44,6 +45,7 @@ import EntryCard from '../components/content/EntryCard'
 import ContextualEntryThread from '../components/content/ContextualEntryThread'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
 import TribeMinimalCard from '../components/tribe/TribeMinimalCard'
+import FossilTogglePill from '../components/common/FossilTogglePill'
 import FollowListModal from '../components/profile/FollowListModal'
 import ProfileLikesModal from '../components/profile/ProfileLikesModal'
 import ProfileModifiersModal from '../components/profile/ProfileModifiersModal'
@@ -155,6 +157,9 @@ export default function ProfilePage() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('bots')
+  // Fosil (dormant) bot/klanlar bu sayfada varsayılan olarak gizli.
+  const [showFossilProfileBots, setShowFossilProfileBots] = useState(false)
+  const [showFossilProfileTribes, setShowFossilProfileTribes] = useState(false)
   const [postsPage, setPostsPage] = useState(1)
   const [entriesPage, setEntriesPage] = useState(1)
   const inferredPerPage = 5
@@ -195,7 +200,7 @@ export default function ProfilePage() {
   const handleTriggerDebate = async (proposition) => {
     try {
       setDebatePending(true)
-      toast.loading(t('profile.triggering_debate', 'Münazara başlatılıyor...'), {
+      toast.loading(t('profile.triggering_debate', 'Meydan okuma başlatılıyor...'), {
         id: 'debate-trigger',
       })
       const res = await actorApi.triggerDebate({
@@ -205,7 +210,7 @@ export default function ProfilePage() {
       const isBotTarget = profile?.discriminator === 'Bot'
       if (isBotTarget) {
         toast.success(
-          t('profile.debate_triggered', 'Münazara başlatıldı! Arenaya aktarılıyorsunuz...'),
+          t('profile.debate_triggered', 'Meydan okuma başlatıldı! Arenaya aktarılıyorsunuz...'),
           {
             id: 'debate-trigger',
           }
@@ -214,7 +219,7 @@ export default function ProfilePage() {
         toast.success(
           t(
             'profile.debate_invitation_sent',
-            'Münazara meydan okuması kullanıcıya iletildi. Rakibin kabul etmesi bekleniyor...'
+            'Meydan okuma kullanıcıya iletildi. Rakibin kabul etmesi bekleniyor...'
           ),
           {
             id: 'debate-trigger',
@@ -268,7 +273,7 @@ export default function ProfilePage() {
         errorMessages = [
           err.response?.data?.message ||
             err.message ||
-            t('profile.debate_error', 'Münazara başlatılamadı.'),
+            t('profile.debate_error', 'Meydan okuma başlatılamadı.'),
         ]
       }
 
@@ -318,6 +323,34 @@ export default function ProfilePage() {
   const sortedAssignedCards = useMemo(
     () => sortCardsOwnedFirst(profile?.assignedCards || [], buildOwnedCardIdSet(myCards || [])),
     [profile, myCards]
+  )
+
+  const isDormantItem = (item) => Boolean(item?.isDormant ?? item?.IsDormant ?? false)
+
+  const visibleProfileBots = useMemo(
+    () =>
+      showFossilProfileBots
+        ? profile?.bots || []
+        : (profile?.bots || []).filter((b) => !isDormantItem(b)),
+    [profile, showFossilProfileBots]
+  )
+
+  const visibleProfileTribes = useMemo(
+    () =>
+      showFossilProfileTribes
+        ? profile?.tribes || []
+        : (profile?.tribes || []).filter((t) => !isDormantItem(t)),
+    [profile, showFossilProfileTribes]
+  )
+
+  const fossilProfileBotCount = useMemo(
+    () => (profile?.bots || []).filter((b) => isDormantItem(b)).length,
+    [profile]
+  )
+
+  const fossilProfileTribeCount = useMemo(
+    () => (profile?.tribes || []).filter((t) => isDormantItem(t)).length,
+    [profile]
   )
 
   const isMyBot =
@@ -385,11 +418,10 @@ export default function ProfilePage() {
         className={
           isCurrentUserPremium ? 'btn btn-sm' : 'btn btn-primary btn-sm profile-premium-btn'
         }
-        onClick={isCurrentUserPremium ? undefined : () => setIsPremiumOpen(true)}
-        disabled={isCurrentUserPremium}
+        onClick={() => setIsPremiumOpen(true)}
         title={
           isCurrentUserPremium
-            ? t('premium.active', 'Premium Aktif')
+            ? t('premium.manage_subscription', 'Premium Üyeliği Yönet')
             : t('premium.title', 'Premium')
         }
         style={{
@@ -402,7 +434,7 @@ export default function ProfilePage() {
           background: 'var(--color-warning)',
           borderColor: '#000',
           color: '#fff',
-          cursor: isCurrentUserPremium ? 'default' : 'pointer',
+          cursor: 'pointer',
           paddingTop: 6,
           paddingBottom: 6,
         }}
@@ -699,6 +731,20 @@ export default function ProfilePage() {
           size: 25,
         },
     ...modelEmblem,
+    ...(isDormant
+      ? [
+          {
+            key: 'fossil',
+            label: t(
+              'common.fossil_bot_desc',
+              'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.'
+            ),
+            Icon: FossilIcon,
+            tone: 'fossil',
+            size: 24,
+          },
+        ]
+      : []),
   ]
 
   const userCapabilities = profile.userSettings?.userCapabilities ?? UserCapabilities.Default
@@ -787,22 +833,11 @@ export default function ProfilePage() {
                     onChange={(e) => setEditForm((f) => ({ ...f, profileName: e.target.value }))}
                   />
                 ) : (
-                  <>
-                    <span
-                      style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                    >
-                      {profile.profileName}
-                    </span>
-                    {isDormant && (
-                      <span
-                        className="badge-fossil"
-                        style={{ fontSize: 12, padding: '2px 8px', borderRadius: 6 }}
-                        title={t('common.fossil_bot_desc', 'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.')}
-                      >
-                        <TRexSkullIcon className="badge-fossil-icon" />
-                      </span>
-                    )}
-                  </>
+                  <span
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  >
+                    {profile.profileName}
+                  </span>
                 )}
               </h1>
             </div>
@@ -1004,7 +1039,7 @@ export default function ProfilePage() {
                 className="btn btn-outline btn-sm"
                 onClick={() => navigate('/hierarchy?actorId=' + actorId)}
               >
-                <Network size={14} /> {t('profile.network')}
+                <Network size={14} /> {t('profile.hierarchy', 'Hierarchy')}
               </button>
               {isLoggedIn && !isOwnProfile && (
                 <button
@@ -1012,9 +1047,9 @@ export default function ProfilePage() {
                   onClick={isDormant ? undefined : () => setDebateModalOpen(true)}
                   disabled={isDormant}
                   style={isDormant ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
-                  title={isDormant ? t('profile.dormant_cannot_debate', 'Fosil botlar yeni münazaraya katılamaz.') : undefined}
+                  title={isDormant ? t('profile.dormant_cannot_debate', 'Fosil botlar yeni meydan okumaya katılamaz.') : undefined}
                 >
-                  <AngryBotWithSwordsIcon size={14} /> {t('profile.trigger_debate', 'Münazara')}
+                  <AngryBotWithSwordsIcon size={14} /> {t('profile.trigger_debate', 'Meydan Okuma')}
                 </button>
               )}
             </div>
@@ -1329,7 +1364,7 @@ export default function ProfilePage() {
                 <Bot size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.bot_ownership_limit', 'Bot Sahiplik Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.botsCount ?? (profile.bots?.length || 0)} /{' '}
+                  {profile.botsCount ?? (profile.bots?.filter(b => !b.isDormant)?.length || 0)} /{' '}
                   {profile.userSettings.botCountLimit || 5}
                 </span>
               </div>
@@ -1341,7 +1376,7 @@ export default function ProfilePage() {
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.tribe_limit', 'Klan Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.tribes?.length || 0} / {profile.userSettings.tribeCountLimit || 3}
+                  {profile.tribes?.filter(t => !t.isDormant)?.length || 0} / {profile.userSettings.tribeCountLimit || 3}
                 </span>
               </div>
               <span className="profile-limit-divider">•</span>
@@ -1349,7 +1384,7 @@ export default function ProfilePage() {
                 className="profile-limit-chip"
                 title={t(
                   'profile.daily_debate_limit_desc',
-                  'Eşzamanlı/günlük tartışma ve münazara hakkı'
+                  'Eşzamanlı/günlük tartışma ve meydan okuma hakkı'
                 )}
               >
                 <AngryBotWithSwordsIcon
@@ -1379,7 +1414,7 @@ export default function ProfilePage() {
                 <Bot size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.bot_ownership_limit', 'Bot Sahiplik Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.botsCount ?? (profile.bots?.length || 0)} /{' '}
+                  {profile.botsCount ?? (profile.bots?.filter(b => !b.isDormant)?.length || 0)} /{' '}
                   {profile.botSettings.botCountLimit || 4}
                 </span>
               </div>
@@ -1391,13 +1426,13 @@ export default function ProfilePage() {
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.tribe_limit', 'Klan Limiti')}:</span>
                 <span className="profile-limit-chip__val">
-                  {profile.tribes?.length || 0} / {profile.botSettings.tribeCountLimit || 3}
+                  {profile.tribes?.filter(t => !t.isDormant)?.length || 0} / {profile.botSettings.tribeCountLimit || 3}
                 </span>
               </div>
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t('profile.daily_debate_limit_desc', 'Eşzamanlı aktif münazara hakkı')}
+                title={t('profile.daily_debate_limit_desc', 'Eşzamanlı aktif meydan okuma hakkı')}
               >
                 <AngryBotWithSwordsIcon
                   size={25}
@@ -1611,14 +1646,14 @@ export default function ProfilePage() {
             >
               {tab === 'posts' && `${t('profile.posts')} (${profile.postCount ?? 0})`}
               {tab === 'entries' && `${t('profile.entries')} (${profile.entryCount ?? 0})`}
-              {tab === 'bots' && `${t('profile.bots')} (${profile.bots?.length ?? 0})`}
-              {tab === 'tribes' && `${t('profile.tribes')} (${profile.tribes?.length ?? 0})`}
+              {tab === 'bots' && `${t('profile.bots')} (${visibleProfileBots.length})`}
+              {tab === 'tribes' && `${t('profile.tribes')} (${visibleProfileTribes.length})`}
             </button>
           ))}
         </div>
 
         {/* Paging Controls */}
-        {(activeTab === 'posts' || activeTab === 'entries') && (
+        {activeTab === 'posts' || activeTab === 'entries' ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               className="btn btn-outline btn-sm"
@@ -1665,7 +1700,19 @@ export default function ProfilePage() {
               <ChevronRight size={14} />
             </button>
           </div>
-        )}
+        ) : activeTab === 'bots' ? (
+          <FossilTogglePill
+            count={fossilProfileBotCount}
+            open={showFossilProfileBots}
+            onToggle={() => setShowFossilProfileBots((v) => !v)}
+          />
+        ) : activeTab === 'tribes' ? (
+          <FossilTogglePill
+            count={fossilProfileTribeCount}
+            open={showFossilProfileTribes}
+            onToggle={() => setShowFossilProfileTribes((v) => !v)}
+          />
+        ) : null}
       </div>
 
       {/* ─── Tab Content ─── */}
@@ -1698,10 +1745,10 @@ export default function ProfilePage() {
 
         {activeTab === 'bots' && (
           <div className="flex-col gap-2">
-            {!profile.bots || profile.bots.length === 0 ? (
+            {visibleProfileBots.length === 0 && fossilProfileBotCount === 0 ? (
               <p className="empty-state">{t('profile.no_bots')}</p>
             ) : (
-              profile.bots.map((bot) => (
+              visibleProfileBots.map((bot) => (
                 <div key={bot.actorId} className="lb-card" style={{ padding: '8px 16px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <ActorMinimalCard actor={bot} showPoint={true} />
@@ -1714,10 +1761,10 @@ export default function ProfilePage() {
 
         {activeTab === 'tribes' && (
           <div className="flex-col gap-2">
-            {!profile.tribes || profile.tribes.length === 0 ? (
+            {visibleProfileTribes.length === 0 && fossilProfileTribeCount === 0 ? (
               <p className="empty-state">{t('profile.no_tribes')}</p>
             ) : (
-              profile.tribes.map((tribe) => <TribeMinimalCard key={tribe.tribeId} {...tribe} />)
+              visibleProfileTribes.map((tribe) => <TribeMinimalCard key={tribe.tribeId} {...tribe} />)
             )}
           </div>
         )}

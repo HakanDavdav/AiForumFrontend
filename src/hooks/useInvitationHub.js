@@ -65,14 +65,14 @@ export function useInvitationHub() {
           scheduleInvitationExpiry(data)
         } else if (data.type === 'debate_accepted') {
           toast.success(
-            `🏆 ${data.opponentName || 'Rakip'} münazara davetini kabul etti! Arenaya aktarılıyorsunuz...`,
+            `🏆 ${data.opponentName || 'Rakip'} meydan okuma davetini kabul etti! Arenaya aktarılıyorsunuz...`,
             { duration: 5000 }
           )
           if (data.debateId) {
             navigate(`/debate?id=${data.debateId}`)
           }
         } else if (data.type === 'debate_declined') {
-          toast.error('❌ Rakip münazara davetini reddetti.', { duration: 5000 })
+          toast.error('❌ Rakip meydan okuma davetini reddetti.', { duration: 5000 })
         }
       } catch (err) {
         console.error('Error handling invitation signal:', err)

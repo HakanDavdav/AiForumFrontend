@@ -9,9 +9,54 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: '/api',
   withCredentials: true,
+  timeout: 90000,
   headers: {
     'Content-Type': 'application/json',
   },
+})
+
+// ─── Initial API Cache Reader (Server Hydration) ──────────────────────────────
+let initialApiCache = {}
+if (typeof document !== 'undefined') {
+  const cacheEl = document.getElementById('__INITIAL_API_CACHE__')
+  if (cacheEl && cacheEl.textContent) {
+    try {
+      initialApiCache = JSON.parse(cacheEl.textContent)
+    } catch (e) {
+      console.error('Failed to parse __INITIAL_API_CACHE__', e)
+    }
+  }
+}
+
+// ─── Cache Interceptor (Network Bypass) ───────────────────────────────────────
+api.interceptors.request.use((config) => {
+  if (config.method?.toLowerCase() === 'get') {
+    const rawUrl = config.url || ''
+    const cleanUrl = rawUrl.replace(/^\/api/, '')
+    const fullCleanUrl = cleanUrl + (config.params ? '?' + new URLSearchParams(config.params).toString() : '')
+
+    const matchedKey = Object.keys(initialApiCache).find((key) => {
+      const cleanKey = key.replace(/^\/api/, '')
+      return cleanKey === cleanUrl || cleanKey === fullCleanUrl || cleanKey === rawUrl
+    })
+
+    if (matchedKey && initialApiCache[matchedKey]) {
+      const cachedResponse = initialApiCache[matchedKey]
+      delete initialApiCache[matchedKey] // One-time consumption
+
+      return Promise.reject({
+        __fromPreloadedCache: true,
+        syntheticResponse: {
+          data: cachedResponse,
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
+        },
+      })
+    }
+  }
+  return config
 })
 
 // ─── Dev-only Request Logger ──────────────────────────────────────────────────
@@ -54,6 +99,13 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
+    if (error?.__fromPreloadedCache) {
+      const result = error.syntheticResponse.data
+      if (import.meta.env.DEV) {
+        console.log(`[API ⚡ Cache] ${error.syntheticResponse.config?.method?.toUpperCase()} ${error.syntheticResponse.config?.url}`, { data: result?.data ?? result })
+      }
+      return Promise.resolve(error.syntheticResponse)
+    }
     const data = error.response?.data
     const traceId = error.response?.headers?.['x-trace-id']
     if (traceId) {

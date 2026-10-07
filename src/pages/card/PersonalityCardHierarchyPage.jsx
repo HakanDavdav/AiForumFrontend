@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
 import {
   Network,
   Plus,
@@ -10,8 +11,6 @@ import {
   Crown,
   Focus,
   Bot as BotIconLucide,
-  Users,
-  Layers,
   CircleAlert,
   CircleMinus,
   CirclePlus,
@@ -23,6 +22,60 @@ import TribeMinimalCard from '../../components/tribe/TribeMinimalCard'
 import BotIcon from '../../components/common/icons/BotIcon'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import HierarchyConnectionsOverlay from '../../components/hierarchy/HierarchyConnectionsOverlay'
+import TRexSkullIcon from '../../assets/t-rex-skull-svgrepo-com.svg?react'
+
+function isNodeFossil(child) {
+  if (!child) return false
+  return Boolean(
+    child.isDormant ||
+    child.IsDormant ||
+    child.data?.isDormant ||
+    child.data?.IsDormant ||
+    child.bot?.isDormant ||
+    child.bot?.IsDormant ||
+    child.tribe?.isDormant ||
+    child.tribe?.IsDormant ||
+    child.actor?.isDormant ||
+    child.actor?.IsDormant
+  )
+}
+
+function hasActiveDescendantsCard(node) {
+  if (!node || !node.children || node.children.length === 0) return false
+  for (const child of node.children) {
+    if (!isNodeFossil(child)) return true
+    if (hasActiveDescendantsCard(child)) return true
+  }
+  return false
+}
+
+function collectPromotedActiveCardChildren(fossilNode, ancestorsSoFar = [], expandedAncestorIds = new Set()) {
+  const currentAncestors = [...ancestorsSoFar, fossilNode]
+  const promoted = []
+
+  if (fossilNode.children && fossilNode.children.length > 0) {
+    for (const child of fossilNode.children) {
+      if (!isNodeFossil(child)) {
+        promoted.push({
+          ...child,
+          _fossilAncestors: currentAncestors,
+        })
+      } else if (hasActiveDescendantsCard(child)) {
+        if (expandedAncestorIds.has(child.id)) {
+          promoted.push({
+            ...child,
+            _isEnjectedFossil: true,
+            _fossilAncestors: currentAncestors,
+          })
+        } else {
+          promoted.push(...collectPromotedActiveCardChildren(child, currentAncestors, expandedAncestorIds))
+        }
+      }
+    }
+  }
+
+  return promoted
+}
 
 // ── Tree Builder Algorithm ──────────────────────────────────────────────────
 function buildCardHierarchyTree(card) {
@@ -155,21 +208,117 @@ function buildCardHierarchyTree(card) {
 }
 
 // ── Recursive TreeNode Component ─────────────────────────────────────────────
-function CardTreeNode({ node, isAllCollapsed, expandTrigger, parentId = null }) {
+function CardTreeNode({
+  node,
+  isAllCollapsed,
+  expandTrigger,
+  parentId = null,
+  showFossils = false,
+  expandedAncestorIds,
+  onToggleAncestor,
+  fossilAncestors = null,
+  isEnjectedFossil = false,
+}) {
   const { t } = useTranslation()
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [localFossilExpanded, setLocalFossilExpanded] = useState(null)
 
   useEffect(() => {
     if (expandTrigger > 0) {
       setIsCollapsed(isAllCollapsed)
+      if (showFossils) {
+        setLocalFossilExpanded(!isAllCollapsed)
+      } else {
+        setLocalFossilExpanded(false)
+      }
     }
-  }, [expandTrigger, isAllCollapsed])
+  }, [expandTrigger, isAllCollapsed, showFossils])
 
-  const hasChildren = Boolean(node.children && node.children.length > 0)
+  const allChildren = node.children || []
+  const directActiveChildren = allChildren.filter((c) => !isNodeFossil(c))
+  const allFossilChildren = allChildren.filter((c) => isNodeFossil(c))
+
+  const pureFossilChildren = []
+  const fossilAncestorsWithActiveDescendants = []
+
+  for (const fChild of allFossilChildren) {
+    if (hasActiveDescendantsCard(fChild)) {
+      fossilAncestorsWithActiveDescendants.push(fChild)
+    } else {
+      pureFossilChildren.push(fChild)
+    }
+  }
+
+  let displayActiveChildren = [...directActiveChildren]
+  let enjectedFossilChildren = []
+
+  if (showFossils) {
+    pureFossilChildren.push(...fossilAncestorsWithActiveDescendants)
+  } else {
+    for (const fChild of fossilAncestorsWithActiveDescendants) {
+      if (expandedAncestorIds?.has(fChild.id)) {
+        enjectedFossilChildren.push(fChild)
+      } else {
+        const promoted = collectPromotedActiveCardChildren(fChild, [], expandedAncestorIds)
+        displayActiveChildren.push(...promoted)
+      }
+    }
+  }
+
+  const totalActive = displayActiveChildren.length + enjectedFossilChildren.length
+  const totalPureFossils = pureFossilChildren.length
+  const hasChildren = totalActive > 0 || totalPureFossils > 0
+
+  const effectiveFossilExpanded = localFossilExpanded !== null ? localFossilExpanded : showFossils
   const isDeleted = Boolean(node.isDeleted)
 
   return (
     <div className={`vtree-node${node.nodeType === 'tribe' ? ' vtree-node--tribe' : ''}`}>
+      {/* ── Sanal Atlama Köprü Rozeti (Bypass Bridge Badge) ────────────────── */}
+      {fossilAncestors && fossilAncestors.length > 0 && (
+        <div className="vtree-ancestor-bridge-pill-wrapper">
+          <button
+            type="button"
+            className="vtree-ancestor-bridge-pill"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onToggleAncestor) {
+                onToggleAncestor(fossilAncestors[fossilAncestors.length - 1].id)
+              }
+            }}
+            title={t('hierarchy.show_fossil_ancestor_tooltip', {
+              name: fossilAncestors.map((a) => a.data?.profileName || a.data?.tribeName || a.id).join(' → '),
+            })}
+          >
+            <TRexSkullIcon className="badge-fossil-icon" />
+            {fossilAncestors.length > 1 && (
+              <span style={{ fontSize: 10, fontWeight: 800, paddingRight: 1 }}>{fossilAncestors.length}</span>
+            )}
+            <CirclePlus size={12} strokeWidth={2.4} />
+          </button>
+        </div>
+      )}
+
+      {/* ── Araya Enjekte Edilmiş Fosil Ata Rozeti (Kapatma Butonu) ─────────── */}
+      {isEnjectedFossil && (
+        <div className="vtree-ancestor-bridge-pill-wrapper">
+          <button
+            type="button"
+            className="vtree-ancestor-bridge-pill vtree-ancestor-bridge-pill--expanded"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (onToggleAncestor) {
+                onToggleAncestor(node.id)
+              }
+            }}
+            title={t('hierarchy.collapse_fossil_ancestor_tooltip', 'Fosil atayı daralt ve alt birimleri doğrudan üste bağla')}
+          >
+            <TRexSkullIcon className="badge-fossil-icon" />
+            <CircleMinus size={12} strokeWidth={2.4} />
+          </button>
+        </div>
+      )}
+
       <div
         className="vtree-card-wrapper"
         data-node-id={node.id}
@@ -241,10 +390,13 @@ function CardTreeNode({ node, isAllCollapsed, expandTrigger, parentId = null }) 
         ) : node.nodeType === 'tribe' ? (
           <div style={{ position: 'relative', width: '100%', minWidth: 180 }}>
             <TribeMinimalCard
+              tribe={node.tribe || node.data}
               tribeId={node.tribe?.tribeId || node.data?.tribeId}
               tribeName={node.tribe?.tribeName || node.data?.tribeName}
               tribePoint={node.tribe?.tribePoint ?? node.data?.tribePoint}
               imageUrl={node.tribe?.imageUrl || node.data?.imageUrl}
+              isDormant={isNodeFossil(node)}
+              assignedCardIds={node.tribe?.assignedCardIds || node.tribe?.AssignedCardIds || node.data?.assignedCardIds || node.data?.AssignedCardIds}
               variant="expanded"
               clickable={true}
               style={{
@@ -342,12 +494,19 @@ function CardTreeNode({ node, isAllCollapsed, expandTrigger, parentId = null }) 
                     boxShadow: '0 3px 10px rgba(217, 119, 6, 0.18)',
                     minWidth: 195,
                   }
-                : {
-                    background: 'var(--color-surface)',
-                    borderColor: isDeleted ? 'var(--color-border)' : 'var(--color-border)',
-                    boxShadow: 'var(--shadow-sm)',
-                    minWidth: 190,
-                  }
+                : isEnjectedFossil
+                  ? {
+                      background: 'color-mix(in srgb, var(--color-primary) 8%, var(--color-surface))',
+                      borderColor: 'var(--color-primary)',
+                      boxShadow: '0 3px 10px var(--color-primary-shadow)',
+                      minWidth: 190,
+                    }
+                  : {
+                      background: 'var(--color-surface)',
+                      borderColor: isDeleted ? 'var(--color-border)' : 'var(--color-border)',
+                      boxShadow: 'var(--shadow-sm)',
+                      minWidth: 190,
+                    }
             }
           />
         )}
@@ -377,7 +536,25 @@ function CardTreeNode({ node, isAllCollapsed, expandTrigger, parentId = null }) 
         <div className="vtree-children-container">
           <div className="vtree-stem-down" />
           <div className="vtree-children-row">
-            {node.children.map((child) => (
+            {/* 1. Araya Enjekte Edilmiş Fosil Atalar */}
+            {enjectedFossilChildren.map((child) => (
+              <div key={`enjected-${child.id}`} className="vtree-child-branch vtree-child-branch--enjected-fossil">
+                <div className="vtree-branch-line" />
+                <CardTreeNode
+                  node={child}
+                  parentId={node.id}
+                  isAllCollapsed={isAllCollapsed}
+                  expandTrigger={expandTrigger}
+                  showFossils={showFossils}
+                  expandedAncestorIds={expandedAncestorIds}
+                  onToggleAncestor={onToggleAncestor}
+                  isEnjectedFossil={true}
+                />
+              </div>
+            ))}
+
+            {/* 2. Aktif & Terfi Etmiş Birimler */}
+            {displayActiveChildren.map((child) => (
               <div key={child.id} className="vtree-child-branch">
                 <div className="vtree-branch-line" />
                 <CardTreeNode
@@ -385,9 +562,67 @@ function CardTreeNode({ node, isAllCollapsed, expandTrigger, parentId = null }) 
                   parentId={node.id}
                   isAllCollapsed={isAllCollapsed}
                   expandTrigger={expandTrigger}
+                  showFossils={showFossils}
+                  expandedAncestorIds={expandedAncestorIds}
+                  onToggleAncestor={onToggleAncestor}
+                  fossilAncestors={child._fossilAncestors}
+                  isEnjectedFossil={Boolean(child._isEnjectedFossil)}
                 />
               </div>
             ))}
+
+            {/* 3. Saf Fosil Birimleri Grubu (Açılım Noktasında Sabit Hap + Alt Dallar) */}
+            {totalPureFossils > 0 && (
+              <div className="vtree-child-branch vtree-child-branch--fossil-group">
+                <div className="vtree-branch-line" />
+                <div
+                  className="vtree-card-wrapper"
+                  data-node-id={`fossil-pill-${node.id}`}
+                  data-parent-id={node.id}
+                >
+                  <button
+                    type="button"
+                    className={`vtree-fossil-pill ${effectiveFossilExpanded ? 'vtree-fossil-pill--expanded' : ''}`}
+                    onClick={() => setLocalFossilExpanded(!effectiveFossilExpanded)}
+                    title={
+                      effectiveFossilExpanded
+                        ? t('hierarchy.hide_fossils', 'Fosilleşmiş alt birimleri daralt')
+                        : t('hierarchy.show_fossils', 'Fosilleşmiş alt birimleri göster')
+                    }
+                  >
+                    <TRexSkullIcon className="badge-fossil-icon" />
+                    <span>{totalPureFossils}</span>
+                    {effectiveFossilExpanded ? (
+                      <CircleMinus size={15} strokeWidth={2.2} />
+                    ) : (
+                      <CirclePlus size={15} strokeWidth={2.2} />
+                    )}
+                  </button>
+                </div>
+
+                {effectiveFossilExpanded && (
+                  <div className="vtree-children-container">
+                    <div className="vtree-stem-down" />
+                    <div className="vtree-children-row">
+                      {pureFossilChildren.map((child) => (
+                        <div key={child.id} className="vtree-child-branch vtree-child-branch--fossil">
+                          <div className="vtree-branch-line" />
+                          <CardTreeNode
+                            node={child}
+                            parentId={`fossil-pill-${node.id}`}
+                            isAllCollapsed={isAllCollapsed}
+                            expandTrigger={expandTrigger}
+                            showFossils={showFossils}
+                            expandedAncestorIds={expandedAncestorIds}
+                            onToggleAncestor={onToggleAncestor}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -402,9 +637,44 @@ export default function PersonalityCardHierarchyPage() {
   const cardId = searchParams.get('cardId') || searchParams.get('ownershipId')
   const navigate = useNavigate()
 
-  const [cardData, setCardData] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const {
+    data: cardData = null,
+    isLoading,
+    error: queryError,
+    refetch: loadHierarchy,
+  } = useQuery({
+    queryKey: ['cardHierarchy', cardId],
+    queryFn: async () => {
+      const res = await personalityCardApi.getCardHierarchy(cardId)
+      const payload = res.data?.data !== undefined ? res.data.data : res.data
+      if (payload && (payload.personalityCardId || payload.cardId || res.data?.success)) {
+        return payload
+      }
+      throw new Error(res.data?.message || t('card.load_failed', 'Hiyerarşi verisi yüklenemedi.'))
+    },
+    enabled: Boolean(cardId),
+  })
+
+  const error = !cardId
+    ? t('card.no_card_id', 'Kart ID bilgisi bulunamadı.')
+    : queryError
+    ? queryError.response?.data?.message || queryError.message || t('card.load_error', 'Bağlantı hatası oluştu.')
+    : null
+
+  const [showFossils, setShowFossils] = useState(false)
+  const [expandedAncestorIds, setExpandedAncestorIds] = useState(() => new Set())
+
+  const handleToggleAncestor = useCallback((ancestorId) => {
+    setExpandedAncestorIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(ancestorId)) {
+        next.delete(ancestorId)
+      } else {
+        next.add(ancestorId)
+      }
+      return next
+    })
+  }, [])
   const [zoomLevel, setZoomLevel] = useState(0.85)
   const [isViewReady, setIsViewReady] = useState(false)
   // Sınırsız pan: scroll sınırları yerine transform translate ile her yöne serbest kaydırma
@@ -426,35 +696,6 @@ export default function PersonalityCardHierarchyPage() {
     startPanY: 0,
     hasMoved: false,
   })
-
-  const loadHierarchy = useCallback(async () => {
-    if (!cardId) {
-      setIsLoading(false)
-      setError(t('card.no_card_id', 'Kart ID bilgisi bulunamadı.'))
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-    try {
-      const res = await personalityCardApi.getCardHierarchy(cardId)
-      const payload = res.data?.data !== undefined ? res.data.data : res.data
-      if (payload && (payload.personalityCardId || payload.cardId || res.data?.success)) {
-        setCardData(payload)
-      } else {
-        setError(res.data?.message || t('card.load_failed', 'Hiyerarşi verisi yüklenemedi.'))
-      }
-    } catch (err) {
-      console.error('Failed to fetch card hierarchy:', err)
-      setError(err.response?.data?.message || t('card.load_error', 'Bağlantı hatası oluştu.'))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [cardId, t])
-
-  useEffect(() => {
-    loadHierarchy()
-  }, [loadHierarchy])
 
   const treeContainerRef = useRef(null)
 
@@ -554,14 +795,21 @@ export default function PersonalityCardHierarchyPage() {
 
   // Mouse pan event handlers (transform tabanlı sınırsız kaydırma)
   const handleMouseDown = (e) => {
-    if (e.button !== 0) return
-    if (e.target.closest('button, input, textarea, a, select')) return
+    // Sol tık (0) veya orta tekerlek tuşu (1) ile sürükleme
+    if (e.button !== 0 && e.button !== 1) return
+    // Sol tıkta buton veya form elemanına tıklandıysa sürüklemeyi başlatma; orta tıkta ise her yerden sürükleme başlatılabilir
+    if (e.button === 0 && e.target.closest('button, input, textarea, a, select')) return
+
+    if (e.button === 1) {
+      e.preventDefault() // Tarayıcının orta tık auto-scroll ikonunu ve davranışını engelle
+    }
 
     const container = containerRef.current
     if (!container) return
 
     panState.current = {
       isDown: true,
+      button: e.button,
       startX: e.pageX,
       startY: e.pageY,
       startPanX: panOffset.x,
@@ -605,7 +853,8 @@ export default function PersonalityCardHierarchyPage() {
   }, [])
 
   const handleClickCapture = (e) => {
-    if (panState.current.hasMoved) {
+    // Sürükleme yapıldıysa veya orta tık ise kartların/linklerin kazara tıklanmasını önle
+    if (panState.current.hasMoved || e.button === 1) {
       e.stopPropagation()
       e.preventDefault()
       panState.current.hasMoved = false
@@ -628,23 +877,29 @@ export default function PersonalityCardHierarchyPage() {
     }
   }, [])
 
-  // İçeride tekerlekle kaydırmayı engelle, ana sayfaya aktar
+  // Mouse tekerleği: Normal tekerlek ile kamerayı kaydır (pan), Ctrl + tekerlek ile zoom yap
   useEffect(() => {
     const targetEl = blockRef.current || containerRef.current
     if (!targetEl) return
 
     const handleWheel = (e) => {
-      e.preventDefault()
-      const scrollContainer = document.getElementById('scroll-container')
-      if (
-        scrollContainer &&
-        scrollContainer.scrollHeight > scrollContainer.clientHeight &&
-        getComputedStyle(scrollContainer).overflowY !== 'visible'
-      ) {
-        scrollContainer.scrollBy({ top: e.deltaY, behavior: 'auto' })
-      } else {
-        window.scrollBy({ top: e.deltaY, behavior: 'auto' })
+      // 1. Ctrl + Tekerlek veya Meta + Tekerlek (Trackpad pinch dahil) -> Kamera Yakınlaştır / Uzaklaştır (Zoom)
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        const factor = Math.abs(e.deltaY) < 20 ? -e.deltaY * 0.005 : (e.deltaY < 0 ? 0.05 : -0.05)
+        setZoomLevel((prev) => Math.min(2.5, Math.max(0.05, +(prev + factor).toFixed(2))))
+        return
       }
+
+      // 2. Normal Tekerlek -> Kamera Kaydırma (Pan)
+      e.preventDefault()
+      const dx = e.shiftKey ? -e.deltaY : -e.deltaX
+      const dy = e.shiftKey ? 0 : -e.deltaY
+
+      setPanOffset((prev) => ({
+        x: prev.x + dx,
+        y: prev.y + dy,
+      }))
     }
 
     targetEl.addEventListener('wheel', handleWheel, { passive: false })
@@ -867,6 +1122,33 @@ export default function PersonalityCardHierarchyPage() {
             <Focus size={13} />
             <span>Default</span>
           </button>
+
+          <div style={{ width: 1, height: 18, background: 'var(--color-border)' }} />
+
+          {/* Fosil Düğümleri Göster / Gizle Toggle */}
+          <button
+            type="button"
+            className={`btn btn-primary btn-sm btn-fossil-toggle ${showFossils ? 'btn-fossil-toggle--active' : ''}`}
+            onClick={() => setShowFossils((prev) => !prev)}
+            disabled={!treeRoot}
+            title={
+              showFossils
+                ? t('hierarchy.hide_fossils_tooltip', 'Fosilleşmiş birimleri gizle')
+                : t('hierarchy.show_fossils_tooltip', 'Fosilleşmiş birimleri göster')
+            }
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              padding: '0 16px',
+              height: 32,
+              opacity: showFossils ? 1 : 0.85,
+            }}
+          >
+            <TRexSkullIcon className="badge-fossil-icon" />
+            <span>{showFossils ? t('common.enabled', 'Enabled') : t('common.disabled', 'Disabled')}</span>
+          </button>
         </div>
       </div>
 
@@ -875,6 +1157,12 @@ export default function PersonalityCardHierarchyPage() {
         ref={containerRef}
         onMouseDown={handleMouseDown}
         onClickCapture={handleClickCapture}
+        onAuxClick={(e) => {
+          if (e.button === 1) {
+            e.preventDefault()
+            e.stopPropagation()
+          }
+        }}
         style={{
           flex: 1,
           width: '100%',
@@ -960,6 +1248,9 @@ export default function PersonalityCardHierarchyPage() {
               parentId={null}
               isAllCollapsed={isAllCollapsed}
               expandTrigger={expandTrigger}
+              showFossils={showFossils}
+              expandedAncestorIds={expandedAncestorIds}
+              onToggleAncestor={handleToggleAncestor}
             />
           </div>
           </div>

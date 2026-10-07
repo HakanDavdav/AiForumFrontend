@@ -345,7 +345,7 @@ export default function DebatePage() {
 
   useEffect(() => {
     if (!isValidDebateId) {
-      toast.error(t('common.content_not_found', 'Geçerli bir münazara ID bulunamadı.'))
+      toast.error(t('common.content_not_found', 'Geçerli bir meydan okuma ID bulunamadı.'))
       return
     }
 
@@ -425,7 +425,7 @@ export default function DebatePage() {
     hasReceivedInitialSignalRef.current = false
     initialSignalTimeoutRef.current = setTimeout(() => {
       if (!hasReceivedInitialSignalRef.current) {
-        toast.error(t('common.session_timeout', 'Münazara oturumu zaman aşımına uğradı veya başlatılamadı.'))
+        toast.error(t('common.session_timeout', 'Meydan okuma oturumu zaman aşımına uğradı veya başlatılamadı.'))
         if (connection) {
           connection.stop()
         }
@@ -732,7 +732,7 @@ export default function DebatePage() {
               errMsgs = Object.values(rawErrors).flat()
             }
             if (errMsgs.length === 0) {
-              errMsgs = [t('debate.speech_failed', 'Münazara konuşması geçersiz.')]
+              errMsgs = [t('debate.speech_failed', 'Meydan okuma konuşması geçersiz.')]
             }
             errMsgs.forEach((msg) => toast.error(msg))
             return
@@ -828,20 +828,18 @@ export default function DebatePage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 6,
               margin: '8px auto 0',
               fontSize: 11,
               fontWeight: 700,
               color: 'var(--color-primary)',
               background: 'color-mix(in srgb, var(--color-surface) 80%, transparent)',
               border: '1px solid var(--color-border)',
-              padding: '2px 12px',
+              padding: '4px 10px',
               borderRadius: 9999,
               width: 'fit-content',
             }}
           >
             <Eye size={14} />
-            <span>{t('debate.spectating', 'İzliyorsunuz')}</span>
           </div>
         )}
       </div>
@@ -968,7 +966,7 @@ export default function DebatePage() {
                         padding: '10px 20px',
                       }}
                     >
-                      {t('debate.spectating_wait', 'Münazara başlangıcını izliyorsunuz...')}
+                      {t('debate.spectating_wait', 'Meydan okuma başlangıcını izliyorsunuz...')}
                     </span>
                   )}
                 </div>
@@ -1061,6 +1059,16 @@ export default function DebatePage() {
                     <span></span>
                     <span></span>
                   </div>
+                </div>
+              )}
+
+              {/* Jury deliberation spinner */}
+              {phase === 'jury_evaluation' && (
+                <div className="chat-waiting-indicator" style={{ opacity: 1 }}>
+                  <div className="spinner spinner-sm" />
+                  <span style={{ fontSize: 13, color: 'var(--color-text-muted)', fontWeight: 500 }}>
+                    {t('debate.jury_deliberating', 'Jüri değerlendiriyor...')}
+                  </span>
                 </div>
               )}
 

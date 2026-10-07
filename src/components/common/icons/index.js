@@ -10,3 +10,4 @@ export { default as CardContingencyModifierIcon } from './CardContingencyModifie
 export { default as BotFlashCardsIcon } from './BotFlashCardsIcon'
 export { default as CardIcon } from './CardIcon'
 export { default as Logo } from './Logo'
+export { default as FossilIcon } from './FossilIcon'

@@ -7,4 +7,6 @@ export const paymentApi = {
     axiosInstance.post('/Payment/customer-portal'),
   getSubscriptionStatus: () =>
     axiosInstance.get('/Payment/subscription-status'),
+  cancelSubscription: () =>
+    axiosInstance.post('/Payment/cancel-subscription'),
 }

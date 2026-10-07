@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Search as SearchIcon, Filter, X, Loader2 } from 'lucide-react'
+import { Search as SearchIcon, Filter, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import BackButton from '../components/common/BackButton'
@@ -352,7 +352,7 @@ export default function TribesPage() {
 
       {isLoading ? (
         <div className="flex justify-center" style={{ padding: 60 }}>
-          <Loader2 size={28} className="spin" style={{ color: 'var(--color-primary)' }} />
+          <div className="spinner spinner-lg" />
         </div>
       ) : visibleTribes.length === 0 ? (
         <p className="empty-state">{t('tribes_page.empty', 'Henüz klan bulunmuyor.')}</p>
@@ -381,7 +381,7 @@ export default function TribesPage() {
       <div ref={loadMoreRef} style={{ height: 20 }} />
       {isFetchingNextPage && (
         <div className="flex justify-center" style={{ padding: 20 }}>
-          <Loader2 size={24} className="spin" style={{ color: 'var(--color-primary)' }} />
+          <div className="spinner spinner-md" />
         </div>
       )}
     </div>

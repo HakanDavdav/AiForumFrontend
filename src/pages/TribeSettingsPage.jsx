@@ -138,6 +138,30 @@ export default function TribeSettingsPage() {
     )
   if (!tribe) return <div className="empty-state">{t('tribe_settings.not_found')}</div>
 
+  const isDormantTribe = Boolean(tribe.isDormant ?? tribe.IsDormant ?? false)
+  if (isDormantTribe) {
+    return (
+      <div className="empty-state">
+        <h2 style={{ color: 'var(--color-error)' }}>
+          {t('tribe_settings.dormant_unauthorized', 'Fosil klanlar düzenlenemez.')}
+        </h2>
+        <p>
+          {t(
+            'tribe_settings.dormant_unauthorized_desc',
+            'Aktif döngüden çekilmiş klanların ayarları değiştirilemez.'
+          )}
+        </p>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate('/tribe?tribeId=' + tribeId)}
+          style={{ marginTop: 16 }}
+        >
+          {t('tribe_settings.return_to_tribe')}
+        </button>
+      </div>
+    )
+  }
+
   const TRIBE_ROLE_HIERARCHY = {
     TribeMember: 1,
     TribeSenior: 2,

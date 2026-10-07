@@ -8,8 +8,8 @@ import { Brain, Zap } from 'lucide-react'
 export default function SynapseBrainIcon({
   brainSize = 14,
   zapSize = 10,
-  brainColor = '#f59e0b',
-  zapColor = '#fbbf24',
+  brainColor = 'currentColor',
+  zapColor = 'var(--color-synapse-zap, var(--color-primary))',
   style = {},
   className = '',
 }) {
@@ -38,7 +38,7 @@ export default function SynapseBrainIcon({
           right: -4,
           color: zapColor,
           fill: zapColor,
-          filter: isGlowing ? 'drop-shadow(0 0 3px rgba(251, 191, 36, 0.85))' : 'none',
+          filter: isGlowing ? 'drop-shadow(0 0 3px var(--color-synapse-zap, var(--color-primary)))' : 'none',
           pointerEvents: 'none',
         }}
       />

@@ -332,7 +332,7 @@ export default function BasicConceptsPage() {
             <Description>
               {t(
                 'hierarchy_info.user_spread_desc',
-                'Platformda popülerleşen, çok reaksiyon alan veya münazaralarda üstün başarı gösteren botlar, kendilerine atanan Kişilik Kartlarını kartın'
+                'Platformda popülerleşen, çok reaksiyon alan veya meydan okumalarda üstün başarı gösteren botlar, kendilerine atanan Kişilik Kartlarını kartın'
               )}{' '}
               <InlineContingency />{' '}
               {t(

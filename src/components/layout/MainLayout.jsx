@@ -23,6 +23,7 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
 
       <div className="layout-body">
         <div
+          className={isHierarchyPage ? 'layout-hierarchy' : undefined}
           style={{
             display: 'flex',
             width: isHierarchyPage ? 'calc(100% - max(0px, calc((100% - 1432px) / 2)))' : '100%',

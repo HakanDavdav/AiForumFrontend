@@ -439,6 +439,7 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
             >
               {myBots.map((bot) => {
                 const isAssigned = editFormData.assignedBotIds.includes(bot.actorId)
+                const isBotDormant = Boolean(bot.isDormant ?? bot.IsDormant ?? false)
                 return (
                   <ActorMinimalCard
                     key={bot.actorId}
@@ -454,7 +455,7 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
                           : [...prev.assignedBotIds, bot.actorId],
                       }))
                     }}
-                    disabled={editMutation.isPending || deleteMutation.isPending}
+                    disabled={editMutation.isPending || deleteMutation.isPending || isBotDormant}
                     variant="compact"
                   />
                 )

@@ -89,9 +89,9 @@ export default function SearchPage() {
       if (total === 0) return <div className="empty-state">{t('search.no_results_for', { query })}</div>
 
       return (
-        <div className="flex-col gap-6">
+        <div className="flex flex-col">
           {g.actors?.length > 0 && (
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: 12 }}>
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('search.actors')}</h3>
               <div className="flex flex-col">
                 {g.actors.map((a) => (
@@ -105,7 +105,13 @@ export default function SearchPage() {
             </div>
           )}
           {g.tribes?.length > 0 && (
-            <div style={{ marginTop: 16 }}>
+            <div
+              style={{
+                marginTop: g.actors?.length > 0 ? 16 : 12,
+                paddingTop: g.actors?.length > 0 ? 16 : 0,
+                borderTop: g.actors?.length > 0 ? '1px solid var(--color-border)' : undefined,
+              }}
+            >
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('search.tribes')}</h3>
               <div className="flex flex-col">
                 {g.tribes.map((t) => (
@@ -119,7 +125,13 @@ export default function SearchPage() {
             </div>
           )}
           {g.posts?.length > 0 && (
-            <div style={{ marginTop: 16 }}>
+            <div
+              style={{
+                marginTop: (g.actors?.length > 0 || g.tribes?.length > 0) ? 16 : 12,
+                paddingTop: (g.actors?.length > 0 || g.tribes?.length > 0) ? 16 : 0,
+                borderTop: (g.actors?.length > 0 || g.tribes?.length > 0) ? '1px solid var(--color-border)' : undefined,
+              }}
+            >
               <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{t('search.posts')}</h3>
               <div className="flex flex-col gap-4">
                 {g.posts.map((p) => (

@@ -36,7 +36,7 @@ export default function TriggerDebateModal({ isOpen, onClose, onSubmit, targetNa
           <div className="flex items-center" style={{ gap: 14 }}>
             <AngryBotWithSwordsIcon size={26} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
             <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0 }}>
-              {t('profile.trigger_debate', 'Münazara')}
+              {t('profile.trigger_debate', 'Meydan Okuma')}
             </h3>
           </div>
           <button className="btn-icon" onClick={onClose}>
