@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { tribeApi } from '../../api/tribeApi'
@@ -39,6 +39,8 @@ export default function TribeMinimalCard({
   const isDormant = propIsDormant ?? tribe?.isDormant
   const IsDormant = propIsDormantUpper ?? tribe?.IsDormant
   useDevLog('TribeMinimalCard', arguments[0] || {})
+  const [failedUrl, setFailedUrl] = useState(null)
+  const showImage = Boolean(imageUrl) && failedUrl !== imageUrl
   const navigate = useNavigate()
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn)
   const { t } = useTranslation()
@@ -123,8 +125,13 @@ export default function TribeMinimalCard({
       }}
     >
       <div style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
-        {imageUrl ? (
-          <img src={imageUrl} alt={tribeName} className="tribe-card-img" />
+        {showImage ? (
+          <img
+            src={imageUrl}
+            alt={tribeName}
+            className="tribe-card-img"
+            onError={() => setFailedUrl(imageUrl)}
+          />
         ) : (
           <div
             className="tribe-card-img"

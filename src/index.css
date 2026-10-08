@@ -887,19 +887,24 @@
 
 @media (max-width: 640px) {
   .personality-card-slots {
-    --personality-card-width: 136px;
-    min-height: 238px;
-    padding: 29px 14px 15px;
+    --personality-card-width: 200px;
+    min-height: 290px;
+    padding: 30px 20px 18px;
   }
 
   .personality-card-slot {
-    margin-left: -22px;
+    min-width: 0;
+    margin-left: -18px;
   }
 
   .personality-card {
-    height: 230px;
-    min-height: 230px;
+    height: auto;
+    min-height: 240px;
     padding-inline: 13px;
+  }
+
+  .personality-card-slot .personality-card {
+    min-height: 255px;
   }
 
   .personality-card--editor {
@@ -4241,6 +4246,30 @@ textarea {
   background: color-mix(in srgb, var(--color-primary) 10%, transparent);
 }
 
+/* ─── TopicTag ────────────────────────────────────────────────────────── */
+/* (components.css import edilmediği için tag stilleri burada tanımlıdır) */
+.topic-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.topic-tag:hover {
+  opacity: 0.8;
+}
+
+.topic-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
 /* ════════════════════════════════════════════════════════════════════ */
 /* MOBILE RESPONSIVE GLOBAL — (≤900px / ≤640px)                        */
 /* ════════════════════════════════════════════════════════════════════ */
@@ -4352,17 +4381,23 @@ textarea {
     max-width: 132px !important;
   }
 
-  /* Profil istatistik satırı mobilde iki satıra sarılır */
+  /* Profil istatistikleri mobilde 3 sütunlu simetrik grid */
   .profile-stats-grid {
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+    gap: 4px;
+    margin-top: 12px;
   }
 
   .profile-stat-box {
     padding: 6px 8px;
-    flex: 1 1 auto;
-    min-width: 56px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profile-stat-box--wide {
+    grid-column: span 2;
   }
 
   .profile-stat-value {
@@ -4372,6 +4407,52 @@ textarea {
   .profile-header-card {
     padding: 14px 12px;
     gap: 10px;
+  }
+
+  /* Profil başlığı mobilde dikey istiflenir: avatar üstte, içerik altta */
+  .profile-header-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  .profile-header-left {
+    order: 2;
+    width: 100%;
+    align-items: center !important;
+    text-align: center;
+  }
+
+  .profile-header-left .flex.items-center {
+    justify-content: center;
+  }
+
+  .profile-header-left .flex.flex-wrap {
+    justify-content: center;
+  }
+
+  .profile-header-left .topic-tag-list {
+    justify-content: center;
+  }
+
+  .profile-header-divider {
+    display: none !important;
+  }
+
+  .profile-header-right {
+    order: 1;
+    width: 100% !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .profile-header-right .flex.flex-col {
+    width: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   /* Sayfa başlıkları */
@@ -4390,12 +4471,52 @@ textarea {
     height: 40px;
   }
 
-  .post-card-footer {
-    flex-direction: column;
-    align-items: stretch;
+  .post-card-footer > div,
+  .entry-card-footer > div {
+    flex-wrap: wrap;
+    row-gap: 6px;
   }
 
-  .post-card-footer > div {
-    justify-content: space-between;
+  /* Kart sayfası başlığı: yardım ikonu sıkıştırmasın */
+  .card-page-header {
+    flex-wrap: wrap;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 16px !important;
+  }
+
+  .card-page-header .icon-action-button {
+    margin-right: 0 !important;
+  }
+
+  /* Hierarchy üst blokları: etiket gizlenir, araç çubuğu yatay kaydırılır */
+  .hierarchy-header-left {
+    flex: 1 1 auto;
+    max-width: 56% !important;
+    padding: 6px 12px !important;
+  }
+
+  .hierarchy-header-label,
+  .hierarchy-header-bullet {
+    display: none;
+  }
+
+  .hierarchy-header-right {
+    max-width: 46%;
+  }
+
+  .hierarchy-header-identity {
+    flex: 1 1 auto;
+    gap: 6px !important;
+  }
+
+  .hierarchy-toolbar {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .hierarchy-toolbar::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -56,9 +56,9 @@
     font-size: 20px !important;
   }
 
+  /* Mobilde rozet logonun ve arama ikonunun üstüne bindiği için gizlenir */
   .season-remaining-badge--floating {
-    bottom: 3px;
-    right: -30px;
+    display: none !important;
   }
 
   .topbar-menu-btn {

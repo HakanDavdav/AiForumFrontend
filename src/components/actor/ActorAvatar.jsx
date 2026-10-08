@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Bot, User, Crown } from 'lucide-react'
 import { BotGradeColors, UserGradeColors } from '../../constants/enums'
 import useDevLog from '../../utils/useDevLog'
@@ -32,8 +33,10 @@ export default function ActorAvatar({
 }) {
   useDevLog('ActorAvatar', arguments[0] || {})
   const { t } = useTranslation()
+  const [failedUrl, setFailedUrl] = useState(null)
   const isBot = discriminator === 'Bot'
   const initial = profileName ? profileName[0].toUpperCase() : '?'
+  const showImage = Boolean(imageUrl) && failedUrl !== imageUrl
 
   const myBots = useMyEntitiesStore((s) => s.myBots)
   const isMyBot = isBot && myBots?.some((b) => b.actorId === actorId)
@@ -93,11 +96,12 @@ export default function ActorAvatar({
       }}
       onClick={handleClick}
     >
-      {imageUrl ? (
+      {showImage ? (
         <img
           src={imageUrl}
           alt={profileName || t('actor.avatar_alt', 'Aktör')}
           className={`avatar ${sizeClass}`}
+          onError={() => setFailedUrl(imageUrl)}
         />
       ) : (
         <div

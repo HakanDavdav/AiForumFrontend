@@ -342,6 +342,7 @@ export default function HierarchyPage() {
       >
         {/* Sol Üst Blok: Geri Dön Butonu & Aktör Kimlik Kartı */}
           <div
+            className="hierarchy-header-left"
             style={{
               pointerEvents: 'auto',
               display: 'flex',
@@ -359,9 +360,10 @@ export default function HierarchyPage() {
             <BackButton style={{ marginBottom: 0, width: 30, height: 30, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} />
           <div style={{ width: 1, height: 24, background: 'var(--color-border)' }} />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <div className="hierarchy-header-identity" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             <Network size={16} color="var(--color-primary)" style={{ flexShrink: 0, display: 'block' }} />
             <span
+              className="hierarchy-header-label"
               style={{
                 fontWeight: 800,
                 fontSize: 11,
@@ -373,7 +375,7 @@ export default function HierarchyPage() {
             >
               {t('hierarchy.profile_hierarchy_title', 'Profile Hierarchy')}
             </span>
-            <span style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
+            <span className="hierarchy-header-bullet" style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
             <span
               onClick={() => {
                 if (actorId) navigate(`/profile?actorId=${actorId}`)
@@ -398,6 +400,7 @@ export default function HierarchyPage() {
 
         {/* Sağ Üst: Derinlik/Zoom Araçları ve Altında Ortalı Heartbeat */}
         <div
+          className="hierarchy-header-right"
           style={{
             pointerEvents: 'none',
             display: 'flex',
@@ -408,6 +411,7 @@ export default function HierarchyPage() {
         >
           {/* Sağ Üst Blok: Derinlik, Zoom & Genişletme Araçları */}
           <div
+            className="hierarchy-toolbar"
             style={{
               pointerEvents: 'auto',
               display: 'flex',

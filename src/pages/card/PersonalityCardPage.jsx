@@ -147,6 +147,7 @@ export default function PersonalityCardPage() {
       </div>
 
       <div
+        className="card-page-header"
         style={{
           display: 'flex',
           alignItems: 'center',

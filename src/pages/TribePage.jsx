@@ -48,6 +48,7 @@ export default function TribePage() {
   const { t } = useTranslation()
   const [isBouncing, setIsBouncing] = useState(false)
   const [modifiersModalOpen, setModifiersModalOpen] = useState(false)
+  const [tribeImgFailed, setTribeImgFailed] = useState(false)
   // Fosil (dormant) üyeler varsayılan olarak gizli.
   const [showFossilMembers, setShowFossilMembers] = useState(false)
   // Limitler & Miras paneli açma/kapama durumu (ProfilePage ile ORTAK global state)
@@ -189,11 +190,12 @@ export default function TribePage() {
       {/* ─── Tribe Header ─── */}
       <div className={`profile-header-card${isDormant ? ' profile-header-card--dormant' : ''}`}>
         <div
-          className="flex justify-between"
+          className="flex justify-between profile-header-row"
           style={{ gap: 20, width: '100%', alignItems: 'stretch', marginBottom: -6 }}
         >
           {/* ─── LEFT COLUMN ─── */}
           <div
+            className="profile-header-left"
             style={{
               flex: 1,
               minWidth: 0,
@@ -264,6 +266,7 @@ export default function TribePage() {
 
           {/* ─── VERTICAL DIVIDER ─── */}
           <div
+            className="profile-header-divider"
             style={{
               width: 0,
               borderLeft: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
@@ -274,6 +277,7 @@ export default function TribePage() {
 
           {/* ─── RIGHT COLUMN ─── */}
           <div
+            className="profile-header-right"
             style={{
               width: 144,
               flexShrink: 0,
@@ -294,10 +298,11 @@ export default function TribePage() {
                 flexShrink: 0,
               }}
             >
-              {tribe.imageUrl ? (
+              {tribe.imageUrl && !tribeImgFailed ? (
                 <img
                   src={tribe.imageUrl}
                   alt={tribe.tribeName}
+                  onError={() => setTribeImgFailed(true)}
                   style={{
                     width: 144,
                     height: 144,

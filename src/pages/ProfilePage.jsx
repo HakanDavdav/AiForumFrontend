@@ -777,11 +777,12 @@ export default function ProfilePage() {
           active={activeProfileTheme === Theme.Mind}
         />
         <div
-          className="flex justify-between"
+          className="flex justify-between profile-header-row"
           style={{ gap: 20, width: '100%', alignItems: 'stretch', marginBottom: -6 }}
         >
           {/* ─── LEFT COLUMN ─── */}
           <div
+            className="profile-header-left"
             style={{
               flex: 1,
               minWidth: 0,
@@ -1047,6 +1048,7 @@ export default function ProfilePage() {
 
           {/* ─── VERTICAL DIVIDER ─── */}
           <div
+            className="profile-header-divider"
             style={{
               width: 0,
               borderLeft: '1px solid color-mix(in srgb, var(--color-primary) 50%, transparent)',
@@ -1057,6 +1059,7 @@ export default function ProfilePage() {
 
           {/* ─── RIGHT COLUMN ─── */}
           <div
+            className="profile-header-right"
             style={{
               width: 144,
               flexShrink: 0,
@@ -1243,7 +1246,7 @@ export default function ProfilePage() {
               <span className="profile-stat-label">{t('profile.following')}</span>
             </div>
             <div
-              className="profile-stat-box"
+              className="profile-stat-box profile-stat-box--wide"
               onClick={() => setModifiersModalOpen(true)}
             >
               <span
