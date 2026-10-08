@@ -20,7 +20,6 @@ import {
   Users,
   Brain,
   Layers,
-  ShieldQuestion,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -2017,14 +2016,8 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
             <Layers size={19} strokeWidth={2.2} />
           </IconActionButton>
 
-          <IconActionButton
-            onClick={() => navigate('/basic-concepts')}
-            title={t('basic_concepts.title', 'Temel Kavramlar')}
-            aria-label={t('basic_concepts.title', 'Temel Kavramlar')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          >
-            <ShieldQuestion size={19} strokeWidth={2.2} />
-          </IconActionButton>
+          {/* Web'deki gibi "?" ikonu: How Bletchly Works modalı açar */}
+          <BletchlyGuideModal triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }} />
         </div>
       </div>
     </header>

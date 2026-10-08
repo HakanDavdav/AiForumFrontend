@@ -887,7 +887,7 @@
 
 @media (max-width: 640px) {
   .personality-card-slots {
-    --personality-card-width: min(280px, 80vw);
+    --personality-card-width: min(300px, 84vw);
     min-height: 290px;
     padding: 30px 20px 18px;
   }
@@ -4543,11 +4543,25 @@ textarea {
   }
 
   /* Like/Dislike/BrutallyDislike kendi satırında; yorum + Recalled
-     (ve cevapla/katla) bir alt satırda sıralanır. */
+     (ve cevapla/katla) bir alt satırda sıralanır. İki satır arasına,
+     kart üstündeki çizgiyle aynı tasarımda yatay ayraç konur. */
+  .post-card-footer > div:first-child,
+  .entry-card-footer > div:first-child {
+    flex: 1 1 100%;
+  }
+
   .post-card-footer .reaction-group,
   .entry-card-footer .reaction-group {
     flex-basis: 100%;
     order: -1;
+    /* ReactionButton kökündeki inline border/padding'i ezmek için !important */
+    border-bottom: 1px solid var(--color-border-light) !important;
+    padding-bottom: 6px !important;
+  }
+
+  .post-card-footer > div:nth-child(2),
+  .entry-card-footer > div:nth-child(2) {
+    margin-left: auto;
   }
 
   /* Kart sayfası başlığı: yardım ikonu sıkıştırmasın */
@@ -4593,28 +4607,14 @@ textarea {
     display: none;
   }
 
-  /* ── Assigned satırları: etiket kendi satırına iner, minimal kart tam genişlik
-     alır; böylece kart adı kırpılmadan görünür (fosil pill sağda kalır). ── */
+  /* ── Assigned satırları: web ile aynı düzen (etiket solda, kart + fosil pill
+     aynı satırda). Dar ekranda isme yer açmak için girintiler daraltılır. ── */
   .personality-card__assignment-row--branch {
-    flex-wrap: wrap;
-  }
-
-  .personality-card__assignment-row--branch > .personality-card__assignment-label--assigned {
-    flex-basis: 100%;
-    margin-top: 0 !important;
-  }
-
-  .personality-card__assignment-row--branch > div:last-child {
-    flex: 1 1 100% !important;
-  }
-
-  /* Dar ekranlarda dal girintileri ve chip içi boşluklar daraltılır */
-  .personality-card__assignment-row--branch {
-    padding-left: 10px;
+    padding-left: 6px;
   }
 
   .personality-card__assignment-row--target-layer.personality-card__assignment-row--has-source-layer {
-    padding-left: 20px;
+    padding-left: 14px;
   }
 
   .personality-card .personality-card__assignment-node-row > .actor-chip:not(.actor-chip--selectable) {
@@ -4631,7 +4631,7 @@ textarea {
     flex-wrap: wrap;
     justify-content: flex-start;
     align-content: center;
-    row-gap: 2px;
+    row-gap: 4px;
     border-radius: var(--radius-lg);
     padding: 4px 10px 6px 4px;
   }
@@ -4646,7 +4646,7 @@ textarea {
   .tribe-card:not(.layout-topbar *):has(.actor-chip-hier-btn) {
     flex-wrap: wrap;
     justify-content: flex-start;
-    row-gap: 2px;
+    row-gap: 4px;
     padding: 6px 10px 8px;
   }
 

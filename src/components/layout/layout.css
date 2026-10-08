@@ -32,6 +32,25 @@
   display: none !important;
 }
 
+/* Mobil sol drawer: akışlı açılış (soldan kayarak girer) */
+@keyframes mobile-drawer-slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes mobile-drawer-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Mobil üst bar hızlı bağlantı ikonları — masaüstünde gizli */
 .mobile-topbar-quick {
   display: none;
@@ -110,6 +129,18 @@
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
+    animation: mobile-drawer-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .mobile-drawer-overlay {
+    animation: mobile-drawer-overlay-in 0.28s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .layout-left-drawer,
+    .mobile-drawer-overlay {
+      animation: none;
+    }
   }
 
   /* Drawer üst barı: marka + kapat */

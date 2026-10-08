@@ -54,7 +54,7 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
           {/* Mobil Sol Drawer */}
           {isLeftDrawerOpen && (
             <>
-              <div className="modal-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
+              <div className="modal-overlay mobile-drawer-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
               <div className="layout-left-drawer" role="dialog" aria-modal="true">
                 <div className="layout-left-drawer__bar">
                   <button
