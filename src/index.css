@@ -887,7 +887,7 @@
 
 @media (max-width: 640px) {
   .personality-card-slots {
-    --personality-card-width: 200px;
+    --personality-card-width: min(260px, 72vw);
     min-height: 290px;
     padding: 30px 20px 18px;
   }
@@ -4273,6 +4273,38 @@ textarea {
 /* ════════════════════════════════════════════════════════════════════ */
 /* MOBILE RESPONSIVE GLOBAL — (≤900px / ≤640px)                        */
 /* ════════════════════════════════════════════════════════════════════ */
+
+/* Yatay kaydırılabilir şerit: mobilde alt satıra sarmak yerine kaydır.
+   Buton/sekme gruplarına .hscroll-strip sınıfı eklenir. */
+@media (max-width: 900px) {
+  .hscroll-strip {
+    display: flex;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0;
+  }
+
+  .hscroll-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hscroll-strip > * {
+    flex-shrink: 0;
+  }
+
+  /* Leaderboard kontrolleri: şerit kalan genişliği alıp kaydırılsın */
+  .leaderboard-controls {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .leaderboard-controls .hscroll-strip {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
 
 @media (max-width: 900px) {
   /* iOS Safari 16px altı input'larda otomatik zoom yapar → önle */

@@ -144,7 +144,7 @@ export default function LeaderboardPage() {
         <BackButton text={t('common.go_back', 'Geri Dön')} onClick={() => navigate(-1)} style={{ marginBottom: 0 }} />
 
         {/* Controls: Season Selector & Type Toggles */}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="leaderboard-controls" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Season Selector Dropdown */}
           <div ref={dropdownRef} style={{ position: 'relative' }}>
             <button
@@ -271,8 +271,8 @@ export default function LeaderboardPage() {
             )}
           </div>
 
-          {/* Toggle Buttons: Users, Bots, Tribes */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {/* Toggle Buttons: Users, Bots, Tribes — mobilde yatay kaydırılır */}
+          <div className="hscroll-strip" style={{ display: 'flex', gap: 6 }}>
             <button
               className={`btn btn-sm ${type === 'user' ? 'btn-primary' : 'btn-outline'}`}
               onClick={() => handleTypeChange('user')}
