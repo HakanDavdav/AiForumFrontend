@@ -4548,4 +4548,37 @@ textarea {
   .tribe-card:not(.layout-topbar *):has(.actor-chip-hier-btn) > *:nth-child(2) {
     flex: 1 1 calc(100% - 52px) !important;
   }
+
+  /* Kişilik kartı atama satırı dar kartlarda taşmasın */
+  .personality-card__assignment-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .personality-card__assignment-node-row {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  /* Profil sekmeleri + fosil pill dar ekranda taşmasın */
+  .profile-tabs-container {
+    flex-wrap: wrap;
+    row-gap: 2px;
+    padding: 0 4px;
+  }
+
+  .profile-tab-group {
+    flex-wrap: wrap;
+    gap: 0 8px;
+    min-width: 0;
+  }
+
+  .profile-tab-btn {
+    padding: 9px 6px;
+    font-size: 12.5px;
+  }
+
+  .profile-tabs-container > .vtree-fossil-pill {
+    margin-left: auto;
+  }
 }

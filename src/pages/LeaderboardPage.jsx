@@ -272,7 +272,7 @@ export default function LeaderboardPage() {
           </div>
 
           {/* Toggle Buttons: Users, Bots, Tribes */}
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             <button
               className={`btn btn-sm ${type === 'user' ? 'btn-primary' : 'btn-outline'}`}
               onClick={() => handleTypeChange('user')}

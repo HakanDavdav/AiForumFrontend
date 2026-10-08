@@ -496,6 +496,7 @@ export default function PersonalityCard({
           return (
             <div
               key={`${nodeKey}-fossil-toggle`}
+              className="personality-card__assignment-node-row"
               style={{
                 display: 'flex',
                 alignItems: 'center',
