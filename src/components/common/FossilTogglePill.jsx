@@ -14,28 +14,35 @@ export default function FossilTogglePill({
   keepDropdownOpen = false,
   wrapperStyle,
   style,
+  title,
+  titleOpen,
+  small = false,
 }) {
   const { t } = useTranslation()
+  const iconSize = small ? 12 : 15
 
   const button = (
     <button
       type="button"
       {...(keepDropdownOpen ? { 'data-keep-dropdown-open': true } : {})}
-      className={`vtree-fossil-pill ${open ? 'vtree-fossil-pill--expanded' : ''}`}
-      onClick={onToggle}
-      title={
+      className={`vtree-fossil-pill${small ? ' vtree-fossil-pill--sm' : ''}${open ? ' vtree-fossil-pill--expanded' : ''}`}
+      onClick={(event) => {
+        event.stopPropagation()
+        onToggle?.(event)
+      }}
+      aria-label={
         open
-          ? t('hierarchy.hide_fossils', 'Fosilleşmiş alt birimleri daralt')
-          : t('hierarchy.show_fossils', 'Fosilleşmiş alt birimleri göster')
+          ? titleOpen || t('hierarchy.hide_fossils', 'Fosilleşmiş alt birimleri daralt')
+          : title || t('hierarchy.show_fossils', 'Fosilleşmiş alt birimleri göster')
       }
       style={style}
     >
       <TRexSkullIcon className="badge-fossil-icon" />
       <span>{count}</span>
       {open ? (
-        <CircleMinus size={15} strokeWidth={2.2} />
+        <CircleMinus size={iconSize} strokeWidth={2.2} />
       ) : (
-        <CirclePlus size={15} strokeWidth={2.2} />
+        <CirclePlus size={iconSize} strokeWidth={2.2} />
       )}
     </button>
   )

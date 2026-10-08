@@ -72,7 +72,7 @@ export function useInvitationHub() {
             navigate(`/debate?id=${data.debateId}`)
           }
         } else if (data.type === 'debate_declined') {
-          toast.error('❌ Rakip meydan okuma davetini reddetti.', { duration: 5000 })
+          toast.error(t('debate.invitation_declined', '❌ Rakip meydan okuma davetini reddetti.'), { duration: 5000 })
         }
       } catch (err) {
         console.error('Error handling invitation signal:', err)

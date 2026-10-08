@@ -600,7 +600,6 @@ export default function TribeSettingsPage() {
                         {member.roleName === 'Member' || !member.roleName ? (
                           <button
                             className="btn btn-ghost btn-sm"
-                            title={t('tribe_settings.make_moderator')}
                             onClick={() =>
                               rankMutation.mutate({
                                 memberActorId: member.actor.actorId,
@@ -614,7 +613,6 @@ export default function TribeSettingsPage() {
                         ) : (
                           <button
                             className="btn btn-ghost btn-sm"
-                            title={t('tribe_settings.demote_desc')}
                             onClick={() =>
                               rankMutation.mutate({
                                 memberActorId: member.actor.actorId,
@@ -630,7 +628,6 @@ export default function TribeSettingsPage() {
                         <button
                           className="btn btn-ghost btn-sm"
                           style={{ color: '#ef4444' }}
-                          title={t('tribe_settings.expel_desc')}
                           onClick={() => {
                             if (window.confirm(t('tribe_settings.confirm_expel'))) {
                               expelMutation.mutate(member.actor.actorId)

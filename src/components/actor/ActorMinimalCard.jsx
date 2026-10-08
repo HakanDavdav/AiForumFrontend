@@ -183,7 +183,6 @@ export default function ActorMinimalCard({
       <div
         className={`actor-chip actor-chip--ultra-compact${isDormant ? ' actor-chip--dormant' : ''}`}
         onClick={selectable ? handleActorClick : undefined}
-        title={profileName || t('actor.unnamed', 'İsimsiz')}
         style={{
           position: 'relative',
           display: 'inline-flex',
@@ -217,7 +216,7 @@ export default function ActorMinimalCard({
             type="button"
             className="actor-chip-hier-btn actor-chip-hier-btn--ultra"
             onClick={handleHierarchyClick}
-            title={t('actor.show_hierarchy', 'Hiyerarşiyi göster')}
+            aria-label={t('actor.show_hierarchy', 'Hiyerarşiyi göster')}
           >
             <Network size={11} />
           </button>
@@ -228,7 +227,7 @@ export default function ActorMinimalCard({
             type="button"
             className="actor-chip-hier-btn actor-chip-hier-btn--ultra"
             onClick={handleMindClick}
-            title={
+            aria-label={
               hasTriggeredNodes
                 ? `${t('mind.show', 'Zihin Haritası')} (${effectiveTriggeredNodeIds.length} ${t('mind.triggered_nodes', 'tetiklenen anı')})`
                 : t('mind.show', 'Zihin Haritası')
@@ -320,10 +319,6 @@ export default function ActorMinimalCard({
       {matchingCardsCount > 0 && (
         <div
           className="actor-chip-card-stack"
-          title={t('card.matching_cards_assigned', {
-            count: matchingCardsCount,
-            defaultValue: `${matchingCardsCount} adet kişisel kartınız bu botta takılı`,
-          })}
           onClick={clickable && !selectable ? handleActorClick : undefined}
           style={{
             display: 'flex',
@@ -360,7 +355,6 @@ export default function ActorMinimalCard({
       {isDormant && (
         <span
           className="badge-fossil badge-fossil--plain"
-          title={t('common.fossil_bot_desc', 'Fosil Bot: Aktif döngüden çekilmiş, soy ağacında köprü görevi görür.')}
         >
           <TRexSkullIcon className="badge-fossil-icon" />
         </span>
@@ -371,7 +365,7 @@ export default function ActorMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleHierarchyClick}
-          title={t('actor.show_hierarchy', 'Hiyerarşiyi göster')}
+          aria-label={t('actor.show_hierarchy', 'Hiyerarşiyi göster')}
         >
           <Network size={12} />
         </button>
@@ -381,7 +375,7 @@ export default function ActorMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
-          title={
+          aria-label={
             hasTriggeredNodes
               ? `${t('mind.show', 'Zihin Haritası')} (${effectiveTriggeredNodeIds.length} ${t('mind.triggered_nodes', 'tetiklenen anı')})`
               : t('mind.show', 'Zihin Haritası')
@@ -399,7 +393,7 @@ export default function ActorMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
-          title={t('action.edit')}
+          aria-label={t('action.edit')}
         >
           <Edit2 size={12} />
         </button>
@@ -413,7 +407,7 @@ export default function ActorMinimalCard({
             e.stopPropagation()
             setIsPremiumOpen(true)
           }}
-          title={isPremiumOwner ? t('premium.active', 'Premium Aktif') : t('premium.title', 'Premium')}
+          aria-label={isPremiumOwner ? t('premium.active', 'Premium Aktif') : t('premium.title', 'Premium')}
         >
           {isPremiumOwner ? (
             <KingIcon size={16} />
@@ -465,7 +459,6 @@ export default function ActorMinimalCard({
                   border: isPropLeading ? '1px solid #3b82f6' : '1px solid transparent',
                   lineHeight: '14px',
                 }}
-                title={`Proponent: ${pScore}`}
               >
                 P:{pScore}
               </span>
@@ -480,7 +473,6 @@ export default function ActorMinimalCard({
                   border: isOppLeading ? '1px solid #ec4899' : '1px solid transparent',
                   lineHeight: '14px',
                 }}
-                title={`Opponent: ${oScore}`}
               >
                 O:{oScore}
               </span>

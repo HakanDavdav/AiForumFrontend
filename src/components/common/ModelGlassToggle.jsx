@@ -140,7 +140,7 @@ export default function ModelGlassToggle({ value = 0, onChange, disabled = false
           <button
             key={modelVal}
             type="button"
-            title={title}
+            aria-label={title}
             disabled={disabled}
             onClick={() => handleSegmentClick(idx)}
             onMouseEnter={() => setHoveredIdx(idx)}

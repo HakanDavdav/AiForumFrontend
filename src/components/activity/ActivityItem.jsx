@@ -52,7 +52,7 @@ export default function ActivityItem({ activity, onMarkRead, currentProfileName,
         <span className="activity-time">{timeAgo}</span>
       </div>
       {mentionsProfile && (
-        <div style={{ padding: '0 8px', color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }} title={t('activity.mentioned_tooltip', { name: currentProfileName, defaultValue: `@${currentProfileName} bahsedildi` })}>
+        <div style={{ padding: '0 8px', color: 'var(--color-primary)', display: 'flex', alignItems: 'center' }}>
           <AtSign size={16} />
         </div>
       )}

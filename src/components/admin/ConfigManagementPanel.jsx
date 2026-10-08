@@ -430,7 +430,6 @@ export default function ConfigManagementPanel() {
                         fontWeight: 600,
                         transition: 'all var(--transition-fast)',
                       }}
-                      title={t('admin.remove_item', 'Remove Item')}
                     >
                       {t('admin.delete_item', '✕ Sil')}
                     </button>
@@ -874,7 +873,7 @@ export default function ConfigManagementPanel() {
               cursor: 'pointer',
               transition: 'all var(--transition-fast)',
             }}
-            title={isAllExpanded ? t('admin.collapse_all', 'Tümünü Kapat') : t('admin.expand_all', 'Tümünü Aç')}
+            aria-label={isAllExpanded ? t('admin.collapse_all', 'Tümünü Kapat') : t('admin.expand_all', 'Tümünü Aç')}
           >
             <span
               style={{

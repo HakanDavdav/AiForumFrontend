@@ -143,7 +143,6 @@ export default function TribeMinimalCard({
         )}
         {isMyTribe && (
           <span
-            title={t('common.your_tribe', 'Senin Klanın')}
             style={{
               position: 'absolute',
               top: isCompact ? -3 : -4,
@@ -167,10 +166,6 @@ export default function TribeMinimalCard({
       {matchingCardsCount > 0 && (
         <div
           className="actor-chip-card-stack"
-          title={t('card.matching_cards_assigned_tribe', {
-            count: matchingCardsCount,
-            defaultValue: `${matchingCardsCount} adet kişisel kartınız bu klanda takılı`,
-          })}
           onClick={clickable ? handleClick : undefined}
           style={{
             display: 'flex',
@@ -207,7 +202,6 @@ export default function TribeMinimalCard({
       {isDormantTribe && (
         <span
           className="badge-fossil badge-fossil--plain"
-          title={t('common.fossil_tribe_desc', 'Fosil Klan: Aktif döngüden çekilmiş inaktif klan.')}
         >
           <TRexSkullIcon className="badge-fossil-icon" />
         </span>
@@ -217,7 +211,7 @@ export default function TribeMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleMindClick}
-          title={t('mind.show', 'Hafıza haritasını göster')}
+          aria-label={t('mind.show', 'Hafıza haritasını göster')}
           style={{ color: 'var(--color-text-muted)' }}
         >
           <Brain size={12} />
@@ -228,7 +222,7 @@ export default function TribeMinimalCard({
           type="button"
           className="actor-chip-hier-btn"
           onClick={handleEditClick}
-          title={t('action.edit', 'Düzenle')}
+          aria-label={t('action.edit', 'Düzenle')}
           style={{ color: 'var(--color-text-muted)' }}
         >
           <Edit2 size={12} />

@@ -97,7 +97,6 @@ export default function CardMinimalCard({
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
-                title={cardName}
               >
                 {cardName}
               </span>
@@ -172,7 +171,6 @@ export default function CardMinimalCard({
               border: '1px solid rgba(var(--color-primary-rgb, 99, 102, 241), 0.25)',
               fontSize: 12,
             }}
-            title={t('card.assignment_count_desc', 'Bu kartın botlara atanma sayısı')}
           >
             <Bot size={13} style={{ color: 'var(--color-primary)' }} />
             <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>
@@ -193,7 +191,6 @@ export default function CardMinimalCard({
                 fontSize: 11,
                 color: 'var(--color-text-muted)',
               }}
-              title={t('card.ownership_count_desc', 'Bu karta sahip aktör sayısı')}
             >
               <Users size={12} />
               <span>{ownershipCount}</span>
@@ -206,7 +203,7 @@ export default function CardMinimalCard({
               type="button"
               className="btn btn-ghost btn-xs"
               onClick={handleHierarchyClick}
-              title={t('card.view_hierarchy', 'Yayılım / Miras Ağacını Gör')}
+              aria-label={t('card.view_hierarchy', 'Yayılım / Miras Ağacını Gör')}
               style={{
                 padding: '4px',
                 borderRadius: 6,

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import CardIcon from './icons/CardIcon'
+import FossilIcon from './icons/FossilIcon'
 
 const CARD_ASPECT = 112 / 96
 const FADE = 0.18
@@ -104,6 +105,7 @@ export default function ArrowCardTravel({
   crownedChance = 0.3,
   purchasedChance = 0.1,
   dormantArrowIds = [],
+  fossilBotIds = [],
   className = '',
 }) {
   const containerRef = useRef(null)
@@ -111,6 +113,7 @@ export default function ArrowCardTravel({
   const segmentsRef = useRef([])
   const cardsRef = useRef([])
   const [cards, setCards] = useState([])
+  const [fossils, setFossils] = useState([])
 
   useEffect(() => {
     const container = containerRef.current
@@ -194,6 +197,24 @@ export default function ArrowCardTravel({
       return applyFlow(pts, override || flowMode, Boolean(override))
     })
     if (routesPts.length === 0) return
+
+    const hiddenFossilEls = []
+    const fossilItems = []
+    fossilBotIds.forEach((id) => {
+      const el = svg.querySelector(`#${id}`)
+      if (!el) return
+      const b = el.getBBox()
+      if (!b || (b.width === 0 && b.height === 0)) return
+      el.style.visibility = 'hidden'
+      hiddenFossilEls.push(el)
+      fossilItems.push({
+        id,
+        leftPct: ((b.x + b.width / 2) / vb.width) * 100,
+        topPct: ((b.y + b.height / 2) / vb.height) * 100,
+        sizePct: (Math.max(b.width, b.height) / vb.width) * 100,
+      })
+    })
+    setFossils(fossilItems)
 
     const computeSegments = () => {
       const rect = container.getBoundingClientRect()
@@ -498,8 +519,11 @@ export default function ArrowCardTravel({
     return () => {
       cancelAnimationFrame(rafId)
       if (ro) ro.disconnect()
+      hiddenFossilEls.forEach((el) => {
+        el.style.visibility = ''
+      })
     }
-  }, [Svg, cardWidth, speed, offset, spacing, cardColor, flowMode, flowModeOverrides, pulseInterval, onPulse, maxCards, rerandomizeInterval, crownedChance, purchasedChance, dormantArrowIds.join(',')])
+  }, [Svg, cardWidth, speed, offset, spacing, cardColor, flowMode, flowModeOverrides, pulseInterval, onPulse, maxCards, rerandomizeInterval, crownedChance, purchasedChance, dormantArrowIds.join(','), fossilBotIds.join(',')])
 
   const cardHeight = cardWidth * CARD_ASPECT
 
@@ -508,6 +532,24 @@ export default function ArrowCardTravel({
       {Svg ? (
         <Svg style={{ width: '100%', height: 'auto', display: 'block', ...svgStyle }} />
       ) : null}
+      {fossils.map((f) => (
+        <div
+          key={f.id}
+          className="fossil-bot-overlay"
+          style={{
+            position: 'absolute',
+            left: `${f.leftPct}%`,
+            top: `${f.topPct}%`,
+            width: `${f.sizePct}%`,
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none',
+            zIndex: 4,
+            color: 'var(--color-dormant)',
+          }}
+        >
+          <FossilIcon size="100%" style={{ width: '100%', height: 'auto', display: 'block' }} />
+        </div>
+      ))}
       {cards.map(c => (
         <div
           key={c.id}

@@ -829,7 +829,6 @@ function DebateItem({ debate, actorId, onClick }) {
             e.stopPropagation()
             navigate(`/debate?id=${debate.debateId}&spectate=1`)
           }}
-          title={t('left_panel.watch', 'İzle')}
           aria-label={t('left_panel.watch', 'İzle')}
           style={{
             display: 'flex',

@@ -131,7 +131,6 @@ function TribeBranch({ tribe, parentActorId, t }) {
                   <div
                     key={idx}
                     className="vtree-tribe-bot-icon"
-                    title={t('common.bot', 'Bot')}
                   >
                     <BotIcon size={26} />
                   </div>
@@ -148,7 +147,6 @@ function TribeBranch({ tribe, parentActorId, t }) {
                     gap: 4,
                     padding: '2px 0 4px',
                   }}
-                  title={t('common.more', 'Daha fazla')}
                 >
                   {[0, 1, 2].map((dotIdx) => (
                     <span
@@ -271,9 +269,6 @@ function TreeNode({
                 onToggleAncestor(fossilAncestors[fossilAncestors.length - 1].actorId)
               }
             }}
-            title={t('hierarchy.show_fossil_ancestor_tooltip', {
-              name: fossilAncestors.map((a) => a.profileName || a.name || 'Fosil').join(' → '),
-            })}
           >
             <TRexSkullIcon className="badge-fossil-icon" />
             {fossilAncestors.length > 1 && (
@@ -296,7 +291,7 @@ function TreeNode({
                 onToggleAncestor(node.actorId)
               }
             }}
-            title={t('hierarchy.collapse_fossil_ancestor_tooltip', 'Fosil atayı daralt ve alt birimleri doğrudan üste bağla')}
+            aria-label={t('hierarchy.collapse_fossil_ancestor_tooltip', 'Fosil atayı daralt ve alt birimleri doğrudan üste bağla')}
           >
             <TRexSkullIcon className="badge-fossil-icon" />
             <CircleMinus size={12} strokeWidth={2.4} />
@@ -340,7 +335,7 @@ function TreeNode({
             onClick={handleToggle}
             disabled={isExpanding}
             className="vtree-toggle-btn"
-            title={
+            aria-label={
               hasChildren
                 ? isCollapsed
                   ? t('hierarchy.expand', 'Genişlet')
@@ -428,7 +423,7 @@ function TreeNode({
                     type="button"
                     className={`vtree-fossil-pill ${effectiveFossilExpanded ? 'vtree-fossil-pill--expanded' : ''}`}
                     onClick={() => setLocalFossilExpanded(!effectiveFossilExpanded)}
-                    title={
+                    aria-label={
                       effectiveFossilExpanded
                         ? t('hierarchy.hide_fossils', 'Fosilleşmiş alt birimleri daralt')
                         : t('hierarchy.show_fossils', 'Fosilleşmiş alt birimleri göster')

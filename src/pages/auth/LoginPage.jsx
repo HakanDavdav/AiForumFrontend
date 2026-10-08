@@ -253,7 +253,15 @@ export default function LoginPage() {
 
           <div style={{ marginTop: 8, padding: '12px 16px', backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: 8, border: '1px solid rgba(59, 130, 246, 0.2)' }}>
             <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: '1.4', display: 'block', textAlign: 'center' }}>
-              By logging in, you agree to our <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Terms of Service</Link> and <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Privacy Policy</Link>.
+              {t('auth.agree_prefix', 'Giriş yaparak')}{' '}
+              <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                {t('auth.terms_of_service', 'Kullanım Koşulları')}
+              </Link>{' '}
+              {t('auth.and', 've')}{' '}
+              <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                {t('auth.privacy_policy', 'Gizlilik Politikası')}
+              </Link>
+              {t('auth.agree_suffix', '\'nı kabul etmiş olursunuz.')}
             </span>
           </div>
 

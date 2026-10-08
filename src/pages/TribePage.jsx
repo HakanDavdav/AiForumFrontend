@@ -239,7 +239,6 @@ export default function TribePage() {
                   <span
                     key={key}
                     className={`bot-capability-emblem bot-capability-emblem--${tone}`}
-                    title={label}
                     aria-label={label}
                     role="img"
                   >
@@ -333,7 +332,6 @@ export default function TribePage() {
 
               {isMyTribe && (
                 <span
-                  title={t('common.your_tribe', 'Senin Klanın')}
                   style={{
                     position: 'absolute',
                     top: -11,
@@ -353,10 +351,6 @@ export default function TribePage() {
               {/* Avatar Sağ Alt: Sadece Klan Grade Rozeti */}
               {tribeGradeLabel && (
                 <div
-                  title={t('tribe.grade_label', {
-                    grade: tribeGradeLabel,
-                    defaultValue: `Klan derecesi: ${tribeGradeLabel}`,
-                  })}
                   style={{
                     position: 'absolute',
                     bottom: 4,
@@ -475,7 +469,6 @@ export default function TribePage() {
             <div
               className="profile-stat-box"
               onClick={() => setModifiersModalOpen(true)}
-              title={t('profile.modifiers_tooltip', 'Modifiers & Statü Detayları')}
             >
               <span
                 className="profile-stat-value"
@@ -520,7 +513,7 @@ export default function TribePage() {
             className="profile-limits-toggle"
             onClick={toggleLimits}
             aria-expanded={isLimitsExpanded}
-            title={t(
+            aria-label={t(
               'profile.limits_header_desc',
               isLimitsExpanded
                 ? 'Limitler ve miras detaylarını gizle'
@@ -544,7 +537,6 @@ export default function TribePage() {
           >
             <div
               className="profile-limit-chip"
-              title={t('tribe.member_capacity_desc', 'Klanın alabileceği maksimum üye sayısı')}
             >
               <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
               <span>{t('tribe.member_capacity', 'Üye Kapasitesi')}:</span>
@@ -570,10 +562,6 @@ export default function TribePage() {
           >
             <div
               className="profile-limit-chip"
-              title={t(
-                'profile.bot_assignment_limit_desc',
-                'Maksimum atanabilir kişilik kartı sayısı'
-              )}
             >
               <BotFlashCardsIcon
                 size={25}
@@ -587,10 +575,6 @@ export default function TribePage() {
             <span className="profile-limit-divider">•</span>
             <div
               className="profile-limit-chip"
-              title={t(
-                'profile.card_inheritance_chance_desc',
-                'Kişilik kartı kalıtım ve miras alma olasılığı'
-              )}
             >
               <CardContingencyIcon
                 size={25}
@@ -607,10 +591,6 @@ export default function TribePage() {
                   <span className="profile-limit-divider">•</span>
                   <div
                     className="profile-limit-chip"
-                    title={t(
-                      'profile.card_inheritance_modifier_desc',
-                      'Dereceye bağlı ek kişilik kartı miras çarpanı'
-                    )}
                   >
                     <CardContingencyModifierIcon
                       size={42}

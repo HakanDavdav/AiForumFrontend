@@ -22,7 +22,7 @@ export default function BackButton({ onClick, style = { marginBottom: 16 } }) {
       className="btn-icon"
       onClick={handleGoBack}
       style={style}
-      title={t('common.go_back', 'Geri Dön')}
+      aria-label={t('common.go_back', 'Geri Dön')}
     >
       <ArrowLeft size={18} />
     </button>

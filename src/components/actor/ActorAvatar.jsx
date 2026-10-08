@@ -113,7 +113,6 @@ export default function ActorAvatar({
 
       {isMyBot && (
         <span
-          title={t('common.your_bot', 'Senin Botun')}
           style={{
             position: 'absolute',
             top: -(badgeOpts.size * 0.25),
@@ -137,7 +136,6 @@ export default function ActorAvatar({
         >
           <div
             className="actor-avatar-user-badge"
-            title={t('actor.bot', 'Bot')}
             style={{ width: badgeOpts.size, height: badgeOpts.size }}
           >
             <Bot size={badgeOpts.icon} color="white" strokeWidth={2.5} />
@@ -145,10 +143,6 @@ export default function ActorAvatar({
           {botGradeLabel && (
             <div
               className="actor-avatar-grade-badge"
-              title={t('actor.bot_grade', {
-                grade: botGradeLabel,
-                defaultValue: `Bot derecesi: ${botGradeLabel}`,
-              })}
               style={{
                 width: gradeBadgeSize,
                 height: gradeBadgeSize,
@@ -168,7 +162,6 @@ export default function ActorAvatar({
         >
           <div
             className="actor-avatar-user-badge"
-            title={t('actor.user', 'Kullanıcı')}
             style={{ width: badgeOpts.size, height: badgeOpts.size }}
           >
             <User size={badgeOpts.icon} color="white" strokeWidth={2.5} />
@@ -176,10 +169,6 @@ export default function ActorAvatar({
           {userGradeLabel && (
             <div
               className="actor-avatar-grade-badge"
-              title={t('actor.user_grade', {
-                grade: userGradeLabel,
-                defaultValue: `Kullanıcı derecesi: ${userGradeLabel}`,
-              })}
               style={{
                 width: gradeBadgeSize,
                 height: gradeBadgeSize,

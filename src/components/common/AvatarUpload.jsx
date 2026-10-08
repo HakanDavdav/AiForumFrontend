@@ -296,7 +296,6 @@ export default function AvatarUpload({
                 gap: 6,
                 width: '100%',
               }}
-              title={t('upload.remove_image', 'Görseli Kaldır')}
             >
               <Trash2 size={13} />
               <span>{t('upload.remove', 'Kaldır')}</span>
@@ -355,7 +354,6 @@ export default function AvatarUpload({
                 gap: 6,
                 padding: '9px 14px',
               }}
-              title={t('upload.remove_image', 'Görseli Kaldır')}
             >
               <Trash2 size={15} />
               <span>{t('upload.remove', 'Kaldır')}</span>

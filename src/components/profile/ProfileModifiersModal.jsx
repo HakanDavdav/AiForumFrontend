@@ -186,7 +186,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
         {/* Base value - Sadece 'Base:' ve sağında sayı */}
         {baseValue !== undefined && (
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-secondary)' }}>
-            <span style={{ fontWeight: 600 }}>Base:</span>
+            <span style={{ fontWeight: 600 }}>{t('profile.mod_base', 'Base')}:</span>
             <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>{baseValue}</span>
           </div>
         )}
@@ -209,7 +209,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
         <div style={{ height: 1, background: 'var(--color-border)', margin: '3px 0' }} />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-          <span style={{ fontWeight: 700 }}>Total:</span>
+          <span style={{ fontWeight: 700 }}>{t('profile.mod_total', 'Total')}:</span>
           <span style={{ color: 'var(--color-primary)', fontSize: 13, fontWeight: 800 }}>{totalValue}</span>
         </div>
       </div>
@@ -306,10 +306,10 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   topContent: renderGradeCheckpoints(),
                   baseValue: '0',
                   modifiers: [
-                    { label: 'Slot/Kart', value: `+${stepBonus}`, color: gradeColor },
-                    ...(!isTribe ? [{ label: 'Meydan Okuma', value: `+${stepBonus}`, color: 'var(--color-primary)' }] : []),
-                    { label: 'Miras', value: `+%${stepBonus}`, color: 'var(--color-primary)' },
-                    ...(isBot || isTribe ? [{ label: 'Miras Çarpanı', value: `+%${gradeContingencyMod}`, color: '#f59e0b' }] : []),
+                    { label: t('profile.mod_slot_card', 'Slot/Kart'), value: `+${stepBonus}`, color: gradeColor },
+                    ...(!isTribe ? [{ label: t('profile.mod_debate', 'Meydan Okuma'), value: `+${stepBonus}`, color: 'var(--color-primary)' }] : []),
+                    { label: t('profile.mod_contingency', 'Miras'), value: `+%${stepBonus}`, color: 'var(--color-primary)' },
+                    ...(isBot || isTribe ? [{ label: t('profile.mod_contingency_mult', 'Miras Çarpanı'), value: `+%${gradeContingencyMod}`, color: '#f59e0b' }] : []),
                   ],
                   totalValue: `+${stepBonus}`,
                 })}
@@ -364,10 +364,10 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   renderModifierBubble({
                     baseValue: '0',
                     modifiers: [
-                      { label: 'Bot Kotası', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Kart Alanı', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Meydan Okuma', value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
-                      { label: 'Miras Şansı', value: isPremiumUser ? '+%4' : '+%0', color: 'var(--color-primary)' },
+                      { label: t('profile.mod_bot_quota', 'Bot Kotası'), value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: t('profile.mod_card_area', 'Kart Alanı'), value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: t('profile.mod_debate', 'Meydan Okuma'), value: isPremiumUser ? '+4' : '+0', color: 'var(--color-primary)' },
+                      { label: t('profile.mod_contingency_chance', 'Miras Şansı'), value: isPremiumUser ? '+%4' : '+%0', color: 'var(--color-primary)' },
                     ],
                     totalValue: isPremiumUser ? '+4' : '+0',
                   })}
@@ -433,16 +433,16 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
 
                 {activeBubble === 'botMemory' &&
                   renderModifierBubble({
-                    title: 'Hafıza Süresi',
-                    baseValue: '30 Gün',
+                    title: t('profile.mod_memory_duration', 'Hafıza Süresi'),
+                    baseValue: t('profile.mod_30_days', '30 Gün'),
                     modifiers: [
                       {
                         label: hasBotMemory ? t('bot.capability_extended_memory', 'Genişletilmiş Hafıza') : t('bot.capability_memory', 'Hafıza'),
-                        value: hasBotMemory ? '2x' : '1x (Default)',
+                        value: hasBotMemory ? '2x' : `1x (${t('hierarchy.default_view', 'Varsayılan')})`,
                         color: hasBotMemory ? 'var(--color-warning)' : 'var(--color-primary)',
                       },
                     ],
-                    totalValue: hasBotMemory ? '60 Gün' : '30 Gün',
+                    totalValue: hasBotMemory ? t('profile.mod_60_days', '60 Gün') : t('profile.mod_30_days', '30 Gün'),
                   })}
               </div>
             )}

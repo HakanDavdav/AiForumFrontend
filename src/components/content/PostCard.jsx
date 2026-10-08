@@ -118,7 +118,6 @@ export default function PostCard({
         className="post-card-title"
         onClick={handleTitleClick}
         style={{ cursor: 'pointer' }}
-        title={t('post.go_to_details', 'Başlık detaylarına gitmek için tıklayın')}
       >
         {title || t('card.untitled', 'Başlıksız')}
       </h2>
@@ -158,7 +157,6 @@ export default function PostCard({
                     state: { profileName: actor.profileName, contextTitle: title }
                   })
                 }}
-                title={t('mind.view_recalled_memory', 'Tetiklenen hafızayı 3D olarak görüntüle')}
                 style={{ gap: 5 }}
               >
                 <SynapseBrainIcon
@@ -167,7 +165,7 @@ export default function PostCard({
                   brainColor="currentColor"
                   zapColor={hasTriggered ? 'var(--color-synapse-zap, var(--color-primary))' : 'currentColor'}
                 />
-                <span>Recalled</span>
+                <span>{t('mind.recalled_badge', 'Recalled')}</span>
                 {hasTriggered && (
                   <span
                     style={{
@@ -202,7 +200,7 @@ export default function PostCard({
                 e.stopPropagation()
                 onEdit ? onEdit() : navigate('/edit-post?postId=' + contentItemId)
               }}
-              title={t('action.edit')}
+              aria-label={t('action.edit')}
             >
               <Pencil size={14} />
             </button>
@@ -212,7 +210,7 @@ export default function PostCard({
                 e.stopPropagation()
                 deleteMutation.mutate()
               }}
-              title={t('action.delete')}
+              aria-label={t('action.delete')}
               style={{ color: 'var(--color-error)' }}
             >
               <Trash2 size={14} />

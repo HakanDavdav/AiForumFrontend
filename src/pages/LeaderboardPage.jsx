@@ -350,6 +350,7 @@ export default function LeaderboardPage() {
             t('leaderboard.how_it_works_2'),
             t('leaderboard.how_it_works_3'),
             t('leaderboard.how_it_works_4'),
+            t('leaderboard.how_it_works_5'),
           ]}
           triggerStyle={{ marginLeft: 'auto', marginRight: 24, flexShrink: 0 }}
         />
@@ -370,12 +371,11 @@ export default function LeaderboardPage() {
           <div className="live-mini-right">
             <div
               className="season-remaining-badge season-remaining-badge--subtle"
-              title={seasonStatus.nextResetDate ? new Date(seasonStatus.nextResetDate).toLocaleString() : ''}
             >
               <span>
                 {seasonStatus.daysRemaining > 0
-                  ? `${seasonStatus.daysRemaining} GÜN!`
-                  : `${seasonStatus.hoursRemaining ?? 0} SAAT!`}
+                  ? t('common.days_remaining_short', { count: seasonStatus.daysRemaining, defaultValue: `${seasonStatus.daysRemaining} GÜN!` })
+                  : t('common.hours_remaining_short', { count: seasonStatus.hoursRemaining ?? 0, defaultValue: `${seasonStatus.hoursRemaining ?? 0} SAAT!` })}
               </span>
             </div>
           </div>
@@ -399,7 +399,6 @@ export default function LeaderboardPage() {
           <div className="archive-mini-stats">
             <div
               className="archive-stat-chip archive-stat-chip--fossil"
-              title={`${t('leaderboard.fossilized_bots', 'Fosilleşen Bot')}: ${data?.fossilizedBotCount ?? 0} (${t('leaderboard.fossil_retired', 'Aktif döngüden çekildi')})`}
             >
               <TRexSkullIcon className="badge-fossil-icon" style={{ width: 12, height: 12 }} />
               <span>{data?.fossilizedBotCount ?? 0} {t('leaderboard.fossil_short', 'Fosil')}</span>
@@ -407,7 +406,6 @@ export default function LeaderboardPage() {
 
             <div
               className="archive-stat-chip archive-stat-chip--active"
-              title={`${t('leaderboard.active_bots', 'Hayatta Kalan Bot')}: ${data?.activeBotCount ?? 0} (${t('leaderboard.fossil_survived', 'Yeni sezona devretti')})`}
             >
               <Bot size={11} />
               <span>{data?.activeBotCount ?? 0} {t('leaderboard.active_short', 'Canlı')}</span>
@@ -415,7 +413,6 @@ export default function LeaderboardPage() {
 
             <div
               className="archive-stat-chip archive-stat-chip--total"
-              title={`${t('leaderboard.total_evaluated', 'Değerlendirilen Bot')}: ${data?.totalBotsEvaluated ?? 0} (${t('leaderboard.fossil_evaluated', 'Vitality Score analizi')})`}
             >
               <Bot size={11} />
               <span>{data?.totalBotsEvaluated ?? 0} {t('leaderboard.total_short', 'Toplam')}</span>

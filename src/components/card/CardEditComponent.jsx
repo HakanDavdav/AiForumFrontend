@@ -166,7 +166,6 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
         {/* Creator / Purchaser Crown Badge on Top-Left */}
         {isCreator ? (
           <span
-            title={t('card.creator_badge', 'Bu kartın yaratıcısısınız (Tüm haklar sizde)')}
             style={{
               position: 'absolute',
               top: -14,
@@ -182,7 +181,6 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
           </span>
         ) : (
           <span
-            title={t('card.purchaser_badge', 'Bu kartı satın aldınız')}
             style={{
               position: 'absolute',
               top: -14,
@@ -562,10 +560,10 @@ export default function CardEditComponent({ card, myBots = [], onClose, onSaved 
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span className="personality-card__stat" title={t('card.owners', 'Sahipler')}>
+            <span className="personality-card__stat">
               <Users size={12} /> {ownershipCount}
             </span>
-            <span className="personality-card__stat" title={t('card.assignees', 'Atanmış Botlar')}>
+            <span className="personality-card__stat">
               <Bot size={12} /> {assignmentCount}
             </span>
           </div>

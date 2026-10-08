@@ -34,7 +34,6 @@ export default function HowItWorksHelp({
         aria-label={triggerLabel}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        title={triggerLabel}
         style={triggerStyle}
       >
         <ShieldQuestion size={20} strokeWidth={2.2} />

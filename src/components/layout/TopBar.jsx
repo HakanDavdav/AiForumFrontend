@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import {
   Search,
   Settings,
@@ -15,6 +15,7 @@ import {
   Bot,
   CirclePlus,
   PaintbrushVertical,
+  Edit2,
   X,
   Users,
   Brain,
@@ -27,7 +28,7 @@ import { searchApi } from '../../api/searchApi'
 import { actorApi } from '../../api/actorApi'
 import { identityApi } from '../../api/identityApi'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { OrderType, OrderTypeLabels } from '../../constants/enums'
+import { OrderType, OrderTypeLabels, UserCapabilities } from '../../constants/enums'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import ActorMinimalCard from '../actor/ActorMinimalCard'
 import PostMinimalCard from '../content/PostMinimalCard'
@@ -43,6 +44,20 @@ import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import BletchlyGuideModal from '../common/BletchlyGuideModal'
 import Logo from '../common/icons/Logo'
 import FossilTogglePill from '../common/FossilTogglePill'
+import { applyCustomColorVars, clearCustomColorVars, normalizeHex } from '../../utils/themeColor'
+
+const COLOR_PRESETS = [
+  { color: '#3b82f6', label: 'Mavi', isDefault: true },
+  { color: '#10b981', label: 'Yeşil', isDefault: true },
+  { color: '#8b5cf6', label: 'Mor' },
+  { color: '#06b6d4', label: 'Turkuaz' },
+  { color: '#f97316', label: 'Turuncu' },
+  { color: '#ec4899', label: 'Pembe' },
+  { color: '#ef4444', label: 'Kırmızı' },
+  { color: '#eab308', label: 'Sarı' },
+  { color: '#14b8a6', label: 'Teal' },
+  { color: '#6366f1', label: 'İndigo' },
+]
 
 export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   useDevLog('TopBar', arguments[0] || {})
@@ -92,10 +107,8 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   const langs = [
     { code: 'tr', label: 'Türkçe', flagUrl: 'https://flagcdn.com/w20/tr.png' },
     { code: 'en', label: 'English', flagUrl: 'https://flagcdn.com/w20/us.png' },
-    { code: 'zh', label: '中文', flagUrl: 'https://flagcdn.com/w20/cn.png' },
     { code: 'ja', label: '日本語', flagUrl: 'https://flagcdn.com/w20/jp.png' },
     { code: 'hi', label: 'हिन्दी', flagUrl: 'https://flagcdn.com/w20/in.png' },
-    { code: 'ku', label: 'Kurdî', flagUrl: null, fallbackEmoji: '☀️' },
     { code: 'de', label: 'Deutsch', flagUrl: 'https://flagcdn.com/w20/de.png' },
     { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },
     { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w20/sa.png' },
@@ -107,8 +120,10 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
     langs.find((l) => l.code === rawLang || l.code === rawLang.split('-')[0]) || langs[0]
   const currentLang = activeLangObj.code
 
-  const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
+  const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode, customColor, setCustomColor, setGreenMode, savedCustomColor, setSavedCustomColor } =
+    useThemeStore()
   const [isBotShaking, setIsBotShaking] = useState(false)
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const [langDropdownPos, setLangDropdownPos] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -136,10 +151,31 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   }
 
   const handleBotClick = () => {
-    toggleGreenMode()
     setIsBotShaking(true)
     setTimeout(() => setIsBotShaking(false), 500)
+    if (isPremium) {
+      setIsPaletteOpen((v) => !v)
+      return
+    }
+    toggleGreenMode()
   }
+
+  const applyPaletteColor = useCallback(
+    (color) => {
+      const normalized = typeof color === 'string' ? color.toLowerCase() : ''
+      if (normalized === '#10b981') {
+        setCustomColor(null)
+        setGreenMode(true)
+      } else if (normalized === '#3b82f6') {
+        setCustomColor(null)
+        setGreenMode(false)
+      } else {
+        setGreenMode(false)
+        setCustomColor(normalized)
+      }
+    },
+    [setCustomColor, setGreenMode]
+  )
 
   const queryClient = useQueryClient()
   const myTribesRef = useRef(null)
@@ -147,6 +183,10 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   const filterRef = useRef(null)
   const searchRef = useRef(null)
   const langRef = useRef(null)
+  const paletteRef = useRef(null)
+  const colorInputRef = useRef(null)
+  const colorRafRef = useRef(null)
+  const pendingPreviewColorRef = useRef(null)
   const debounceTimerRef = useRef(null)
   const suppressSuggestionsRef = useRef(false)
 
@@ -223,6 +263,88 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
     enabled: !!actorId && isLoggedIn,
   })
 
+  const userCapabilities = Number(
+    myProfile?.userSettings?.userCapabilities ?? UserCapabilities.Default
+  )
+  const isPremium = (userCapabilities & UserCapabilities.Premium) === UserCapabilities.Premium
+
+  // Renk seçici sürüklenirken store'a yazmadan CSS değişkenlerini doğrudan DOM'a
+  // rAF ile yazar (en fazla çerçeve başına bir kez); seçim bırakılınca store'a commit edilir.
+  const cancelColorPreview = useCallback(() => {
+    if (colorRafRef.current) {
+      cancelAnimationFrame(colorRafRef.current)
+      colorRafRef.current = null
+    }
+    pendingPreviewColorRef.current = null
+  }, [])
+
+  const previewCustomColor = useCallback(
+    (color) => {
+      pendingPreviewColorRef.current = color
+      if (colorRafRef.current) return
+      colorRafRef.current = requestAnimationFrame(() => {
+        colorRafRef.current = null
+        applyCustomColorVars(pendingPreviewColorRef.current, isDarkMode)
+      })
+    },
+    [isDarkMode]
+  )
+
+  const commitCustomColor = useCallback(
+    (color) => {
+      if (colorRafRef.current) {
+        cancelAnimationFrame(colorRafRef.current)
+        colorRafRef.current = null
+      }
+      pendingPreviewColorRef.current = null
+      const normalized = normalizeHex(color)
+      if (!normalized) return
+      if (normalized === '#10b981') {
+        clearCustomColorVars(true)
+      } else if (normalized === '#3b82f6') {
+        clearCustomColorVars(false)
+      } else {
+        applyCustomColorVars(normalized, isDarkMode)
+        setSavedCustomColor(normalized)
+      }
+      applyPaletteColor(normalized)
+    },
+    [applyPaletteColor, isDarkMode, setSavedCustomColor]
+  )
+
+  useEffect(() => {
+    const input = colorInputRef.current
+    if (!input || !isPaletteOpen || !isPremium) return undefined
+    const handleInput = (event) => previewCustomColor(event.target.value)
+    const handleCommit = (event) => commitCustomColor(event.target.value)
+    input.addEventListener('input', handleInput)
+    input.addEventListener('change', handleCommit)
+    input.addEventListener('blur', handleCommit)
+    return () => {
+      input.removeEventListener('input', handleInput)
+      input.removeEventListener('change', handleCommit)
+      input.removeEventListener('blur', handleCommit)
+      if (colorRafRef.current) {
+        cancelAnimationFrame(colorRafRef.current)
+        colorRafRef.current = null
+      }
+    }
+  }, [isPaletteOpen, isPremium, previewCustomColor, commitCustomColor])
+
+  useEffect(() => {
+    const input = colorInputRef.current
+    if (!input || pendingPreviewColorRef.current) return
+    const next = customColor || (isGreenMode ? '#10b981' : '#3b82f6')
+    if (input.value !== next) input.value = next
+  }, [customColor, isGreenMode, isPaletteOpen])
+
+  // Palet kapanırken (dışarı tıklama vb.) yerel değişkenlere yazılmış ama
+  // store'a commit edilmemiş önizleme rengi varsa kalıcı hale getir.
+  useEffect(() => {
+    if (isPaletteOpen || !pendingPreviewColorRef.current) return
+    commitCustomColor(pendingPreviewColorRef.current)
+  }, [isPaletteOpen, commitCustomColor])
+
   const logoutMutation = useMutation({
     mutationFn: () => identityApi.logout(),
     onSuccess: () => {
@@ -259,6 +381,9 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
       }
       if (langRef.current && !langRef.current.contains(e.target)) {
         setIsLangOpen(false)
+      }
+      if (paletteRef.current && !paletteRef.current.contains(e.target)) {
+        setIsPaletteOpen(false)
       }
     }
     document.addEventListener('mousedown', handler)
@@ -444,16 +569,11 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
               type="button"
               className="season-remaining-badge season-remaining-badge--floating"
               onClick={() => navigate('/leaderboard')}
-              title={t('leaderboard.season_remaining_tooltip', {
-                season: seasonStatus.currentSeason ?? 1,
-                days: seasonStatus.daysRemaining,
-                defaultValue: `Sezon ${seasonStatus.currentSeason ?? 1} • ${seasonStatus.daysRemaining} gün kaldı`,
-              })}
             >
               <span>
                 {seasonStatus.daysRemaining > 0
-                  ? `${seasonStatus.daysRemaining} GÜN!`
-                  : `${seasonStatus.hoursRemaining ?? 0} SAAT!`}
+                  ? t('common.days_remaining_short', { count: seasonStatus.daysRemaining, defaultValue: `${seasonStatus.daysRemaining} GÜN!` })
+                  : t('common.hours_remaining_short', { count: seasonStatus.hoursRemaining ?? 0, defaultValue: `${seasonStatus.hoursRemaining ?? 0} SAAT!` })}
               </span>
             </button>
           )}
@@ -781,7 +901,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                     ? 'var(--color-primary)'
                     : undefined,
               }}
-              title={
+              aria-label={
                 searchMode === 'general'
                   ? t('topbar.general_search_no_filter')
                   : t('topbar.search_filters')
@@ -819,7 +939,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                   setFilterEndDate('')
                   setShowSuggestions(false)
                 }}
-                title={t('common.clear_all', 'Tümünü Temizle')}
+                aria-label={t('common.clear_all', 'Tümünü Temizle')}
                 style={{
                   position: 'absolute',
                   top: -4,
@@ -919,7 +1039,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                             // or just do handleOrderTypeChange({ target: { value: '' } })
                             handleOrderTypeChange({ target: { value: '' } })
                           }}
-                          title={t('common.clear', 'Temizle')}
+                          aria-label={t('common.clear', 'Temizle')}
                         >
                           <X size={16} />
                         </button>
@@ -945,7 +1065,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                           className="btn btn-ghost btn-sm"
                           style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
                           onClick={() => setFilterStartDate('')}
-                          title={t('common.clear', 'Temizle')}
+                          aria-label={t('common.clear', 'Temizle')}
                         >
                           <X size={16} />
                         </button>
@@ -971,7 +1091,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                           className="btn btn-ghost btn-sm"
                           style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
                           onClick={() => setFilterEndDate('')}
-                          title={t('common.clear', 'Temizle')}
+                          aria-label={t('common.clear', 'Temizle')}
                         >
                           <X size={16} />
                         </button>
@@ -1029,7 +1149,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 alignItems: 'center',
                 transform: 'translateY(-1px)',
               }}
-              title="LinkedIn"
+              aria-label="LinkedIn"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1057,7 +1177,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 alignItems: 'center',
                 transform: 'translateY(-1px)',
               }}
-              title="GitHub"
+              aria-label="GitHub"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1074,29 +1194,194 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 <path d="M9 18c-4.5 1.5-5-2.5-7-3" />
               </svg>
             </a>
+            <a
+              href="https://www.instagram.com/hakandavdav/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                transform: 'translateY(-1px)',
+              }}
+              aria-label="Instagram"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+              </svg>
+            </a>
             <div
               style={{ width: 1, height: 28, background: 'var(--color-border)', margin: '0 4px' }}
             />
 
-            <button
-              className={`btn-icon ${
-                isBotShaking ? (isGreenMode ? 'theme-toggle-to-green' : 'theme-toggle-to-blue') : ''
-              }`}
-              onClick={handleBotClick}
-              title={isGreenMode ? 'Mavi Tema' : 'Yeşil Tema'}
-              style={{ color: 'var(--color-primary)', height: 30, padding: '0 2px' }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
-                <Bot size={18} strokeWidth={2.4} />
-                <PaintbrushVertical size={15} strokeWidth={2.2} style={{ marginLeft: -5 }} />
-              </span>
-            </button>
+            <div style={{ position: 'relative' }} ref={paletteRef}>
+              <button
+                className={`btn-icon ${
+                  isBotShaking
+                    ? isPremium
+                      ? 'theme-toggle-shake'
+                      : isGreenMode
+                        ? 'theme-toggle-to-green'
+                        : 'theme-toggle-to-blue'
+                    : ''
+                }`}
+                onClick={handleBotClick}
+                aria-label={
+                  isPremium
+                    ? t('topbar.premium_palette_title', 'Özel Renk Paleti')
+                    : isGreenMode
+                      ? 'Mavi Tema'
+                      : 'Yeşil Tema'
+                }
+                style={{ color: 'var(--color-primary)', height: 30, padding: '0 2px' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', whiteSpace: 'nowrap' }}>
+                  <Bot size={18} strokeWidth={2.4} />
+                  <PaintbrushVertical size={15} strokeWidth={2.2} style={{ marginLeft: -5 }} />
+                </span>
+              </button>
+
+              <AnimatePresence>
+                {isPaletteOpen && isPremium && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: 6,
+                      background: 'var(--color-bg)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 12,
+                      boxShadow: 'var(--shadow-lg)',
+                      zIndex: 250,
+                      width: 152,
+                      padding: 8,
+                    }}
+                  >
+                    <div
+                      style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 5 }}
+                    >
+                      {COLOR_PRESETS.map((preset) => {
+                        const activeBase = customColor || (isGreenMode ? '#10b981' : '#3b82f6')
+                        return (
+                          <button
+                            key={preset.color}
+                            type="button"
+                            onClick={() => {
+                              cancelColorPreview()
+                              applyPaletteColor(preset.color)
+                            }}
+                            aria-label={preset.label}
+                            style={{
+                              position: 'relative',
+                              width: 20,
+                              height: 20,
+                              borderRadius: '50%',
+                              background: preset.color,
+                              border: `2px solid ${
+                                activeBase === preset.color
+                                  ? 'var(--color-text-primary)'
+                                  : 'transparent'
+                              }`,
+                              cursor: 'pointer',
+                              padding: 0,
+                            }}
+                          >
+                            {preset.isDefault && (
+                              <span
+                                style={{
+                                  position: 'absolute',
+                                  inset: 0,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: 10,
+                                  fontWeight: 800,
+                                  color: '#ffffff',
+                                  lineHeight: 1,
+                                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
+                                  pointerEvents: 'none',
+                                }}
+                              >
+                                D
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+                      {savedCustomColor && (
+                        <button
+                          type="button"
+                          aria-label={t('topbar.premium_palette_saved', 'Kayıtlı renk')}
+                          onClick={() => {
+                            cancelColorPreview()
+                            applyPaletteColor(savedCustomColor)
+                          }}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: '50%',
+                            background: savedCustomColor,
+                            border: `2px solid ${
+                              customColor === savedCustomColor
+                                ? 'var(--color-text-primary)'
+                                : 'transparent'
+                            }`,
+                            cursor: 'pointer',
+                            padding: 0,
+                            marginRight: 6,
+                          }}
+                        />
+                      )}
+                      <button
+                        type="button"
+                        className="actor-chip-hier-btn"
+                        aria-label={t('topbar.premium_palette_custom', 'Custom')}
+                        onClick={() => colorInputRef.current?.click()}
+                        style={{ width: 24, height: 24 }}
+                      >
+                        <Edit2 size={13} />
+                      </button>
+                      <input
+                        ref={colorInputRef}
+                        type="color"
+                        defaultValue={customColor || (isGreenMode ? '#10b981' : '#3b82f6')}
+                        style={{
+                          position: 'absolute',
+                          width: 0,
+                          height: 0,
+                          opacity: 0,
+                          pointerEvents: 'none',
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <button
               className="btn-icon"
               onClick={toggleTheme}
-              title={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
+              aria-label={isDarkMode ? 'Açık Tema' : 'Koyu Tema'}
               style={{
-                color: isGreenMode ? '#10b981' : '#3b82f6',
+                color: customColor || (isGreenMode ? '#10b981' : '#3b82f6'),
                 width: 30,
                 height: 30,
                 padding: 0,
@@ -1203,14 +1488,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
               <div
                 className={hasPendingInvitation ? 'topbar-invite-chip' : undefined}
                 style={{ display: 'flex', alignItems: 'center', position: 'relative' }}
-                title={
-                  hasPendingInvitation
-                    ? t(
-                        'debate.pending_invitation',
-                        'Meydan okuma daveti bekliyor — açmak için tıklayın'
-                      )
-                    : undefined
-                }
                 onClickCapture={
                   hasPendingInvitation
                     ? (event) => {
@@ -1232,13 +1509,11 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                   <>
                     <span
                       className="topbar-invite-badge"
-                      title={t('debate.pending_invitation', 'Meydan okuma daveti bekliyor')}
                     >
                       !
                     </span>
                     <span
                       className="season-remaining-badge season-remaining-badge--subtle topbar-invite-counter"
-                      title={t('debate.pending_invitation', 'Meydan okuma daveti bekliyor')}
                     >
                       <span>{inviteSecondsLeft ?? 120}s</span>
                     </span>
@@ -1249,7 +1524,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
               <button
                 className="btn-icon"
                 onClick={() => logoutMutation.mutate()}
-                title={t('topbar.logout')}
+                aria-label={t('topbar.logout')}
                 style={{ width: 30, height: 30, padding: 0 }}
               >
                 <LogOut size={15} />
@@ -1306,7 +1581,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
-          title={t('sort.best_desc', 'dünün en beğenilenleri')}
         >
           {t('sort.best', 'En İyiler')}
         </button>
@@ -1314,7 +1588,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('mostDisliked')}
-          title={t('sort.worst_desc', 'dünün en nefret edilenleri')}
         >
           {t('sort.worst', 'En Kötüler')}
         </button>
@@ -1445,7 +1718,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}
-                          title={t('topbar.new_tribe')}
+                          aria-label={t('topbar.new_tribe')}
                         >
                           <CirclePlus size={19} strokeWidth={2.4} />
                         </button>
@@ -1570,7 +1843,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}
-                          title={t('topbar.new_bot')}
+                          aria-label={t('topbar.new_bot')}
                         >
                           <CirclePlus size={19} strokeWidth={2.4} />
                         </button>
@@ -1593,7 +1866,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                   className="btn btn-outline"
                   style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
                   onClick={() => navigate('/admin/panel')}
-                  title="Admin Panel"
                 >
                   Admin
                 </button>
