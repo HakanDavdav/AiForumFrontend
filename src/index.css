@@ -4542,6 +4542,14 @@ textarea {
     row-gap: 6px;
   }
 
+  /* Like/Dislike/BrutallyDislike kendi satırında; yorum + Recalled
+     (ve cevapla/katla) bir alt satırda sıralanır. */
+  .post-card-footer .reaction-group,
+  .entry-card-footer .reaction-group {
+    flex-basis: 100%;
+    order: -1;
+  }
+
   /* Kart sayfası başlığı: yardım ikonu sıkıştırmasın */
   .card-page-header {
     flex-wrap: wrap;
@@ -4621,14 +4629,14 @@ textarea {
   .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-hier-btn),
   .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-premium-btn) {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
     align-content: center;
     row-gap: 2px;
     border-radius: var(--radius-lg);
     padding: 4px 10px 6px 4px;
   }
 
-  /* Avatar + isim satırı tam genişlik; butonlar alt satırda sağda */
+  /* Avatar + isim satırı tam genişlik; butonlar alt satırda soldan (avatar hizasından) başlar */
   .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-hier-btn) > div:first-child,
   .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-premium-btn) > div:first-child {
     flex-basis: 100% !important;
@@ -4637,7 +4645,7 @@ textarea {
 
   .tribe-card:not(.layout-topbar *):has(.actor-chip-hier-btn) {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
     row-gap: 2px;
     padding: 6px 10px 8px;
   }

@@ -78,12 +78,12 @@
     display: none !important;
   }
 
-  /* Hızlı bağlantı ikonları: masaüstü ikon grubuyla aynı görünüm, sağda */
+  /* Hızlı bağlantı ikonları: masaüstü ikon grubuyla aynı görünüm, ortada */
   .mobile-topbar-quick {
     display: flex;
     align-items: center;
     gap: 7px;
-    margin-left: auto;
+    margin: 0 auto;
   }
 
   .layout-body {

@@ -40,20 +40,31 @@ export default function MobileDrawerExtras() {
 
   return (
     <div className="mobile-drawer-extras">
+      {/* Web versiyondaki gibi yalnızca ikon: açık/koyu tema + mavi/yeşil tema */}
       <div className="mobile-drawer-extras__row">
-        <button type="button" className="mobile-drawer-extra-btn" onClick={toggleTheme}>
+        <button
+          type="button"
+          className="mobile-drawer-extra-btn"
+          onClick={toggleTheme}
+          aria-label={isDarkMode ? t('topbar.light_mode', 'Açık Tema') : t('topbar.dark_mode', 'Koyu Tema')}
+          title={isDarkMode ? t('topbar.light_mode', 'Açık Tema') : t('topbar.dark_mode', 'Koyu Tema')}
+        >
           {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-          <span>{isDarkMode ? t('topbar.light_mode', 'Açık Tema') : t('topbar.dark_mode', 'Koyu Tema')}</span>
         </button>
-        <button type="button" className="mobile-drawer-extra-btn" onClick={toggleGreenMode}>
+        <button
+          type="button"
+          className="mobile-drawer-extra-btn"
+          onClick={toggleGreenMode}
+          aria-label={isGreenMode ? t('topbar.green_theme', 'Yeşil Tema') : t('topbar.blue_theme', 'Mavi Tema')}
+          title={isGreenMode ? t('topbar.green_theme', 'Yeşil Tema') : t('topbar.blue_theme', 'Mavi Tema')}
+        >
           <span
             className="mobile-drawer-paint-bot"
             style={{ color: isGreenMode ? '#10b981' : 'var(--color-primary)' }}
           >
-            <Bot size={17} strokeWidth={2.4} />
-            <PaintbrushVertical size={14} strokeWidth={2.2} style={{ marginLeft: -4 }} />
+            <Bot size={18} strokeWidth={2.4} />
+            <PaintbrushVertical size={15} strokeWidth={2.2} style={{ marginLeft: -5 }} />
           </span>
-          <span>{isGreenMode ? t('topbar.green_theme', 'Yeşil Tema') : t('topbar.blue_theme', 'Mavi Tema')}</span>
         </button>
       </div>
 
