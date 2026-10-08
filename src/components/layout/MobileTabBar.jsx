@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Home, Search, PenSquare, Swords, User } from 'lucide-react'
+import { Home, Search, PenSquare, User } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import { useTranslation } from 'react-i18next'
@@ -45,13 +45,6 @@ export default function MobileTabBar() {
       active: isActive('/create-post', '/edit-post'),
       primary: true,
       onClick: () => go(isLoggedIn ? '/create-post' : '/login'),
-    },
-    {
-      key: 'debates',
-      label: t('tab_bar.debates', 'Arenalar'),
-      icon: <Swords size={21} strokeWidth={2.1} />,
-      active: isActive('/active-debates', '/debate'),
-      onClick: () => go('/active-debates'),
     },
     {
       key: 'profile',

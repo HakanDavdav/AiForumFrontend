@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Moon, Sun, Podium, Users, PackageOpen, BookOpen } from 'lucide-react'
+import { ChevronDown, Layers, Moon, Podium, ShieldQuestion, Sun, Users } from 'lucide-react'
 import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
+import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import useThemeStore from '../../store/themeStore'
 import { useTranslation } from 'react-i18next'
 
@@ -15,32 +17,83 @@ const LANGS = [
 ]
 
 /**
- * Mobil sol drawer'ın alt bölümü: tema (açık/koyu/yeşil) anahtarı,
- * dil seçici ve footer bağlantıları. Masaüstünde bunlar üst bardadır.
+ * Mobil sol drawer'ın alt bölümü: ikon-only hızlı bağlantılar (masaüstü
+ * üst bardaki ikon grubuyla aynı), tema (açık/koyu/yeşil) anahtarı,
+ * dil dropdown'ı ve footer bağlantıları. Masaüstünde bunlar üst bardadır.
  */
 export default function MobileDrawerExtras() {
   const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const [isLangOpen, setIsLangOpen] = useState(false)
+  const langRef = useRef(null)
 
   const rawLang = (i18n.language || 'tr').toLowerCase()
-  const currentLang = (LANGS.find((l) => l.code === rawLang || l.code === rawLang.split('-')[0]) || LANGS[0]).code
+  const currentLang =
+    LANGS.find((l) => l.code === rawLang || l.code === rawLang.split('-')[0]) || LANGS[0]
 
+  useEffect(() => {
+    if (!isLangOpen) return undefined
+    const handleClick = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) setIsLangOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [isLangOpen])
+
+  // Masaüstü üst bardaki ikon grubuyla birebir aynı ikonlar
   const quickLinks = [
-    { key: 'leaderboard', label: t('topbar.leaderboard', 'Liderlik Tablosu'), icon: <Podium size={17} />, to: '/leaderboard' },
-    { key: 'tribes', label: t('topbar.tribes', 'Klanlar'), icon: <Users size={17} />, to: '/tribes' },
-    { key: 'marketplace', label: t('card.marketplace', 'Kart Marketi'), icon: <PackageOpen size={17} />, to: '/marketplace' },
-    { key: 'cards', label: t('card.cards', 'Kartlarım'), icon: <BotFlashCardsIcon size={17} />, to: '/cards' },
-    { key: 'concepts', label: t('basic_concepts.title', 'Temel Kavramlar'), icon: <BookOpen size={17} />, to: '/basic-concepts' },
+    {
+      key: 'leaderboard',
+      label: t('topbar.leaderboard', 'Liderlik Tablosu'),
+      icon: <Podium size={19} strokeWidth={2.2} />,
+      to: '/leaderboard?type=user',
+    },
+    {
+      key: 'tribes',
+      label: t('topbar.tribes', 'Klanlar'),
+      icon: <Users size={19} strokeWidth={2.2} />,
+      to: '/tribes',
+    },
+    {
+      key: 'debates',
+      label: t('topbar.active_debates', 'Aktif Meydan Okumalar'),
+      icon: <AngryBotWithSwordsIcon size={19} />,
+      to: '/active-debates',
+    },
+    {
+      key: 'marketplace',
+      label: t('card.marketplace', 'Kart Marketi'),
+      icon: <BotFlashCardsIcon size={19} />,
+      to: '/marketplace',
+    },
+    {
+      key: 'cards',
+      label: t('card.cards', 'Kartlarım'),
+      icon: <Layers size={19} strokeWidth={2.2} />,
+      to: '/cards',
+    },
+    {
+      key: 'concepts',
+      label: t('basic_concepts.title', 'Temel Kavramlar'),
+      icon: <ShieldQuestion size={19} strokeWidth={2.2} />,
+      to: '/basic-concepts',
+    },
   ]
 
   return (
     <div className="mobile-drawer-extras">
       <div className="mobile-drawer-extras__quick">
         {quickLinks.map((l) => (
-          <button key={l.key} type="button" className="mobile-drawer-quick-link" onClick={() => navigate(l.to)}>
+          <button
+            key={l.key}
+            type="button"
+            className="mobile-drawer-quick-link"
+            title={l.label}
+            aria-label={l.label}
+            onClick={() => navigate(l.to)}
+          >
             {l.icon}
-            <span>{l.label}</span>
           </button>
         ))}
       </div>
@@ -59,22 +112,50 @@ export default function MobileDrawerExtras() {
         </button>
       </div>
 
-      <div className="mobile-drawer-extras__langs">
-        {LANGS.map((l) => (
-          <button
-            key={l.code}
-            type="button"
-            className={`mobile-drawer-lang-btn${currentLang === l.code ? ' is-active' : ''}`}
-            onClick={() => i18n.changeLanguage(l.code)}
-          >
-            {l.flagUrl ? (
-              <img src={l.flagUrl} alt={l.code} style={{ width: 20, height: 15, borderRadius: 2 }} />
-            ) : (
-              <span>{l.label}</span>
-            )}
-            <span>{l.label}</span>
-          </button>
-        ))}
+      <div className="mobile-drawer-lang" ref={langRef}>
+        <button
+          type="button"
+          className="mobile-drawer-lang-trigger"
+          onClick={() => setIsLangOpen((v) => !v)}
+          aria-haspopup="listbox"
+          aria-expanded={isLangOpen}
+        >
+          <img
+            src={currentLang.flagUrl}
+            alt={currentLang.code}
+            style={{ width: 20, height: 15, borderRadius: 2 }}
+          />
+          <span>{currentLang.label}</span>
+          <ChevronDown
+            size={15}
+            className={`mobile-drawer-lang-caret${isLangOpen ? ' is-open' : ''}`}
+          />
+        </button>
+
+        {isLangOpen && (
+          <div className="mobile-drawer-lang-menu" role="listbox">
+            {LANGS.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                role="option"
+                aria-selected={currentLang.code === l.code}
+                className={`mobile-drawer-lang-option${currentLang.code === l.code ? ' is-active' : ''}`}
+                onClick={() => {
+                  i18n.changeLanguage(l.code)
+                  setIsLangOpen(false)
+                }}
+              >
+                <img
+                  src={l.flagUrl}
+                  alt={l.code}
+                  style={{ width: 20, height: 15, borderRadius: 2 }}
+                />
+                <span>{l.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mobile-drawer-extras__links">
