@@ -32,6 +32,11 @@
   display: none !important;
 }
 
+/* Mobil üst bar hızlı bağlantı ikonları — masaüstünde gizli */
+.mobile-topbar-quick {
+  display: none;
+}
+
 /* ─── Mobil Breakpoint (≤900px) ───────────────────────────────────────── */
 
 @media (max-width: 900px) {
@@ -71,6 +76,14 @@
 
   .topbar-search-form {
     display: none !important;
+  }
+
+  /* Hızlı bağlantı ikonları: masaüstü ikon grubuyla aynı görünüm, sağda */
+  .mobile-topbar-quick {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-left: auto;
   }
 
   .layout-body {
@@ -278,33 +291,6 @@
   .mobile-drawer-extras__row {
     display: flex;
     gap: 8px;
-  }
-
-  /* Masaüstü üst bar ikon grubuyla aynı görünüm: yalnızca ikon */
-  .mobile-drawer-extras__quick {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 6px;
-  }
-
-  .mobile-drawer-quick-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 0;
-    border-radius: 10px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    font-family: inherit;
-  }
-
-  .mobile-drawer-quick-link:hover,
-  .mobile-drawer-quick-link:active {
-    color: var(--color-primary);
-    border-color: var(--color-primary-light);
   }
 
   .mobile-drawer-extra-btn {

@@ -19,6 +19,8 @@ import {
   X,
   Users,
   Brain,
+  Layers,
+  ShieldQuestion,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -1597,37 +1599,40 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           overflowX: 'auto',
         }}
       >
-        {/* Cache buttons */}
+        {/* Cache buttons — mobilde sol drawer'a taşındı */}
         <button
-          className={`btn ${activeLeftCacheType === 'trending' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`btn hide-under-900 ${activeLeftCacheType === 'trending' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('trending')}
         >
           {t('sort.popular', 'Popüler')}
         </button>
         <button
-          className={`btn ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`btn hide-under-900 ${activeLeftCacheType === 'recent' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('recent')}
         >
           {t('sort.new')}
         </button>
         <button
-          className={`btn ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`btn hide-under-900 ${activeLeftCacheType === 'mostLiked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('mostLiked')}
         >
           {t('sort.best', 'En İyiler')}
         </button>
         <button
-          className={`btn ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`btn hide-under-900 ${activeLeftCacheType === 'mostDisliked' ? 'btn-primary' : 'btn-ghost'}`}
           style={{ padding: '6px 10px', minWidth: '80px', fontSize: 12 }}
           onClick={() => setActiveLeftCacheType('mostDisliked')}
         >
           {t('sort.worst', 'En Kötüler')}
         </button>
 
-        <div style={{ width: 1, height: 32, background: 'var(--color-border)', margin: '0 8px' }} />
+        <div
+          className="hide-under-900"
+          style={{ width: 1, height: 32, background: 'var(--color-border)', margin: '0 8px' }}
+        />
 
         {/* My Tribes & My Bots dropdowns */}
         {isLoggedIn && (
@@ -1963,6 +1968,63 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           </IconActionButton>
 
           <BletchlyGuideModal triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }} />
+        </div>
+
+        {/* Mobil hızlı bağlantılar — masaüstü ikon grubuyla aynı (drawer'dan taşındı) */}
+        <div className="mobile-topbar-quick">
+          <IconActionButton
+            onClick={() => navigate('/leaderboard?type=user')}
+            title={t('topbar.leaderboard', 'Liderlik Tablosu')}
+            aria-label={t('topbar.leaderboard', 'Liderlik Tablosu')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <Podium size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/tribes')}
+            title={t('topbar.tribes', 'Klanlar')}
+            aria-label={t('topbar.tribes', 'Klanlar')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <Users size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/active-debates')}
+            title={t('topbar.active_debates', 'Aktif Meydan Okumalar')}
+            aria-label={t('topbar.active_debates', 'Aktif Meydan Okumalar')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <AngryBotWithSwordsIcon size={19} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/marketplace')}
+            title={t('card.marketplace', 'Kart Marketi')}
+            aria-label={t('card.marketplace', 'Kart Marketi')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <BotFlashCardsIcon size={19} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/cards')}
+            title={t('card.cards', 'Kartlarım')}
+            aria-label={t('card.cards', 'Kartlarım')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <Layers size={19} strokeWidth={2.2} />
+          </IconActionButton>
+
+          <IconActionButton
+            onClick={() => navigate('/basic-concepts')}
+            title={t('basic_concepts.title', 'Temel Kavramlar')}
+            aria-label={t('basic_concepts.title', 'Temel Kavramlar')}
+            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
+          >
+            <ShieldQuestion size={19} strokeWidth={2.2} />
+          </IconActionButton>
         </div>
       </div>
     </header>

@@ -23,6 +23,7 @@ export default function LeftPanel() {
     isActivitiesExpanded,
     toggleActivities,
     activeLeftCacheType,
+    setActiveLeftCacheType,
     isDebatesExpanded,
     toggleDebates,
   } = useUIStore()
@@ -459,6 +460,25 @@ export default function LeftPanel() {
       )}
 
       <hr className="divider" style={{ margin: '4px 0' }} />
+
+      {/* ─── Cache type selector (yalnızca mobil drawer; masaüstünde üst barda) ────── */}
+      <div className="left-cache-tabs hscroll-strip">
+        {[
+          { key: 'trending', label: t('sort.popular', 'Popüler') },
+          { key: 'recent', label: t('sort.new', 'Yeni') },
+          { key: 'mostLiked', label: t('sort.best', 'En İyiler') },
+          { key: 'mostDisliked', label: t('sort.worst', 'En Kötüler') },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            className={`left-cache-tab${activeLeftCacheType === tab.key ? ' is-active' : ''}`}
+            onClick={() => setActiveLeftCacheType(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* ─── Cache Widgets ────── */}
       {activeLeftCacheType === 'recent' && (

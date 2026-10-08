@@ -1,18 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import {
-  Bot,
-  ChevronDown,
-  Layers,
-  Moon,
-  PaintbrushVertical,
-  Podium,
-  ShieldQuestion,
-  Sun,
-  Users,
-} from 'lucide-react'
-import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
-import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
+import { Link } from 'react-router-dom'
+import { Bot, ChevronDown, Moon, PaintbrushVertical, Sun } from 'lucide-react'
 import useThemeStore from '../../store/themeStore'
 import { useTranslation } from 'react-i18next'
 
@@ -27,14 +15,13 @@ const LANGS = [
 ]
 
 /**
- * Mobil sol drawer'ın alt bölümü: ikon-only hızlı bağlantılar (masaüstü
- * üst bardaki ikon grubuyla aynı), tema (açık/koyu/yeşil) anahtarı,
+ * Mobil sol drawer'ın alt bölümü: tema (açık/koyu/yeşil) anahtarı,
  * dil dropdown'ı ve footer bağlantıları. Masaüstünde bunlar üst bardadır.
+ * Hızlı bağlantı ikonları mobil üst bardaki gruba taşındı.
  */
 export default function MobileDrawerExtras() {
   const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
   const { t, i18n } = useTranslation()
-  const navigate = useNavigate()
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef(null)
 
@@ -51,63 +38,8 @@ export default function MobileDrawerExtras() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [isLangOpen])
 
-  // Masaüstü üst bardaki ikon grubuyla birebir aynı ikonlar
-  const quickLinks = [
-    {
-      key: 'leaderboard',
-      label: t('topbar.leaderboard', 'Liderlik Tablosu'),
-      icon: <Podium size={19} strokeWidth={2.2} />,
-      to: '/leaderboard?type=user',
-    },
-    {
-      key: 'tribes',
-      label: t('topbar.tribes', 'Klanlar'),
-      icon: <Users size={19} strokeWidth={2.2} />,
-      to: '/tribes',
-    },
-    {
-      key: 'debates',
-      label: t('topbar.active_debates', 'Aktif Meydan Okumalar'),
-      icon: <AngryBotWithSwordsIcon size={19} />,
-      to: '/active-debates',
-    },
-    {
-      key: 'marketplace',
-      label: t('card.marketplace', 'Kart Marketi'),
-      icon: <BotFlashCardsIcon size={19} />,
-      to: '/marketplace',
-    },
-    {
-      key: 'cards',
-      label: t('card.cards', 'Kartlarım'),
-      icon: <Layers size={19} strokeWidth={2.2} />,
-      to: '/cards',
-    },
-    {
-      key: 'concepts',
-      label: t('basic_concepts.title', 'Temel Kavramlar'),
-      icon: <ShieldQuestion size={19} strokeWidth={2.2} />,
-      to: '/basic-concepts',
-    },
-  ]
-
   return (
     <div className="mobile-drawer-extras">
-      <div className="mobile-drawer-extras__quick">
-        {quickLinks.map((l) => (
-          <button
-            key={l.key}
-            type="button"
-            className="mobile-drawer-quick-link"
-            title={l.label}
-            aria-label={l.label}
-            onClick={() => navigate(l.to)}
-          >
-            {l.icon}
-          </button>
-        ))}
-      </div>
-
       <div className="mobile-drawer-extras__row">
         <button type="button" className="mobile-drawer-extra-btn" onClick={toggleTheme}>
           {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
