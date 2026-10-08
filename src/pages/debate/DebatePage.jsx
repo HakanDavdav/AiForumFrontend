@@ -754,7 +754,7 @@ export default function DebatePage() {
   }, [messages, phase])
 
   if (!isValidDebateId) {
-    return <div className="p-8 text-center text-red-500">No valid debate ID specified.</div>
+    return <div className="p-8 text-center text-red-500">{t('debate.invalid_id', 'Geçerli bir tartışma kimliği belirtilmedi.')}</div>
   }
 
   const isProponentWinner =
@@ -818,7 +818,6 @@ export default function DebatePage() {
         <div
           className={`debate-proposition-container ${isTopicExpanded ? 'expanded' : ''}`}
           onClick={() => setIsTopicExpanded(!isTopicExpanded)}
-          title={!isTopicExpanded ? 'Genişletmek için tıkla' : 'Daraltmak için tıkla'}
         >
           <h2 className="debate-proposition-text">{proposition}</h2>
         </div>
@@ -1083,7 +1082,7 @@ export default function DebatePage() {
                       <AngryBotWithSwordsIcon size={22} color="#fff" />
                     </div>
                     <div className="verdict-banner__text">
-                      <span className="verdict-banner__title">Debate Winner</span>
+                      <span className="verdict-banner__title">{t('debate.winner_title', 'Meydan Okuma Kazananı')}</span>
                       <span className="verdict-banner__winner">{verdict?.winnerName}</span>
                     </div>
                   </div>
@@ -1092,7 +1091,7 @@ export default function DebatePage() {
                     onClick={() => navigate('/')}
                     style={{ display: 'flex', alignItems: 'center', gap: 6 }}
                   >
-                    <ArrowLeft size={16} /> Back to Feed
+                    <ArrowLeft size={16} /> {t('common.back_to_feed', 'Akışa Dön')}
                   </button>
                 </div>
               )}
@@ -1106,7 +1105,7 @@ export default function DebatePage() {
           {juries.length > 0 && (
             <div className="jury-panel">
               <div className="jury-panel__title">
-                <span>Juries</span>
+                <span>{t('debate.juries_title', 'Jüri Heyeti')}</span>
               </div>
               <div className="jury-grid">
                 {juries.map((jury, idx) => {
@@ -1160,9 +1159,9 @@ export default function DebatePage() {
                   <AngryBotWithSwordsIcon size={26} color="#fff" />
                 </div>
                 <div className="verdict-banner__text">
-                  <span className="verdict-banner__title">Debate Concluded</span>
+                  <span className="verdict-banner__title">{t('debate.concluded_title', 'Meydan Okuma Tamamlandı')}</span>
                   <span className="verdict-banner__winner">
-                    Winner: <strong>{verdict.winnerName || 'Draw'}</strong> (
+                    {t('debate.winner_label', 'Kazanan')}: <strong>{verdict.winnerName || t('debate.draw', 'Berabere')}</strong> (
                     {verdict.proponentScore} - {verdict.opponentScore})
                   </span>
                 </div>
@@ -1172,7 +1171,7 @@ export default function DebatePage() {
                 onClick={() => navigate('/')}
                 style={{ display: 'flex', alignItems: 'center', gap: 6 }}
               >
-                <ArrowLeft size={16} /> Ana Sayfaya Dön
+                <ArrowLeft size={16} /> {t('common.back_to_home', 'Ana Sayfaya Dön')}
               </button>
             </div>
           )}

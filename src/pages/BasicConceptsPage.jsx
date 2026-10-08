@@ -21,6 +21,8 @@ import HeartSvg from '../assets/FigmaNew/heart.svg?react'
 const themedStyle = { color: 'var(--color-primary)' }
 const TUTORIAL_DORMANT_ARROWS = ['Arrow_3']
 const TRIBE_DORMANT_ARROWS = ['Arrow_8', 'Arrow_9', 'Arrow_2', 'Arrow_3', 'Arrow']
+const TUTORIAL_FOSSIL_BOTS = ['Bot_3']
+const TRIBE_FOSSIL_BOTS = ['Bot_3', 'Bot_2', 'Bot_7']
 
 const descriptionStyle = {
   margin: 0,
@@ -214,6 +216,10 @@ export default function BasicConceptsPage() {
           stroke: var(--color-dormant) !important;
           color: var(--color-dormant) !important;
         }
+
+        .fossil-bot-overlay svg path {
+          fill: var(--color-dormant);
+        }
       `}</style>
 
       <div className="flex items-center gap-3 px-2" style={{ marginBottom: 12 }}>
@@ -357,6 +363,89 @@ export default function BasicConceptsPage() {
           </TextColumn>
         </Section>
 
+        <Section title={t('hierarchy_info.section_heartbeat_title', 'Heartbeat')}>
+          <VisualStage>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'clamp(10px, 2vw, 20px)',
+                width: '100%',
+              }}
+            >
+              <div
+                style={{
+                  flex: '0 0 auto',
+                  width: 'min(24%, 146px)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <ArrowCardTravel
+                  Svg={TutorialBotSpreadSvg}
+                  widthPct={100}
+                  svgStyle={themedStyle}
+                  pulseInterval={4000}
+                  onPulse={handlePulse}
+                />
+              </div>
+              <div
+                style={{
+                  flex: '1 1 0px',
+                  minWidth: 0,
+                  maxWidth: 420,
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <ArrowCardTravel
+                  Svg={TribeTutorialSvg}
+                  widthPct={100}
+                  svgStyle={themedStyle}
+                  pulseInterval={4000}
+                />
+              </div>
+              <div
+                key={pulseCount}
+                style={{
+                  width: 60,
+                  height: 60,
+                  color: 'var(--color-primary)',
+                  animation: 'heartBeat 0.6s ease',
+                  flexShrink: 0,
+                }}
+              >
+                <HeartSvg
+                  width={60}
+                  height={60}
+                  style={{ display: 'block', width: '100%', height: '100%' }}
+                />
+              </div>
+            </div>
+          </VisualStage>
+          <TextColumn>
+            <Description>
+              {t(
+                'hierarchy_info.heartbeat_desc',
+                'Belirli aralıklarla çalışan heartbeat ile, ebeveyn bot mevcut Kişilik Kartlarını çocuk botlarına aktarma fırsatı yakalar. Kartın'
+              )}{' '}
+              <InlineContingency />{' '}
+              {t(
+                'hierarchy_info.heartbeat_desc_2',
+                'bu transferin gerçekleşip gerçekleşmeyeceğini belirler. Böylece botunuza yeni eklediğiniz bir kart zamanla alt hiyerarşiye de yayılabilir.'
+              )}
+            </Description>
+            <Description style={{ marginTop: 8 }}>
+              {t(
+                'hierarchy_info.heartbeat_desc_3',
+                'Heartbeat yalnızca çocuk botlarla sınırlı değildir: yetkili botlar kendi Kişilik Kartlarını klanlarına da aktarabilir; bu kartlar klan aracılığıyla üye botlara yayılır.'
+              )}
+            </Description>
+          </TextColumn>
+        </Section>
+
         <Section title={t('hierarchy_info.section_tutorial_title', 'Manipülasyon Riski')}>
           <VisualStage>
             <ArrowCardTravel Svg={TutorialSvg} widthPct={68} svgStyle={themedStyle} />
@@ -451,57 +540,6 @@ export default function BasicConceptsPage() {
           </TextColumn>
         </Section>
 
-        <Section title={t('hierarchy_info.section_heartbeat_title', 'Heartbeat')}>
-          <VisualStage>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 28,
-                width: '100%',
-              }}
-            >
-              <ArrowCardTravel
-                Svg={TutorialBotSpreadSvg}
-                widthPct={24}
-                svgStyle={themedStyle}
-                pulseInterval={4000}
-                onPulse={handlePulse}
-              />
-              <div
-                key={pulseCount}
-                style={{
-                  width: 48,
-                  height: 48,
-                  color: 'var(--color-primary)',
-                  animation: 'heartBeat 0.6s ease',
-                  flexShrink: 0,
-                }}
-              >
-                <HeartSvg
-                  width={48}
-                  height={48}
-                  style={{ display: 'block', width: '100%', height: '100%' }}
-                />
-              </div>
-            </div>
-          </VisualStage>
-          <TextColumn>
-            <Description>
-              {t(
-                'hierarchy_info.heartbeat_desc',
-                'Belirli aralıklarla çalışan heartbeat ile, ebeveyn bot mevcut Kişilik Kartlarını çocuk botlarına aktarma fırsatı yakalar. Kartın'
-              )}{' '}
-              <InlineContingency />{' '}
-              {t(
-                'hierarchy_info.heartbeat_desc_2',
-                'bu transferin gerçekleşip gerçekleşmeyeceğini belirler. Böylece botunuza yeni eklediğiniz bir kart zamanla alt hiyerarşiye de yayılabilir.'
-              )}
-            </Description>
-          </TextColumn>
-        </Section>
-
         <Section
           title={t('hierarchy_info.section_seasonal_reset_title', 'Sezonluk Döngü ve Sıfırlama')}
         >
@@ -531,6 +569,7 @@ export default function BasicConceptsPage() {
                   svgStyle={themedStyle}
                   className="dormant-tutorial-container"
                   dormantArrowIds={TUTORIAL_DORMANT_ARROWS}
+                  fossilBotIds={TUTORIAL_FOSSIL_BOTS}
                 />
               </div>
               <div
@@ -548,6 +587,7 @@ export default function BasicConceptsPage() {
                   svgStyle={themedStyle}
                   className="dormant-tribe-container"
                   dormantArrowIds={TRIBE_DORMANT_ARROWS}
+                  fossilBotIds={TRIBE_FOSSIL_BOTS}
                 />
               </div>
             </div>

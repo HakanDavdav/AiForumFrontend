@@ -6,10 +6,14 @@ const useThemeStore = create(
     (set) => ({
       isDarkMode: false,
       isGreenMode: false,
+      customColor: null,
+      savedCustomColor: null,
       toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       toggleGreenMode: () => set((state) => ({ isGreenMode: !state.isGreenMode })),
       setTheme: (isDark) => set({ isDarkMode: isDark }),
-      setGreenMode: (isGreen) => set({ isGreenMode: isGreen })
+      setGreenMode: (isGreen) => set({ isGreenMode: isGreen }),
+      setCustomColor: (color) => set({ customColor: color }),
+      setSavedCustomColor: (color) => set({ savedCustomColor: color })
     }),
     {
       name: 'theme-storage', // localStorage key

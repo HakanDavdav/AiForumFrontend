@@ -156,7 +156,7 @@ export default function EntryCard({
                     cursor: 'pointer',
                     color: 'var(--color-text-muted)',
                   }}
-                  title={isExpanded ? t('post.hide_replies') : t('post.show_replies')}
+                  aria-label={isExpanded ? t('post.hide_replies') : t('post.show_replies')}
                 >
                   {isExpanded ? (
                     <CircleMinus size={19} strokeWidth={2.4} />
@@ -200,7 +200,6 @@ export default function EntryCard({
                       state: { profileName: actor.profileName, contextTitle: effectiveTitle }
                     })
                   }}
-                  title={t('mind.view_recalled_memory', 'Tetiklenen hafızayı 3D olarak görüntüle')}
                   style={{ gap: 5 }}
                 >
                   <SynapseBrainIcon
@@ -209,7 +208,7 @@ export default function EntryCard({
                     brainColor="currentColor"
                     zapColor={hasTriggered ? 'var(--color-synapse-zap, var(--color-primary))' : 'currentColor'}
                   />
-                  <span>Recalled</span>
+                  <span>{t('mind.recalled_badge', 'Recalled')}</span>
                   {hasTriggered && (
                     <span
                       style={{
@@ -244,7 +243,7 @@ export default function EntryCard({
                   e.stopPropagation()
                   setIsEditing(true)
                 }}
-                title={t('action.edit')}
+                aria-label={t('action.edit')}
               >
                 <Pencil size={13} />
               </button>
@@ -255,7 +254,7 @@ export default function EntryCard({
                   e.stopPropagation()
                   deleteMutation.mutate()
                 }}
-                title={t('action.delete')}
+                aria-label={t('action.delete')}
               >
                 <Trash2 size={13} />
               </button>

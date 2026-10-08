@@ -419,11 +419,6 @@ export default function ProfilePage() {
           isCurrentUserPremium ? 'btn btn-sm' : 'btn btn-primary btn-sm profile-premium-btn'
         }
         onClick={() => setIsPremiumOpen(true)}
-        title={
-          isCurrentUserPremium
-            ? t('premium.manage_subscription', 'Premium Üyeliği Yönet')
-            : t('premium.title', 'Premium')
-        }
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -459,7 +454,6 @@ export default function ProfilePage() {
           className={`btn btn-sm ${activeProfileTheme === Theme.Mind ? 'btn-primary' : 'btn-outline'}`}
           onClick={() => handleSelectTheme(Theme.Mind)}
           disabled={themeMutation.isPending}
-          title={t('topbar.mind_ambience', 'Mind Arka Planı')}
           aria-label={t('topbar.mind_ambience', 'Mind Arka Planı')}
           style={{
             flex: 1,
@@ -490,7 +484,6 @@ export default function ProfilePage() {
           className={`btn btn-sm ${activeProfileTheme === Theme.Welcome ? 'btn-primary' : 'btn-outline'}`}
           onClick={() => handleSelectTheme(Theme.Welcome)}
           disabled={themeMutation.isPending}
-          title={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
           aria-label={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
           style={{
             flex: 1,
@@ -520,7 +513,6 @@ export default function ProfilePage() {
           className={`btn btn-sm ${activeProfileTheme === Theme.Bots ? 'btn-primary' : 'btn-outline'}`}
           onClick={() => handleSelectTheme(Theme.Bots)}
           disabled={themeMutation.isPending}
-          title={t('topbar.ambient_bots', 'Bot Arka Planı')}
           aria-label={t('topbar.ambient_bots', 'Bot Arka Planı')}
           style={{
             flex: 1,
@@ -993,7 +985,6 @@ export default function ProfilePage() {
                     <span
                       key={key}
                       className={`bot-capability-emblem bot-capability-emblem--${tone}`}
-                      title={label}
                       aria-label={label}
                       role="img"
                     >
@@ -1009,7 +1000,6 @@ export default function ProfilePage() {
                     <span
                       key={key}
                       className={`bot-capability-emblem bot-capability-emblem--${tone}`}
-                      title={label}
                       aria-label={label}
                       role="img"
                     >
@@ -1255,7 +1245,6 @@ export default function ProfilePage() {
             <div
               className="profile-stat-box"
               onClick={() => setModifiersModalOpen(true)}
-              title={t('profile.modifiers_tooltip', 'Modifiers & Statü Detayları')}
             >
               <span
                 className="profile-stat-value"
@@ -1331,7 +1320,7 @@ export default function ProfilePage() {
               className="profile-limits-toggle"
               onClick={toggleLimits}
               aria-expanded={isLimitsExpanded}
-              title={t(
+              aria-label={t(
                 'profile.limits_header_desc',
                 isLimitsExpanded
                   ? 'Limitler ve miras detaylarını gizle'
@@ -1356,10 +1345,6 @@ export default function ProfilePage() {
             >
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.bot_ownership_limit_desc',
-                  'Maksimum sahip olunabilir bot sayısı'
-                )}
               >
                 <Bot size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.bot_ownership_limit', 'Bot Sahiplik Limiti')}:</span>
@@ -1371,7 +1356,6 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum klan sayısı')}
               >
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.tribe_limit', 'Klan Limiti')}:</span>
@@ -1382,10 +1366,6 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.daily_debate_limit_desc',
-                  'Eşzamanlı/günlük tartışma ve meydan okuma hakkı'
-                )}
               >
                 <AngryBotWithSwordsIcon
                   size={25}
@@ -1406,10 +1386,6 @@ export default function ProfilePage() {
             >
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.bot_ownership_limit_desc',
-                  'Maksimum sahip olunabilir bot sayısı'
-                )}
               >
                 <Bot size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.bot_ownership_limit', 'Bot Sahiplik Limiti')}:</span>
@@ -1421,7 +1397,6 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t('profile.tribe_limit_desc', 'Dahil olunabilecek maksimum klan sayısı')}
               >
                 <Users size={25} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
                 <span>{t('profile.tribe_limit', 'Klan Limiti')}:</span>
@@ -1432,7 +1407,6 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t('profile.daily_debate_limit_desc', 'Eşzamanlı aktif meydan okuma hakkı')}
               >
                 <AngryBotWithSwordsIcon
                   size={25}
@@ -1464,10 +1438,6 @@ export default function ProfilePage() {
             >
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.card_ownership_limit_desc',
-                  'Maksimum sahip olunabilir kişilik kartı sayısı'
-                )}
               >
                 <BotFlashCardsIcon
                   size={25}
@@ -1486,10 +1456,6 @@ export default function ProfilePage() {
                   <span className="profile-limit-divider">•</span>
                   <div
                     className="profile-limit-chip"
-                    title={t(
-                      'profile.bot_assignment_limit_desc',
-                      'Maksimum atanabilir kişilik kartı sayısı'
-                    )}
                   >
                     <BotFlashCardsIcon
                       size={25}
@@ -1506,10 +1472,6 @@ export default function ProfilePage() {
               <span className="profile-limit-divider">•</span>
               <div
                 className="profile-limit-chip"
-                title={t(
-                  'profile.card_inheritance_chance_desc',
-                  'Kişilik kartı kalıtım ve miras alma olasılığı'
-                )}
               >
                 <CardContingencyIcon
                   size={25}
@@ -1531,10 +1493,6 @@ export default function ProfilePage() {
                     <span className="profile-limit-divider">•</span>
                     <div
                       className="profile-limit-chip"
-                      title={t(
-                        'profile.card_inheritance_modifier_desc',
-                        'Dereceye bağlı ek kişilik kartı miras çarpanı'
-                      )}
                     >
                       <CardContingencyModifierIcon
                         size={42}

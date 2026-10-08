@@ -12,6 +12,22 @@
   --color-primary-shadow: rgba(59, 130, 246, 0.3);
   --color-synapse-zap: var(--color-primary);
 
+  /* Personality Card Theme Tokens (Premium özel renk ile override edilir) */
+  --pc-filled-bg: linear-gradient(135deg, #93c5fd 0%, #e0f2fe 100%);
+  --pc-filled-border: #2563eb;
+  --pc-filled-eyebrow: #1d4ed8;
+  --pc-filled-badge-bg: rgba(37, 99, 235, 0.08);
+  --pc-filled-badge-text: #1d4ed8;
+  --pc-filled-badge-border: rgba(37, 99, 235, 0.15);
+  --pc-filled-shadow: 0 4px 14px rgba(37, 99, 235, 0.16);
+  --pc-tribe-bg: linear-gradient(135deg, #3b82f6 0%, #8cbffc 100%);
+  --pc-tribe-border: #1d4ed8;
+  --pc-tribe-eyebrow: #1e3a8a;
+  --pc-tribe-badge-bg: rgba(30, 58, 138, 0.12);
+  --pc-tribe-badge-text: #1e3a8a;
+  --pc-tribe-badge-border: rgba(30, 58, 138, 0.25);
+  --pc-tribe-shadow: 0 4px 14px rgba(29, 78, 216, 0.16);
+
   --color-bg: #ffffff;
   --color-surface: #f8fafc;
   --color-surface-2: #f1f5f9;
@@ -272,65 +288,65 @@
 
 /* General Filled card color adjustments - Richer */
 .personality-card--filled {
-  background: linear-gradient(135deg, #93c5fd 0%, #e0f2fe 100%) !important;
-  border-color: #2563eb !important;
+  background: var(--pc-filled-bg) !important;
+  border-color: var(--pc-filled-border) !important;
   border-width: 2px !important;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.16) !important;
+  box-shadow: var(--pc-filled-shadow) !important;
 }
 .personality-card--filled .personality-card__eyebrow {
-  color: #1d4ed8 !important;
+  color: var(--pc-filled-eyebrow) !important;
 }
 .personality-card--filled .personality-card__type-badge {
-  background: rgba(37, 99, 235, 0.08) !important;
-  color: #1d4ed8 !important;
-  border-color: rgba(37, 99, 235, 0.15) !important;
+  background: var(--pc-filled-badge-bg) !important;
+  color: var(--pc-filled-badge-text) !important;
+  border-color: var(--pc-filled-badge-border) !important;
 }
 
 /* Tribe-assigned card color adjustments - Darker for Light Mode */
 .personality-card--tribe-assigned {
-  background: linear-gradient(135deg, #3b82f6 0%, #8cbffc 100%) !important;
-  border-color: #1d4ed8 !important;
+  background: var(--pc-tribe-bg) !important;
+  border-color: var(--pc-tribe-border) !important;
   border-width: 2px !important;
-  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.16) !important;
+  box-shadow: var(--pc-tribe-shadow) !important;
 }
 .personality-card--tribe-assigned .personality-card__eyebrow {
-  color: #1e3a8a !important;
+  color: var(--pc-tribe-eyebrow) !important;
 }
 .personality-card--tribe-assigned .personality-card__type-badge {
-  background: rgba(30, 58, 138, 0.12) !important;
-  color: #1e3a8a !important;
-  border-color: rgba(30, 58, 138, 0.25) !important;
+  background: var(--pc-tribe-badge-bg) !important;
+  color: var(--pc-tribe-badge-text) !important;
+  border-color: var(--pc-tribe-badge-border) !important;
 }
 
 /* Dark Mode Overrides */
 :root.dark .personality-card--filled {
-  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%) !important;
-  border-color: #3b82f6 !important;
+  background: var(--pc-filled-bg) !important;
+  border-color: var(--pc-filled-border) !important;
   border-width: 2px !important;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.22) !important;
+  box-shadow: var(--pc-filled-shadow) !important;
 }
 :root.dark .personality-card--filled .personality-card__eyebrow {
-  color: #93c5fd !important;
+  color: var(--pc-filled-eyebrow) !important;
 }
 :root.dark .personality-card--filled .personality-card__type-badge {
-  background: rgba(59, 130, 246, 0.12) !important;
-  color: #93c5fd !important;
-  border-color: rgba(59, 130, 246, 0.2) !important;
+  background: var(--pc-filled-badge-bg) !important;
+  color: var(--pc-filled-badge-text) !important;
+  border-color: var(--pc-filled-badge-border) !important;
 }
 
 :root.dark .personality-card--tribe-assigned {
-  background: linear-gradient(135deg, #2f6aef 0%, #213d96 100%) !important;
-  border-color: #60a5fa !important;
+  background: var(--pc-tribe-bg) !important;
+  border-color: var(--pc-tribe-border) !important;
   border-width: 2px !important;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.16) !important;
+  box-shadow: var(--pc-tribe-shadow) !important;
 }
 :root.dark .personality-card--tribe-assigned .personality-card__eyebrow {
-  color: #bfdbfe !important;
+  color: var(--pc-tribe-eyebrow) !important;
 }
 :root.dark .personality-card--tribe-assigned .personality-card__type-badge {
-  background: rgba(96, 165, 250, 0.15) !important;
-  color: #bfdbfe !important;
-  border-color: rgba(96, 165, 250, 0.25) !important;
+  background: var(--pc-tribe-badge-bg) !important;
+  color: var(--pc-tribe-badge-text) !important;
+  border-color: var(--pc-tribe-badge-border) !important;
 }
 
 /* Green Theme Overrides */
@@ -926,6 +942,21 @@
   --color-primary-gradient-end: #60a5fa;
   --color-primary-shadow: rgba(59, 130, 246, 0.3);
   --color-synapse-zap: var(--color-primary-dark);
+
+  --pc-filled-bg: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  --pc-filled-border: #3b82f6;
+  --pc-filled-eyebrow: #93c5fd;
+  --pc-filled-badge-bg: rgba(59, 130, 246, 0.12);
+  --pc-filled-badge-text: #93c5fd;
+  --pc-filled-badge-border: rgba(59, 130, 246, 0.2);
+  --pc-filled-shadow: 0 4px 14px rgba(59, 130, 246, 0.22);
+  --pc-tribe-bg: linear-gradient(135deg, #2f6aef 0%, #213d96 100%);
+  --pc-tribe-border: #60a5fa;
+  --pc-tribe-eyebrow: #bfdbfe;
+  --pc-tribe-badge-bg: rgba(96, 165, 250, 0.15);
+  --pc-tribe-badge-text: #bfdbfe;
+  --pc-tribe-badge-border: rgba(96, 165, 250, 0.25);
+  --pc-tribe-shadow: 0 4px 14px rgba(59, 130, 246, 0.16);
 }
 
 :root.theme-green {
@@ -1665,6 +1696,28 @@ html.dark .bot-capability-emblem--fossil path {
   animation: themeToggleToBlue 0.5s ease-in-out;
 }
 
+@keyframes themeToggleShake {
+  0% {
+    transform: translateX(0) rotate(0) scale(1);
+  }
+
+  35% {
+    transform: translateX(-2px) rotate(-10deg) scale(1.15);
+  }
+
+  65% {
+    transform: translateX(2px) rotate(10deg) scale(1.15);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0) scale(1);
+  }
+}
+
+.theme-toggle-shake svg {
+  animation: themeToggleShake 0.5s ease-in-out;
+}
+
 .actor-avatar-bot-badge {
   background: var(--color-bot);
 }
@@ -2244,6 +2297,17 @@ html.dark .bot-capability-emblem--fossil path {
   background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
   color: var(--color-primary);
   box-shadow: 0 4px 14px var(--color-primary-shadow);
+}
+
+.vtree-fossil-pill--sm {
+  gap: 4px;
+  padding: 2px 7px;
+  font-size: 10px;
+}
+
+.vtree-fossil-pill--sm .badge-fossil-icon {
+  width: 12px;
+  height: 12px;
 }
 
 .vtree-fossil-pill--expanded {

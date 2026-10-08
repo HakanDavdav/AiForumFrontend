@@ -803,7 +803,6 @@ export default function PremiumModal({ isOpen, onClose }) {
                     type="button"
                     className={`btn btn-sm ${activeThemeIndex === 0 ? 'btn-primary' : 'btn-outline'}`}
                     onClick={() => setActiveThemeIndex(0)}
-                    title={t('topbar.mind_ambience', 'Mind Arka Planı')}
                     aria-label={t('topbar.mind_ambience', 'Mind Arka Planı')}
                     style={{
                       width: 38,
@@ -832,7 +831,6 @@ export default function PremiumModal({ isOpen, onClose }) {
                     type="button"
                     className={`btn btn-sm ${activeThemeIndex === 1 ? 'btn-primary' : 'btn-outline'}`}
                     onClick={() => setActiveThemeIndex(1)}
-                    title={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
                     aria-label={t('topbar.welcome_ambience', 'Welcome Arka Planı')}
                     style={{
                       width: 38,
@@ -861,7 +859,6 @@ export default function PremiumModal({ isOpen, onClose }) {
                     type="button"
                     className={`btn btn-sm ${activeThemeIndex === 2 ? 'btn-primary' : 'btn-outline'}`}
                     onClick={() => setActiveThemeIndex(2)}
-                    title={t('topbar.ambient_bots', 'Bot Arka Planı')}
                     aria-label={t('topbar.ambient_bots', 'Bot Arka Planı')}
                     style={{
                       width: 38,
@@ -1160,7 +1157,6 @@ export default function PremiumModal({ isOpen, onClose }) {
                     padding: '8px 14px',
                     color: 'var(--color-text-secondary)',
                   }}
-                  title={t('premium.manage_portal_tooltip', 'Fatura ve ödeme yöntemlerinizi Stripe üzerinde yönetin')}
                 >
                   {portalMutation.isPending ? (
                     <Loader2 size={14} className="animate-spin" />

@@ -378,7 +378,6 @@ export default function HierarchyPage() {
               onClick={() => {
                 if (actorId) navigate(`/profile?actorId=${actorId}`)
               }}
-              title={t('common.open_profile', 'Profili aç')}
               style={{
                 fontWeight: 700,
                 fontSize: 15,
@@ -482,7 +481,7 @@ export default function HierarchyPage() {
               type="button"
               className="btn btn-ghost btn-sm"
               onClick={() => setZoomLevel((z) => Math.min(2.0, +(z + 0.05).toFixed(2)))}
-              title={t('hierarchy.zoom_in', 'Büyüt (+)')}
+              aria-label={t('hierarchy.zoom_in', 'Büyüt (+)')}
               style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <Plus size={14} />
@@ -491,7 +490,7 @@ export default function HierarchyPage() {
               type="button"
               className="btn btn-ghost btn-sm"
               onClick={() => setZoomLevel((z) => Math.max(0.05, +(z - 0.05).toFixed(2)))}
-              title={t('hierarchy.zoom_out', 'Küçült (-)')}
+              aria-label={t('hierarchy.zoom_out', 'Küçült (-)')}
               style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
               <Minus size={14} />
@@ -526,11 +525,10 @@ export default function HierarchyPage() {
               className="btn btn-primary btn-sm"
               onClick={handleDefaultView}
               disabled={!treeData}
-              title={t('hierarchy.default_view', 'Varsayılan görünüme dön')}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
             >
               <Focus size={13} />
-              <span>Default</span>
+              <span>{t('hierarchy.default_view', 'Varsayılan')}</span>
             </button>
 
             <div style={{ width: 1, height: 18, background: 'var(--color-border)' }} />
@@ -541,11 +539,6 @@ export default function HierarchyPage() {
               className={`btn btn-primary btn-sm btn-fossil-toggle ${showFossils ? 'btn-fossil-toggle--active' : ''}`}
               onClick={() => setShowFossils((prev) => !prev)}
               disabled={!treeData}
-              title={
-                showFossils
-                  ? t('hierarchy.hide_fossils_tooltip', 'Fosilleşmiş birimleri gizle')
-                  : t('hierarchy.show_fossils_tooltip', 'Fosilleşmiş birimleri göster')
-              }
               style={{
                 display: 'flex',
                 alignItems: 'center',

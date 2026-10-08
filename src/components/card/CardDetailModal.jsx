@@ -122,7 +122,7 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
       iconSize: 20,
       label: t('card.prompt', 'Kişilik Promptu'),
       value: personalityPrompt || (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-danger)' }} title={t('card.not_creator', 'Orijinal prompta erişmek için yaratıcısı olmalısınız.')}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--color-danger)' }}>
           <Crown size={16} /> 
           {t('card.hidden_prompt', 'Gizli (Yalnızca Yaratıcı)')}
         </span>
@@ -211,7 +211,6 @@ export default function CardDetailModal({ card, isOpen, onClose, onEditClick = n
                   onClose()
                   onEditClick(card)
                 }}
-                title={t('action.edit', 'Düzenle')}
                 aria-label={t('action.edit', 'Düzenle')}
                 style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)' }}
               >

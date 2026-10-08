@@ -20,7 +20,6 @@ export function TopicTag({ topicType, size = 'sm', onClick }) {
         padding: size === 'sm' ? '2px 8px' : '3px 12px',
       }}
       onClick={onClick}
-      title={label}
     >
       {label}
     </span>

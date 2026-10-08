@@ -129,7 +129,6 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
                       >
                         {acqType === 0 && (
                           <span
-                            title={t('card.creator_badge', 'Bu kartın yaratıcısı')}
                             style={{
                               color: 'var(--color-warning)',
                               filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.5))',
@@ -142,7 +141,6 @@ export default function CardActorListModal({ cardId, type, isOpen, onClose }) {
                         )}
                         {acqType === 1 && (
                           <span
-                            title={t('card.purchaser_badge', 'Bu kartı satın aldı')}
                             style={{
                               display: 'inline-flex',
                               alignItems: 'center',

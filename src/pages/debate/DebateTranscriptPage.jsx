@@ -269,7 +269,6 @@ export default function DebateTranscriptPage() {
           <div
             className={`debate-proposition-container ${isTopicExpanded ? 'expanded' : ''}`}
             onClick={() => setIsTopicExpanded(!isTopicExpanded)}
-            title={!isTopicExpanded ? t('common.click_to_expand', 'Genişletmek için tıkla') : t('common.click_to_collapse', 'Daraltmak için tıkla')}
           >
             <h2 className="debate-proposition-text">{debate.proposition || t('debate.no_proposition', 'Önerme belirtilmedi')}</h2>
           </div>

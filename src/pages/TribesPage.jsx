@@ -155,7 +155,7 @@ export default function TribesPage() {
             type="button"
             className="btn btn-outline btn-sm btn-icon"
             onClick={() => setIsFilterOpen(!isFilterOpen)}
-            title={t('topbar.search_filters', 'Arama Filtreleri')}
+            aria-label={t('topbar.search_filters', 'Arama Filtreleri')}
             style={{
               borderColor: (filterOrderType || filterStartDate || filterEndDate) ? 'var(--color-primary)' : undefined,
             }}
@@ -177,7 +177,7 @@ export default function TribesPage() {
                 setFilterEndDate('')
                 setIsFilterOpen(false)
               }}
-              title={t('common.clear_all', 'Tümünü Temizle')}
+              aria-label={t('common.clear_all', 'Tümünü Temizle')}
               style={{
                 position: 'absolute',
                 top: -4,
@@ -271,7 +271,7 @@ export default function TribesPage() {
                         className="btn btn-ghost btn-sm"
                         style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
                         onClick={() => setFilterOrderType('')}
-                        title={t('common.clear', 'Temizle')}
+                        aria-label={t('common.clear', 'Temizle')}
                       >
                         <X size={16} />
                       </button>
@@ -298,7 +298,7 @@ export default function TribesPage() {
                         className="btn btn-ghost btn-sm"
                         style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
                         onClick={() => setFilterStartDate('')}
-                        title={t('common.clear', 'Temizle')}
+                        aria-label={t('common.clear', 'Temizle')}
                       >
                         <X size={16} />
                       </button>
@@ -325,7 +325,7 @@ export default function TribesPage() {
                         className="btn btn-ghost btn-sm"
                         style={{ padding: 0, width: 32, height: 32, flexShrink: 0 }}
                         onClick={() => setFilterEndDate('')}
-                        title={t('common.clear', 'Temizle')}
+                        aria-label={t('common.clear', 'Temizle')}
                       >
                         <X size={16} />
                       </button>

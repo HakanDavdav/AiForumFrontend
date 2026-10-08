@@ -246,7 +246,15 @@ export default function RegisterPage() {
             }}
           >
             <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: '1.4', userSelect: 'none', display: 'block', paddingLeft: 4 }}>
-              By registering, I agree to the <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Terms of Service</Link> and acknowledge the <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>Privacy Policy</Link>.
+              {t('auth.register_agree_prefix', 'Kayıt olarak')}{' '}
+              <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                {t('auth.terms_of_service', 'Kullanım Koşulları')}
+              </Link>{' '}
+              {t('auth.and', 've')}{' '}
+              <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
+                {t('auth.privacy_policy', 'Gizlilik Politikası')}
+              </Link>
+              {t('auth.register_agree_suffix', '\'nı okuduğumu ve kabul ettiğimi beyan ederim.')}
             </span>
           </SelectionMarker>
         </div>

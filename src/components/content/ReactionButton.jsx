@@ -247,7 +247,7 @@ export default function ReactionButton({
                   onShowReactions && onShowReactions(type)
                 }}
                 className="tiny-reaction-list-btn"
-                title={t('card.see_list')}
+                aria-label={t('card.see_list')}
               >
                 <CirclePlus size={14} />
               </button>

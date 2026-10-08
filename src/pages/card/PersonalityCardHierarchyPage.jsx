@@ -286,9 +286,6 @@ function CardTreeNode({
                 onToggleAncestor(fossilAncestors[fossilAncestors.length - 1].id)
               }
             }}
-            title={t('hierarchy.show_fossil_ancestor_tooltip', {
-              name: fossilAncestors.map((a) => a.data?.profileName || a.data?.tribeName || a.id).join(' → '),
-            })}
           >
             <TRexSkullIcon className="badge-fossil-icon" />
             {fossilAncestors.length > 1 && (
@@ -311,7 +308,7 @@ function CardTreeNode({
                 onToggleAncestor(node.id)
               }
             }}
-            title={t('hierarchy.collapse_fossil_ancestor_tooltip', 'Fosil atayı daralt ve alt birimleri doğrudan üste bağla')}
+            aria-label={t('hierarchy.collapse_fossil_ancestor_tooltip', 'Fosil atayı daralt ve alt birimleri doğrudan üste bağla')}
           >
             <TRexSkullIcon className="badge-fossil-icon" />
             <CircleMinus size={12} strokeWidth={2.4} />
@@ -348,7 +345,6 @@ function CardTreeNode({
               justifyContent: 'center',
               pointerEvents: 'none',
             }}
-            title={t('card.owner_badge', 'Kart Sahibi')}
           >
             <Crown size={12} strokeWidth={2.5} />
           </div>
@@ -375,7 +371,6 @@ function CardTreeNode({
               alignItems: 'center',
               gap: 3,
             }}
-            title={t('card.deleted_bridge_hint', 'Bu düğüm silinmiş ancak soy ağacı için köprü olarak korunuyor')}
           >
             <CircleAlert size={10} />
             <span>{t('card.tombstone', 'Köprü (Feshedildi)')}</span>
@@ -445,7 +440,6 @@ function CardTreeNode({
                   <div
                     key={idx}
                     className="vtree-tribe-bot-icon"
-                    title={t('common.bot', 'Bot')}
                   >
                     <BotIcon size={26} />
                   </div>
@@ -462,7 +456,6 @@ function CardTreeNode({
                     gap: 4,
                     padding: '2px 0 4px',
                   }}
-                  title={t('common.more', 'Daha fazla')}
                 >
                   {[0, 1, 2].map((dotIdx) => (
                     <span
@@ -520,7 +513,7 @@ function CardTreeNode({
               e.stopPropagation()
               setIsCollapsed((c) => !c)
             }}
-            title={
+            aria-label={
               isCollapsed
                 ? t('hierarchy.expand', 'Genişlet')
                 : t('hierarchy.collapse', 'Daralt')
@@ -584,7 +577,7 @@ function CardTreeNode({
                     type="button"
                     className={`vtree-fossil-pill ${effectiveFossilExpanded ? 'vtree-fossil-pill--expanded' : ''}`}
                     onClick={() => setLocalFossilExpanded(!effectiveFossilExpanded)}
-                    title={
+                    aria-label={
                       effectiveFossilExpanded
                         ? t('hierarchy.hide_fossils', 'Fosilleşmiş alt birimleri daralt')
                         : t('hierarchy.show_fossils', 'Fosilleşmiş alt birimleri göster')
@@ -987,7 +980,6 @@ export default function PersonalityCardHierarchyPage() {
               onClick={() => {
                 navigate('/cards')
               }}
-              title={t('common.open_cards', 'Kartları aç')}
               style={{
                 fontWeight: 700,
                 fontSize: 15,
@@ -1032,7 +1024,6 @@ export default function PersonalityCardHierarchyPage() {
               color: 'var(--color-text-secondary)',
               padding: '0 4px',
             }}
-            title={t('card.total_owners', 'Toplam Sahip Sayısı')}
           >
             <Crown size={14} color="var(--color-warning)" />
             <span>{ownersCount}</span>
@@ -1052,7 +1043,6 @@ export default function PersonalityCardHierarchyPage() {
               color: 'var(--color-text-secondary)',
               padding: '0 4px',
             }}
-            title={t('card.total_assignments', 'Toplam Atama Sayısı')}
           >
             <BotIconLucide size={14} color="var(--color-primary)" />
             <span>{assignmentsCount}</span>
@@ -1079,7 +1069,7 @@ export default function PersonalityCardHierarchyPage() {
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => setZoomLevel((z) => Math.min(2.0, +(z + 0.1).toFixed(2)))}
-            title={t('hierarchy.zoom_in', 'Büyüt (+)')}
+            aria-label={t('hierarchy.zoom_in', 'Büyüt (+)')}
             style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <Plus size={14} />
@@ -1088,7 +1078,7 @@ export default function PersonalityCardHierarchyPage() {
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => setZoomLevel((z) => Math.max(0.05, +(z - 0.1).toFixed(2)))}
-            title={t('hierarchy.zoom_out', 'Küçült (-)')}
+            aria-label={t('hierarchy.zoom_out', 'Küçült (-)')}
             style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <Minus size={14} />
@@ -1116,11 +1106,10 @@ export default function PersonalityCardHierarchyPage() {
             className="btn btn-primary btn-sm"
             onClick={handleDefaultView}
             disabled={!treeRoot}
-            title={t('hierarchy.default_view', 'Varsayılan görünüme dön')}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
           >
             <Focus size={13} />
-            <span>Default</span>
+            <span>{t('hierarchy.default_view', 'Varsayılan')}</span>
           </button>
 
           <div style={{ width: 1, height: 18, background: 'var(--color-border)' }} />
@@ -1131,11 +1120,6 @@ export default function PersonalityCardHierarchyPage() {
             className={`btn btn-primary btn-sm btn-fossil-toggle ${showFossils ? 'btn-fossil-toggle--active' : ''}`}
             onClick={() => setShowFossils((prev) => !prev)}
             disabled={!treeRoot}
-            title={
-              showFossils
-                ? t('hierarchy.hide_fossils_tooltip', 'Fosilleşmiş birimleri gizle')
-                : t('hierarchy.show_fossils_tooltip', 'Fosilleşmiş birimleri göster')
-            }
             style={{
               display: 'flex',
               alignItems: 'center',

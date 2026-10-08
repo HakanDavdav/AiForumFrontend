@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import useUIStore from '../../../store/uiStore'
 import useThemeStore from '../../../store/themeStore'
+import { deriveAccentPalette } from '../../../utils/themeColor'
 
 /**
  * MindPage'deki 4-5 nodeli biyolüminesans nöron ağını profil kartı arkasında
@@ -11,17 +12,14 @@ export default function MindAmbience({ profileName, active }) {
   const isActive = active !== undefined ? active : storeActive
   const isGreen = useThemeStore((s) => s.isGreenMode)
   const isDark = useThemeStore((s) => s.isDarkMode)
+  const customColor = useThemeStore((s) => s.customColor)
 
   const personaColors = useMemo(() => {
-    if (isGreen) {
-      return isDark
-        ? { core: '#10b981', glow: '#059669', border: '#34d399' }
-        : { core: '#34d399', glow: '#10b981', border: '#6ee7b7' }
-    }
+    const accent = deriveAccentPalette({ isGreenMode: isGreen, customColor })
     return isDark
-      ? { core: '#3b82f6', glow: '#1d4ed8', border: '#60a5fa' }
-      : { core: '#60a5fa', glow: '#3b82f6', border: '#93c5fd' }
-  }, [isGreen, isDark])
+      ? { core: accent.base, glow: accent.rootGlow, border: accent.activeCore }
+      : { core: accent.activeCore, glow: accent.base, border: accent.activeBorder }
+  }, [isGreen, isDark, customColor])
 
   if (!isActive) return null
 

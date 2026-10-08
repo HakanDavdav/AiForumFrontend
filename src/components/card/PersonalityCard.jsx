@@ -9,6 +9,7 @@ import ActorAvatar from '../actor/ActorAvatar'
 import TribeMinimalCard from '../tribe/TribeMinimalCard'
 import SelectionMarker from '../common/SelectionMarker'
 import IconActionButton from '../common/IconActionButton'
+import FossilTogglePill from '../common/FossilTogglePill'
 import BotIcon from '../common/icons/BotIcon'
 
 export default function PersonalityCard({
@@ -46,6 +47,9 @@ export default function PersonalityCard({
   const navigate = useNavigate()
   const [modalType, setModalType] = useState(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [showFossilSources, setShowFossilSources] = useState(false)
+  const [showFossilTargets, setShowFossilTargets] = useState(false)
+  const [showFossilAssigned, setShowFossilAssigned] = useState(false)
 
   if (variant === 'distribute') {
     const actorData = actor || card?.actor || card?.winnerActor || {}
@@ -180,7 +184,7 @@ export default function PersonalityCard({
                 e.stopPropagation()
                 onToggleEditorLock(!editorLocked)
               }}
-              title={
+              aria-label={
                 editorLocked
                   ? t('card.locked_assignment', 'Bu atama kilitli')
                   : t('card.lock_assignment', 'Bu atamayı kilitle')
@@ -245,10 +249,10 @@ export default function PersonalityCard({
 
         {editorConfirmed && (
           <div className="personality-card__stats personality-card-editor__confirmed-stats">
-            <span className="personality-card__stat" title={t('card.owners', 'Sahipler')}>
+            <span className="personality-card__stat">
               <Crown size={12} />0
             </span>
-            <span className="personality-card__stat" title={t('card.assignees', 'Atanmış Botlar')}>
+            <span className="personality-card__stat">
               <Bot size={12} />0
             </span>
           </div>
@@ -442,6 +446,74 @@ export default function PersonalityCard({
   const assignmentTargets = sortByDormantStatus(collectAssignmentNodes(resolveTargetNode))
   const hasAssignmentFlow = assignmentSources.length > 0 || assignmentTargets.length > 0
 
+  const countDormantNodes = (nodes) => nodes.filter((node) => isEntityDormant(node)).length
+  const fossilSourceCount = countDormantNodes(assignmentSources)
+  const fossilTargetCount = countDormantNodes(assignmentTargets)
+  const fossilAssignedCount = countDormantNodes(assignedNodes)
+  const visibleAssignmentSources = showFossilSources
+    ? assignmentSources
+    : assignmentSources.filter((node) => !isEntityDormant(node))
+  const visibleAssignmentTargets = showFossilTargets
+    ? assignmentTargets
+    : assignmentTargets.filter((node) => !isEntityDormant(node))
+  const visibleAssignedNodes = showFossilAssigned
+    ? assignedNodes
+    : assignedNodes.filter((node) => !isEntityDormant(node))
+
+  const renderAssignedNodeColumn = (
+    nodes,
+    fossilCount,
+    showFossils,
+    onToggleFossils,
+    keyPrefix,
+    renderCard
+  ) => {
+    const pill = (
+      <FossilTogglePill
+        count={fossilCount}
+        open={showFossils}
+        onToggle={onToggleFossils}
+        small
+        title={t('card.show_fossil_assignments', 'Fosilleşmiş atamaları göster')}
+        titleOpen={t('card.hide_fossil_assignments', 'Fosilleşmiş atamaları gizle')}
+      />
+    )
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          gap: 2,
+          flex: 1,
+          minWidth: 0,
+        }}
+      >
+        {nodes.map((node, index) => {
+          const nodeKey = `${keyPrefix}-${node.type}-${node.data?.actorId || node.data?.tribeId}`
+          const cardNode = renderCard(node, nodeKey)
+          if (index !== 0) return cardNode
+          return (
+            <div
+              key={`${nodeKey}-fossil-toggle`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                maxWidth: '100%',
+                minWidth: 0,
+              }}
+            >
+              {cardNode}
+              {pill}
+            </div>
+          )
+        })}
+        {nodes.length === 0 && pill}
+      </div>
+    )
+  }
+
   // Effective lock state: either the explicit `locked` prop or the assignment data's own
   // IsLocked flag (CardAssignmentProjectionDto.isLocked) coming from assignment-centric renders.
   const effectiveLocked = Boolean(
@@ -531,7 +603,6 @@ export default function PersonalityCard({
         >
           {currentAcqType === 0 && (
             <span
-              title={t('card.creator_badge', 'Bu kartın yaratıcısısınız (Tüm haklar sizde)')}
               style={{
                 color: 'var(--color-warning)',
                 filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
@@ -544,7 +615,6 @@ export default function PersonalityCard({
           )}
           {currentAcqType === 1 && (
             <span
-              title={t('card.purchaser_badge', 'Bu kartı satın aldınız')}
               style={{
                 color: '#b87333',
                 filter: 'drop-shadow(0px 2px 2px rgba(0,0,0,0.5))',
@@ -574,7 +644,7 @@ export default function PersonalityCard({
           )}
           {isAssignmentLocked && (
             <span
-              title={t('card.locked_assignment', 'Bu atama kilitli')}
+              aria-label={t('card.locked_assignment', 'Bu atama kilitli')}
               onClick={
                 showLockToggle
                   ? (e) => {
@@ -610,7 +680,7 @@ export default function PersonalityCard({
               e.stopPropagation()
               onToggleLock(personalityCardId ?? card)
             }}
-            title={
+            aria-label={
               lockToggleActive
                 ? t('card.locked_assignment', 'Bu atama kilitli')
                 : t('card.lock_assignment', 'Bu atamayı kilitle')
@@ -637,7 +707,7 @@ export default function PersonalityCard({
               e.stopPropagation()
               onEditClick(card)
             }}
-            title={t('action.edit', 'Düzenle')}
+            aria-label={t('action.edit', 'Düzenle')}
             style={{
               width: 26,
               height: 26,
@@ -744,20 +814,16 @@ export default function PersonalityCard({
                       >
                         {t('card.assigned_label', 'Assigned')}:
                       </span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          gap: 2,
-                          flex: 1,
-                          minWidth: 0,
-                        }}
-                      >
-                        {assignmentSources.map((node) =>
+                      {renderAssignedNodeColumn(
+                        visibleAssignmentSources,
+                        fossilSourceCount,
+                        showFossilSources,
+                        () => setShowFossilSources((value) => !value),
+                        'src',
+                        (node, nodeKey) =>
                           node.type === 'tribe' ? (
                             <TribeMinimalCard
-                              key={`src-tribe-${node.data.tribeId}`}
+                              key={nodeKey}
                               tribeId={node.data.tribeId}
                               tribeName={node.data.tribeName}
                               tribePoint={node.data.tribePoint}
@@ -771,7 +837,7 @@ export default function PersonalityCard({
                             />
                           ) : (
                             <ActorMinimalCard
-                              key={`src-actor-${node.data.actorId}`}
+                              key={nodeKey}
                               actor={node.data}
                               showHierarchyBtn={false}
                               showMindBtn={false}
@@ -781,8 +847,7 @@ export default function PersonalityCard({
                               variant="compact"
                             />
                           )
-                        )}
-                      </div>
+                      )}
                     </div>
                   )}
 
@@ -799,20 +864,16 @@ export default function PersonalityCard({
                       >
                         {t('card.assigned_label', 'Assigned')}:
                       </span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'flex-start',
-                          gap: 2,
-                          flex: 1,
-                          minWidth: 0,
-                        }}
-                      >
-                        {assignmentTargets.map((node) =>
+                      {renderAssignedNodeColumn(
+                        visibleAssignmentTargets,
+                        fossilTargetCount,
+                        showFossilTargets,
+                        () => setShowFossilTargets((value) => !value),
+                        'tgt',
+                        (node, nodeKey) =>
                           node.type === 'tribe' ? (
                             <TribeMinimalCard
-                              key={`tgt-tribe-${node.data.tribeId}`}
+                              key={nodeKey}
                               tribeId={node.data.tribeId}
                               tribeName={node.data.tribeName}
                               tribePoint={node.data.tribePoint}
@@ -826,7 +887,7 @@ export default function PersonalityCard({
                             />
                           ) : (
                             <ActorMinimalCard
-                              key={`tgt-actor-${node.data.actorId}`}
+                              key={nodeKey}
                               actor={node.data}
                               showHierarchyBtn={false}
                               showMindBtn={false}
@@ -836,8 +897,7 @@ export default function PersonalityCard({
                               variant="compact"
                             />
                           )
-                        )}
-                      </div>
+                      )}
                     </div>
                   )}
                 </>
@@ -854,20 +914,16 @@ export default function PersonalityCard({
                     >
                       {t('card.assigned_label', 'Assigned')}:
                     </span>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        gap: 2,
-                        flex: 1,
-                        minWidth: 0,
-                      }}
-                    >
-                      {assignedNodes.map((node) =>
+                    {renderAssignedNodeColumn(
+                      visibleAssignedNodes,
+                      fossilAssignedCount,
+                      showFossilAssigned,
+                      () => setShowFossilAssigned((value) => !value),
+                      'assigned',
+                      (node, nodeKey) =>
                         node.type === 'tribe' ? (
                           <TribeMinimalCard
-                            key={`assigned-tribe-${node.data.tribeId}`}
+                            key={nodeKey}
                             {...node.data}
                             isDormant={node.data.isDormant ?? node.data.IsDormant}
                             variant="compact"
@@ -878,7 +934,7 @@ export default function PersonalityCard({
                           />
                         ) : (
                           <ActorMinimalCard
-                            key={`assigned-actor-${node.data.actorId}`}
+                            key={nodeKey}
                             actor={node.data}
                             showHierarchyBtn={false}
                             showMindBtn={false}
@@ -888,8 +944,7 @@ export default function PersonalityCard({
                             variant="compact"
                           />
                         )
-                      )}
-                    </div>
+                    )}
                   </div>
                 )
               )}
@@ -911,7 +966,7 @@ export default function PersonalityCard({
                 setIsDetailOpen(true)
               }}
               className="personality-card__stat"
-              title={t('card.details', 'Kart Detayları')}
+              aria-label={t('card.details', 'Kart Detayları')}
             >
               <Info size={12} />
             </button>
@@ -922,7 +977,7 @@ export default function PersonalityCard({
                 if (personalityCardId) setModalType('owners')
               }}
               className="personality-card__stat"
-              title={t('card.owners', 'Sahipler')}
+              aria-label={t('card.owners', 'Sahipler')}
             >
               <Crown size={12} />
               {ownershipCount}
@@ -934,7 +989,7 @@ export default function PersonalityCard({
                 if (personalityCardId) setModalType('assignees')
               }}
               className="personality-card__stat"
-              title={t('card.assignees', 'Atanmış Botlar')}
+              aria-label={t('card.assignees', 'Atanmış Botlar')}
             >
               <Bot size={12} />
               {assignmentCount}
@@ -949,7 +1004,7 @@ export default function PersonalityCard({
                 e.stopPropagation()
                 navigate(`/card-hierarchy?cardId=${personalityCardId}`)
               }}
-              title={t('card.view_hierarchy', 'Kart Hiyerarşisi')}
+              aria-label={t('card.view_hierarchy', 'Kart Hiyerarşisi')}
             >
               <Network size={18} strokeWidth={2} />
             </button>

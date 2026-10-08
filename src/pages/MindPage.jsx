@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import useThemeStore from '../store/themeStore'
+import { deriveAccentPalette } from '../utils/themeColor'
 import ForceGraph3D from 'react-force-graph-3d'
 import * as THREE from 'three'
 import { actorApi } from '../api/actorApi'
@@ -43,18 +44,16 @@ const NEURON_COLORS = {
 }
 
 function getActiveNeuronColor() {
-  const isGreen = useThemeStore.getState().isGreenMode
-  return isGreen
-    ? { core: '#34d399', glow: '#10b981' } // Canlı Neon Zümrüt Yeşili
-    : { core: '#60a5fa', glow: '#3b82f6' } // Canlı Neon Siber Mavi
+  const { isGreenMode, customColor } = useThemeStore.getState()
+  const accent = deriveAccentPalette({ isGreenMode, customColor })
+  return { core: accent.activeCore, glow: accent.activeGlow }
 }
 
 function getNeuronColor(label, isRoot = false) {
-  const isGreen = useThemeStore.getState().isGreenMode
+  const { isGreenMode, customColor } = useThemeStore.getState()
+  const accent = deriveAccentPalette({ isGreenMode, customColor })
   if (label === 'Persona' || isRoot) {
-    return isGreen
-      ? { core: '#10b981', glow: '#059669' } // Canlı Zümrüt Yeşili
-      : { core: '#3b82f6', glow: '#1d4ed8' } // Siber Mavi
+    return { core: accent.base, glow: accent.rootGlow }
   }
   return NEURON_COLORS[label] || NEURON_COLORS.default
 }
@@ -404,22 +403,21 @@ function strHash(str) {
 }
 
 // Global shader uniforms (Biyolüminesans elektrik impulsu)
-const isInitialGreen = typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isGreenMode : false
+const initialAccent = deriveAccentPalette({
+  isGreenMode: typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isGreenMode : false,
+  customColor: typeof useThemeStore !== 'undefined' ? useThemeStore.getState().customColor : null,
+})
 const globalUniforms = {
   uTime: { value: 0 },
   uPulseColor: {
-    value: new THREE.Vector3(
-      isInitialGreen ? 0.2 : 0.23,
-      isInitialGreen ? 0.83 : 0.51,
-      isInitialGreen ? 0.6 : 0.98
-    ),
+    value: new THREE.Vector3(...initialAccent.pulseRgb),
   },
 }
 
 // ─── MindAmbience Sinaps Bağlantı Materyalleri ────────────────────────────────
 // 1. Sinaps ana omurga yolu (MindAmbience stroke="var(--color-border)" strokeWidth="1.6" strokeOpacity="0.5")
 const _synapseTrackMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#064e3b' : '#1e293b',
+  color: initialAccent.trackDark,
   transparent: true,
   opacity: 0.4,
   depthWrite: false,
@@ -427,7 +425,7 @@ const _synapseTrackMat = new THREE.MeshBasicMaterial({
 
 // 2. Sinaps dış eterik ışıma halesi (MindAmbience filter="url(#synapseGlow)" strokeOpacity="0.15")
 const _synapseHaloMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#10b981' : '#3b82f6',
+  color: initialAccent.activeGlow,
   transparent: true,
   opacity: 0.16,
   blending: THREE.AdditiveBlending,
@@ -439,7 +437,7 @@ const _synapseDashShaderMat = new THREE.ShaderMaterial({
   uniforms: {
     uTime: globalUniforms.uTime,
     uColor: {
-      value: new THREE.Color(isInitialGreen ? '#34d399' : '#60a5fa'),
+      value: new THREE.Color(initialAccent.activeCore),
     },
   },
   vertexShader: `
@@ -481,7 +479,7 @@ const _synapseDashShaderMat = new THREE.ShaderMaterial({
 
 // 4. Seyahat eden darbe küresi (Traveling Pulse Orb) ışıma materyalleri
 const _orbGlowMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#34d399' : '#60a5fa',
+  color: initialAccent.activeCore,
   transparent: true,
   opacity: 0.75,
   blending: THREE.AdditiveBlending,
@@ -489,7 +487,7 @@ const _orbGlowMat = new THREE.MeshBasicMaterial({
 })
 
 const _orbCoronaMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#10b981' : '#3b82f6',
+  color: initialAccent.activeGlow,
   transparent: true,
   opacity: 0.25,
   blending: THREE.AdditiveBlending,
@@ -498,14 +496,14 @@ const _orbCoronaMat = new THREE.MeshBasicMaterial({
 
 // 5. Aktif / Recalled bağlantılar için güçlü, parıltılı nöral sinaps materyalleri
 const _activeSynapseTrackMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#059669' : '#2563eb',
+  color: initialAccent.deepMid,
   transparent: true,
   opacity: 0.85,
   depthWrite: false,
 })
 
 const _activeSynapseHaloMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#34d399' : '#60a5fa',
+  color: initialAccent.activeCore,
   transparent: true,
   opacity: 0.65,
   blending: THREE.AdditiveBlending,
@@ -516,7 +514,7 @@ const _activeSynapseDashShaderMat = new THREE.ShaderMaterial({
   uniforms: {
     uTime: globalUniforms.uTime,
     uColor: {
-      value: new THREE.Color(isInitialGreen ? '#6ee7b7' : '#93c5fd'),
+      value: new THREE.Color(initialAccent.activeBorder),
     },
   },
   vertexShader: `
@@ -555,7 +553,7 @@ const _activeSynapseDashShaderMat = new THREE.ShaderMaterial({
 })
 
 const _activeOrbGlowMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#6ee7b7' : '#93c5fd',
+  color: initialAccent.activeBorder,
   transparent: true,
   opacity: 0.95,
   blending: THREE.AdditiveBlending,
@@ -563,7 +561,7 @@ const _activeOrbGlowMat = new THREE.MeshBasicMaterial({
 })
 
 const _activeOrbCoronaMat = new THREE.MeshBasicMaterial({
-  color: isInitialGreen ? '#34d399' : '#60a5fa',
+  color: initialAccent.activeCore,
   transparent: true,
   opacity: 0.5,
   blending: THREE.AdditiveBlending,
@@ -582,9 +580,10 @@ function buildCapillaryObject(link) {
       link?.isRecalled ||
       (link?.source?.isActive && link?.target?.isActive)
     )
-    const isGreen = useThemeStore.getState().isGreenMode
-    const isDark = typeof useThemeStore !== 'undefined' ? useThemeStore.getState().isDarkMode : true
-    const cacheKey = `${link.name}_${isGreen}_${isRecalled}_${isDark ? 'dark' : 'light'}`
+    const { isGreenMode, customColor, isDarkMode } = useThemeStore.getState()
+    const accent = deriveAccentPalette({ isGreenMode, customColor })
+    const isDark = typeof useThemeStore !== 'undefined' ? isDarkMode : true
+    const cacheKey = `${link.name}_${accent.base}_${isRecalled}_${isDark ? 'dark' : 'light'}`
     if (!linkLabelCache.has(cacheKey)) {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
@@ -598,18 +597,13 @@ function buildCapillaryObject(link) {
     if (isDark) {
       if (isRecalled) {
           // Koyu Tema Recalled: Parlayan neon hap, elektrik gradyan ve beyaz yazı
-          ctx.shadowColor = isGreen ? 'rgba(52, 211, 153, 0.7)' : 'rgba(96, 165, 250, 0.7)'
+          ctx.shadowColor = accent.shadowDark
           ctx.shadowBlur = 24
           ctx.shadowOffsetY = 0
 
           const bgGrad = ctx.createLinearGradient(12, 12, rectWidth + 12, 84)
-          if (isGreen) {
-            bgGrad.addColorStop(0, '#064e3b')
-            bgGrad.addColorStop(1, '#065f46')
-          } else {
-            bgGrad.addColorStop(0, '#1e3a8a')
-            bgGrad.addColorStop(1, '#1d4ed8')
-          }
+          bgGrad.addColorStop(0, accent.darkBgStart)
+          bgGrad.addColorStop(1, accent.darkBgEnd)
           ctx.fillStyle = bgGrad
         } else {
           ctx.fillStyle = 'rgba(10, 15, 25, 0.9)'
@@ -619,42 +613,33 @@ function buildCapillaryObject(link) {
         ctx.fill()
         ctx.shadowColor = 'transparent'
 
-        ctx.strokeStyle = isRecalled
-          ? (isGreen ? '#34d399' : '#60a5fa')
-          : (isGreen ? '#10b981' : '#3b82f6')
+        ctx.strokeStyle = isRecalled ? accent.activeCore : accent.activeGlow
         ctx.lineWidth = isRecalled ? 4.5 : 3
         ctx.stroke()
 
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.font = 'bold 44px Inter, sans-serif'
-        ctx.fillStyle = isRecalled
-          ? '#ffffff'
-          : (isGreen ? '#a7f3d0' : '#bfdbfe')
+        ctx.fillStyle = isRecalled ? '#ffffff' : accent.light
         ctx.fillText(link.name, canvas.width / 2, 48)
       } else {
         // Modern Açık Tema
         if (isRecalled) {
           // Vurgulu Recalled Anı Bağlantısı: Zengin, canlı elektrik mavi/yeşil gradyan, parlak rim, saf beyaz yazı
-          ctx.shadowColor = isGreen ? 'rgba(5, 150, 105, 0.45)' : 'rgba(37, 99, 235, 0.45)'
+          ctx.shadowColor = accent.shadowLight
           ctx.shadowBlur = 22
           ctx.shadowOffsetY = 4
 
           const bgGrad = ctx.createLinearGradient(12, 12, rectWidth + 12, 84)
-          if (isGreen) {
-            bgGrad.addColorStop(0, '#047857')
-            bgGrad.addColorStop(1, '#059669')
-          } else {
-            bgGrad.addColorStop(0, '#1d4ed8')
-            bgGrad.addColorStop(1, '#2563eb')
-          }
+          bgGrad.addColorStop(0, accent.lightBgStart)
+          bgGrad.addColorStop(1, accent.lightBgEnd)
           ctx.fillStyle = bgGrad
           ctx.beginPath()
           ctx.roundRect(12, 12, rectWidth, 72, 18)
           ctx.fill()
           ctx.shadowColor = 'transparent'
 
-          ctx.strokeStyle = isGreen ? '#6ee7b7' : '#93c5fd'
+          ctx.strokeStyle = accent.activeBorder
           ctx.lineWidth = 4.5
           ctx.stroke()
 
@@ -1040,6 +1025,11 @@ export default function MindPage() {
 
   const isGreenMode = useThemeStore((s) => s.isGreenMode)
   const isDarkMode = useThemeStore((s) => s.isDarkMode)
+  const customColor = useThemeStore((s) => s.customColor)
+  const accent = useMemo(
+    () => deriveAccentPalette({ isGreenMode, customColor }),
+    [isGreenMode, customColor]
+  )
 
   const bgColor = isDarkMode ? '#09090b' : '#f8fafc'
   const headerBg = isDarkMode ? 'rgba(9, 9, 11, 0.85)' : 'rgba(255, 255, 255, 0.88)'
@@ -1049,64 +1039,61 @@ export default function MindPage() {
     linkLabelCache.clear()
     nodeTextureCache.clear()
     nodeBadgeCache.clear()
-    const green = isGreenMode
     const dark = isDarkMode
 
     // Omurga yolu: Koyu temada koyu tonlar, Açık temada soft modern gri/zümrüt
-    _synapseTrackMat.color.set(dark ? (green ? '#064e3b' : '#1e293b') : (green ? '#a7f3d0' : '#cbd5e1'))
+    _synapseTrackMat.color.set(dark ? accent.trackDark : accent.trackLight)
     _synapseTrackMat.opacity = dark ? 0.4 : 0.65
 
     // Dış hale materyali: Koyu temada Additive, Açık temada NormalBlending
-    _synapseHaloMat.color.set(green ? '#10b981' : '#3b82f6')
+    _synapseHaloMat.color.set(accent.activeGlow)
     _synapseHaloMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
-    _synapseHaloMat.opacity = dark ? (green ? 0.18 : 0.15) : 0.24
+    _synapseHaloMat.opacity = dark ? (isGreenMode ? 0.18 : 0.15) : 0.24
     _synapseHaloMat.needsUpdate = true
 
     // Dolaşan orblar
-    _orbGlowMat.color.set(dark ? (green ? '#34d399' : '#60a5fa') : (green ? '#059669' : '#2563eb'))
+    _orbGlowMat.color.set(dark ? accent.activeCore : accent.deepMid)
     _orbGlowMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
     _orbGlowMat.needsUpdate = true
 
-    _orbCoronaMat.color.set(green ? '#10b981' : '#3b82f6')
+    _orbCoronaMat.color.set(accent.activeGlow)
     _orbCoronaMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
     _orbCoronaMat.needsUpdate = true
 
     // Aktif recalled bağlantı materyalleri
-    _activeSynapseTrackMat.color.set(dark ? (green ? '#059669' : '#2563eb') : (green ? '#34d399' : '#60a5fa'))
+    _activeSynapseTrackMat.color.set(dark ? accent.deepMid : accent.activeCore)
     _activeSynapseTrackMat.opacity = dark ? 0.6 : 0.75
 
-    _activeSynapseHaloMat.color.set(green ? '#34d399' : '#60a5fa')
+    _activeSynapseHaloMat.color.set(accent.activeCore)
     _activeSynapseHaloMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
     _activeSynapseHaloMat.needsUpdate = true
 
-    _activeOrbGlowMat.color.set(dark ? (green ? '#6ee7b7' : '#93c5fd') : (green ? '#10b981' : '#3b82f6'))
+    _activeOrbGlowMat.color.set(dark ? accent.activeBorder : accent.activeGlow)
     _activeOrbGlowMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
     _activeOrbGlowMat.needsUpdate = true
 
-    _activeOrbCoronaMat.color.set(green ? '#34d399' : '#60a5fa')
+    _activeOrbCoronaMat.color.set(accent.activeCore)
     _activeOrbCoronaMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
     _activeOrbCoronaMat.needsUpdate = true
 
     if (_synapseDashShaderMat.uniforms.uColor) {
-      _synapseDashShaderMat.uniforms.uColor.value.set(dark ? (green ? '#34d399' : '#60a5fa') : (green ? '#059669' : '#2563eb'))
+      _synapseDashShaderMat.uniforms.uColor.value.set(dark ? accent.activeCore : accent.deepMid)
       _synapseDashShaderMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
       _synapseDashShaderMat.needsUpdate = true
     }
     if (_activeSynapseDashShaderMat.uniforms.uColor) {
-      _activeSynapseDashShaderMat.uniforms.uColor.value.set(dark ? (green ? '#6ee7b7' : '#93c5fd') : (green ? '#10b981' : '#2563eb'))
+      _activeSynapseDashShaderMat.uniforms.uColor.value.set(
+        dark ? accent.activeBorder : accent.activeDashLight
+      )
       _activeSynapseDashShaderMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending
       _activeSynapseDashShaderMat.needsUpdate = true
     }
 
-    globalUniforms.uPulseColor.value.set(
-      green ? 0.2 : 0.23,
-      green ? 0.83 : 0.51,
-      green ? 0.6 : 0.98
-    )
+    globalUniforms.uPulseColor.value.set(...accent.pulseRgb)
     if (fgRef.current && typeof fgRef.current.refresh === 'function') {
       fgRef.current.refresh()
     }
-  }, [isGreenMode, isDarkMode])
+  }, [accent, isDarkMode, isGreenMode])
 
   const [selectedNode, setSelectedNode] = useState(null)
   const [nodeSearch, setNodeSearch] = useState('')
@@ -1302,7 +1289,7 @@ export default function MindPage() {
       nodes,
       links: linksArr,
     }
-  }, [rawData, tribeId, actorId, rootName, highlightIds, focusNodeParam, isGreenMode])
+  }, [rawData, tribeId, actorId, rootName, highlightIds, focusNodeParam, isGreenMode, customColor])
 
   const sortedNodes = useMemo(() => {
     return [...graphData.nodes].sort((a, b) => {
@@ -1541,7 +1528,7 @@ export default function MindPage() {
           >
             <button
               onClick={() => navigate(-1)}
-              title={t('common.back', 'Geri')}
+              aria-label={t('common.back', 'Geri')}
               style={{
                 width: 30,
                 height: 30,
@@ -1653,8 +1640,8 @@ export default function MindPage() {
                   width: 8,
                   height: 8,
                   borderRadius: '50%',
-                  background: isGreenMode ? '#34d399' : '#60a5fa',
-                  boxShadow: `0 0 0 2.5px ${isGreenMode ? 'rgba(52, 211, 153, 0.32)' : 'rgba(96, 165, 250, 0.32)'}, 0 0 8px ${isGreenMode ? '#34d399' : '#60a5fa'}`,
+                  background: accent.activeCore,
+                  boxShadow: `0 0 0 2.5px ${hexToRgba(accent.activeCore, 0.32)}, 0 0 8px ${accent.activeCore}`,
                   flexShrink: 0,
                 }}
               />
@@ -1676,7 +1663,7 @@ export default function MindPage() {
 
             {/* 2. Düğüm Tipleri (Persona, Tribe, Someone, Thought) */}
             {[
-              { color: isGreenMode ? '#10b981' : '#3b82f6', label: tribeId ? t('mind.labels.tribe_root', 'Tribe (Root)') : t('mind.labels.persona', 'Persona') },
+              { color: accent.activeGlow, label: tribeId ? t('mind.labels.tribe_root', 'Tribe (Root)') : t('mind.labels.persona', 'Persona') },
               { color: NEURON_COLORS.Tribe.core, label: tribeId ? t('mind.labels.other_tribes', 'Other Tribes') : t('mind.labels.tribe', 'Tribe') },
               { color: NEURON_COLORS.Actor.core, label: t('mind.labels.actor', 'Someone') },
               { color: NEURON_COLORS.GeneralThought.core, label: t('mind.labels.general_thought', 'Thought') },
@@ -1720,11 +1707,10 @@ export default function MindPage() {
                   fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
                 }
               }}
-              title={t('hierarchy.default_view', 'Varsayılan görünüme dön')}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
             >
               <Focus size={13} />
-              <span>Default</span>
+              <span>{t('hierarchy.default_view', 'Varsayılan')}</span>
             </button>
           </div>
         </div>
@@ -1876,7 +1862,7 @@ export default function MindPage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Brain size={16} style={{ color: isGreenMode ? '#10b981' : '#3b82f6' }} />
+                    <Brain size={16} style={{ color: accent.activeGlow }} />
                     <span style={{ fontSize: 13, fontWeight: 700, color: isDarkMode ? '#f0e6ff' : '#111827' }}>
                       {t('mind.memories_title', 'Anılar')}
                     </span>
@@ -1907,7 +1893,7 @@ export default function MindPage() {
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
-                    title={isNodeListCollapsed ? t('common.expand', 'Genişlet') : t('common.collapse', 'Daralt')}
+                    aria-label={isNodeListCollapsed ? t('common.expand', 'Genişlet') : t('common.collapse', 'Daralt')}
                   >
                     <span
                       style={{
