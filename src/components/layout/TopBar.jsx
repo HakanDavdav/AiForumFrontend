@@ -513,6 +513,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
     <header className="layout-topbar">
       {/* ─── Row 1 ─── */}
       <div
+        className="topbar-row topbar-row-1"
         style={{
           height: 56,
           display: 'flex',
@@ -523,8 +524,12 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
         }}
       >
         {/* Hamburger (mobil) */}
-        <button className="btn-icon" onClick={toggleLeftDrawer} style={{ display: 'none' }}>
-          <Menu size={20} />
+        <button
+          className="btn-icon topbar-menu-btn"
+          onClick={toggleLeftDrawer}
+          aria-label={t('topbar.menu', 'Menü')}
+        >
+          <Menu size={22} />
         </button>
 
         {/* Bletchly Logo Resized & Season Countdown */}
@@ -552,6 +557,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           >
             <Logo width={36} height={48} fill="var(--color-primary)" />
             <span
+              className="topbar-brand-text"
               style={{
                 fontWeight: 800,
                 fontSize: 26,
@@ -1117,8 +1123,19 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           </button>
         </form>
 
+        {/* Mobil arama ikonu (≤900px) */}
+        <button
+          type="button"
+          className="btn-icon topbar-search-icon-btn"
+          onClick={() => navigate('/search')}
+          aria-label={t('topbar.search')}
+        >
+          <Search size={20} />
+        </button>
+
         {/* Right: user info */}
         <div
+          className="topbar-right-group"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -1553,6 +1570,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
 
       {/* ─── Row 2 ─── */}
       <div
+        className="topbar-row topbar-row-2"
         style={{
           height: 56,
           display: 'flex',

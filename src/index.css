@@ -1224,7 +1224,14 @@ select {
 }
 
 .layout-footer {
-  /* Flex container'in en altÄ±nda durmasÄ± iÃ§in */
+  /* Flex container'in en altında durması için */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--color-text-muted);
   height: var(--footer-height);
   background: var(--color-bg);
   border-top: 1px solid var(--color-border);
@@ -4232,4 +4239,163 @@ textarea {
 
 .season-option-btn.active {
   background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+/* ════════════════════════════════════════════════════════════════════ */
+/* MOBILE RESPONSIVE GLOBAL — (≤900px / ≤640px)                        */
+/* ════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  /* iOS Safari 16px altı input'larda otomatik zoom yapar → önle */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .layout-center-inner {
+    padding: 10px 10px 12px !important;
+  }
+
+  /* Dokunma hedefleri (≥40px) */
+  .btn-icon {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .icon-action-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Kartlar / içerik */
+  .post-card {
+    padding: 14px 12px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+  }
+
+  .post-card-title {
+    font-size: 17px;
+  }
+
+  .post-card-content {
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
+
+  .post-card-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .entry-card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .card,
+  .card-surface {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+
+  .empty-state {
+    padding: 24px 12px !important;
+    font-size: 14px;
+  }
+
+  /* Modallar */
+  .modal-box {
+    max-width: calc(100vw - 24px);
+    max-height: 85vh;
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  /* Tepki / araç çubukları */
+  .post-card-footer .btn-sm {
+    min-height: 34px;
+    padding-inline: 10px;
+  }
+
+  .reaction-btn {
+    min-height: 36px;
+    padding-inline: 10px;
+  }
+
+  .tiny-reaction-list-btn {
+    width: 22px;
+    height: 22px;
+  }
+
+  .entry-draft .btn {
+    min-height: 40px;
+    padding-inline: 14px;
+  }
+
+  .entry-draft textarea {
+    font-size: 16px;
+  }
+
+  /* Kullanıcı çipi üst barda taşmasın */
+  .topbar-right-group {
+    gap: 4px !important;
+  }
+
+  .topbar-right-group .actor-chip {
+    min-width: 0 !important;
+    max-width: 132px !important;
+  }
+
+  /* Profil istatistik satırı mobilde iki satıra sarılır */
+  .profile-stats-grid {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    justify-content: space-between;
+  }
+
+  .profile-stat-box {
+    padding: 6px 8px;
+    flex: 1 1 auto;
+    min-width: 56px;
+  }
+
+  .profile-stat-value {
+    font-size: 17px;
+  }
+
+  .profile-header-card {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  /* Sayfa başlıkları */
+  h1 {
+    font-size: 20px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .layout-center-inner {
+    padding: 8px 8px 12px !important;
+  }
+
+  .page-header-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .post-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .post-card-footer > div {
+    justify-content: space-between;
+  }
 }

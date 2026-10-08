@@ -1,21 +1,31 @@
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import TopBar from './TopBar'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
 import FooterBar from './FooterBar'
+import MobileTabBar from './MobileTabBar'
+import MobileDrawerExtras from './MobileDrawerExtras'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
 
 /**
  * MainLayout — 3 kolonlu ana iskelet.
- * Mobil ekranlarda sağ ve sol paneller gizlenir.
+ * Mobil ekranlarda sağ ve sol paneller gizlenir; sol panel drawer olarak açılır,
+ * alt kısımda MobileTabBar görünür.
  * Hiyerarşi sayfasında sağ panel gizlenir ve orta panel genişler.
  */
 export default function MainLayout({ children, pendingInvitation = null, onOpenInvitation }) {
   useDevLog('MainLayout', arguments[0] || {})
-  const { isLeftDrawerOpen, isRightDrawerOpen, closeDrawers } = useUIStore()
+  const { isLeftDrawerOpen, closeDrawers } = useUIStore()
   const location = useLocation()
-  const isHierarchyPage = location.pathname.startsWith('/hierarchy') || location.pathname.startsWith('/card-hierarchy')
+  const isHierarchyPage =
+    location.pathname.startsWith('/hierarchy') || location.pathname.startsWith('/card-hierarchy')
+
+  // Rota değiştiğinde mobil drawer'ları kapat
+  useEffect(() => {
+    closeDrawers()
+  }, [location.pathname, closeDrawers])
 
   return (
     <div className="layout-root">
@@ -40,19 +50,9 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
           {isLeftDrawerOpen && (
             <>
               <div className="modal-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
-              <div
-                style={{
-                  position: 'fixed',
-                  top: 'var(--topbar-height)',
-                  left: 0,
-                  bottom: 0,
-                  width: '80%',
-                  zIndex: 101,
-                  background: 'var(--color-bg)',
-                  overflowY: 'auto',
-                }}
-              >
+              <div className="layout-left-drawer" role="dialog" aria-modal="true">
                 <LeftPanel />
+                <MobileDrawerExtras />
               </div>
             </>
           )}
@@ -64,6 +64,7 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
               {/* Merkez İçerik */}
               <main className="layout-center" id="scroll-container" style={{ minWidth: 0, width: '100%' }}>
                 <div
+                  className="layout-center-inner"
                   style={{
                     maxWidth: isHierarchyPage ? '100%' : 800,
                     width: '100%',
@@ -84,6 +85,9 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
           </div>
         </div>
       </div>
+
+      {/* Mobil alt gezinme çubuğu */}
+      <MobileTabBar />
     </div>
   )
 }

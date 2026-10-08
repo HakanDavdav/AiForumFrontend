@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { Search } from 'lucide-react'
 import { searchApi } from '../api/searchApi'
 import PostCard from '../components/content/PostCard'
 import ActorMinimalCard from '../components/actor/ActorMinimalCard'
@@ -9,12 +11,18 @@ import useDevLog from '../utils/useDevLog'
 import { useTranslation } from 'react-i18next'
 
 export default function SearchPage() {
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const query = searchParams.get('query') || ''
   const mode = searchParams.get('mode') || 'general'
   const orderType = searchParams.get('orderType') || ''
   const startDate = searchParams.get('startDate') || ''
   const endDate = searchParams.get('endDate') || ''
+
+  // Mobil cihazlarda üst barda arama formu gizli olduğundan,
+  // arama sayfasının kendi içinde bir form bulunur.
+  const [localQuery, setLocalQuery] = useState(query)
+  const [localMode, setLocalMode] = useState(mode)
 
   useDevLog('SearchPage', arguments[0] || {})
 
@@ -66,7 +74,23 @@ export default function SearchPage() {
   })
 
   if (!query && mode === 'general') {
-    return <div className="empty-state">{t('search.type_to_search')}</div>
+    return (
+      <>
+        <MobileSearchForm
+          query={localQuery}
+          mode={localMode}
+          onQueryChange={setLocalQuery}
+          onModeChange={setLocalMode}
+          onSubmit={() =>
+            navigate(
+              `/search?query=${encodeURIComponent(localQuery)}&mode=${localMode}`
+            )
+          }
+          t={t}
+        />
+        <div className="empty-state">{t('search.type_to_search')}</div>
+      </>
+    )
   }
 
   if (isLoading) {
@@ -187,6 +211,16 @@ export default function SearchPage() {
 
   return (
     <div className="flex-col gap-4">
+      <MobileSearchForm
+        query={localQuery}
+        mode={localMode}
+        onQueryChange={setLocalQuery}
+        onModeChange={setLocalMode}
+        onSubmit={() =>
+          navigate(`/search?query=${encodeURIComponent(localQuery)}&mode=${localMode}`)
+        }
+        t={t}
+      />
       <div style={{ paddingBottom: 16, borderBottom: '1px solid var(--color-border)' }}>
         <BackButton />
         <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -258,5 +292,55 @@ export default function SearchPage() {
       </div>
       {renderResults()}
     </div>
+  )
+}
+
+/**
+ * Mobil (≤900px) ekranlarda üst bardaki arama formunun yerini alan
+ * sayfa içi arama formu. Masaüstünde gizlenir.
+ */
+function MobileSearchForm({ query, mode, onQueryChange, onModeChange, onSubmit, t }) {
+  const modes = [
+    { key: 'general', label: t('search.mode.general', 'Genel') },
+    { key: 'posts', label: t('search.mode.posts', 'Başlıklar') },
+    { key: 'actors', label: t('search.mode.actors', 'Aktörler') },
+    { key: 'tribes', label: t('search.mode.tribes', 'Klanlar') },
+  ]
+
+  return (
+    <form
+      className="mobile-search-form"
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSubmit()
+      }}
+    >
+      <div className="mobile-search-form__input-row">
+        <div className="mobile-search-form__input-wrap">
+          <Search size={17} className="mobile-search-form__icon" />
+          <input
+            className="input"
+            placeholder={t('topbar.search', 'Ara')}
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary btn-sm">
+          {t('topbar.search_button', 'Ara')}
+        </button>
+      </div>
+      <div className="mobile-search-form__modes">
+        {modes.map((m) => (
+          <button
+            key={m.key}
+            type="button"
+            className={`mobile-search-form__mode${mode === m.key ? ' is-active' : ''}`}
+            onClick={() => onModeChange(m.key)}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+    </form>
   )
 }

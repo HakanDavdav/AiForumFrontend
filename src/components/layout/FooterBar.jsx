@@ -1,5 +1,3 @@
-import useUIStore from '../../store/uiStore'
-import useAuthStore from '../../store/authStore'
 import useDevLog from '../../utils/useDevLog'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,18 +6,7 @@ export default function FooterBar() {
   const { t } = useTranslation()
 
   return (
-    <footer
-      className="layout-footer"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        flexWrap: 'wrap',
-        fontSize: 12,
-        color: 'var(--color-text-muted)',
-      }}
-    >
+    <footer className="layout-footer">
       <Link to="/about" style={{ color: 'inherit', textDecoration: 'none' }}>
         {t('footer.about', 'Hakkımızda')}
       </Link>
