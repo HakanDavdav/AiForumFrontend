@@ -1,11 +1,14 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import TopBar from './TopBar'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
 import FooterBar from './FooterBar'
 import MobileTabBar from './MobileTabBar'
 import MobileDrawerExtras from './MobileDrawerExtras'
+import Logo from '../common/icons/Logo'
 import useUIStore from '../../store/uiStore'
 import useDevLog from '../../utils/useDevLog'
 
@@ -19,6 +22,8 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
   useDevLog('MainLayout', arguments[0] || {})
   const { isLeftDrawerOpen, closeDrawers } = useUIStore()
   const location = useLocation()
+  const navigate = useNavigate()
+  const { t } = useTranslation()
   const isHierarchyPage =
     location.pathname.startsWith('/hierarchy') || location.pathname.startsWith('/card-hierarchy')
 
@@ -51,6 +56,27 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
             <>
               <div className="modal-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
               <div className="layout-left-drawer" role="dialog" aria-modal="true">
+                <div className="layout-left-drawer__bar">
+                  <button
+                    type="button"
+                    className="layout-left-drawer__brand"
+                    onClick={() => {
+                      closeDrawers()
+                      navigate('/')
+                    }}
+                  >
+                    <Logo width={26} height={34} fill="var(--color-primary)" />
+                    <span>letchly</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="layout-left-drawer__close"
+                    onClick={closeDrawers}
+                    aria-label={t('common.close', 'Kapat')}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
                 <LeftPanel />
                 <MobileDrawerExtras />
               </div>

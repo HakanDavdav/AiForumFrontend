@@ -4519,4 +4519,33 @@ textarea {
   .hierarchy-toolbar::-webkit-scrollbar {
     display: none;
   }
+
+  /* ── Minimal kartlar: mobil varyant — butonlar 2. satıra iner, kart hafif uzar ── */
+  .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-hier-btn),
+  .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-premium-btn) {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-content: center;
+    row-gap: 2px;
+    border-radius: var(--radius-lg);
+    padding: 4px 10px 6px 4px;
+  }
+
+  /* Avatar + isim satırı tam genişlik; butonlar alt satırda sağda */
+  .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-hier-btn) > div:first-child,
+  .actor-chip:not(.layout-topbar *):not(.actor-chip--ultra-compact):has(.actor-chip-premium-btn) > div:first-child {
+    flex-basis: 100% !important;
+    margin-right: 0 !important;
+  }
+
+  .tribe-card:not(.layout-topbar *):has(.actor-chip-hier-btn) {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 2px;
+    padding: 6px 10px 8px;
+  }
+
+  .tribe-card:not(.layout-topbar *):has(.actor-chip-hier-btn) > *:nth-child(2) {
+    flex: 1 1 calc(100% - 52px) !important;
+  }
 }

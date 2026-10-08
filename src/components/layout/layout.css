@@ -83,19 +83,61 @@
     display: none !important;
   }
 
-  /* Mobil sol drawer */
+  /* Mobil sol drawer — ekranın en üstünden başlar, üstte boşluk bırakmaz */
   .layout-left-drawer {
     position: fixed;
-    top: var(--topbar-height);
+    top: 0;
     left: 0;
     bottom: 0;
     width: min(85vw, 340px);
     z-index: 101;
+    padding-top: env(safe-area-inset-top, 0px);
     background: var(--color-bg);
     overflow-y: auto;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.18);
     display: flex;
     flex-direction: column;
+  }
+
+  /* Drawer üst barı: marka + kapat */
+  .layout-left-drawer__bar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 8px 10px 8px 14px;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .layout-left-drawer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  .layout-left-drawer__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
   }
 
   .layout-left-drawer .layout-left {
