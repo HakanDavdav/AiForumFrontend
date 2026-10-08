@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ChevronDown, Layers, Moon, Podium, ShieldQuestion, Sun, Users } from 'lucide-react'
+import {
+  Bot,
+  ChevronDown,
+  Layers,
+  Moon,
+  PaintbrushVertical,
+  Podium,
+  ShieldQuestion,
+  Sun,
+  Users,
+} from 'lucide-react'
 import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
 import useThemeStore from '../../store/themeStore'
@@ -105,9 +115,12 @@ export default function MobileDrawerExtras() {
         </button>
         <button type="button" className="mobile-drawer-extra-btn" onClick={toggleGreenMode}>
           <span
-            className="mobile-drawer-color-dot"
-            style={{ background: isGreenMode ? '#10b981' : '#3b82f6' }}
-          />
+            className="mobile-drawer-paint-bot"
+            style={{ color: isGreenMode ? '#10b981' : 'var(--color-primary)' }}
+          >
+            <Bot size={17} strokeWidth={2.4} />
+            <PaintbrushVertical size={14} strokeWidth={2.2} style={{ marginLeft: -4 }} />
+          </span>
           <span>{isGreenMode ? t('topbar.green_theme', 'Yeşil Tema') : t('topbar.blue_theme', 'Mavi Tema')}</span>
         </button>
       </div>

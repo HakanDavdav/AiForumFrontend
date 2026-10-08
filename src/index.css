@@ -4549,36 +4549,55 @@ textarea {
     flex: 1 1 calc(100% - 52px) !important;
   }
 
-  /* Kişilik kartı atama satırı dar kartlarda taşmasın */
-  .personality-card__assignment-row {
-    flex-wrap: wrap;
-    row-gap: 4px;
-  }
-
+  /* PC gibi: chip daralıp isim kısalsın, fosil pill her zaman üst kartın sağında kalsın */
   .personality-card__assignment-node-row {
-    flex-wrap: wrap;
-    row-gap: 4px;
+    flex-wrap: nowrap;
   }
 
-  /* Profil sekmeleri + fosil pill dar ekranda taşmasın */
+  .personality-card__assignment-node-row > .actor-chip,
+  .personality-card__assignment-node-row > .tribe-card {
+    min-width: 0;
+  }
+
+  .personality-card__assignment-node-row > .tribe-card {
+    flex-shrink: 1;
+  }
+
+  .personality-card__assignment-node-row > .vtree-fossil-pill {
+    flex-shrink: 0;
+  }
+
+  /* Profil sekmeleri: tek satır, yatay kaydırılabilir; fosil pill / sayfalama sağda sabit */
   .profile-tabs-container {
-    flex-wrap: wrap;
-    row-gap: 2px;
+    flex-wrap: nowrap;
+    gap: 6px;
     padding: 0 4px;
   }
 
   .profile-tab-group {
-    flex-wrap: wrap;
-    gap: 0 8px;
+    flex: 1 1 auto;
     min-width: 0;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .profile-tab-group::-webkit-scrollbar {
+    display: none;
   }
 
   .profile-tab-btn {
-    padding: 9px 6px;
+    flex: 0 0 auto;
+    padding: 9px 8px;
     font-size: 12.5px;
+    white-space: nowrap;
   }
 
-  .profile-tabs-container > .vtree-fossil-pill {
+  .profile-tabs-container > .vtree-fossil-pill,
+  .profile-tabs-container > div:last-child {
+    flex-shrink: 0;
     margin-left: auto;
   }
 }

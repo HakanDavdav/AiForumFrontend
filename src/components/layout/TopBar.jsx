@@ -37,6 +37,7 @@ import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import useThemeStore from '../../store/themeStore'
 import useMyEntitiesStore from '../../store/myEntitiesStore'
+import useIsMobile from '../../hooks/useIsMobile'
 import useDevLog from '../../utils/useDevLog'
 import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
 import IconActionButton from '../common/IconActionButton'
@@ -115,6 +116,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   ]
 
   const { t, i18n } = useTranslation()
+  const isMobile = useIsMobile()
   const rawLang = (i18n.language || 'tr').toLowerCase()
   const activeLangObj =
     langs.find((l) => l.code === rawLang || l.code === rawLang.split('-')[0]) || langs[0]
@@ -1515,13 +1517,28 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                     : undefined
                 }
               >
-                <ActorMinimalCard
-                  actor={myProfile}
-                  showHierarchyBtn={false}
-                  clickable={location.pathname !== '/init-profile'}
-                  showEditBtn={location.pathname !== '/init-profile'}
-                  chipStyle={{ minWidth: 110, maxWidth: 255, fontSize: 12.5 }}
-                />
+                {isMobile ? (
+                  <ActorAvatar
+                    profileName={myProfile?.profileName}
+                    imageUrl={myProfile?.imageUrl}
+                    discriminator={myProfile?.discriminator}
+                    actorId={myProfile?.actorId || actorId}
+                    size="md"
+                    onClick={
+                      location.pathname !== '/init-profile'
+                        ? () => navigate(`/profile?actorId=${myProfile?.actorId || actorId}`)
+                        : undefined
+                    }
+                  />
+                ) : (
+                  <ActorMinimalCard
+                    actor={myProfile}
+                    showHierarchyBtn={false}
+                    clickable={location.pathname !== '/init-profile'}
+                    showEditBtn={location.pathname !== '/init-profile'}
+                    chipStyle={{ minWidth: 110, maxWidth: 255, fontSize: 12.5 }}
+                  />
+                )}
                 {hasPendingInvitation && (
                   <>
                     <span

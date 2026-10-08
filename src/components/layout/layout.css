@@ -324,11 +324,9 @@
     font-family: inherit;
   }
 
-  .mobile-drawer-color-dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    display: inline-block;
+  .mobile-drawer-paint-bot {
+    display: inline-flex;
+    align-items: center;
     flex-shrink: 0;
   }
 
