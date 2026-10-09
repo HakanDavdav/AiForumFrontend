@@ -8,6 +8,7 @@ import HierarchyTree from '../components/hierarchy/HierarchyTree'
 import HeartSvg from '../assets/FigmaNew/heart.svg?react'
 import TRexSkullIcon from '../assets/t-rex-skull-svgrepo-com.svg?react'
 import useDevLog from '../utils/useDevLog'
+import useTouchPanZoom from '../hooks/useTouchPanZoom'
 import { useTranslation } from 'react-i18next'
 
 export default function HierarchyPage() {
@@ -61,7 +62,19 @@ export default function HierarchyPage() {
     hasMoved: false,
   })
 
+  // Mobil: tek parmak pan + iki parmak pinch-zoom
+  const { onTouchStart, onTouchMove, onTouchEnd, lastTouchAt } = useTouchPanZoom({
+    containerRef,
+    zoomRef: zoomLevelRef,
+    panRef: panOffsetRef,
+    setZoom: setZoomLevel,
+    setPan: setPanOffset,
+    panState,
+  })
+
   const handleMouseDown = (e) => {
+    // Dokunmatikten gelen sentetik fare olaylarını yok say
+    if (Date.now() - lastTouchAt.current < 700) return
     // Sol tık (0) veya orta tekerlek tuşu (1) ile sürükleme
     if (e.button !== 0 && e.button !== 1) return
     // Sol tıkta buton veya form elemanına tıklandıysa sürüklemeyi başlatma; orta tıkta ise her yerden sürükleme başlatılabilir
@@ -311,6 +324,7 @@ export default function HierarchyPage() {
   return (
     <div
       ref={blockRef}
+      className="hierarchy-page-root"
       style={{
         width: '100%',
         height: 'calc(100vh - 135px)',
@@ -592,6 +606,10 @@ export default function HierarchyPage() {
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
         onClickCapture={handleClickCapture}
         onAuxClick={(e) => {
           if (e.button === 1) {
@@ -612,6 +630,7 @@ export default function HierarchyPage() {
           userSelect: isPanning ? 'none' : 'auto',
           background: 'transparent',
           padding: '76px 20px 24px',
+          touchAction: 'none',
         }}
       >
         {isLoading ? null : treeData ? (

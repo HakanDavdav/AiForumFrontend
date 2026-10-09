@@ -32,6 +32,11 @@
   display: none !important;
 }
 
+/* Sol kenar drawer tutamacı — yalnızca mobilde görünür */
+.mobile-drawer-handle {
+  display: none;
+}
+
 /* Mobil sol drawer: akışlı açılış (soldan kayarak girer) */
 @keyframes mobile-drawer-slide-in {
   from {
@@ -51,16 +56,16 @@
   }
 }
 
-/* Mobil üst bar hızlı bağlantı ikonları — masaüstünde gizli */
-.mobile-topbar-quick {
-  display: none;
-}
-
 /* ─── Mobil Breakpoint (≤900px) ───────────────────────────────────────── */
 
 @media (max-width: 900px) {
   :root {
-    --topbar-height: 96px; /* 52px row1 + 44px row2 */
+    --topbar-height: 52px; /* yalnızca row1; row2 sadece Tribes/Bots/Cards varken */
+  }
+
+  /* Tribes/Bots/Cards grubu görünüyorsa topbar iki satır olur */
+  :root:has(.topbar-my-entities) {
+    --topbar-height: 96px;
   }
 
   /* Topbar mobil düzen */
@@ -70,10 +75,30 @@
     gap: 8px !important;
   }
 
+  /* Mobilde row2 içeriği (sıralama, ikon grubu) drawer'a taşındı;
+     yalnızca Tribes/Bots/Cards grubu görünür ve ortalanır */
   .topbar-row-2 {
+    display: none !important;
+  }
+
+  .topbar-row-2:has(> .topbar-my-entities) {
+    display: flex !important;
     height: 44px !important;
     padding: 0 10px !important;
     gap: 4px !important;
+    justify-content: center;
+  }
+
+  /* Tribes/Bots dropdown panelleri: mobilde ekran genişliğine sığdır
+     ve topbar'ın hemen altından başlat */
+  .topbar-tribes-dropdown,
+  .topbar-bots-dropdown {
+    top: 100px !important;
+    left: 10px !important;
+    right: 10px;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
   }
 
   .topbar-brand-text {
@@ -89,25 +114,27 @@
     display: inline-flex !important;
   }
 
-  .topbar-search-icon-btn {
-    display: inline-flex !important;
-  }
-
+  /* Üstteki ara butonu mobilde kaldırıldı (alt tab bar'da "Ara" var) */
   .topbar-search-form {
     display: none !important;
-  }
-
-  /* Hızlı bağlantı ikonları: masaüstü ikon grubuyla aynı görünüm, ortada */
-  .mobile-topbar-quick {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin: 0 auto;
   }
 
   .layout-body {
     padding-top: var(--topbar-height);
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Sol kenar drawer rayı (8px konum + 12px genişlik) sayfa içeriğinin
+     üstüne binmesin diye içerik sağa kaydırılır (inline padding'i ezer) */
+  .layout-center-inner {
+    padding-left: 32px !important;
+  }
+
+  /* Mobilde dış çerçeve boşluğu kaldırılır: sayfa blokları ekran
+     genişliğinden olabildiğince faydalanır (iç boşlukları .layout-center-inner verir) */
+  .layout-body > div:first-child {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   /* Footer yerini mobil tab bar alır */
@@ -134,6 +161,40 @@
 
   .mobile-drawer-overlay {
     animation: mobile-drawer-overlay-in 0.28s ease;
+  }
+
+  /* Sol kenar rayı: topbar'dan en alta uzanır, hafifçe içerlek durur
+     (OS geri-sürükleme bölgesiyle çakışmayı azaltır) */
+  .mobile-drawer-handle {
+    position: fixed;
+    left: 8px;
+    top: var(--topbar-height);
+    bottom: 0;
+    z-index: 94;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-primary) 8%, transparent) 0%,
+      color-mix(in srgb, var(--color-primary) 16%, transparent) 50%,
+      color-mix(in srgb, var(--color-primary) 8%, transparent) 100%
+    );
+    color: var(--color-text-muted);
+    opacity: 0.45;
+    cursor: grab;
+    touch-action: none;
+    transition: opacity var(--transition-fast), color var(--transition-fast);
+  }
+
+  .mobile-drawer-handle:hover,
+  .mobile-drawer-handle:active {
+    opacity: 1;
+    color: var(--color-primary);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -171,6 +232,7 @@
     cursor: pointer;
   }
 
+  /* Sadece X ikonu: kare arka plan/çerçeve yok */
   .layout-left-drawer__close {
     display: inline-flex;
     align-items: center;
@@ -178,10 +240,14 @@
     width: 38px;
     height: 38px;
     border-radius: 10px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
+    border: none;
+    background: transparent;
     color: var(--color-text-secondary);
     cursor: pointer;
+  }
+
+  .layout-left-drawer__close:hover {
+    color: var(--color-text-primary);
   }
 
   .layout-left-drawer .layout-left {
@@ -214,6 +280,7 @@
   }
 
   .mobile-tab-bar__item {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -227,15 +294,38 @@
     cursor: pointer;
     padding: 4px 2px;
     font-family: inherit;
+    transition: color 0.22s ease;
   }
 
+  .mobile-tab-bar__item svg {
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Seçili sekme: renk + üstte beliren kısa çizgi + hafif büyüyen ikon */
   .mobile-tab-bar__item.is-active {
     color: var(--color-primary);
     font-weight: 600;
   }
 
-  .mobile-tab-bar__item.is-primary {
-    color: var(--color-primary);
+  .mobile-tab-bar__item.is-active svg {
+    transform: translateY(-1px) scale(1.12);
+  }
+
+  .mobile-tab-bar__item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 26px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: var(--color-primary);
+    transform: translateX(-50%) scaleX(0);
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .mobile-tab-bar__item.is-active::before {
+    transform: translateX(-50%) scaleX(1);
   }
 
   .mobile-tab-bar__label {
@@ -320,12 +410,57 @@
   }
 
   .mobile-drawer-extras__row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
 
+  /* Masaüstü üst bar ikon grubuyla aynı görünüm: yalnızca ikon */
+  .mobile-drawer-extras__quick {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+  }
+
+  .mobile-drawer-quick-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .mobile-drawer-quick-link:hover,
+  .mobile-drawer-quick-link:active {
+    color: var(--color-primary);
+    border-color: var(--color-primary-light);
+  }
+
+  /* HowItWorksHelp ("?") tetikleyicisi: grid hücresini quick-link gibi doldurur */
+  .mobile-drawer-extras__quick .icon-action-button {
+    width: 100%;
+    height: 100%;
+    min-height: 44px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+  }
+
+  .mobile-drawer-extras__quick .icon-action-button:hover,
+  .mobile-drawer-extras__quick .icon-action-button:active {
+    color: var(--color-primary);
+    border-color: var(--color-primary-light);
+  }
+
   .mobile-drawer-extra-btn {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -347,17 +482,19 @@
     flex-shrink: 0;
   }
 
-  /* Dil seçici dropdown */
+  /* Dil seçici dropdown — tema butonlarıyla aynı satırda, sadece bayrak */
   .mobile-drawer-lang {
     position: relative;
+    display: flex;
   }
 
   .mobile-drawer-lang-trigger {
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 8px;
     border-radius: 10px;
     border: 1px solid var(--color-border);
     background: var(--color-surface);
@@ -369,7 +506,6 @@
   }
 
   .mobile-drawer-lang-caret {
-    margin-left: auto;
     transition: transform var(--transition-fast);
   }
 
@@ -380,7 +516,7 @@
   .mobile-drawer-lang-menu {
     position: absolute;
     bottom: calc(100% + 6px);
-    left: 0;
+    left: auto;
     right: 0;
     z-index: 50;
     display: flex;
@@ -391,6 +527,8 @@
     border: 1px solid var(--color-border);
     background: var(--color-bg);
     box-shadow: var(--shadow-lg);
+    min-width: 160px;
+    width: max-content;
     max-height: 260px;
     overflow-y: auto;
   }

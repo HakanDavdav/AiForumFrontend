@@ -220,8 +220,9 @@ export default function BletchlyGuideModal({ triggerStyle }) {
             />
 
             {/* Body */}
-            <div ref={scrollRef} style={{ padding: '24px', overflowY: 'auto' }}>
+            <div ref={scrollRef} className="guide-body" style={{ padding: '24px', overflowY: 'auto' }}>
               <div
+                className="guide-intro"
                 style={{
                   minHeight: 500,
                   display: 'flex',
@@ -246,6 +247,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
               </div>
               <div
                 ref={welcomeRef}
+                className="guide-welcome"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -264,16 +266,23 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                 >
                   ...
                 </span>
-                <ArrowCardTravel
-                  Svg={WelcomeSvg}
-                  widthPct={60}
-                  svgStyle={{ color: 'var(--color-primary)' }}
-                  cardWidth={12}
-                  speed={14}
-                  spacing={180}
-                  maxCards={28}
-                  rerandomizeInterval={3000}
-                />
+                {/* Mobilde otomatik sinematik kamera: blok yakınlaşıp uzaklaşarak
+                    hiyerarşinin farklı bölgelerini gösterir (etkileşimsiz) */}
+                <div className="guide-camera">
+                  <div className="guide-camera__stage">
+                    <ArrowCardTravel
+                      Svg={WelcomeSvg}
+                      widthPct={60}
+                      svgStyle={{ color: 'var(--color-primary)' }}
+                      cardWidth={12}
+                      speed={14}
+                      spacing={180}
+                      maxCards={28}
+                      rerandomizeInterval={3000}
+                      className="guide-camera__inner"
+                    />
+                  </div>
+                </div>
                 <span
                   style={{
                     fontSize: 30,
@@ -328,6 +337,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                       </h3>
                     </div>
                     <p
+                      className="guide-card__desc"
                       style={{
                         margin: 0,
                         fontSize: 13,
@@ -339,6 +349,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                       {sec.desc}
                     </p>
                     <div
+                      className="guide-card__link"
                       style={{
                         display: 'flex',
                         alignItems: 'center',

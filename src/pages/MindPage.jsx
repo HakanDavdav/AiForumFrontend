@@ -1097,7 +1097,9 @@ export default function MindPage() {
 
   const [selectedNode, setSelectedNode] = useState(null)
   const [nodeSearch, setNodeSearch] = useState('')
-  const [isNodeListCollapsed, setIsNodeListCollapsed] = useState(false)
+  const [isNodeListCollapsed, setIsNodeListCollapsed] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  )
 
   const fgRef = useRef()
   const containerRef = useRef()
@@ -1500,6 +1502,7 @@ export default function MindPage() {
       >
         {/* Header — PersonalityCardHierarchyPage tarzı yüzen (floating) pill çifti */}
         <div
+          className="mind-header"
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -1619,6 +1622,7 @@ export default function MindPage() {
 
           {/* Sağ: Node tanımları + Varsayılan Görünüm */}
           <div
+            className="mind-controls"
             style={{
               display: 'flex',
               alignItems: 'center',

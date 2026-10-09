@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Bot, ChevronDown, Moon, PaintbrushVertical, Sun } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Bot, ChevronDown, Moon, PaintbrushVertical, Podium, Sun, Users } from 'lucide-react'
+import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
+import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
+import BletchlyGuideModal from '../common/BletchlyGuideModal'
 import useThemeStore from '../../store/themeStore'
 import { useTranslation } from 'react-i18next'
 
@@ -15,14 +18,16 @@ const LANGS = [
 ]
 
 /**
- * Mobil sol drawer'ın alt bölümü: tema (açık/koyu/yeşil) anahtarı,
- * dil dropdown'ı ve footer bağlantıları. Masaüstünde bunlar üst bardadır.
- * Hızlı bağlantı ikonları mobil üst bardaki gruba taşındı.
+ * Mobil sol drawer'ın alt bölümü: hızlı bağlantı ikonları (masaüstü üst
+ * bardaki grupla aynı), tema (açık/koyu/yeşil) anahtarı, dil dropdown'ı ve
+ * footer bağlantıları. Masaüstünde bunlar üst bardadır.
  */
 export default function MobileDrawerExtras() {
   const { isDarkMode, toggleTheme, isGreenMode, toggleGreenMode } = useThemeStore()
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const [isLangOpen, setIsLangOpen] = useState(false)
+  const [isBotShaking, setIsBotShaking] = useState(false)
   const langRef = useRef(null)
 
   const rawLang = (i18n.language || 'tr').toLowerCase()
@@ -38,9 +43,60 @@ export default function MobileDrawerExtras() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [isLangOpen])
 
+  // Masaüstü üst bardaki ikon grubuyla birebir aynı ikonlar
+  const quickLinks = [
+    {
+      key: 'leaderboard',
+      label: t('topbar.leaderboard', 'Liderlik Tablosu'),
+      icon: <Podium size={19} strokeWidth={2.2} />,
+      to: '/leaderboard?type=user',
+    },
+    {
+      key: 'tribes',
+      label: t('topbar.tribes', 'Klanlar'),
+      icon: <Users size={19} strokeWidth={2.2} />,
+      to: '/tribes',
+    },
+    {
+      key: 'debates',
+      label: t('topbar.active_debates', 'Aktif Meydan Okumalar'),
+      icon: <AngryBotWithSwordsIcon size={19} />,
+      to: '/active-debates',
+    },
+    {
+      key: 'marketplace',
+      label: t('card.marketplace', 'Kart Marketi'),
+      icon: <BotFlashCardsIcon size={19} />,
+      to: '/marketplace',
+    },
+    {
+      key: 'cards',
+      label: t('card.cards', 'Kartlarım'),
+      icon: <BotFlashCardsIcon size={19} />,
+      to: '/cards',
+    },
+  ]
+
   return (
     <div className="mobile-drawer-extras">
-      {/* Web versiyondaki gibi yalnızca ikon: açık/koyu tema + mavi/yeşil tema */}
+      <div className="mobile-drawer-extras__quick">
+        {quickLinks.map((l) => (
+          <button
+            key={l.key}
+            type="button"
+            className="mobile-drawer-quick-link"
+            title={l.label}
+            aria-label={l.label}
+            onClick={() => navigate(l.to)}
+          >
+            {l.icon}
+          </button>
+        ))}
+        {/* Web'deki gibi "?" ikonu: How Bletchly Works modalı açar */}
+        <BletchlyGuideModal triggerStyle={{ width: '100%', height: '100%' }} />
+      </div>
+
+      {/* Tema (açık/koyu + mavi/yeşil) ve dil seçici aynı satırda */}
       <div className="mobile-drawer-extras__row">
         <button
           type="button"
@@ -53,8 +109,14 @@ export default function MobileDrawerExtras() {
         </button>
         <button
           type="button"
-          className="mobile-drawer-extra-btn"
-          onClick={toggleGreenMode}
+          className={`mobile-drawer-extra-btn${
+            isBotShaking ? (isGreenMode ? ' theme-toggle-to-blue' : ' theme-toggle-to-green') : ''
+          }`}
+          onClick={() => {
+            setIsBotShaking(true)
+            toggleGreenMode()
+            setTimeout(() => setIsBotShaking(false), 500)
+          }}
           aria-label={isGreenMode ? t('topbar.green_theme', 'Yeşil Tema') : t('topbar.blue_theme', 'Mavi Tema')}
           title={isGreenMode ? t('topbar.green_theme', 'Yeşil Tema') : t('topbar.blue_theme', 'Mavi Tema')}
         >
@@ -66,52 +128,53 @@ export default function MobileDrawerExtras() {
             <PaintbrushVertical size={15} strokeWidth={2.2} style={{ marginLeft: -5 }} />
           </span>
         </button>
-      </div>
 
-      <div className="mobile-drawer-lang" ref={langRef}>
-        <button
-          type="button"
-          className="mobile-drawer-lang-trigger"
-          onClick={() => setIsLangOpen((v) => !v)}
-          aria-haspopup="listbox"
-          aria-expanded={isLangOpen}
-        >
-          <img
-            src={currentLang.flagUrl}
-            alt={currentLang.code}
-            style={{ width: 20, height: 15, borderRadius: 2 }}
-          />
-          <span>{currentLang.label}</span>
-          <ChevronDown
-            size={15}
-            className={`mobile-drawer-lang-caret${isLangOpen ? ' is-open' : ''}`}
-          />
-        </button>
+        <div className="mobile-drawer-lang" ref={langRef}>
+          <button
+            type="button"
+            className="mobile-drawer-lang-trigger"
+            onClick={() => setIsLangOpen((v) => !v)}
+            aria-haspopup="listbox"
+            aria-expanded={isLangOpen}
+            aria-label={currentLang.label}
+            title={currentLang.label}
+          >
+            <img
+              src={currentLang.flagUrl}
+              alt={currentLang.code}
+              style={{ width: 20, height: 15, borderRadius: 2 }}
+            />
+            <ChevronDown
+              size={14}
+              className={`mobile-drawer-lang-caret${isLangOpen ? ' is-open' : ''}`}
+            />
+          </button>
 
-        {isLangOpen && (
-          <div className="mobile-drawer-lang-menu" role="listbox">
-            {LANGS.map((l) => (
-              <button
-                key={l.code}
-                type="button"
-                role="option"
-                aria-selected={currentLang.code === l.code}
-                className={`mobile-drawer-lang-option${currentLang.code === l.code ? ' is-active' : ''}`}
-                onClick={() => {
-                  i18n.changeLanguage(l.code)
-                  setIsLangOpen(false)
-                }}
-              >
-                <img
-                  src={l.flagUrl}
-                  alt={l.code}
-                  style={{ width: 20, height: 15, borderRadius: 2 }}
-                />
-                <span>{l.label}</span>
-              </button>
-            ))}
-          </div>
-        )}
+          {isLangOpen && (
+            <div className="mobile-drawer-lang-menu" role="listbox">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  role="option"
+                  aria-selected={currentLang.code === l.code}
+                  className={`mobile-drawer-lang-option${currentLang.code === l.code ? ' is-active' : ''}`}
+                  onClick={() => {
+                    i18n.changeLanguage(l.code)
+                    setIsLangOpen(false)
+                  }}
+                >
+                  <img
+                    src={l.flagUrl}
+                    alt={l.code}
+                    style={{ width: 20, height: 15, borderRadius: 2 }}
+                  />
+                  <span>{l.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="mobile-drawer-extras__links">

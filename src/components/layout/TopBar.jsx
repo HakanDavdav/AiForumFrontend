@@ -19,7 +19,6 @@ import {
   X,
   Users,
   Brain,
-  Layers,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -1633,11 +1632,11 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           style={{ width: 1, height: 32, background: 'var(--color-border)', margin: '0 8px' }}
         />
 
-        {/* My Tribes & My Bots dropdowns */}
+        {/* My Tribes & My Bots dropdowns — mobilde de görünür */}
         {isLoggedIn && (
           <>
             <div
-              className="hide-under-900"
+              className="topbar-my-entities"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -1675,6 +1674,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 <AnimatePresence>
                   {isMyTribesOpen && tribesDropdownPos && (
                     <motion.div
+                      className="topbar-tribes-dropdown"
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
@@ -1795,6 +1795,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 <AnimatePresence>
                   {isMyBotsOpen && botsDropdownPos && (
                     <motion.div
+                      className="topbar-bots-dropdown"
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -8 }}
@@ -1966,57 +1967,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
             <BotFlashCardsIcon size={19} />
           </IconActionButton>
 
-          <BletchlyGuideModal triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }} />
-        </div>
-
-        {/* Mobil hızlı bağlantılar — masaüstü ikon grubuyla aynı (drawer'dan taşındı) */}
-        <div className="mobile-topbar-quick">
-          <IconActionButton
-            onClick={() => navigate('/leaderboard?type=user')}
-            title={t('topbar.leaderboard', 'Liderlik Tablosu')}
-            aria-label={t('topbar.leaderboard', 'Liderlik Tablosu')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          >
-            <Podium size={19} strokeWidth={2.2} />
-          </IconActionButton>
-
-          <IconActionButton
-            onClick={() => navigate('/tribes')}
-            title={t('topbar.tribes', 'Klanlar')}
-            aria-label={t('topbar.tribes', 'Klanlar')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          >
-            <Users size={19} strokeWidth={2.2} />
-          </IconActionButton>
-
-          <IconActionButton
-            onClick={() => navigate('/active-debates')}
-            title={t('topbar.active_debates', 'Aktif Meydan Okumalar')}
-            aria-label={t('topbar.active_debates', 'Aktif Meydan Okumalar')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          >
-            <AngryBotWithSwordsIcon size={19} />
-          </IconActionButton>
-
-          <IconActionButton
-            onClick={() => navigate('/marketplace')}
-            title={t('card.marketplace', 'Kart Marketi')}
-            aria-label={t('card.marketplace', 'Kart Marketi')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          >
-            <BotFlashCardsIcon size={19} />
-          </IconActionButton>
-
-          <IconActionButton
-            onClick={() => navigate('/cards')}
-            title={t('card.cards', 'Kartlarım')}
-            aria-label={t('card.cards', 'Kartlarım')}
-            style={{ width: 38, height: 38, boxSizing: 'border-box' }}
-          >
-            <Layers size={19} strokeWidth={2.2} />
-          </IconActionButton>
-
-          {/* Web'deki gibi "?" ikonu: How Bletchly Works modalı açar */}
           <BletchlyGuideModal triggerStyle={{ width: 38, height: 38, boxSizing: 'border-box' }} />
         </div>
       </div>

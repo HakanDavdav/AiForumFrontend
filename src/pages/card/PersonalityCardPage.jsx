@@ -157,7 +157,7 @@ export default function PersonalityCardPage() {
           borderBottom: '1px solid var(--color-border)',
         }}
       >
-        <div className="page-header-icon">
+        <div className="page-header-icon page-header-icon--card">
           <BotFlashCardsIcon size={30} color="#fff" />
         </div>
         <div>

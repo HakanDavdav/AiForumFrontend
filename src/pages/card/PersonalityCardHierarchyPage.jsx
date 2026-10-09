@@ -22,6 +22,7 @@ import TribeMinimalCard from '../../components/tribe/TribeMinimalCard'
 import BotIcon from '../../components/common/icons/BotIcon'
 import PersonalityCard from '../../components/card/PersonalityCard'
 import HierarchyConnectionsOverlay from '../../components/hierarchy/HierarchyConnectionsOverlay'
+import useTouchPanZoom from '../../hooks/useTouchPanZoom'
 import TRexSkullIcon from '../../assets/t-rex-skull-svgrepo-com.svg?react'
 
 function isNodeFossil(child) {
@@ -675,6 +676,12 @@ export default function PersonalityCardHierarchyPage() {
   const [isAllCollapsed, setIsAllCollapsed] = useState(false)
   const [expandTrigger, setExpandTrigger] = useState(0)
 
+  // Dokunmatik pan/zoom handler'ları stale closure'a düşmesin diye güncel değer ref'leri
+  const zoomLevelRef = useRef(zoomLevel)
+  useEffect(() => { zoomLevelRef.current = zoomLevel }, [zoomLevel])
+  const panOffsetRef = useRef(panOffset)
+  useEffect(() => { panOffsetRef.current = panOffset }, [panOffset])
+
   const blockRef = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
 
@@ -786,8 +793,20 @@ export default function PersonalityCardHierarchyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [treeRoot])
 
+  // Mobil: tek parmak pan + iki parmak pinch-zoom
+  const { onTouchStart, onTouchMove, onTouchEnd, lastTouchAt } = useTouchPanZoom({
+    containerRef,
+    zoomRef: zoomLevelRef,
+    panRef: panOffsetRef,
+    setZoom: setZoomLevel,
+    setPan: setPanOffset,
+    panState,
+  })
+
   // Mouse pan event handlers (transform tabanlı sınırsız kaydırma)
   const handleMouseDown = (e) => {
+    // Dokunmatikten gelen sentetik fare olaylarını yok say
+    if (Date.now() - lastTouchAt.current < 700) return
     // Sol tık (0) veya orta tekerlek tuşu (1) ile sürükleme
     if (e.button !== 0 && e.button !== 1) return
     // Sol tıkta buton veya form elemanına tıklandıysa sürüklemeyi başlatma; orta tıkta ise her yerden sürükleme başlatılabilir
@@ -913,6 +932,7 @@ export default function PersonalityCardHierarchyPage() {
   return (
     <div
       ref={blockRef}
+      className="hierarchy-page-root"
       style={{
         width: '100%',
         height: 'calc(100vh - 135px)',
@@ -1140,6 +1160,10 @@ export default function PersonalityCardHierarchyPage() {
       <div
         ref={containerRef}
         onMouseDown={handleMouseDown}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
         onClickCapture={handleClickCapture}
         onAuxClick={(e) => {
           if (e.button === 1) {
@@ -1147,6 +1171,7 @@ export default function PersonalityCardHierarchyPage() {
             e.stopPropagation()
           }
         }}
+        className="hierarchy-viewport"
         style={{
           flex: 1,
           width: '100%',
@@ -1157,6 +1182,7 @@ export default function PersonalityCardHierarchyPage() {
           cursor: isPanning ? 'grabbing' : 'grab',
           position: 'relative',
           userSelect: 'none',
+          touchAction: 'none',
         }}
       >
         {isLoading ? (

@@ -103,7 +103,7 @@ export default function PostCard({
             </>
           )}
         </div>
-        <span className="text-muted" style={{ marginLeft: 'auto' }}>{timeAgo}</span>
+        <span className="text-muted post-card-header-date" style={{ marginLeft: 'auto' }}>{timeAgo}</span>
       </div>
 
       {/* Topic Tags */}
@@ -128,17 +128,21 @@ export default function PostCard({
       {/* Footer */}
       <div className="post-card-footer">
         <div className="flex items-center gap-2">
-          <ReactionButton
-            contentItemId={contentItemId}
-            likeCount={likeCount}
-            dislikeCount={dislikeCount}
-            currentUserReaction={currentUserReaction}
-            currentLikeId={currentLikeId}
-            onShowReactions={(type) => {
-              setActiveLikesTab(type)
-              setShowLikes(true)
-            }}
-          />
+          <div className="footer-react-row">
+            <ReactionButton
+              contentItemId={contentItemId}
+              likeCount={likeCount}
+              dislikeCount={dislikeCount}
+              currentUserReaction={currentUserReaction}
+              currentLikeId={currentLikeId}
+              onShowReactions={(type) => {
+                setActiveLikesTab(type)
+                setShowLikes(true)
+              }}
+            />
+            {/* Mobilde tarih, reaksiyon satırının en sağında gösterilir */}
+            <span className="footer-mobile-date text-muted">{timeAgo}</span>
+          </div>
           {actor?.discriminator === 'Bot' && (() => {
             const effectiveNodeIds = (triggeredNodeIds && triggeredNodeIds.length > 0)
               ? triggeredNodeIds

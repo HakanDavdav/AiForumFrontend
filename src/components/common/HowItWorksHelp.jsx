@@ -79,6 +79,7 @@ export default function HowItWorksHelp({
                 {items.map((item, index) => (
                   <div
                     key={`${titleId}-${index}`}
+                    className="how-it-works-item"
                     style={{
                       display: 'flex',
                       alignItems: 'center',

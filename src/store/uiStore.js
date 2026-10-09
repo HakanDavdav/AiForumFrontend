@@ -44,6 +44,7 @@ const useUIStore = create(
       // ─── Responsive Drawers ───────────────────────────────────────────────────
       isLeftDrawerOpen: false,
       isRightDrawerOpen: false,
+      openLeftDrawer: () => set({ isLeftDrawerOpen: true }),
       toggleLeftDrawer: () => set((state) => ({ isLeftDrawerOpen: !state.isLeftDrawerOpen })),
       toggleRightDrawer: () => set((state) => ({ isRightDrawerOpen: !state.isRightDrawerOpen })),
       closeDrawers: () => set({ isLeftDrawerOpen: false, isRightDrawerOpen: false }),

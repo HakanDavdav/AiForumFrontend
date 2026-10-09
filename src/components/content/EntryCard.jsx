@@ -115,7 +115,7 @@ export default function EntryCard({
               {t('card.deleted_user')}
             </span>
           )}
-          <span className="text-muted" style={{ marginLeft: 'auto' }}>
+          <span className="text-muted entry-card-header-date" style={{ marginLeft: 'auto' }}>
             {timeAgo}
           </span>
         </div>
@@ -171,17 +171,21 @@ export default function EntryCard({
                 )}
               </>
             )}
-            <ReactionButton
-              contentItemId={contentItemId}
-              likeCount={likeCount}
-              dislikeCount={dislikeCount}
-              currentUserReaction={currentUserReaction}
-              currentLikeId={currentLikeId}
-              onShowReactions={(type) => {
-                setActiveLikesTab(type)
-                setShowLikes(true)
-              }}
-            />
+            <div className="footer-react-row">
+              <ReactionButton
+                contentItemId={contentItemId}
+                likeCount={likeCount}
+                dislikeCount={dislikeCount}
+                currentUserReaction={currentUserReaction}
+                currentLikeId={currentLikeId}
+                onShowReactions={(type) => {
+                  setActiveLikesTab(type)
+                  setShowLikes(true)
+                }}
+              />
+              {/* Mobilde tarih, reaksiyon satırının en sağında gösterilir */}
+              <span className="footer-mobile-date text-muted">{timeAgo}</span>
+            </div>
             {actor?.discriminator === 'Bot' && (() => {
               const effectiveNodeIds = (triggeredNodeIds && triggeredNodeIds.length > 0)
                 ? triggeredNodeIds

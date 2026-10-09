@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { X } from 'lucide-react'
+import { GripVertical, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import useDrawerSwipe from '../../hooks/useDrawerSwipe'
 import TopBar from './TopBar'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
@@ -20,12 +21,23 @@ import useDevLog from '../../utils/useDevLog'
  */
 export default function MainLayout({ children, pendingInvitation = null, onOpenInvitation }) {
   useDevLog('MainLayout', arguments[0] || {})
-  const { isLeftDrawerOpen, closeDrawers } = useUIStore()
+  const { isLeftDrawerOpen, openLeftDrawer, closeDrawers } = useUIStore()
   const location = useLocation()
   const navigate = useNavigate()
   const { t } = useTranslation()
   const isHierarchyPage =
     location.pathname.startsWith('/hierarchy') || location.pathname.startsWith('/card-hierarchy')
+  const drawerRef = useRef(null)
+  const drawerOverlayRef = useRef(null)
+
+  // Sol kenardan sağa sürükle → aç; drawer üzerinde sola sürükle → kapat
+  useDrawerSwipe({
+    drawerRef,
+    overlayRef: drawerOverlayRef,
+    isOpen: isLeftDrawerOpen,
+    onOpen: openLeftDrawer,
+    onClose: closeDrawers,
+  })
 
   // Rota değiştiğinde mobil drawer'ları kapat
   useEffect(() => {
@@ -51,11 +63,30 @@ export default function MainLayout({ children, pendingInvitation = null, onOpenI
           {/* Sol Panel (Desktop) */}
           <LeftPanel />
 
+          {/* Sol kenar tutamacı: hafifçe taşar, tıklanınca veya sağa
+              sürüklenince mobil drawer açılır (yalnızca mobilde görünür) */}
+          {!isLeftDrawerOpen && (
+            <button
+              type="button"
+              className="mobile-drawer-handle"
+              onClick={openLeftDrawer}
+              aria-label={t('common.open_menu', 'Menüyü aç')}
+              title={t('common.open_menu', 'Menüyü aç')}
+            >
+              <GripVertical size={12} />
+            </button>
+          )}
+
           {/* Mobil Sol Drawer */}
           {isLeftDrawerOpen && (
             <>
-              <div className="modal-overlay mobile-drawer-overlay" onClick={closeDrawers} style={{ zIndex: 100 }} />
-              <div className="layout-left-drawer" role="dialog" aria-modal="true">
+              <div
+                className="modal-overlay mobile-drawer-overlay"
+                onClick={closeDrawers}
+                style={{ zIndex: 100 }}
+                ref={drawerOverlayRef}
+              />
+              <div className="layout-left-drawer" role="dialog" aria-modal="true" ref={drawerRef}>
                 <div className="layout-left-drawer__bar">
                   <button
                     type="button"

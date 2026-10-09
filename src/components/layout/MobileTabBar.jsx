@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Home, Search, PenSquare, User } from 'lucide-react'
+import { Home, Search, User } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import { useTranslation } from 'react-i18next'
@@ -39,14 +39,6 @@ export default function MobileTabBar() {
       onClick: () => go('/search'),
     },
     {
-      key: 'create',
-      label: t('tab_bar.create', 'Yeni'),
-      icon: <PenSquare size={22} strokeWidth={2.2} />,
-      active: isActive('/create-post', '/edit-post'),
-      primary: true,
-      onClick: () => go(isLoggedIn ? '/create-post' : '/login'),
-    },
-    {
       key: 'profile',
       label: t('tab_bar.profile', 'Profil'),
       icon: <User size={21} strokeWidth={2.1} />,
@@ -61,7 +53,7 @@ export default function MobileTabBar() {
         <button
           key={tab.key}
           type="button"
-          className={`mobile-tab-bar__item${tab.active ? ' is-active' : ''}${tab.primary ? ' is-primary' : ''}`}
+          className={`mobile-tab-bar__item${tab.active ? ' is-active' : ''}`}
           onClick={tab.onClick}
           aria-current={tab.active ? 'page' : undefined}
         >

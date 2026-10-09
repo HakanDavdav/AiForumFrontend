@@ -920,7 +920,7 @@
   }
 
   .personality-card--editor .personality-card-editor__name {
-    width: calc(100% - 152px);
+    width: 100%;
   }
 }
 
@@ -3325,6 +3325,16 @@ html.dark .fossil-stamp-icon path {
   margin-top: var(--space-2);
 }
 
+/* Mobilde reaksiyon satırı + tarih sarmalayıcısı; masaüstünde yerleşimi
+   değiştirmez (display:contents) ve tarih gizlidir. */
+.footer-react-row {
+  display: contents;
+}
+
+.footer-mobile-date {
+  display: none;
+}
+
 /* â”€â”€â”€ Premium Entry Card (Comments) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .entry-card {
   background: var(--color-surface);
@@ -3982,6 +3992,57 @@ textarea {
   border-color: var(--color-warning);
 }
 
+/* BletchlyGuideModal — karşılama hiyerarşi bloğu kamera sarmalayıcısı */
+.guide-camera {
+  width: 60%;
+  flex-shrink: 0;
+}
+
+.guide-camera__stage {
+  width: 100%;
+}
+
+.guide-camera__inner {
+  width: 100% !important;
+}
+
+/* Mobilde otomatik kamera turu: yakınlaş, gez, uzaklaş (duraklamalı) */
+@keyframes guide-camera-tour {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  16% {
+    transform: translate(-15%, 9%) scale(1.65);
+  }
+  28% {
+    transform: translate(-15%, 9%) scale(1.65);
+  }
+  40% {
+    transform: translate(14%, 10%) scale(1.7);
+  }
+  52% {
+    transform: translate(14%, 10%) scale(1.7);
+  }
+  64% {
+    transform: translate(0, 0) scale(1);
+  }
+  76% {
+    transform: translate(-6%, -16%) scale(1.8);
+  }
+  88% {
+    transform: translate(-6%, -16%) scale(1.8);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-camera__stage {
+    animation: none;
+  }
+}
+
 /* BletchlyGuideModal Premium kart ikonu — kalin */
 .guide-premium-icon path {
   stroke: currentColor;
@@ -4337,6 +4398,48 @@ textarea {
     flex: 1 1 auto;
     min-width: 0;
   }
+
+  /* Mind graph üst barı: kontrol şeridi alt satıra iner ve yatay kaydırılır */
+  .mind-header {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    /* Sol kenar drawer rayı (8+12px) geri butonunun üstüne binmesin */
+    padding-left: 32px !important;
+  }
+
+  .mind-header .mind-controls {
+    flex: 1 1 100%;
+    max-width: 100% !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mind-header .mind-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mind-header .mind-controls > * {
+    flex-shrink: 0;
+  }
+
+  /* Kütüphanenin masaüstü fare talimatı mobilde gizlenir */
+  .scene-nav-info {
+    display: none !important;
+  }
+}
+
+/* Hierarchy sayfası: mobilde topbar + tab bar + iç boşluklara göre yükseklik */
+@media (min-width: 641px) and (max-width: 900px) {
+  .hierarchy-page-root {
+    height: calc(100vh - var(--topbar-height) - 96px - env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hierarchy-page-root {
+    height: calc(100vh - var(--topbar-height) - 84px - env(safe-area-inset-bottom, 0px)) !important;
+  }
 }
 
 @media (max-width: 900px) {
@@ -4532,8 +4635,28 @@ textarea {
   }
 
   .page-header-icon {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  /* Başlık ikonları mobilde küçülür (verdict banner'lar inline stil aldığı için etkilenmez) */
+  .page-header-icon > svg {
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+
+  /* Sarmalayıcı div kullanan başlık ikonları (ör. AngryBotWithSwords) oransal küçülür */
+  .page-header-icon > div {
+    transform: scale(0.8);
+  }
+
+  /* Kişilik Kartlarım sayfası: içteki kart ikonu blokla dengeli kalsın */
+  .page-header-icon--card > svg {
+    width: 24px !important;
+    height: 24px !important;
   }
 
   .post-card-footer > div,
@@ -4544,24 +4667,103 @@ textarea {
 
   /* Like/Dislike/BrutallyDislike kendi satırında; yorum + Recalled
      (ve cevapla/katla) bir alt satırda sıralanır. İki satır arasına,
-     kart üstündeki çizgiyle aynı tasarımda yatay ayraç konur. */
+     kart üstündeki çizgiyle aynı tasarımda düz yatay ayraç konur.
+     Sol grup display:contents ile footer'a düzleşir; böylece sahip
+     aksiyonları (düzenle/sil) de aynı satırda sağa yaslanır. */
   .post-card-footer > div:first-child,
   .entry-card-footer > div:first-child {
-    flex: 1 1 100%;
+    display: contents;
   }
 
-  .post-card-footer .reaction-group,
-  .entry-card-footer .reaction-group {
+  .entry-card-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Entry kart sahip aksiyonları mobilde görünür (yorum/Recalled satırında) */
+  .entry-card-footer .hide-under-1200 {
+    display: flex !important;
+  }
+
+  .footer-react-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex-basis: 100%;
     order: -1;
-    /* ReactionButton kökündeki inline border/padding'i ezmek için !important */
-    border-bottom: 1px solid var(--color-border-light) !important;
-    padding-bottom: 6px !important;
+    border-bottom: 1px solid var(--color-border-light);
+    padding-bottom: 10px;
+  }
+
+  /* EntryCard zemini surface olduğu için açık renkli ayraç kayboluyordu;
+     kart hover/click olmadan da çizgi görünür kalsın */
+  .entry-card .footer-react-row {
+    border-bottom-color: var(--color-border);
+  }
+
+  .footer-mobile-date {
+    display: inline;
+    margin-left: auto;
+    font-size: var(--font-size-sm, 12px);
+    white-space: nowrap;
+  }
+
+  .post-card-header-date,
+  .entry-card-header-date {
+    display: none;
   }
 
   .post-card-footer > div:nth-child(2),
   .entry-card-footer > div:nth-child(2) {
     margin-left: auto;
+  }
+
+  /* Sayfa tanıtım başlıkları: başlık ikonun sağında, açıklama alt satırda
+     (ikonun sol hizasından başlar); "?" butonu başlık satırında sağda kalır. */
+  div:has(> .page-header-icon):not(.verdict-banner__content) {
+    flex-wrap: wrap;
+    row-gap: 4px !important;
+  }
+
+  div:has(> .page-header-icon):not(.verdict-banner__content) > div:not(.page-header-icon) {
+    display: contents;
+  }
+
+  div:has(> .page-header-icon):not(.verdict-banner__content) > .icon-action-button {
+    order: 1;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  /* Başlıktaki "?" (hakkında) ikonu butonla dengeli kalsın */
+  div:has(> .page-header-icon):not(.verdict-banner__content) > .icon-action-button > svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  /* p, display:contents'li sarmalayıcının çocuğu olduğu için torun seçici */
+  div:has(> .page-header-icon):not(.verdict-banner__content) > div:not(.page-header-icon) > p {
+    order: 2;
+    flex-basis: 100%;
+    margin-top: 0 !important;
+  }
+
+  /* Sayfa tanıtım başlıkları (Kart Marketi, Meydan Okumalar vb.): mobilde bir tık küçük */
+  div:has(> .page-header-icon):not(.verdict-banner__content) h1 {
+    font-size: 18px !important;
+  }
+
+  /* HowItWorksHelp modalı: mobilde "i" ikonları kaldırılır, sadece metin kalır */
+  .how-it-works-item {
+    display: block !important;
+  }
+
+  .how-it-works-item > div:first-child {
+    display: none !important;
   }
 
   /* Kart sayfası başlığı: yardım ikonu sıkıştırmasın */
@@ -4643,6 +4845,19 @@ textarea {
     margin-right: 0 !important;
   }
 
+  /* Post/Entry kart içi actor minimal kartlar: en az ~%70 yatay genişlik.
+     Tribe '›' bağlantılı senaryo (yanında tribe-card olan) hariç tutulur. */
+  .post-card div:has(> .actor-chip):not(:has(> .tribe-card)),
+  .entry-card div:has(> .actor-chip):not(:has(> .tribe-card)) {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .post-card div:has(> .actor-chip):not(:has(> .tribe-card)) > .actor-chip:not(.actor-chip--ultra-compact),
+  .entry-card div:has(> .actor-chip):not(:has(> .tribe-card)) > .actor-chip:not(.actor-chip--ultra-compact) {
+    min-width: 70%;
+  }
+
   .tribe-card:not(.layout-topbar *):has(.actor-chip-hier-btn) {
     flex-wrap: wrap;
     justify-content: flex-start;
@@ -4704,5 +4919,63 @@ textarea {
   .profile-tabs-container > div:last-child {
     flex-shrink: 0;
     margin-left: auto;
+  }
+
+  /* ─── How It Works modalı: mobil kompakt düzen ───────────────────────
+     Kartlarda yalnızca ikon + başlık kalır; giriş ve karşılama bölümleri
+     ekranı kaplamaz. */
+  .guide-body {
+    padding: 16px !important;
+  }
+
+  .guide-intro {
+    min-height: 200px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .guide-intro p {
+    font-size: 19px !important;
+  }
+
+  .guide-welcome {
+    gap: 28px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .guide-card {
+    padding: 14px !important;
+    gap: 0 !important;
+  }
+
+  .guide-card__desc,
+  .guide-card__link {
+    display: none !important;
+  }
+
+  /* Karşılama bloğu: "..." süsleri gizlenir, hiyerarşi bloğu tam genişlikte
+     otomatik kamera turuyla sunulur (kullanıcı müdahalesi yok) */
+  .guide-welcome > span {
+    display: none !important;
+  }
+
+  .guide-camera {
+    width: 100%;
+    aspect-ratio: 3007 / 2141;
+    overflow: hidden;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .guide-camera__stage {
+    width: 100%;
+    transform-origin: center center;
+    animation: guide-camera-tour 32s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .guide-camera__inner {
+    pointer-events: none;
   }
 }
