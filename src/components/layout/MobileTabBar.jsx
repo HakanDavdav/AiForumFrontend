@@ -1,12 +1,19 @@
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Home, Search, User } from 'lucide-react'
+import { ArrowLeft, Home, Podium, Search, User, Users } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import useAuthStore from '../../store/authStore'
 import useUIStore from '../../store/uiStore'
 import { useTranslation } from 'react-i18next'
+import BotFlashCardsIcon from '../common/icons/BotFlashCardsIcon'
+import AngryBotWithSwordsIcon from '../common/icons/AngryBotWithSwordsIcon'
+import BletchlyGuideModal from '../common/BletchlyGuideModal'
 
 /**
  * MobileTabBar — yalnızca mobil (≤900px) ekranlarda görünen alt gezinme çubuğu.
  * layout.css içindeki `.mobile-tab-bar` kuralları ile gösterilir/gizlenir.
+ * Sayfa içi geri butonları mobilde gizlendiği için geri, bu barın solunda yer alır.
+ * Barın tam ortasındaki "v" butonu hızlı bağlantı dropdown'ını yukarı açar.
  */
 export default function MobileTabBar() {
   const navigate = useNavigate()
@@ -15,13 +22,67 @@ export default function MobileTabBar() {
   const { closeDrawers } = useUIStore()
   const { t } = useTranslation()
   const path = location.pathname
+  const [isQuickOpen, setIsQuickOpen] = useState(false)
+  const quickRef = useRef(null)
+
+  // Dışarı tıklayınca kapan
+  useEffect(() => {
+    if (!isQuickOpen) return undefined
+    const handleClick = (e) => {
+      if (quickRef.current && !quickRef.current.contains(e.target)) setIsQuickOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [isQuickOpen])
+
+  // Rota değişince kapan
+  useEffect(() => {
+    setIsQuickOpen(false)
+  }, [path])
 
   const go = (to) => {
     closeDrawers()
     navigate(to)
   }
 
+  const goBack = () => {
+    closeDrawers()
+    if (location.key !== 'default') {
+      navigate(-1)
+    } else if (path !== '/') {
+      navigate('/')
+    }
+  }
+
   const isActive = (...paths) => paths.some((p) => path === p || path.startsWith(p + '/'))
+
+  // Drawer'daki "Oturum Açık" altı butonların aynısı (mobilde üst bardan taşındı)
+  const quickLinks = [
+    {
+      key: 'leaderboard',
+      label: t('topbar.leaderboard', 'Liderlik Tablosu'),
+      icon: <Podium size={19} strokeWidth={2.2} />,
+      to: '/leaderboard?type=user',
+    },
+    {
+      key: 'tribes',
+      label: t('topbar.tribes', 'Klanlar'),
+      icon: <Users size={19} strokeWidth={2.2} />,
+      to: '/tribes',
+    },
+    {
+      key: 'debates',
+      label: t('topbar.active_debates', 'Aktif Meydan Okumalar'),
+      icon: <AngryBotWithSwordsIcon size={19} />,
+      to: '/active-debates',
+    },
+    {
+      key: 'marketplace',
+      label: t('card.marketplace', 'Kart Marketi'),
+      icon: <BotFlashCardsIcon size={19} />,
+      to: '/marketplace',
+    },
+  ]
 
   const tabs = [
     {
@@ -49,16 +110,79 @@ export default function MobileTabBar() {
 
   return (
     <nav className="mobile-tab-bar" aria-label={t('tab_bar.nav_label', 'Mobil Gezinme')}>
-      {tabs.map((tab) => (
+      <button
+        type="button"
+        className="mobile-tab-bar__item mobile-tab-bar__item--back"
+        onClick={goBack}
+        aria-label={t('tab_bar.back', 'Geri')}
+      >
+        <ArrowLeft size={21} strokeWidth={2.1} />
+      </button>
+      {tabs.slice(0, 1).map((tab) => (
         <button
           key={tab.key}
           type="button"
           className={`mobile-tab-bar__item${tab.active ? ' is-active' : ''}`}
           onClick={tab.onClick}
+          aria-label={tab.label}
           aria-current={tab.active ? 'page' : undefined}
         >
           {tab.icon}
-          <span className="mobile-tab-bar__label">{tab.label}</span>
+        </button>
+      ))}
+
+      {/* Tam ortada: hızlı bağlantı "v" butonu (dropdown yukarı açılır) */}
+      <div className="mobile-tab-bar__quick" ref={quickRef}>
+        <button
+          type="button"
+          className={`mobile-tab-bar__quick-btn${isQuickOpen ? ' is-open' : ''}`}
+          onClick={() => setIsQuickOpen((v) => !v)}
+          aria-label={t('topbar.quick_links', 'Hızlı Bağlantılar')}
+          aria-expanded={isQuickOpen}
+        >
+          <span className="mobile-tab-bar__quick-caret" aria-hidden="true">▼</span>
+        </button>
+        <AnimatePresence>
+          {isQuickOpen && (
+            <motion.div
+              className="mobile-drawer-extras__quick mobile-tab-bar__quick-dropdown"
+              initial={{ opacity: 0, y: 8, x: '-50%' }}
+              animate={{ opacity: 1, y: 0, x: '-50%' }}
+              exit={{ opacity: 0, y: 8, x: '-50%' }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {quickLinks.map((l) => (
+                <button
+                  key={l.key}
+                  type="button"
+                  className="mobile-drawer-quick-link"
+                  title={l.label}
+                  aria-label={l.label}
+                  onClick={() => {
+                    setIsQuickOpen(false)
+                    go(l.to)
+                  }}
+                >
+                  {l.icon}
+                </button>
+              ))}
+              {/* Guide modalı açıkken dropdown açık kalır (drawer davranışıyla aynı) */}
+              <BletchlyGuideModal triggerStyle={{ width: '100%', height: '100%' }} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {tabs.slice(1).map((tab) => (
+        <button
+          key={tab.key}
+          type="button"
+          className={`mobile-tab-bar__item${tab.active ? ' is-active' : ''}`}
+          onClick={tab.onClick}
+          aria-label={tab.label}
+          aria-current={tab.active ? 'page' : undefined}
+        >
+          {tab.icon}
         </button>
       ))}
     </nav>

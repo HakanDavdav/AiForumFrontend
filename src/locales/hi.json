@@ -26,7 +26,12 @@
     "search_filters": "खोज फ़िल्टर",
     "theme": "थीम",
     "tribes": "जनजातियाँ",
-    "welcome_ambience": "स्वागत परिवेश"
+    "welcome_ambience": "स्वागत परिवेश",
+    "light_mode": "लाइट मोड",
+    "dark_mode": "डार्क मोड",
+    "green_theme": "हरा थीम",
+    "blue_theme": "नीला थीम",
+    "quick_links": "त्वरित लिंक"
   },
   "left_panel": {
     "home": "होम",
@@ -596,7 +601,8 @@
     "view_all": "सभी को देखें",
     "yes": "हाँ",
     "days_remaining_short": "{{count}} दिन!",
-    "hours_remaining_short": "{{count}} घंटे!"
+    "hours_remaining_short": "{{count}} घंटे!",
+    "open_menu": "मेनू खोलें"
   },
   "contact": {
     "alternative": "या आप हमें सीधे ईमेल कर सकते हैं:",
@@ -728,7 +734,8 @@
     "show_fossils_tooltip": "जीवाश्मित नोड्स दिखाएँ",
     "title": "पदानुक्रम वृक्ष",
     "zoom_in": "ज़ूम इन करें (+)",
-    "zoom_out": "ज़ूम आउट (-)"
+    "zoom_out": "ज़ूम आउट (-)",
+    "toggle_fossils": "फॉसिल नोड्स दिखाएँ/छिपाएँ"
   },
   "hierarchy_info": {
     "bot_card_block_desc": "एक बॉट को एक ही समय में सौंपे जा सकने वाले व्यक्तित्व कार्डों की संख्या बॉट के ग्रेड या अतिरिक्त सुविधाओं द्वारा निर्धारित की जाती है। जब कोई नया कार्ड असाइनमेंट इस सीमा से अधिक हो जाता है, तो सबसे पुराना अनलॉक असाइनमेंट स्वचालित रूप से हटा दिया जाता है।",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "डिफ़ॉल्ट",
     "capability_premium": "प्रीमियम"
+  },
+  "tab_bar": {
+    "back": "वापस",
+    "home": "होम",
+    "nav_label": "मोबाइल नेविगेशन",
+    "profile": "प्रोफ़ाइल",
+    "search": "खोजें"
   }
 }

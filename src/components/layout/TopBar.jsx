@@ -3,7 +3,6 @@ import {
   Search,
   Settings,
   User,
-  Menu,
   Bell,
   LogOut,
   PenLine,
@@ -13,6 +12,7 @@ import {
   Sun,
   Moon,
   Bot,
+  ChevronDown,
   CirclePlus,
   PaintbrushVertical,
   Edit2,
@@ -101,7 +101,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
   const {
     setSearchMode,
     searchMode,
-    toggleLeftDrawer,
     activeLeftCacheType,
     setActiveLeftCacheType,
   } = useUIStore()
@@ -525,15 +524,6 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
           borderBottom: '1px solid var(--color-border-light)',
         }}
       >
-        {/* Hamburger (mobil) */}
-        <button
-          className="btn-icon topbar-menu-btn"
-          onClick={toggleLeftDrawer}
-          aria-label={t('topbar.menu', 'Menü')}
-        >
-          <Menu size={22} />
-        </button>
-
         {/* Bletchly Logo Resized & Season Countdown */}
         <div
           style={{
@@ -671,7 +661,7 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
             <input
               className="input"
               style={{ paddingLeft: 32 }}
-              placeholder={t('topbar.search')}
+              placeholder={t('topbar.search', 'Ara')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onClick={() => {
@@ -1502,6 +1492,9 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
             />
           </div>
 
+          {/* Mobil: tema (koyu/açık, mavi/yeşil) ve dil kontrolleri avatarın solunda */}
+          {isMobile && <MobileTopbarControls />}
+
           {isLoggedIn ? (
             <>
               <div
@@ -1641,16 +1634,20 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                marginLeft: 6,
+                marginLeft: isMobile ? 10 : 6,
                 flexShrink: 0,
-                height: 36,
+                height: isMobile ? 32 : 36,
               }}
             >
               {/* My Tribes */}
               <div style={{ position: 'relative' }} ref={myTribesRef}>
                 <button
-                  className="btn btn-outline"
-                  style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
+                  className="btn btn-outline topbar-my-entity-btn"
+                  style={{
+                    width: isMobile ? 104 : 84,
+                    padding: isMobile ? '3px 6px' : '3px 6px',
+                    fontSize: isMobile ? 12.5 : 11,
+                  }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     setTribesDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -1770,8 +1767,12 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
               {/* My Bots */}
               <div style={{ position: 'relative' }} ref={myBotsRef}>
                 <button
-                  className="btn btn-outline"
-                  style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
+                  className="btn btn-outline topbar-my-entity-btn"
+                  style={{
+                    width: isMobile ? 104 : 84,
+                    padding: isMobile ? '3px 6px' : '3px 6px',
+                    fontSize: isMobile ? 12.5 : 11,
+                  }}
                   onClick={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     setBotsDropdownPos({ top: rect.bottom + 4, left: rect.left })
@@ -1893,9 +1894,13 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
                 </AnimatePresence>
               </div>
 
-              <button
-                className="btn btn-outline"
-                style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
+                <button
+                  className="btn btn-outline topbar-my-entity-btn"
+                  style={{
+                    width: isMobile ? 104 : 84,
+                    padding: isMobile ? '3px 6px' : '3px 6px',
+                    fontSize: isMobile ? 12.5 : 11,
+                  }}
                 onClick={() => navigate('/cards')}
               >
                 {t('card.cards', 'Cards')}
@@ -1903,8 +1908,12 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
 
               {import.meta.env.VITE_IS_ADMIN_BUILD === 'true' && isAdmin && (
                 <button
-                  className="btn btn-outline"
-                  style={{ width: 84, padding: '3px 6px', fontSize: 11 }}
+                  className="btn btn-outline topbar-my-entity-btn"
+                  style={{
+                    width: isMobile ? 104 : 84,
+                    padding: isMobile ? '3px 6px' : '3px 6px',
+                    fontSize: isMobile ? 12.5 : 11,
+                  }}
                   onClick={() => navigate('/admin/panel')}
                 >
                   Admin
@@ -1971,5 +1980,279 @@ export default function TopBar({ pendingInvitation = null, onOpenInvitation }) {
         </div>
       </div>
     </header>
+  )
+}
+
+/**
+ * Mobil üst bar kontrolleri: koyu/açık tema, mavi/yeşil tema ve dil seçici.
+ * Daha önce sol drawer'ın alt bölümündeydi; avatarın soluna taşındı.
+ */
+function MobileTopbarControls() {
+  const {
+    isDarkMode,
+    toggleTheme,
+    isGreenMode,
+    toggleGreenMode,
+    customColor,
+    setCustomColor,
+    setGreenMode,
+    savedCustomColor,
+    setSavedCustomColor,
+  } = useThemeStore()
+  const { t, i18n } = useTranslation()
+  const { actorId, isLoggedIn } = useAuthStore()
+  const [isLangOpen, setIsLangOpen] = useState(false)
+  const [isBotShaking, setIsBotShaking] = useState(false)
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false)
+  const langRef = useRef(null)
+  const paletteRef = useRef(null)
+  const colorInputRef = useRef(null)
+
+  // Premium durumu (masaüstüyle aynı sorgu/anahtar; önbellekten okunur)
+  const { data: myProfile } = useQuery({
+    queryKey: ['actorProfile', actorId],
+    queryFn: () => actorApi.getProfile(actorId).then((r) => r.data?.data ?? null),
+    enabled: !!actorId && isLoggedIn,
+  })
+  const userCapabilities = Number(
+    myProfile?.userSettings?.userCapabilities ?? UserCapabilities.Default
+  )
+  const isPremium = (userCapabilities & UserCapabilities.Premium) === UserCapabilities.Premium
+
+  const langs = [
+    { code: 'tr', label: 'Türkçe', flagUrl: 'https://flagcdn.com/w20/tr.png' },
+    { code: 'en', label: 'English', flagUrl: 'https://flagcdn.com/w20/us.png' },
+    { code: 'ja', label: '日本語', flagUrl: 'https://flagcdn.com/w20/jp.png' },
+    { code: 'hi', label: 'हिन्दी', flagUrl: 'https://flagcdn.com/w20/in.png' },
+    { code: 'de', label: 'Deutsch', flagUrl: 'https://flagcdn.com/w20/de.png' },
+    { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },
+    { code: 'ar', label: 'العربية', flagUrl: 'https://flagcdn.com/w20/sa.png' },
+  ]
+  const rawLang = (i18n.language || 'tr').toLowerCase()
+  const activeLangObj =
+    langs.find((l) => l.code === rawLang || l.code === rawLang.split('-')[0]) || langs[0]
+
+  useEffect(() => {
+    if (!isLangOpen) return undefined
+    const handleClick = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) setIsLangOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [isLangOpen])
+
+  useEffect(() => {
+    if (!isPaletteOpen) return undefined
+    const handleClick = (e) => {
+      if (paletteRef.current && !paletteRef.current.contains(e.target)) setIsPaletteOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [isPaletteOpen])
+
+  const applyPaletteColor = useCallback(
+    (color) => {
+      const normalized = typeof color === 'string' ? color.toLowerCase() : ''
+      if (normalized === '#10b981') {
+        setCustomColor(null)
+        setGreenMode(true)
+      } else if (normalized === '#3b82f6') {
+        setCustomColor(null)
+        setGreenMode(false)
+      } else {
+        setGreenMode(false)
+        setCustomColor(normalized)
+      }
+    },
+    [setCustomColor, setGreenMode]
+  )
+
+  const commitCustomColor = (color) => {
+    const normalized = normalizeHex(color)
+    if (!normalized) return
+    if (normalized === '#10b981') {
+      clearCustomColorVars(true)
+    } else if (normalized === '#3b82f6') {
+      clearCustomColorVars(false)
+    } else {
+      applyCustomColorVars(normalized, isDarkMode)
+      setSavedCustomColor(normalized)
+    }
+    applyPaletteColor(normalized)
+  }
+
+  // Premium'da palet açılır; değilse mavi/yeşil tema arasında geçiş yapar
+  const handleBotClick = () => {
+    setIsBotShaking(true)
+    setTimeout(() => setIsBotShaking(false), 500)
+    if (isPremium) {
+      setIsPaletteOpen((v) => !v)
+      return
+    }
+    toggleGreenMode()
+  }
+
+  const themeLabel = isDarkMode
+    ? t('topbar.light_mode', 'Açık Tema')
+    : t('topbar.dark_mode', 'Koyu Tema')
+
+  return (
+    <div className="topbar-mobile-controls">
+      <button
+        type="button"
+        className="btn-icon topbar-mobile-controls__btn"
+        onClick={toggleTheme}
+        aria-label={themeLabel}
+        title={themeLabel}
+      >
+        {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
+
+      <div className="topbar-mobile-controls__palette" ref={paletteRef}>
+        <button
+          type="button"
+          className={`btn-icon topbar-mobile-controls__btn ${
+            isBotShaking
+              ? isPremium
+                ? 'theme-toggle-shake'
+                : isGreenMode
+                  ? 'theme-toggle-to-blue'
+                  : 'theme-toggle-to-green'
+              : ''
+          }`}
+          onClick={handleBotClick}
+          aria-haspopup={isPremium ? 'dialog' : undefined}
+          aria-expanded={isPremium ? isPaletteOpen : undefined}
+          aria-label={
+            isPremium
+              ? t('topbar.premium_palette_title', 'Özel Renk Paleti')
+              : isGreenMode
+                ? t('topbar.green_theme', 'Yeşil Tema')
+                : t('topbar.blue_theme', 'Mavi Tema')
+          }
+          title={
+            isPremium
+              ? t('topbar.premium_palette_title', 'Özel Renk Paleti')
+              : isGreenMode
+                ? t('topbar.green_theme', 'Yeşil Tema')
+                : t('topbar.blue_theme', 'Mavi Tema')
+          }
+        >
+          <span
+            className="mobile-drawer-paint-bot"
+            style={{ color: customColor || (isGreenMode ? '#10b981' : 'var(--color-primary)') }}
+          >
+            <Bot size={18} strokeWidth={2.4} />
+            <PaintbrushVertical size={15} strokeWidth={2.2} style={{ marginLeft: -5 }} />
+          </span>
+        </button>
+
+        {isPaletteOpen && isPremium && (
+          <div
+            className="topbar-mobile-controls__palette-menu"
+            role="dialog"
+            aria-label={t('topbar.premium_palette_title', 'Özel Renk Paleti')}
+          >
+            <div className="topbar-mobile-controls__palette-grid">
+              {COLOR_PRESETS.map((preset) => {
+                const activeBase = customColor || (isGreenMode ? '#10b981' : '#3b82f6')
+                return (
+                  <button
+                    key={preset.color}
+                    type="button"
+                    onClick={() => applyPaletteColor(preset.color)}
+                    aria-label={preset.label}
+                    className={`topbar-mobile-controls__swatch${
+                      activeBase === preset.color ? ' is-active' : ''
+                    }`}
+                    style={{ background: preset.color }}
+                  >
+                    {preset.isDefault && <span>D</span>}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="topbar-mobile-controls__palette-footer">
+              {savedCustomColor && (
+                <button
+                  type="button"
+                  aria-label={t('topbar.premium_palette_saved', 'Kayıtlı renk')}
+                  onClick={() => applyPaletteColor(savedCustomColor)}
+                  className={`topbar-mobile-controls__swatch${
+                    customColor === savedCustomColor ? ' is-active' : ''
+                  }`}
+                  style={{ background: savedCustomColor }}
+                />
+              )}
+              <button
+                type="button"
+                className="topbar-mobile-controls__palette-custom"
+                aria-label={t('topbar.premium_palette_custom', 'Custom')}
+                onClick={() => colorInputRef.current?.click()}
+              >
+                <Edit2 size={13} />
+              </button>
+              <input
+                ref={colorInputRef}
+                type="color"
+                value={customColor || (isGreenMode ? '#10b981' : '#3b82f6')}
+                onChange={(e) => commitCustomColor(e.target.value)}
+                className="topbar-mobile-controls__color-input"
+                aria-label={t('topbar.premium_palette_custom', 'Custom')}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="topbar-mobile-controls__lang" ref={langRef}>
+        <button
+          type="button"
+          className="btn-icon topbar-mobile-controls__btn"
+          onClick={() => setIsLangOpen((v) => !v)}
+          aria-haspopup="listbox"
+          aria-expanded={isLangOpen}
+          aria-label={activeLangObj.label}
+          title={activeLangObj.label}
+        >
+          <img
+            src={activeLangObj.flagUrl}
+            alt={activeLangObj.code}
+            style={{ width: 21, height: 16, borderRadius: 2 }}
+          />
+          <ChevronDown
+            size={14}
+            className={`topbar-mobile-controls__caret${isLangOpen ? ' is-open' : ''}`}
+          />
+        </button>
+
+        {isLangOpen && (
+          <div className="topbar-mobile-controls__lang-menu" role="listbox">
+            {langs.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                role="option"
+                aria-selected={activeLangObj.code === l.code}
+                className={`topbar-mobile-controls__lang-option${
+                  activeLangObj.code === l.code ? ' is-active' : ''
+                }`}
+                onClick={() => {
+                  i18n.changeLanguage(l.code)
+                  setIsLangOpen(false)
+                }}
+              >
+                <img
+                  src={l.flagUrl}
+                  alt={l.code}
+                  style={{ width: 20, height: 15, borderRadius: 2 }}
+                />
+                <span>{l.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }

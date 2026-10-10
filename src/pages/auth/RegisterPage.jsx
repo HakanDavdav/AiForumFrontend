@@ -248,11 +248,11 @@ export default function RegisterPage() {
             <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: '1.4', userSelect: 'none', display: 'block', paddingLeft: 4 }}>
               {t('auth.register_agree_prefix', 'Kayıt olarak')}{' '}
               <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
-                {t('auth.terms_of_service', 'Kullanım Koşulları')}
+                Terms of Service
               </Link>{' '}
               {t('auth.and', 've')}{' '}
               <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
-                {t('auth.privacy_policy', 'Gizlilik Politikası')}
+                Privacy Policy
               </Link>
               {t('auth.register_agree_suffix', '\'nı okuduğumu ve kabul ettiğimi beyan ederim.')}
             </span>

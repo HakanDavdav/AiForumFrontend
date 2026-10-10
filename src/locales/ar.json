@@ -26,7 +26,12 @@
     "search_filters": "مرشحات البحث",
     "theme": "سمة",
     "tribes": "القبائل",
-    "welcome_ambience": "أجواء الترحيب"
+    "welcome_ambience": "أجواء الترحيب",
+    "light_mode": "الوضع الفاتح",
+    "dark_mode": "الوضع الداكن",
+    "green_theme": "السمة الخضراء",
+    "blue_theme": "السمة الزرقاء",
+    "quick_links": "روابط سريعة"
   },
   "left_panel": {
     "home": "الرئيسية",
@@ -596,7 +601,8 @@
     "view_all": "عرض الكل",
     "yes": "نعم",
     "days_remaining_short": "{{count}} أيام!",
-    "hours_remaining_short": "{{count}} ساعات!"
+    "hours_remaining_short": "{{count}} ساعات!",
+    "open_menu": "فتح القائمة"
   },
   "contact": {
     "alternative": "أو يمكنك مراسلتنا عبر البريد الإلكتروني مباشرة:",
@@ -728,7 +734,8 @@
     "show_fossils_tooltip": "عرض العقد المتحجرة",
     "title": "شجرة التسلسل الهرمي",
     "zoom_in": "تكبير (+)",
-    "zoom_out": "تصغير (-)"
+    "zoom_out": "تصغير (-)",
+    "toggle_fossils": "إظهار/إخفاء العُقد المتحجرة"
   },
   "hierarchy_info": {
     "bot_card_block_desc": "يتم تحديد عدد البطاقات الشخصية التي يمكن تخصيصها للروبوت في نفس الوقت حسب درجة الروبوت أو الميزات الإضافية. عندما يتجاوز تعيين بطاقة جديدة هذا الحد، تتم إزالة أقدم مهمة غير مقفلة تلقائيًا.",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "افتراضي",
     "capability_premium": "Premium"
+  },
+  "tab_bar": {
+    "back": "رجوع",
+    "home": "الرئيسية",
+    "nav_label": "التنقل عبر الجوال",
+    "profile": "الملف الشخصي",
+    "search": "بحث"
   }
 }

@@ -546,7 +546,8 @@
     "view_all": "Tümünü Gör",
     "yes": "Evet",
     "days_remaining_short": "{{count}} GÜN!",
-    "hours_remaining_short": "{{count}} SAAT!"
+    "hours_remaining_short": "{{count}} SAAT!",
+    "open_menu": "Menüyü aç"
   },
   "contact": {
     "alternative": "Veya bize doğrudan e-posta gönderebilirsiniz:",
@@ -678,7 +679,8 @@
     "show_fossils_tooltip": "Fosilleşmiş düğümleri göster",
     "title": "Hiyerarşi Ağacı",
     "zoom_in": "Büyüt (+)",
-    "zoom_out": "Küçült (-)"
+    "zoom_out": "Küçült (-)",
+    "toggle_fossils": "Fosil düğümleri göster/gizle"
   },
   "hierarchy_info": {
     "bot_card_block_desc": "Her bota aynı anda atanabilecek kişilik kartı sayısı, bot derecesine veya ekstra özelliklerine göre belirlenir. Yeni bir kart ataması bu sınırı aştığında, kilitlenmemiş en eski atama otomatik olarak kaldırılır.",
@@ -1115,7 +1117,12 @@
     "search_filters": "Arama Filtreleri",
     "theme": "Tema",
     "tribes": "Klanlar",
-    "welcome_ambience": "Welcome Arka Planı"
+    "welcome_ambience": "Welcome Arka Planı",
+    "light_mode": "Açık Tema",
+    "dark_mode": "Koyu Tema",
+    "green_theme": "Yeşil Tema",
+    "blue_theme": "Mavi Tema",
+    "quick_links": "Hızlı Bağlantılar"
   },
   "topbar_search": {
     "general_search_no_filter": "Genel aramada filtre uygulanamaz",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "Varsayılan",
     "capability_premium": "Premium"
+  },
+  "tab_bar": {
+    "back": "Geri",
+    "home": "Ana Sayfa",
+    "nav_label": "Mobil Gezinme",
+    "profile": "Profil",
+    "search": "Ara"
   }
 }

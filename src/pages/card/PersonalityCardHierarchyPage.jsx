@@ -949,6 +949,7 @@ export default function PersonalityCardHierarchyPage() {
     >
       {/* ── Floating Controls & Header ──────────────────────────────────────── */}
       <div
+        className="hierarchy-header"
         style={{
           position: 'absolute',
           top: 14,
@@ -964,6 +965,7 @@ export default function PersonalityCardHierarchyPage() {
       >
         {/* Left: Back button & Card Identity Badge */}
           <div
+            className="hierarchy-header-left"
             style={{
               pointerEvents: 'auto',
               display: 'flex',
@@ -981,9 +983,10 @@ export default function PersonalityCardHierarchyPage() {
             <BackButton style={{ marginBottom: 0, width: 30, height: 30, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }} />
             <div style={{ width: 1, height: 24, background: 'var(--color-border)' }} />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+          <div className="hierarchy-header-identity" style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             <Network size={16} color="var(--color-primary)" style={{ flexShrink: 0, display: 'block' }} />
             <span
+              className="hierarchy-header-label"
               style={{
                 fontWeight: 800,
                 fontSize: 11,
@@ -995,7 +998,7 @@ export default function PersonalityCardHierarchyPage() {
             >
               {t('hierarchy.card_hierarchy_title', 'Card Hierarchy')}
             </span>
-            <span style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
+            <span className="hierarchy-header-bullet" style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
             <span
               onClick={() => {
                 navigate('/cards')
@@ -1019,7 +1022,9 @@ export default function PersonalityCardHierarchyPage() {
         </div>
 
         {/* Right: Controls Toolbar */}
+        <div className="hierarchy-header-right">
         <div
+          className="hierarchy-toolbar"
           style={{
             pointerEvents: 'auto',
             display: 'flex',
@@ -1035,6 +1040,7 @@ export default function PersonalityCardHierarchyPage() {
         >
           {/* Owners Count Badge */}
           <div
+            className="hierarchy-count-badge"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1047,13 +1053,14 @@ export default function PersonalityCardHierarchyPage() {
           >
             <Crown size={14} color="var(--color-warning)" />
             <span>{ownersCount}</span>
-            <span style={{ fontSize: 11, opacity: 0.7 }}>{t('card.owners', 'Sahip')}</span>
+            <span className="hierarchy-count-badge__text" style={{ fontSize: 11, opacity: 0.7 }}>{t('card.owners', 'Sahip')}</span>
           </div>
 
           <div style={{ width: 1, height: 18, background: 'var(--color-border)' }} />
 
           {/* Node Count Badge */}
           <div
+            className="hierarchy-count-badge"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1066,13 +1073,14 @@ export default function PersonalityCardHierarchyPage() {
           >
             <BotIconLucide size={14} color="var(--color-primary)" />
             <span>{assignmentsCount}</span>
-            <span style={{ fontSize: 11, opacity: 0.7 }}>{t('card.assignees', 'Atama')}</span>
+            <span className="hierarchy-count-badge__text" style={{ fontSize: 11, opacity: 0.7 }}>{t('card.assignees', 'Atama')}</span>
           </div>
 
           <div style={{ width: 1, height: 18, background: 'var(--color-border)' }} />
 
           {/* Zoom Level Indicator */}
           <span
+            className="hierarchy-zoom-pct"
             style={{
               fontSize: 12,
               fontWeight: 600,
@@ -1087,7 +1095,7 @@ export default function PersonalityCardHierarchyPage() {
           {/* Zoom Controls */}
           <button
             type="button"
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm hierarchy-zoom-btn"
             onClick={() => setZoomLevel((z) => Math.min(2.0, +(z + 0.1).toFixed(2)))}
             aria-label={t('hierarchy.zoom_in', 'Büyüt (+)')}
             style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -1096,7 +1104,7 @@ export default function PersonalityCardHierarchyPage() {
           </button>
           <button
             type="button"
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm hierarchy-zoom-btn"
             onClick={() => setZoomLevel((z) => Math.max(0.05, +(z - 0.1).toFixed(2)))}
             aria-label={t('hierarchy.zoom_out', 'Küçült (-)')}
             style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -1112,6 +1120,7 @@ export default function PersonalityCardHierarchyPage() {
             className="btn btn-primary btn-sm"
             onClick={handleToggleAll}
             disabled={!treeRoot}
+            aria-label={isAllCollapsed ? t('hierarchy.expand_all', 'Tümünü Genişlet') : t('hierarchy.collapse_all', 'Tümünü Daralt')}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
           >
             {isAllCollapsed ? <Maximize2 size={13} /> : <Minimize2 size={13} />}
@@ -1126,6 +1135,7 @@ export default function PersonalityCardHierarchyPage() {
             className="btn btn-primary btn-sm"
             onClick={handleDefaultView}
             disabled={!treeRoot}
+            aria-label={t('hierarchy.default_view', 'Varsayılan')}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
           >
             <Focus size={13} />
@@ -1140,6 +1150,7 @@ export default function PersonalityCardHierarchyPage() {
             className={`btn btn-primary btn-sm btn-fossil-toggle ${showFossils ? 'btn-fossil-toggle--active' : ''}`}
             onClick={() => setShowFossils((prev) => !prev)}
             disabled={!treeRoot}
+            aria-label={t('hierarchy.toggle_fossils', 'Fosil düğümleri göster/gizle')}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -1153,6 +1164,7 @@ export default function PersonalityCardHierarchyPage() {
             <TRexSkullIcon className="badge-fossil-icon" />
             <span>{showFossils ? t('common.enabled', 'Enabled') : t('common.disabled', 'Disabled')}</span>
           </button>
+        </div>
         </div>
       </div>
 

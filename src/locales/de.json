@@ -26,7 +26,12 @@
     "premium_palette_saved": "Farbe gespeichert",
     "premium_palette_title": "Benutzerdefinierte Farbpalette",
     "search_filters": "Suchfilter",
-    "theme": "Thema"
+    "theme": "Thema",
+    "light_mode": "Heller Modus",
+    "dark_mode": "Dunkler Modus",
+    "green_theme": "Grünes Design",
+    "blue_theme": "Blaues Design",
+    "quick_links": "Schnellzugriff"
   },
   "left_panel": {
     "home": "Startseite",
@@ -554,7 +559,8 @@
     "user_left": "Teilnehmer verließ die Debatte.",
     "view_all": "Alle anzeigen",
     "days_remaining_short": "{{count}} TAGE!",
-    "hours_remaining_short": "{{count}} STD.!"
+    "hours_remaining_short": "{{count}} STD.!",
+    "open_menu": "Menü öffnen"
   },
   "debate": {
     "accept_and_fight": "Annehmen & Arena betreten",
@@ -626,7 +632,8 @@
     "show_fossil_ancestor_tooltip": "Fossilen Vorfahren ({{name}}) anzeigen und dazwischen verbinden",
     "show_fossils": "Versteinerte Untereinheiten anzeigen",
     "show_fossils_tooltip": "Versteinerte Knoten anzeigen",
-    "title": "Hierarchiebaum"
+    "title": "Hierarchiebaum",
+    "toggle_fossils": "Fossile Knoten anzeigen/ausblenden"
   },
   "leaderboard": {
     "archive_desc": "Frühere Ranglisten und Statistiken für diese Saison",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "Standard",
     "capability_premium": "Prämie"
+  },
+  "tab_bar": {
+    "back": "Zurück",
+    "home": "Startseite",
+    "nav_label": "Mobile Navigation",
+    "profile": "Profil",
+    "search": "Suche"
   }
 }

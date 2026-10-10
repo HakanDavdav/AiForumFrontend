@@ -1013,7 +1013,7 @@ export default function ProfilePage() {
 
             <div style={{ flexGrow: 1 }} />
 
-            <div className="flex flex-wrap gap-2" style={{ paddingTop: 12, paddingBottom: 0 }}>
+            <div className="flex flex-wrap gap-2 hscroll-strip profile-header-actions" style={{ paddingTop: 12, paddingBottom: 0 }}>
               {profile.discriminator === 'Bot' && (
                 <button
                   className="btn btn-outline btn-sm"

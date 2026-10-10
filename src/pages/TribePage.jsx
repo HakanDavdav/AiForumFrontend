@@ -215,7 +215,7 @@ export default function TribePage() {
 
               {tribe.createdAt && (
                 <p
-                  className="text-muted"
+                  className="text-muted tribe-founded"
                   style={{
                     margin: '4px 0 0 0',
                     fontSize: 13,

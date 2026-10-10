@@ -191,11 +191,11 @@ export default function useDrawerSwipe({
         if (overlay) overlay.style.opacity = ''
         setTimeout(() => {
           el.style.transition = ''
-          el.style.animation = ''
           if (overlay) {
             overlay.style.transition = ''
-            overlay.style.animation = ''
           }
+          // Not: animation 'none' olarak bırakılır; '' yapılırsa CSS açılış
+          // animasyonu yeniden başlayıp drawer'ı sıfırdan kaydırır (flash).
         }, 240)
       }
     }

@@ -223,7 +223,7 @@ export default function MarketplacePage() {
           <input
             className="input"
             style={{ paddingLeft: 32 }}
-            placeholder={t('card.search_marketplace', 'Marketteki kartlarda ara...')}
+            placeholder={t('topbar.search', 'Ara')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />

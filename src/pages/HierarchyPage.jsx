@@ -341,6 +341,7 @@ export default function HierarchyPage() {
     >
       {/* ── Floating Controls & Header (Sol ve Sağ Üst Bloklar) ──────────────── */}
       <div
+        className="hierarchy-header"
         style={{
           position: 'absolute',
           top: 14,
@@ -440,7 +441,7 @@ export default function HierarchyPage() {
             }}
           >
             {/* Derinlik Kontrolü */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div className="hierarchy-depth" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span
                 style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)' }}
               >
@@ -497,7 +498,7 @@ export default function HierarchyPage() {
             {/* Zoom Butonları */}
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm hierarchy-zoom-btn"
               onClick={() => setZoomLevel((z) => Math.min(2.0, +(z + 0.05).toFixed(2)))}
               aria-label={t('hierarchy.zoom_in', 'Büyüt (+)')}
               style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -506,7 +507,7 @@ export default function HierarchyPage() {
             </button>
             <button
               type="button"
-              className="btn btn-ghost btn-sm"
+              className="btn btn-ghost btn-sm hierarchy-zoom-btn"
               onClick={() => setZoomLevel((z) => Math.max(0.05, +(z - 0.05).toFixed(2)))}
               aria-label={t('hierarchy.zoom_out', 'Küçült (-)')}
               style={{ width: 28, height: 28, padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -522,6 +523,7 @@ export default function HierarchyPage() {
               className="btn btn-primary btn-sm"
               onClick={handleExpandAll}
               disabled={isExpandingAll || !treeData}
+              aria-label={t('hierarchy.expand_all', 'Tümünü Genişlet')}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
             >
               {isExpandingAll ? (
@@ -543,6 +545,7 @@ export default function HierarchyPage() {
               className="btn btn-primary btn-sm"
               onClick={handleDefaultView}
               disabled={!treeData}
+              aria-label={t('hierarchy.default_view', 'Varsayılan')}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
             >
               <Focus size={13} />
@@ -557,6 +560,7 @@ export default function HierarchyPage() {
               className={`btn btn-primary btn-sm btn-fossil-toggle ${showFossils ? 'btn-fossil-toggle--active' : ''}`}
               onClick={() => setShowFossils((prev) => !prev)}
               disabled={!treeData}
+              aria-label={t('hierarchy.toggle_fossils', 'Fosil düğümleri göster/gizle')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -574,6 +578,7 @@ export default function HierarchyPage() {
 
           {/* Sağ Üst Bloğun Altında Ortalı Heartbeat (Büyük & Hızlı Nabız) */}
           <div
+            className="hierarchy-heartbeat"
             style={{
               pointerEvents: 'auto',
               display: 'flex',

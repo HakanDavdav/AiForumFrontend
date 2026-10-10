@@ -19,7 +19,7 @@ export default function BackButton({ onClick, style = { marginBottom: 16 } }) {
 
   return (
     <button
-      className="btn-icon"
+      className="btn-icon page-back-button"
       onClick={handleGoBack}
       style={style}
       aria-label={t('common.go_back', 'Geri Dön')}

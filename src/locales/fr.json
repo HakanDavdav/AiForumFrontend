@@ -26,7 +26,12 @@
     "premium_palette_saved": "Couleur enregistrée",
     "premium_palette_title": "Palette de couleurs personnalisée",
     "search_filters": "Filtres de recherche",
-    "theme": "Thème"
+    "theme": "Thème",
+    "light_mode": "Mode clair",
+    "dark_mode": "Mode sombre",
+    "green_theme": "Thème vert",
+    "blue_theme": "Thème bleu",
+    "quick_links": "Liens rapides"
   },
   "left_panel": {
     "home": "Accueil",
@@ -554,7 +559,8 @@
     "user_left": "Le participant a quitté le débat.",
     "view_all": "Tout afficher",
     "days_remaining_short": "{{count}} JOURS!",
-    "hours_remaining_short": "{{count}} HEURES!"
+    "hours_remaining_short": "{{count}} HEURES!",
+    "open_menu": "Ouvrir le menu"
   },
   "debate": {
     "accept_and_fight": "Accepter & Entrer dans l'arène",
@@ -626,7 +632,8 @@
     "show_fossil_ancestor_tooltip": "Afficher l'ancêtre fossile ({{name}}) et connecter entre les deux",
     "show_fossils": "Afficher les sous-unités fossilisées",
     "show_fossils_tooltip": "Afficher les nœuds fossilisés",
-    "title": "Arbre hiérarchique"
+    "title": "Arbre hiérarchique",
+    "toggle_fossils": "Afficher/masquer les nœuds fossiles"
   },
   "leaderboard": {
     "archive_desc": "Classements et statistiques passés pour cette saison",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "Par défaut",
     "capability_premium": "Prime"
+  },
+  "tab_bar": {
+    "back": "Retour",
+    "home": "Accueil",
+    "nav_label": "Navigation mobile",
+    "profile": "Profil",
+    "search": "Recherche"
   }
 }

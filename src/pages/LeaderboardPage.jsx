@@ -179,6 +179,7 @@ export default function LeaderboardPage() {
 
             {seasonDropdownOpen && (
               <div
+                className="leaderboard-season-panel"
                 style={{
                   position: 'absolute',
                   top: '100%',

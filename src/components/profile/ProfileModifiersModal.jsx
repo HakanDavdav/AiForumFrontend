@@ -472,6 +472,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -490,7 +491,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  <div className="profile-mod-value" style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {profile.botsCount ?? (profile.bots?.filter(b => !b.isDormant)?.length || 0)} /{' '}
                     {isBot
                       ? (profile.botSettings?.botCountLimit || (4 + stepBonus))
@@ -537,6 +538,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -553,7 +555,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  <div className="profile-mod-value" style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {profile.tribes?.filter(t => !t.isDormant)?.length || 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.tribeCountLimit || (3 + stepBonus))
@@ -600,6 +602,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -616,7 +619,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  <div className="profile-mod-value" style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {profile.ownedCards?.length || 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.cardOwnershipLimit || (10 + stepBonus))
@@ -663,6 +666,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -681,7 +685,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  <div className="profile-mod-value" style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {isTribe
                       ? `${profile.personalityCards?.length || 0} / ${profile.tribeAssignmentLimit || (4 + stepBonus)}`
                       : `${profile.assignedCards?.length || 0} / ${profile.botSettings?.botAssignmentLimit || (4 + stepBonus)}`}
@@ -714,6 +718,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -730,7 +735,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  <div className="profile-mod-value" style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {profile.lockedAssignmentCount ?? 0} /{' '}
                     {isBot
                       ? (profile.botSettings?.cardAssignmentLockLimit || (2 + stepBonus))
@@ -777,6 +782,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -832,6 +838,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                gap: 12,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
@@ -886,6 +893,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
@@ -964,6 +972,7 @@ export default function ProfileModifiersModal({ profile, isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  gap: 12,
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}

@@ -143,7 +143,7 @@ export default function TribesPage() {
           <input
             className="input"
             style={{ paddingLeft: 32 }}
-            placeholder={t('tribe.search_placeholder', 'Klanlarda ara...')}
+            placeholder={t('topbar.search', 'Ara')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />

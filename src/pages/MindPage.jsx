@@ -822,6 +822,7 @@ function NodeDetailPanel({ node, onClose, isTribeContext = false }) {
 
   return (
     <div
+      className="mind-node-panel"
       style={{
         position: 'absolute',
         top: '50%',
@@ -1483,10 +1484,20 @@ export default function MindPage() {
     return () => clearInterval(id)
   }, [graphData.nodes.length])
 
+  const handleResetView = () => {
+    selectedNodeRef.current = null
+    setSelectedNode(null)
+    selectedLinkRef.current = null
+    if (fgRef.current && typeof fgRef.current.cameraPosition === 'function') {
+      fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
+    }
+  }
+
   return (
     <>
       {/* Tam ekranı kaplayan nöron ağı overlay */}
       <div
+        className="mind-page-root"
         style={{
           position: 'fixed',
           top: TOPBAR_HEIGHT,
@@ -1532,6 +1543,7 @@ export default function MindPage() {
             <button
               onClick={() => navigate(-1)}
               aria-label={t('common.back', 'Geri')}
+              className="page-back-button"
               style={{
                 width: 30,
                 height: 30,
@@ -1554,6 +1566,7 @@ export default function MindPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
               <Brain size={18} color="var(--color-primary)" style={{ flexShrink: 0, display: 'block' }} />
               <span
+                className="mind-header-label"
                 style={{
                   fontWeight: 800,
                   fontSize: 11,
@@ -1565,7 +1578,7 @@ export default function MindPage() {
               >
                 {t('mind.graph_title', 'MIND GRAPH')}
               </span>
-              <span style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
+              <span className="mind-header-bullet" style={{ color: 'var(--color-primary)', flexShrink: 0, transform: 'translateY(-1px)' }}>•</span>
               {rootName && (
                 <span
                   style={{
@@ -1620,7 +1633,20 @@ export default function MindPage() {
             </div>
           )}
 
-          {/* Sağ: Node tanımları + Varsayılan Görünüm */}
+          {/* Mobil: Varsayılan görünüm butonu üst satırın sağında durur */}
+          <button
+            type="button"
+            className="btn btn-primary btn-sm mind-default-mobile"
+            onClick={handleResetView}
+            aria-label={t('hierarchy.default_view', 'Varsayılan')}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
+          >
+            <Focus size={13} />
+            <span>{t('hierarchy.default_view', 'Varsayılan')}</span>
+          </button>
+
+          {/* Sağ: Node tanımları + Varsayılan Görünüm (mobilde legend + Anılar satırı) */}
+          <div className="mind-legend-row">
           <div
             className="mind-controls"
             style={{
@@ -1703,19 +1729,35 @@ export default function MindPage() {
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={() => {
-                selectedNodeRef.current = null
-                setSelectedNode(null)
-                selectedLinkRef.current = null
-                if (fgRef.current && typeof fgRef.current.cameraPosition === 'function') {
-                  fgRef.current.cameraPosition({ x: 0, y: 0, z: 800 }, { x: 0, y: 0, z: 0 }, 1000)
-                }
-              }}
+              onClick={handleResetView}
+              aria-label={t('hierarchy.default_view', 'Varsayılan')}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '0 16px', height: 32 }}
             >
               <Focus size={13} />
               <span>{t('hierarchy.default_view', 'Varsayılan')}</span>
             </button>
+          </div>
+
+          {/* Mobil: Anılar paneli tetikleyicisi (legend satırının sağında) */}
+          <button
+            type="button"
+            className="mind-memories-btn"
+            onClick={() => setIsNodeListCollapsed((prev) => !prev)}
+            aria-label={t('mind.memories_title', 'Anılar')}
+            aria-expanded={!isNodeListCollapsed}
+          >
+            <Brain size={15} />
+            <span>{t('mind.memories_title', 'Anılar')}</span>
+            <span
+              className="mind-memories-caret"
+              aria-hidden="true"
+              style={{
+                transform: !isNodeListCollapsed ? 'rotate(180deg)' : 'none',
+              }}
+            >
+              ▼
+            </span>
+          </button>
           </div>
         </div>
 
@@ -1819,6 +1861,7 @@ export default function MindPage() {
 
           {/* Sağ Üst Kontrol & Düğüm Listesi */}
           <div
+            className={`mind-memories-wrap${isNodeListCollapsed ? ' is-collapsed' : ''}`}
             style={{
               position: 'absolute',
               top: 24,
@@ -1929,7 +1972,7 @@ export default function MindPage() {
                         <Search size={14} style={{ color: isDarkMode ? 'rgba(240,230,255,0.4)' : 'rgba(0,0,0,0.4)' }} />
                         <input
                           type="text"
-                          placeholder={t('mind.search_memories', 'Anı ara...')}
+                          placeholder={t('topbar.search', 'Ara')}
                           value={nodeSearch}
                           onChange={(e) => setNodeSearch(e.target.value)}
                           style={{

@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ShieldQuestion,
   X,
@@ -184,13 +185,14 @@ export default function BletchlyGuideModal({ triggerStyle }) {
         <ShieldQuestion size={20} strokeWidth={2.2} />
       </IconActionButton>
 
-      {isOpen && (
-        <div
-          className="modal-overlay"
-          onClick={() => setIsOpen(false)}
-          style={{ zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          role="presentation"
-        >
+      {isOpen &&
+        createPortal(
+          <div
+            className="modal-overlay"
+            onClick={() => setIsOpen(false)}
+            style={{ zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            role="presentation"
+          >
           <section
             className="modal-box"
             role="dialog"
@@ -224,11 +226,11 @@ export default function BletchlyGuideModal({ triggerStyle }) {
               <div
                 className="guide-intro"
                 style={{
-                  minHeight: 500,
+                  minHeight: 620,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: 24,
+                  marginBottom: 48,
                 }}
               >
                 <p
@@ -252,7 +254,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginBottom: 24,
+                  marginBottom: 48,
                   gap: 90,
                 }}
               >
@@ -297,6 +299,7 @@ export default function BletchlyGuideModal({ triggerStyle }) {
 
               <div
                 ref={sectionsRef}
+                className="guide-grid"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -408,8 +411,9 @@ export default function BletchlyGuideModal({ triggerStyle }) {
               </button>
             )}
           </section>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
 
       <PremiumModal isOpen={isPremiumOpen} onClose={() => setIsPremiumOpen(false)} />
     </>

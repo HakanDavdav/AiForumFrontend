@@ -255,11 +255,11 @@ export default function LoginPage() {
             <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: '1.4', display: 'block', textAlign: 'center' }}>
               {t('auth.agree_prefix', 'Giriş yaparak')}{' '}
               <Link to="/terms" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
-                {t('auth.terms_of_service', 'Kullanım Koşulları')}
+                Terms of Service
               </Link>{' '}
               {t('auth.and', 've')}{' '}
               <Link to="/privacy" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none' }}>
-                {t('auth.privacy_policy', 'Gizlilik Politikası')}
+                Privacy Policy
               </Link>
               {t('auth.agree_suffix', '\'nı kabul etmiş olursunuz.')}
             </span>

@@ -4388,6 +4388,11 @@ textarea {
     flex-shrink: 0;
   }
 
+  /* Profil başlığındaki aksiyon butonları: sığmazsa kırpılmadan yatay kaydırılır */
+  .profile-header-actions {
+    max-width: 100%;
+  }
+
   /* Leaderboard kontrolleri: şerit kalan genişliği alıp kaydırılsın */
   .leaderboard-controls {
     flex: 1 1 100%;
@@ -4399,12 +4404,16 @@ textarea {
     min-width: 0;
   }
 
+  /* Mind graph: overlay soldan içeri alınır (drawer rayı + diğer sayfalarla uyum) */
+  .mind-page-root {
+    left: 24px !important;
+  }
+
   /* Mind graph üst barı: kontrol şeridi alt satıra iner ve yatay kaydırılır */
   .mind-header {
     flex-wrap: wrap;
     row-gap: 8px;
-    /* Sol kenar drawer rayı (8+12px) geri butonunun üstüne binmesin */
-    padding-left: 32px !important;
+    padding-left: 14px !important;
   }
 
   .mind-header .mind-controls {
@@ -4426,6 +4435,55 @@ textarea {
   /* Kütüphanenin masaüstü fare talimatı mobilde gizlenir */
   .scene-nav-info {
     display: none !important;
+  }
+
+  /* Hierarchy üst blokları: araç çubuğu tam genişlikte ikinci satıra iner,
+     kalp göstergesi sağ alta sabitlenir (ağacın üstünü kapatmasın) */
+  .hierarchy-header {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .hierarchy-header-right {
+    flex: 1 1 100%;
+    max-width: 100% !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+  }
+
+  .hierarchy-header-right > .hierarchy-toolbar {
+    width: 100%;
+  }
+
+  .hierarchy-header-right > .hierarchy-heartbeat {
+    position: fixed !important;
+    right: 14px;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px) + 10px);
+    width: 44px;
+    height: 44px;
+    z-index: 90;
+    pointer-events: none;
+  }
+
+  .hierarchy-header-right > .hierarchy-heartbeat > div {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .hierarchy-header-right > .hierarchy-heartbeat svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Sol kimlik pili, araç çubuğuyla aynı yükseklikte kalsın */
+  .hierarchy-header-left .btn-icon {
+    min-width: 30px !important;
+    min-height: 30px !important;
+  }
+
+  /* İki satırlık üst blokların altında ağaca nefes alanı bırak */
+  .hierarchy-viewport {
+    padding-top: 120px !important;
   }
 }
 
@@ -4544,6 +4602,13 @@ textarea {
     gap: 4px !important;
   }
 
+  /* Üst bardaki yalnızca avatardan oluşan kullanıcı kartı mobilde biraz küçülür */
+  .topbar-right-group .avatar-md {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+  }
+
   .topbar-right-group .actor-chip {
     min-width: 0 !important;
     max-width: 132px !important;
@@ -4599,7 +4664,25 @@ textarea {
     justify-content: center;
   }
 
+  /* Kaydırılabilir aksiyon şeridi: taşma olduğunda ortalanmış taşma yerine
+     baştan hizalanır (aksi halde ilk butonun sol ucu kırpılıp erişilemez olur) */
+  .profile-header-left .flex.flex-wrap.profile-header-actions {
+    justify-content: flex-start;
+    justify-content: safe center;
+  }
+
+  /* Modifiers modalı: "3 / 4" sayaçları ikinci satıra kaymasın */
+  .profile-mod-value {
+    white-space: nowrap;
+    font-size: 13px !important;
+  }
+
   .profile-header-left .topic-tag-list {
+    justify-content: center;
+  }
+
+  /* Klan sayfası "Kuruluş" tarihi profil sayfasındaki "Katılım" gibi ortalanır */
+  .tribe-founded {
     justify-content: center;
   }
 
@@ -4629,34 +4712,49 @@ textarea {
   }
 }
 
+/* Mind: mobil "Varsayılan" butonu yalnızca mobilde görünür */
+.mind-default-mobile {
+  display: none !important;
+}
+
+/* Mind: mobil "Anılar" tetikleyicisi yalnızca mobilde görünür */
+.mind-memories-btn {
+  display: none !important;
+}
+
+/* Mind: legend + Anılar satır sarmalayıcısı masaüstünde şeffaf (contents) */
+.mind-legend-row {
+  display: contents;
+}
+
 @media (max-width: 640px) {
   .layout-center-inner {
     padding: 8px 8px 12px !important;
   }
 
   .page-header-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
   }
 
   /* Başlık ikonları mobilde küçülür (verdict banner'lar inline stil aldığı için etkilenmez) */
   .page-header-icon > svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 16px !important;
+    height: 16px !important;
     min-width: 0 !important;
     min-height: 0 !important;
   }
 
   /* Sarmalayıcı div kullanan başlık ikonları (ör. AngryBotWithSwords) oransal küçülür */
   .page-header-icon > div {
-    transform: scale(0.8);
+    transform: scale(0.66);
   }
 
   /* Kişilik Kartlarım sayfası: içteki kart ikonu blokla dengeli kalsın */
   .page-header-icon--card > svg {
-    width: 24px !important;
-    height: 24px !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 
   .post-card-footer > div,
@@ -4683,6 +4781,56 @@ textarea {
   /* Entry kart sahip aksiyonları mobilde görünür (yorum/Recalled satırında) */
   .entry-card-footer .hide-under-1200 {
     display: flex !important;
+  }
+
+  /* Premium modal alt aksiyonları (Fatura & Kartı Yönet / Aboneliği İptal Et)
+     mobilde biraz küçülüp tek satıra sığar */
+  .premium-footer-actions {
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+  }
+
+  .premium-footer-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    font-size: 11.5px !important;
+    padding: 6px 8px !important;
+    gap: 4px !important;
+    white-space: nowrap;
+  }
+
+  .premium-footer-actions .btn > svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Entry kartlarını saran çerçeve (ContextualEntryThread) mobilde daralır:
+     gri bloklar biraz genişler */
+  .card.flex-col.gap-4 {
+    padding: 12px 6px !important;
+  }
+
+  /* İç içe (girintili) yanıt kartları mobilde daha az girintilenir → genişler */
+  .entry-card.depth-1 {
+    margin-left: 16px;
+  }
+
+  .entry-card.depth-2 {
+    margin-left: 30px;
+  }
+
+  .entry-card.depth-3 {
+    margin-left: 44px;
+  }
+
+  .entry-card.depth-4 {
+    margin-left: 58px;
+  }
+
+  .entry-card.depth-5 {
+    margin-left: 72px;
   }
 
   .footer-react-row {
@@ -4718,6 +4866,39 @@ textarea {
     margin-left: auto;
   }
 
+  /* Mobilde sayfa başlığı (ikon + h1 + açıklama) her zaman en üstte kalır:
+     başlıktan önce gelen kontrol butonları (sezon seçici, Yeni Kart vb.)
+     başlık ve açıklama satırının altına iner */
+  .flex-col.gap-4:has(> div:not(.verdict-banner__content) > .page-header-icon) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flex-col.gap-4 > div:has(> .page-header-icon):not(.verdict-banner__content) {
+    order: -1;
+    margin-bottom: 12px !important;
+    padding-bottom: 10px !important;
+  }
+
+  /* Sezon seçim paneli: mobilde butonun sol kenarından hizalanır, ekrandan taşmaz */
+  .leaderboard-season-panel {
+    left: 0 !important;
+    right: auto !important;
+    max-width: calc(100vw - 24px);
+  }
+
+  /* Mobilde yalnızca (gizli) geri butonu içeren satır, başlık çizgisi ile
+     içerik arasında boşluk bırakmasın */
+  .flex-col.gap-4 > div:has(> .page-back-button:only-child) {
+    display: none;
+  }
+
+  /* Başlıktan hemen sonra gelen içerik üst boşluk eklemesin (çizgiye yakın dursun) */
+  .flex-col.gap-4 > div:has(> .page-header-icon):not(.verdict-banner__content) + div {
+    margin-top: 0 !important;
+  }
+
   /* Sayfa tanıtım başlıkları: başlık ikonun sağında, açıklama alt satırda
      (ikonun sol hizasından başlar); "?" butonu başlık satırında sağda kalır. */
   div:has(> .page-header-icon):not(.verdict-banner__content) {
@@ -4732,17 +4913,17 @@ textarea {
   div:has(> .page-header-icon):not(.verdict-banner__content) > .icon-action-button {
     order: 1;
     margin-left: auto !important;
-    margin-right: 0 !important;
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
+    margin-right: 10px !important;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
   }
 
   /* Başlıktaki "?" (hakkında) ikonu butonla dengeli kalsın */
   div:has(> .page-header-icon):not(.verdict-banner__content) > .icon-action-button > svg {
-    width: 24px !important;
-    height: 24px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
 
   /* p, display:contents'li sarmalayıcının çocuğu olduğu için torun seçici */
@@ -4775,14 +4956,30 @@ textarea {
   }
 
   .card-page-header .icon-action-button {
-    margin-right: 0 !important;
+    margin-right: 10px !important;
   }
 
-  /* Hierarchy üst blokları: etiket gizlenir, araç çubuğu yatay kaydırılır */
+  /* Hierarchy üst bloğu tek bar: kimlik pili + araçlar aynı çerçevede birleşir */
+  .hierarchy-header {
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 4px 8px !important;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+  }
+
   .hierarchy-header-left {
     flex: 1 1 auto;
-    max-width: 56% !important;
-    padding: 6px 12px !important;
+    min-width: 0;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   .hierarchy-header-label,
@@ -4790,23 +4987,201 @@ textarea {
     display: none;
   }
 
-  .hierarchy-header-right {
-    max-width: 46%;
-  }
-
   .hierarchy-header-identity {
     flex: 1 1 auto;
-    gap: 6px !important;
+    gap: 10px !important;
+  }
+
+  .hierarchy-header-right {
+    flex: 0 1 auto !important;
+    max-width: none !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0 !important;
   }
 
   .hierarchy-toolbar {
-    max-width: 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
+    width: auto !important;
+    max-width: none;
+    overflow: visible;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 6px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
-  .hierarchy-toolbar::-webkit-scrollbar {
+  /* Araç çubuğu 320px'e sığsın: metinli butonlar ikona iner, etiket gizlenir */
+  .hierarchy-toolbar > button {
+    width: 30px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .hierarchy-toolbar > button > span {
     display: none;
+  }
+
+  .hierarchy-depth,
+  .hierarchy-zoom-btn {
+    display: none !important;
+  }
+
+  .hierarchy-toolbar > div[style*="width: 1px"] {
+    display: none;
+  }
+
+  .hierarchy-toolbar > span {
+    min-width: 32px !important;
+  }
+
+  .hierarchy-header-right > .hierarchy-heartbeat {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px) + 10px);
+  }
+
+  /* Tek bar kısa kaldığı için ağaç alanı üst boşluğu azaltılır */
+  .hierarchy-viewport {
+    padding-top: 88px !important;
+  }
+
+  /* Mind üst barı: iki ayrık pil yerine tek bütünleşik bar */
+  .mind-header {
+    margin: 8px 12px 0 14px;
+    padding: 8px 10px !important;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+    row-gap: 6px;
+  }
+
+  /* "MIND GRAPH" etiketi gizlenir, isim görünür kalır */
+  .mind-header-label,
+  .mind-header-bullet {
+    display: none;
+  }
+
+  /* Kimlik pili bar içinde erir */
+  .mind-header > div:first-child {
+    flex: 1 1 auto;
+    gap: 8px !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Mobilde legend + Anılar aynı satırda gruplanır */
+  .mind-legend-row {
+    display: flex;
+    flex: 1 1 100%;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* Legend şeridi bar içinde: orijinal boyutlar korunur, yatay kaydırılır.
+     Kenar boşlukları nokta ışımasının kırpılmaması için bırakılır. */
+  .mind-header .mind-controls {
+    flex: 1 1 0%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    row-gap: 0;
+    min-height: 0 !important;
+    padding: 4px 8px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .mind-header .mind-controls::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mind-header .mind-controls span[style*="width: 1px"] {
+    display: none;
+  }
+
+  /* Varsayılan artık üst satırda; şeritteki kopya mobilde gizlenir */
+  .mind-header .mind-controls > button {
+    display: none !important;
+  }
+
+  .mind-default-mobile {
+    display: flex !important;
+    flex-shrink: 0;
+  }
+
+  /* Anılar tetikleyicisi: legend satırının sağında küçük pill */
+  .mind-memories-btn {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    height: 26px;
+    padding: 0 9px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .mind-memories-btn svg {
+    color: var(--color-primary);
+  }
+
+  /* Standart dropdown üçgeni (topbar butonlarındakiyle aynı) sağda, soluk renkte */
+  .mind-memories-caret {
+    font-size: 9px;
+    line-height: 1;
+    display: inline-block;
+    color: var(--color-text-muted);
+    transition: transform 0.2s ease;
+  }
+
+  /* Anılar paneli mobilde yalnızca açıkken görünür (butonla açılır) */
+  .mind-memories-wrap.is-collapsed {
+    display: none !important;
+  }
+
+  /* Node detay paneli mobilde ekrana sığar; alt tab bar'ın altına taşmaz */
+  .mind-node-panel {
+    width: calc(100% - 20px) !important;
+    max-height: calc(100vh - 240px - env(safe-area-inset-bottom, 0px)) !important;
+    top: calc(50% - 30px) !important;
+    padding: 18px !important;
+    border-radius: 16px !important;
+    gap: 16px !important;
+  }
+
+  /* Panel, içeri alınmış grafik alanının dışına taşmasın */
+  .mind-memories-wrap {
+    right: 12px !important;
+    max-width: calc(100% - 12px) !important;
+  }
+
+  .mind-memories-wrap > div {
+    max-width: 100% !important;
+  }
+
+  /* Kart hiyerarşisi barı: sayaç kelimeleri ve zoom göstergesi sadeleşir */
+  .hierarchy-count-badge__text,
+  .hierarchy-zoom-pct {
+    display: none !important;
   }
 
   /* ── Assigned satırları: web ile aynı düzen (etiket solda, kart + fosil pill
@@ -4929,8 +5304,8 @@ textarea {
   }
 
   .guide-intro {
-    min-height: 200px !important;
-    margin-bottom: 16px !important;
+    min-height: 560px !important;
+    margin-bottom: 72px !important;
   }
 
   .guide-intro p {
@@ -4939,7 +5314,13 @@ textarea {
 
   .guide-welcome {
     gap: 28px !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 72px !important;
+    min-height: 560px;
+  }
+
+  /* 320px'te 280px'lik min kolon taşmasın */
+  .guide-grid {
+    grid-template-columns: 1fr !important;
   }
 
   .guide-card {
@@ -4971,11 +5352,47 @@ textarea {
   .guide-camera__stage {
     width: 100%;
     transform-origin: center center;
-    animation: guide-camera-tour 32s ease-in-out infinite;
+    animation: guide-camera-tour 26s ease-in-out infinite;
     will-change: transform;
   }
 
   .guide-camera__inner {
     pointer-events: none;
+  }
+}
+
+/* 320-360px: hierarchy tek barına sığmak için kimlik pili sadeleşir */
+@media (max-width: 360px) {
+  .hierarchy-header-left {
+    gap: 4px !important;
+  }
+
+  .hierarchy-header-left > div[style*="width: 1px"] {
+    display: none;
+  }
+
+  .hierarchy-header-identity {
+    gap: 6px !important;
+  }
+
+  .hierarchy-header {
+    padding: 4px 6px !important;
+  }
+
+  .hierarchy-toolbar {
+    gap: 4px !important;
+  }
+
+  .hierarchy-toolbar > button {
+    width: 28px !important;
+  }
+
+  .hierarchy-toolbar > span {
+    min-width: 28px !important;
+  }
+
+  /* Kart hiyerarşisi barı 320px'e sığsın: sayaç rozetleri gizlenir */
+  .hierarchy-count-badge {
+    display: none !important;
   }
 }

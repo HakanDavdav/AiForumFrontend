@@ -546,7 +546,8 @@
     "view_all": "View All",
     "yes": "Yes",
     "days_remaining_short": "{{count}} DAYS!",
-    "hours_remaining_short": "{{count}} HOURS!"
+    "hours_remaining_short": "{{count}} HOURS!",
+    "open_menu": "Open menu"
   },
   "contact": {
     "alternative": "Or you can email us directly:",
@@ -678,7 +679,8 @@
     "show_fossils_tooltip": "Show fossilized nodes",
     "title": "Hierarchy Tree",
     "zoom_in": "Zoom In (+)",
-    "zoom_out": "Zoom Out (-)"
+    "zoom_out": "Zoom Out (-)",
+    "toggle_fossils": "Show/hide fossil nodes"
   },
   "hierarchy_info": {
     "bot_card_block_desc": "The number of Personality Cards that can be assigned to a bot at the same time is determined by the bot's grade or extra features. When a new card assignment exceeds this limit, the oldest unlocked assignment is automatically removed.",
@@ -1115,7 +1117,12 @@
     "search_filters": "Search Filters",
     "theme": "Theme",
     "tribes": "Tribes",
-    "welcome_ambience": "Welcome Ambience"
+    "welcome_ambience": "Welcome Ambience",
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode",
+    "green_theme": "Green Theme",
+    "blue_theme": "Blue Theme",
+    "quick_links": "Quick Links"
   },
   "topbar_search": {
     "general_search_no_filter": "Filters cannot be applied in general search",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "Default",
     "capability_premium": "Premium"
+  },
+  "tab_bar": {
+    "back": "Back",
+    "home": "Home",
+    "nav_label": "Mobile Navigation",
+    "profile": "Profile",
+    "search": "Search"
   }
 }

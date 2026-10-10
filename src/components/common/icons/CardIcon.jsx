@@ -26,11 +26,14 @@ export default function CardIcon({
   const resolvedCrownSize =
     crownSize ??
     (width < 16
-      ? Math.max(Math.round(width * 0.6), 6)
+      ? Math.max(width * 0.6, 3)
       : Math.max(Math.round(width * 0.45), 8))
 
+  // Taç çizgisi de kartla birlikte ölçeklenir (minik kartlarda kalın kalmasın)
+  const resolvedCrownStroke = width < 16 ? Math.max(width * 0.18, 0.8) : 3.2
+
   const resolvedCrownTop = crownTop ?? -Math.max(Math.round(renderedHeight * 0.08), 1)
-  const resolvedCrownLeft = crownLeft ?? -Math.max(Math.round(width * 0.18), 2)
+  const resolvedCrownLeft = crownLeft ?? -Math.max(width * 0.18, 1)
 
   return (
     <span
@@ -55,7 +58,7 @@ export default function CardIcon({
       {crowned && !purchased && (
         <Crown
           size={resolvedCrownSize}
-          strokeWidth={width < 16 ? 2.2 : 3.2}
+          strokeWidth={resolvedCrownStroke}
           style={{
             position: 'absolute',
             top: resolvedCrownTop,
@@ -86,14 +89,14 @@ export default function CardIcon({
         >
           <Crown
             size={resolvedCrownSize}
-            strokeWidth={width < 16 ? 2.2 : 3.2}
+            strokeWidth={resolvedCrownStroke}
             style={{ color: '#b87333', flexShrink: 0 }}
           />
           <span
             style={{
               marginLeft: `${-resolvedCrownSize * 0.17}px`,
               marginTop: `${resolvedCrownSize * 0.17}px`,
-              fontSize: Math.max(Math.round(resolvedCrownSize * 1.04), 7),
+              fontSize: Math.max(resolvedCrownSize * 1.04, 3),
               fontWeight: 900,
               fontFamily: '"Arial Black", Impact, system-ui, sans-serif',
               lineHeight: 1,

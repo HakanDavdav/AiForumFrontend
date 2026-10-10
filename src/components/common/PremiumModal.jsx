@@ -322,17 +322,10 @@ export default function PremiumModal({ isOpen, onClose }) {
         {/* Header */}
         <ModalHeader
           icon={<Crown size={28} color="#F59E0B" />}
-          title={
-            isPremiumActive
-              ? t('premium.active_title', 'Bletchly Premium')
-              : t('premium.modal_title', 'Bletchly Premium')
-          }
+          title="Premium"
           subtitle={
             isPremiumActive
-              ? t(
-                  'premium.active_desc',
-                  'Aboneliğiniz aktif. Tüm ayrıcalıklar ve limit artışları hesabınıza tanımlı.'
-                )
+              ? null
               : t(
                   'premium.subtitle',
                   'Üst düzey limitler ve özel ayrıcalıklarla platformun gücünü açığa çıkarın.'
@@ -358,7 +351,71 @@ export default function PremiumModal({ isOpen, onClose }) {
               minHeight: 0,
             }}
           >
-            {/* 1. Güncel Abonelik Durum Kartı */}
+            {/* 1. KOCAMAN PREMIUM KING BOT SVG (Modalin En Üstünde) */}
+            <div
+              style={{
+                borderRadius: 18,
+                padding: '24px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                flexShrink: 0,
+                background:
+                  'radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.16) 0%, rgba(59, 130, 246, 0.08) 55%, var(--color-surface) 100%)',
+                border: '1px solid color-mix(in srgb, var(--color-warning) 35%, var(--color-border))',
+                boxShadow: '0 12px 36px -10px rgba(245, 158, 11, 0.22)',
+              }}
+            >
+              {/* Arka Plan Işık Halkası */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 260,
+                  height: 260,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%)',
+                  pointerEvents: 'none',
+                  filter: 'blur(20px)',
+                }}
+              />
+
+              {/* KOCAMAN KING BOT SVG */}
+              <div
+                style={{
+                  position: 'relative',
+                  filter: 'drop-shadow(0 10px 22px rgba(245, 158, 11, 0.32))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  zIndex: 2,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.03) translateY(-2px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1) translateY(0)'
+                }}
+              >
+                <KingSvg
+                  width={150}
+                  height={205}
+                  style={{
+                    display: 'block',
+                    width: 150,
+                    height: 205,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 2. Güncel Abonelik Durum Kartı (Premium Bilgilendirme Bloğu) */}
             <div
               style={{
                 borderRadius: 16,
@@ -530,71 +587,6 @@ export default function PremiumModal({ isOpen, onClose }) {
                       : t('premium.secure_active', 'Doğrulanmış & Korumalı')}
                   </span>
                 </div>
-              </div>
-            </div>
-
-
-            {/* 3. KOCAMAN PREMIUM KING BOT SVG (Modalin En Altında) */}
-            <div
-              style={{
-                borderRadius: 18,
-                padding: '24px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-                flexShrink: 0,
-                background:
-                  'radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.16) 0%, rgba(59, 130, 246, 0.08) 55%, var(--color-surface) 100%)',
-                border: '1px solid color-mix(in srgb, var(--color-warning) 35%, var(--color-border))',
-                boxShadow: '0 12px 36px -10px rgba(245, 158, 11, 0.22)',
-              }}
-            >
-              {/* Arka Plan Işık Halkası */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 260,
-                  height: 260,
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%)',
-                  pointerEvents: 'none',
-                  filter: 'blur(20px)',
-                }}
-              />
-
-              {/* KOCAMAN KING BOT SVG */}
-              <div
-                style={{
-                  position: 'relative',
-                  filter: 'drop-shadow(0 10px 22px rgba(245, 158, 11, 0.32))',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  zIndex: 2,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.03) translateY(-2px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1) translateY(0)'
-                }}
-              >
-                <KingSvg
-                  width={150}
-                  height={205}
-                  style={{
-                    display: 'block',
-                    width: 150,
-                    height: 205,
-                  }}
-                />
               </div>
             </div>
           </div>
@@ -1135,6 +1127,7 @@ export default function PremiumModal({ isOpen, onClose }) {
             ) : (
               /* Normal İptal & Yönet Butonları */
               <div
+                className="premium-footer-actions"
                 style={{
                   display: 'flex',
                   alignItems: 'center',

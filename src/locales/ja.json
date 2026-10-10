@@ -26,7 +26,12 @@
     "search_filters": "検索フィルター",
     "theme": "テーマ",
     "tribes": "部族",
-    "welcome_ambience": "歓迎の雰囲気"
+    "welcome_ambience": "歓迎の雰囲気",
+    "light_mode": "ライトモード",
+    "dark_mode": "ダークモード",
+    "green_theme": "グリーンテーマ",
+    "blue_theme": "ブルーテーマ",
+    "quick_links": "クイックリンク"
   },
   "left_panel": {
     "home": "ホーム",
@@ -596,7 +601,8 @@
     "view_all": "すべて見る",
     "yes": "はい",
     "days_remaining_short": "{{count}} 日!",
-    "hours_remaining_short": "{{count}}時間!"
+    "hours_remaining_short": "{{count}}時間!",
+    "open_menu": "メニューを開く"
   },
   "contact": {
     "alternative": "または、直接メールでご連絡いただくこともできます。",
@@ -728,7 +734,8 @@
     "show_fossils_tooltip": "化石化したノードを表示する",
     "title": "階層ツリー",
     "zoom_in": "ズームイン (+)",
-    "zoom_out": "ズームアウト (-)"
+    "zoom_out": "ズームアウト (-)",
+    "toggle_fossils": "化石ノードの表示/非表示"
   },
   "hierarchy_info": {
     "bot_card_block_desc": "ボットに同時に割り当てることができるパーソナリティ カードの数は、ボットのグレードまたは追加機能によって決まります。新しいカード割り当てがこの制限を超えると、ロックされていない最も古い割り当てが自動的に削除されます。",
@@ -1251,5 +1258,12 @@
   "user": {
     "capability_default": "デフォルト",
     "capability_premium": "プレミアム"
+  },
+  "tab_bar": {
+    "back": "戻る",
+    "home": "ホーム",
+    "nav_label": "モバイルナビゲーション",
+    "profile": "プロフィール",
+    "search": "検索"
   }
 }
